@@ -1,21 +1,17 @@
 <?php
   // these are account wide configuration settings
 
-  // the URL where to the SAML Response/SAML Assertion will be posted
-  $const_assertion_consumer_service_url = "http://localhost/php-saml/consume.php";
-  // name of this application
-  $const_issuer                         = "php-saml";
-  // tells the IdP to return the email address of the current user
-  $const_name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
-
   function saml_get_settings() {
     // this function should be modified to return the SAML settings for the current user
 
-    $settings                           = new SamlSettings();
-    // when using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
-    $settings->idp_sso_target_url       = "https://app.onelogin.com/saml/signon/6171";
-    // the certificate for the users account in the IdP
-    $settings->x509certificate          = "-----BEGIN CERTIFICATE-----
+    $settings = new SamlSettings();
+
+    // When using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
+    $settings->idp_sso_target_url             = "https://app.onelogin.com/saml/signon/6171";
+
+    // The certificate for the users account in the IdP
+    $settings->x509certificate                = <<<ENDCERTIFICATE
+-----BEGIN CERTIFICATE-----
 MIIBrTCCAaGgAwIBAgIBATADBgEAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApD
 YWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9uZUxv
 Z2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMB4XDTEwMDMwOTA5NTgzNFoX
@@ -26,7 +22,18 @@ AoGBANtmwriqGBbZy5Dwy2CmJEtHEENVPoATCZP3UDESRDQmXy9Q0Kq1lBt+KyV4
 kJNHYAAQ9egLGWQ8/1atkPBye5s9fxROtf8VO3uk/x/X5VSRODIrhFISGmKUnVXa
 UhLFIXkGSCAIVfoR5S2ggdfpINKUWGsWS/lEzLNYMBkURXuVAgMBAAEwAwYBAAMB
 AA==
------END CERTIFICATE-----";
+-----END CERTIFICATE-----
+ENDCERTIFICATE;
+
+    // The URL where to the SAML Response/SAML Assertion will be posted
+    $settings->assertion_consumer_service_url = "http://localhost/php-saml/consume.php";
+
+    // Name of this application
+    $settings->issuer                         = "php-saml";
+
+    // Tells the IdP to return the email address of the current user
+    $settings->name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+
 
     return $settings;
   }

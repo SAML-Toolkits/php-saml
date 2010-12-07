@@ -5,8 +5,7 @@
 
   require 'lib/onelogin/saml.php';
 
-  $authrequest = new AuthRequest();
-  $authrequest->user_settings = saml_get_settings();
+  $authrequest = new SamlAuthRequest(saml_get_settings());
   $url = $authrequest->create();
 
   header("Location: $url");
