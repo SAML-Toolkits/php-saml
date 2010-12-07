@@ -1,8 +1,23 @@
 <?php
-  // these are account wide configuration settings
+  /**
+   * SAMPLE Code to demonstrate how provide SAML settings.
+   *
+   * The settings are contained within a SamlSettings object. You need to
+   * provide, at a minimum, the following things:
+   *  - idp_sso_target_url: This is the URL to forward to for auth requests.
+   *    It will be provided by your IdP.
+   *  - x509certificate: This is a certificate required to authenticate your
+   *    request. This certificate should be provided by your IdP.
+   *  - assertion_consumer_service_url: The URL that the IdP should redirect
+   *    to once the authorization is complete. You must provide this, and it
+   *    should point to the consume.php script or its equivalent.
+   */
 
+  /**
+   * Return a SamlSettings object with user settings.
+   */
   function saml_get_settings() {
-    // this function should be modified to return the SAML settings for the current user
+    // This function should be modified to return the SAML settings for the current user
 
     $settings = new SamlSettings();
 
