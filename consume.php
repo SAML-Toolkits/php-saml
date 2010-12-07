@@ -16,8 +16,8 @@
     else
       echo "Invalid SAML response.";
   }
-  catch e {
-    echo "Invalid SAML response: " . e.getMessage();
+  catch (Exception $e) {
+    echo "Invalid SAML response: " . $e->getMessage();
   }
 
 ?>
