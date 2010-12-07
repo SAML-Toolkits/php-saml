@@ -1,14 +1,13 @@
 <?php
 
-  error_reporting(E_ALL); 
+  error_reporting(E_ALL);
 
   require 'settings.php';
 
   require 'lib/onelogin/saml.php';
 
-  $samlresponse = new SamlResponse($_POST['SAMLResponse']);
-  $samlresponse->user_settings = get_user_settings();
-  
+  $samlresponse = new SamlResponse(saml_get_settings(), $_POST['SAMLResponse']);
+
   if ($samlresponse->is_valid())
     echo "You are: ".$samlresponse->get_nameid();
   else

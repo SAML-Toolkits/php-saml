@@ -8,7 +8,7 @@
   // tells the IdP to return the email address of the current user
   $const_name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
 
-  function get_user_settings() {
+  function saml_get_settings() {
     // this function should be modified to return the SAML settings for the current user
 
     $settings                           = new SamlSettings();

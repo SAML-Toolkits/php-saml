@@ -1,12 +1,12 @@
 <?php
-  error_reporting(E_ALL); 
-  
+  error_reporting(E_ALL);
+
   require 'settings.php';
 
   require 'lib/onelogin/saml.php';
-  
+
   $authrequest = new AuthRequest();
-  $authrequest->user_settings = get_user_settings();
+  $authrequest->user_settings = saml_get_settings();
   $url = $authrequest->create();
 
   header("Location: $url");
