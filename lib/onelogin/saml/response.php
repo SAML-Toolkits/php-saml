@@ -42,10 +42,13 @@
 
     /**
      * Determine if the SAML Response is valid using the certificate.
+     *
+     * @return
+     *   TRUE if the document passes. This could throw a generic Exception
+     *   if the document or key cannot be found.
      */
     function is_valid() {
-      $xmlsec = new XmlSec($this->xml);
-      $xmlsec->x509certificate = $this->settings->x509certificate;
+      $xmlsec = new SamlXmlSec($this->settings, $this->xml);
       return $xmlsec->is_valid();
     }
 
