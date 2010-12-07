@@ -8,9 +8,16 @@
 
   $samlresponse = new SamlResponse(saml_get_settings(), $_POST['SAMLResponse']);
 
-  if ($samlresponse->is_valid())
-    echo "You are: ".$samlresponse->get_nameid();
-  else
-    echo "Invalid SAML response.";
+  $valid = false;
+
+  try {
+    if ($samlresponse->is_valid())
+      echo "You are: ".$samlresponse->get_nameid();
+    else
+      echo "Invalid SAML response.";
+  }
+  catch e {
+    echo "Invalid SAML response: " . e.getMessage();
+  }
 
 ?>
