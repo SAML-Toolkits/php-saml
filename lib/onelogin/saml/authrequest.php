@@ -3,7 +3,7 @@
     public $user_settings;
 
     public function create() {
-      $id                = $this->generateUniqueID(42);
+      $id                = $this->generateUniqueID(20);
       $issue_instant     = $this->getTimestamp();
 
       global $const_assertion_consumer_service_url;
