@@ -30,7 +30,7 @@
       $uniqueID = "";
       for ($i = 0; $i < $length; $i++)
         $uniqueID .= substr($chars,rand(0,15),1);
-      return $uniqueID;
+      return "_".$uniqueID;
     }
 
     private function getTimestamp() {
