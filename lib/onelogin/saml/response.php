@@ -23,6 +23,8 @@
     
     function get_nameid() {
       $xpath = new DOMXPath($this->xml);
+			$xpath->registerNamespace("samlp","urn:oasis:names:tc:SAML:2.0:protocol");
+			$xpath->registerNamespace("saml","urn:oasis:names:tc:SAML:2.0:assertion");
       $query = "/samlp:Response/saml:Assertion/saml:Subject/saml:NameID";
       
       $entries = $xpath->query($query);
