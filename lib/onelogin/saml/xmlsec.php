@@ -40,13 +40,13 @@
      */
     
     function validateNumAssertions(){
-      $rootNode = $this->doc; //->documentElement->ownerDocument;
+      $rootNode = $this->document; //->documentElement->ownerDocument;
       $assertionNodes = $rootNode->getElementsByTagName('Assertion');
       return ($assertionNodes->length == 1);
     }
 
     function validateTimestamps(){
-      $rootNode = $this->doc;
+      $rootNode = $this->document;
       $timestampNodes = $rootNode->getElementsByTagName('Conditions');
       for($i=0;$i<$timestampNodes->length;$i++){
         $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
@@ -84,12 +84,12 @@
 
     	$singleAssertion = $this->validateNumAssertions();
       if (!$singleAssertion){
-        throw new Exception("Only ONE SamlAssertion allowed");
+        throw new Exception("Only one SAMLAssertion allowed");
       }
 
       $validTimestamps = $this->validateTimestamps();
       if (!$validTimestamps){
-        throw new Exception("Check your timestamp conditions");
+        throw new Exception("SAMLAssertion conditions not met");
       }
 
     	$objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
