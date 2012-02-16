@@ -410,10 +410,10 @@ class XMLSecurityKey {
     }
 
     private function signOpenSSL($data) {
-	    $algo = OPENSSL_ALGO_SHA1;
-	    if (! empty($this->cryptParams['digest'])) {
-	        $algo = $this->cryptParams['digest'];
-	    }
+        $algo = OPENSSL_ALGO_SHA1;
+        if (! empty($this->cryptParams['digest'])) {
+            $algo = $this->cryptParams['digest'];
+        }
         if (! openssl_sign ($data, $signature, $this->key, $algo)) {
             throw new Exception('Failure Signing Data: ' . openssl_error_string() . ' - ' . $algo);
             return;
@@ -422,10 +422,10 @@ class XMLSecurityKey {
     }
 
     private function verifyOpenSSL($data, $signature) {
-	    $algo = OPENSSL_ALGO_SHA1;
-	    if (! empty($this->cryptParams['digest'])) {
-	        $algo = $this->cryptParams['digest'];
-	    }
+        $algo = OPENSSL_ALGO_SHA1;
+        if (! empty($this->cryptParams['digest'])) {
+            $algo = $this->cryptParams['digest'];
+        }
         return openssl_verify ($data, $signature, $this->key, $algo);
     }
 
@@ -520,7 +520,7 @@ class XMLSecurityKey {
     public function serializeKey($parent) {
 
     }
-    
+
 
 
     /**
@@ -534,7 +534,7 @@ class XMLSecurityKey {
     public function getX509Certificate() {
         return $this->x509Certificate;
     }
-    
+
 }
 
 class XMLSecurityDSig {
@@ -885,10 +885,10 @@ class XMLSecurityDSig {
         if ($nodeset->length == 0) {
             throw new Exception("Reference nodes not found");
         }
-        
+
         /* Initialize/reset the list of validated nodes. */
         $this->validatedNodes = array();
-        
+
         foreach ($nodeset AS $refNode) {
             if (! $this->processRefNode($refNode)) {
                 /* Clear the list of validated nodes. */
@@ -943,8 +943,8 @@ class XMLSecurityDSig {
             foreach ($arTransforms AS $transform) {
                 $transNode = $this->createNewSignNode('Transform');
                 $transNodes->appendChild($transNode);
-                if (is_array($transform) && 
-                    (! empty($transform['http://www.w3.org/TR/1999/REC-xpath-19991116'])) && 
+                if (is_array($transform) &&
+                    (! empty($transform['http://www.w3.org/TR/1999/REC-xpath-19991116'])) &&
                     (! empty($transform['http://www.w3.org/TR/1999/REC-xpath-19991116']['query']))) {
                     $transNode->setAttribute('Algorithm', 'http://www.w3.org/TR/1999/REC-xpath-19991116');
                     $XPathNode = $this->createNewSignNode('XPath', $transform['http://www.w3.org/TR/1999/REC-xpath-19991116']['query']);
@@ -1200,7 +1200,7 @@ class XMLSecurityDSig {
             self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath);
          }
     }
-    
+
     /* This function retrieves an associative array of the validated nodes.
      *
      * The array will contain the id of the referenced node as the key and the node itself

@@ -38,7 +38,7 @@
      *   TRUE if the document passes. This could throw a generic Exception
      *   if the document or key cannot be found.
      */
-    
+
     function validateNumAssertions(){
       $rootNode = $this->document; //->documentElement->ownerDocument;
       $assertionNodes = $rootNode->getElementsByTagName('Assertion');
@@ -60,29 +60,29 @@
       }
       return true;
     }
- 
+
     function is_valid() {
-    	$objXMLSecDSig = new XMLSecurityDSig();
+        $objXMLSecDSig = new XMLSecurityDSig();
 
-    	$objDSig = $objXMLSecDSig->locateSignature($this->document);
-    	if (! $objDSig) {
-    		throw new Exception("Cannot locate Signature Node");
-    	}
-    	$objXMLSecDSig->canonicalizeSignedInfo();
-    	$objXMLSecDSig->idKeys = array('ID');
+        $objDSig = $objXMLSecDSig->locateSignature($this->document);
+        if (! $objDSig) {
+            throw new Exception("Cannot locate Signature Node");
+        }
+        $objXMLSecDSig->canonicalizeSignedInfo();
+        $objXMLSecDSig->idKeys = array('ID');
 
-    	$retVal = $objXMLSecDSig->validateReference();
-    	if (! $retVal) {
-    		throw new Exception("Reference Validation Failed");
-    	}
+        $retVal = $objXMLSecDSig->validateReference();
+        if (! $retVal) {
+            throw new Exception("Reference Validation Failed");
+        }
 
-    	$objKey = $objXMLSecDSig->locateKey();
-    	if (! $objKey ) {
-    		throw new Exception("We have no idea about the key");
-    	}
-    	$key = NULL;
+        $objKey = $objXMLSecDSig->locateKey();
+        if (! $objKey ) {
+            throw new Exception("We have no idea about the key");
+        }
+        $key = NULL;
 
-    	$singleAssertion = $this->validateNumAssertions();
+        $singleAssertion = $this->validateNumAssertions();
       if (!$singleAssertion){
         throw new Exception("Only one SAMLAssertion allowed");
       }
@@ -92,14 +92,13 @@
         throw new Exception("SAMLAssertion conditions not met");
       }
 
-    	$objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
+        $objKeyInfo = XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
 
       $objKey->loadKey($this->settings->x509certificate, FALSE, true);
 
-    	$result = $objXMLSecDSig->verify($objKey);
-    	return $result;
+        $result = $objXMLSecDSig->verify($objKey);
+        return $result;
     }
 
  }
 
-?>
