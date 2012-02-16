@@ -33,7 +33,7 @@ class SamlResponse {
      * @param string $assertion
      *   A UUEncoded SAML assertion from the IdP.
      */
-    function __construct($settings, $assertion) {
+    public function __construct($settings, $assertion) {
         $this->settings = $settings;
         $this->assertion = base64_decode($assertion);
         $this->xml = new DOMDocument();
@@ -47,7 +47,7 @@ class SamlResponse {
      *   TRUE if the document passes. This could throw a generic Exception
      *   if the document or key cannot be found.
      */
-    function is_valid() {
+    public function is_valid() {
         $xmlsec = new SamlXmlSec($this->settings, $this->xml);
         return $xmlsec->is_valid();
     }
@@ -55,7 +55,7 @@ class SamlResponse {
     /**
      * Get the NameID provided by the SAML response from the IdP.
      */
-    function get_nameid() {
+    public function get_nameid() {
         $xpath = new DOMXPath($this->xml);
         $xpath->registerNamespace("samlp","urn:oasis:names:tc:SAML:2.0:protocol");
         $xpath->registerNamespace("saml","urn:oasis:names:tc:SAML:2.0:assertion");
@@ -65,4 +65,3 @@ class SamlResponse {
         return $entries->item(0)->nodeValue;
     }
 }
-

@@ -15,7 +15,7 @@ class SamlAuthRequest {
      *   A SamlResponse settings object containing the necessary
      *   x509 certicate to decode the XML.
      */
-    function __construct($settings) {
+    public function __construct($settings) {
         $this->settings = $settings;
     }
 
