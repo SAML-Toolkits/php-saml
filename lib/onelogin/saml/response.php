@@ -20,10 +20,6 @@ class SamlResponse {
      */
     public $xml;
 
-    // At this time these private members are unused.
-    private $nameid;
-    private $xpath;
-
     /**
      * Construct the response object.
      *
@@ -64,4 +60,25 @@ class SamlResponse {
         $entries = $xpath->query($query);
         return $entries->item(0)->nodeValue;
     }
+
+    /**
+     * Get the named attribute's value from the SAML response from the IdP.
+     *
+     * @return
+     *   The attribute value, FALSE if the attribute wasn't found
+     */
+    public function get_attribute($name) {
+        $xpath = new DOMXPath($this->xml);
+        $xpath->registerNamespace("samlp","urn:oasis:names:tc:SAML:2.0:protocol");
+        $xpath->registerNamespace("saml","urn:oasis:names:tc:SAML:2.0:assertion");
+        $query = "/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name=\"$name\"]/saml:AttributeValue";
+
+        $entries = $xpath->query($query);
+        if($entries->length){
+            return $entries->item(0)->nodeValue;
+        }else{
+            return false;
+        }
+    }
+
 }
