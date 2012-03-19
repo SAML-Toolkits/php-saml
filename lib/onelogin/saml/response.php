@@ -59,9 +59,14 @@
       $xpath = new DOMXPath($this->xml);
 			$xpath->registerNamespace("samlp","urn:oasis:names:tc:SAML:2.0:protocol");
 			$xpath->registerNamespace("saml","urn:oasis:names:tc:SAML:2.0:assertion");
-      $query = "/samlp:Response/saml:Assertion/saml:Subject/saml:NameID";
+      $xpath->registerNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
 
-      $entries = $xpath->query($query);
+      $signatureQuery = "//ds:Reference[@URI]";
+      $id = substr($xpath->query($signatureQuery)->item(0)->getAttribute('URI'), 1);
+
+      $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']/saml:Subject/saml:NameID";
+      $entries = $xpath->query($nameQuery);
+
       return $entries->item(0)->nodeValue;
     }
   }
