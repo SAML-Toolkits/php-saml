@@ -74,29 +74,30 @@ class OneLogin_Saml_XmlSec
 
         $objDSig = $objXMLSecDSig->locateSignature($this->_document);
         if (!$objDSig) {
-            throw new Exception("Cannot locate Signature Node");
+            throw new Exception('Cannot locate Signature Node');
         }
         $objXMLSecDSig->canonicalizeSignedInfo();
         $objXMLSecDSig->idKeys = array('ID');
 
         $retVal = $objXMLSecDSig->validateReference();
         if (!$retVal) {
-            throw new Exception("Reference Validation Failed");
+            throw new Exception('Reference Validation Failed');
         }
 
         $singleAssertion = $this->validateNumAssertions();
         if (!$singleAssertion) {
-            throw new Exception("Only one SAMLAssertion allowed");
+            throw new Exception('Multiple assertions are not supported');
         }
 
         $validTimestamps = $this->validateTimestamps();
         if (!$validTimestamps) {
-            throw new Exception("SAMLAssertion conditions not met");
+            throw new Exception('Timing issues (please check your clock settings)
+            ');
         }
 
         $objKey = $objXMLSecDSig->locateKey();
         if (!$objKey) {
-            throw new Exception("We have no idea about the key");
+            throw new Exception('We have no idea about the key');
         }
 
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
