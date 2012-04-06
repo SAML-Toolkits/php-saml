@@ -27,7 +27,7 @@ class OneLogin_Saml_XmlSec
     public function __construct(OneLogin_Saml_Settings $settings, OneLogin_Saml_Response $response)
     {
         $this->_settings = $settings;
-        $this->_document = $response->document;
+        $this->_document = clone $response->document;
     }
 
     /**
