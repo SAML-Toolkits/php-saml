@@ -33,18 +33,23 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedAttributes, $response->getAttributes());
 
         // An assertion that has no attributes should return an empty array when asked for the attributes
-        $assertion = file_get_contents(TEST_ROOT . '/responses/wrapped_response_2.xml.base64');
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response2.xml.base64');
         $response = new OneLogin_Saml_Response($this->_settings, $assertion);
 
         $this->assertEmpty($response->getAttributes());
     }
 
-    public function testOnlyRetreiveAssertionWithIDThatMatchesSignatureReference()
+    public function testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference()
     {
         $assertion = file_get_contents(TEST_ROOT . '/responses/wrapped_response_2.xml.base64');
         $response = new OneLogin_Saml_Response($this->_settings, $assertion);
-
-        $this->assertNotEquals('root@example.com', $response->getNameId());
+        try {
+            $nameId = $response->getNameId();
+            $this->assertNotEquals('root@example.com', $nameId);
+        }
+        catch (Exception $e) {
+            $this->assertNotEmpty($e->getMessage(), 'Trying to get NameId on an unsigned assertion fails');
+        }
     }
 
     public function testDoesNotAllowSignatureWrappingAttack()
