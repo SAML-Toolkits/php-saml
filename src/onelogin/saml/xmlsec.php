@@ -5,7 +5,8 @@
   /**
    * Determine if the SAML response is valid using a provided x509 certificate.
    */
-  class SamlXmlSec {
+  class SamlXmlSec
+  {
     /**
      * A SamlResponse class provided to the constructor.
      */
@@ -101,5 +102,3 @@
     }
 
  }
-
-?>
