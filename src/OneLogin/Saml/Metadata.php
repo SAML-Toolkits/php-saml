@@ -14,7 +14,7 @@ class OneLogin_Saml_Metadata
      * Service settings
      * @var OneLogin_Saml_Settings
      */
-    private $_settings;
+    protected $_settings;
 
     /**
      * Create a new Metadata document
@@ -47,7 +47,7 @@ class OneLogin_Saml_Metadata
 METADATA_TEMPLATE;
     }
 
-    private function _getMetadataValidTimestamp()
+    protected function _getMetadataValidTimestamp()
     {
         $timeZone = date_default_timezone_get();
         date_default_timezone_set('UTC');

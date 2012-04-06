@@ -9,13 +9,13 @@ class OneLogin_Saml_XmlSec
      * A SamlResponse class provided to the constructor.
      * @var OneLogin_Saml_Settings
      */
-    private $_settings;
+    protected $_settings;
 
     /**
      * The document to be tested.
      * @var DomDocument
      */
-    private $_document;
+    protected $_document;
 
     /**
      * Construct the SamlXmlSec object.

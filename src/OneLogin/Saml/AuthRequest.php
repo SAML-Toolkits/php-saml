@@ -11,7 +11,7 @@ class OneLogin_Saml_AuthRequest
      * A SamlResponse class provided to the constructor.
      * @var OneLogin_Saml_Settings
      */
-    private $_settings;
+    protected $_settings;
 
     /**
      * Construct the response object.
@@ -61,12 +61,12 @@ AUTHNREQUEST;
         return $this->_settings->idpSingleSignOnUrl . "?SAMLRequest=" . $encodedRequest;
     }
 
-    private function _generateUniqueID()
+    protected function _generateUniqueID()
     {
         return self::ID_PREFIX . sha1(uniqid(mt_rand(), TRUE));
     }
 
-    private function _getTimestamp()
+    protected function _getTimestamp()
     {
         $defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');

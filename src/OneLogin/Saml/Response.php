@@ -8,7 +8,7 @@ class OneLogin_Saml_Response
     /**
      * @var OneLogin_Saml_Settings
      */
-    private $_settings;
+    protected $_settings;
 
     /**
      * The decoded, unprocessed XML assertion provided to the constructor.
@@ -82,7 +82,7 @@ class OneLogin_Saml_Response
      * @param string $assertionXpath
      * @return DOMNodeList
      */
-    private function _queryAssertion($assertionXpath)
+    protected function _queryAssertion($assertionXpath)
     {
         $xpath = new DOMXPath($this->document);
         $xpath->registerNamespace('samlp'   , 'urn:oasis:names:tc:SAML:2.0:protocol');
