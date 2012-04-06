@@ -1,8 +1,57 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: boy
- * Date: 4/6/12
- * Time: 8:29 AM
- * To change this template use File | Settings | File Templates.
- */
+
+class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
+{
+    private $_settings;
+
+    public function setUp()
+    {
+        $this->_settings = new OneLogin_Saml_Settings;
+    }
+
+    public function testReturnNameId()
+    {
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response1.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertEquals('support@onelogin.com', $response->getNameId());
+    }
+
+    public function testGetAttributes()
+    {
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response1.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $expectedAttributes = array(
+            'uid' => array(
+                'demo'
+            ),
+            'another_value' => array(
+                'value'
+            ),
+        );
+        $this->assertEquals($expectedAttributes, $response->getAttributes());
+
+        // An assertion that has no attributes should return an empty array when asked for the attributes
+        $assertion = file_get_contents(TEST_ROOT . '/responses/wrapped_response_2.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertEmpty($response->getAttributes());
+    }
+
+    public function testOnlyRetreiveAssertionWithIDThatMatchesSignatureReference()
+    {
+        $assertion = file_get_contents(TEST_ROOT . '/responses/wrapped_response_2.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertNotEquals('root@example.com', $response->getNameId());
+    }
+
+    public function testDoesNotAllowSignatureWrappingAttack()
+    {
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response4.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertEquals('test@onelogin.com', $response->getNameId());
+    }
+}

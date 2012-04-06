@@ -10,11 +10,10 @@
 
 error_reporting(E_ALL);
 
+$settings = NULL;
 require 'settings.php';
 
-require 'lib/onelogin/saml.php';
-
-$authrequest = new OneLogin_Saml_AuthRequest(saml_get_settings());
-$url = $authrequest->create();
+$authRequest = new OneLogin_Saml_AuthRequest($settings);
+$url = $authRequest->getRedirectUrl();
 
 header("Location: $url");

@@ -1,77 +1,98 @@
 <?php
 
-require 'xmlsec.php';
-
 /**
  * Parse the SAML response and maintain the XML for it.
  */
-class SamlResponse
+class OneLogin_Saml_Response
 {
     /**
-     * A SamlResponse class provided to the constructor.
+     * @var OneLogin_Saml_Settings
      */
-    private $settings;
+    private $_settings;
 
     /**
      * The decoded, unprocessed XML assertion provided to the constructor.
+     * @var string
      */
     public $assertion;
 
     /**
      * A DOMDocument class loaded from the $assertion.
+     * @var DomDocument
      */
-    public $xml;
-
-    // At this time these private members are unused.
-    private $nameid;
-    private $xpath;
+    public $document;
 
     /**
      * Construct the response object.
      *
-     * @param SamlResponse $settings
-     *   A SamlResponse settings object containing the necessary
-     *   x509 certicate to decode the XML.
-     * @param string $assertion
-     *   A UUEncoded SAML assertion from the IdP.
+     * @param OneLogin_Saml_Settings $settings Settings containing the necessary X.509 certificate to decode the XML.
+     * @param string $assertion A UUEncoded SAML assertion from the IdP.
      */
-    function __construct($settings, $assertion)
+    public function __construct(OneLogin_Saml_Settings $settings, $assertion)
     {
-        $this->settings = $settings;
+        $this->_settings = $settings;
         $this->assertion = base64_decode($assertion);
-        $this->xml = new DOMDocument();
-        $this->xml->loadXML($this->assertion);
+        $this->document = new DOMDocument();
+        $this->document->loadXML($this->assertion);
     }
 
     /**
      * Determine if the SAML Response is valid using the certificate.
      *
-     * @return
-     *   TRUE if the document passes. This could throw a generic Exception
-     *   if the document or key cannot be found.
+     * @throws Exception
+     * @return bool Validate the document
      */
-    function is_valid()
+    public function isValid()
     {
-        $xmlsec = new SamlXmlSec($this->settings, $this->xml);
-        return $xmlsec->is_valid();
+        $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
+        return $xmlSec->isValid();
     }
 
     /**
      * Get the NameID provided by the SAML response from the IdP.
      */
-    function get_nameid()
+    public function getNameId()
     {
-        $xpath = new DOMXPath($this->xml);
-        $xpath->registerNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
-        $xpath->registerNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
-        $xpath->registerNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+        $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
+        return $entries->item(0)->nodeValue;
+    }
 
-        $signatureQuery = "//ds:Reference[@URI]";
+    public function getAttributes()
+    {
+        $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
+
+        $attributes = array();
+        /** @var $entry DOMNode */
+        foreach ($entries as $entry) {
+            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
+
+            $attributeValues = array();
+            foreach ($entry->childNodes as $childNode) {
+                if ($childNode->tagName === 'saml:AttributeValue'){
+                    $attributeValues[] = $childNode->nodeValue;
+                }
+            }
+
+            $attributes[$attributeName] = $attributeValues;
+        }
+        return $attributes;
+    }
+
+    /**
+     * @param string $assertionXpath
+     * @return DOMNodeList
+     */
+    private function _queryAssertion($assertionXpath)
+    {
+        $xpath = new DOMXPath($this->document);
+        $xpath->registerNamespace('samlp'   , 'urn:oasis:names:tc:SAML:2.0:protocol');
+        $xpath->registerNamespace('saml'    , 'urn:oasis:names:tc:SAML:2.0:assertion');
+        $xpath->registerNamespace('ds'      , 'http://www.w3.org/2000/09/xmldsig#');
+
+        $signatureQuery = '//ds:Reference[@URI]';
         $id = substr($xpath->query($signatureQuery)->item(0)->getAttribute('URI'), 1);
 
-        $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']/saml:Subject/saml:NameID";
-        $entries = $xpath->query($nameQuery);
-
-        return $entries->item(0)->nodeValue;
+        $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']" . $assertionXpath;
+        return $xpath->query($nameQuery);
     }
 }

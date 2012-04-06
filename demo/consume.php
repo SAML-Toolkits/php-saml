@@ -9,20 +9,32 @@
 
 error_reporting(E_ALL);
 
+$settings = NULL;
 require 'settings.php';
 
-require 'lib/onelogin/saml.php';
-
-$samlResponse = new OneLogin_Saml_Response(saml_get_settings(), $_POST['SAMLResponse']);
+$samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
 try {
-    if ($samlResponse->is_valid()) {
-        echo "You are: " . $samlResponse->get_nameid();
+    if ($samlResponse->isValid()) {
+        echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+        $attributes = $samlResponse->getAttributes();
+        if (!empty($attributes)) {
+            echo 'You have the following attributes:<br>';
+            echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+            foreach ($attributes as $attributeName => $attributeValues) {
+                echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+                    foreach ($attributeValues as $attributeValue) {
+                        echo '<li>' . htmlentities($attributeValue) . '</li>';
+                    }
+                echo '</ul></td></tr>';
+            }
+            echo '</tbody></table>';
+        }
     }
     else {
-        echo "Invalid SAML response.";
+        echo 'Invalid SAML response.';
     }
 }
 catch (Exception $e) {
-    echo "Invalid SAML response: " . $e->getMessage();
+    echo 'Invalid SAML response: ' . $e->getMessage();
 }
