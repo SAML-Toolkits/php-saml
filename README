@@ -7,3 +7,7 @@ x509 certificate.
 
 There is more information in this post: 
 http://support.onelogin.com/entries/268420-saml-toolkit-for-php
+
+Note: This branch is now considered legacy and applications should switch to
+the new version. This will continue to be maintained for security issues but
+no new features will be added.
