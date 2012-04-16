@@ -39,12 +39,18 @@ class ResponseTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals('test@onelogin.com', $this->response->get_nameid());
   }
 
-  public function testOnlyRetreiveAssertionWithIDThatMatchesSignatureReference() {
+  public function testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference() {
     $this->assertion = file_get_contents('test/responses/wrapped_response_2.xml.base64');
     $this->settings = saml_get_settings();
     $this->response = new SamlResponse($this->settings, $this->assertion);
 
-    $this->assertNotEquals('root@example.com', $this->response->get_nameid());
+    try {
+      $nameId = $response->getNameId();
+      $this->assertNotEquals('root@example.com', $nameId);
+    }
+    catch (Exception $e) {
+      $this->assertNotEmpty($e->getMessage(), 'Trying to get NameId on an unsigned assertion fails');
+    }
   }
 }
 ?>
