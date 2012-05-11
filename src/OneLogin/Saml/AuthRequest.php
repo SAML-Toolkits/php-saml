@@ -1,5 +1,5 @@
 <?php
-
+require_once('Settings.php');
 /**
  * Create a SAML authorization request.
  */
