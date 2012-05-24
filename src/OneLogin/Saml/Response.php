@@ -89,7 +89,7 @@ class OneLogin_Saml_Response
         $xpath->registerNamespace('saml'    , 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xpath->registerNamespace('ds'      , 'http://www.w3.org/2000/09/xmldsig#');
 
-        $signatureQuery = '//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
+        $signatureQuery = '/samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
         $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
         if (!$assertionReferenceNode) {
             throw new Exception('Unable to query assertion, no Signature Reference found?');
