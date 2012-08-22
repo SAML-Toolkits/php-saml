@@ -11,7 +11,7 @@
 error_reporting(E_ALL);
 
 $settings = NULL;
-require 'settings.php';
+require_once('settings.php');
 
 $authRequest = new OneLogin_Saml_AuthRequest($settings);
 $url = $authRequest->getRedirectUrl();

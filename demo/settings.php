@@ -18,41 +18,49 @@
  *    You must provide this, and it should point to the consume.php script or its equivalent.
  */
 
+
+
 define('XMLSECLIBS_DIR', './../ext/xmlseclibs/');
-require XMLSECLIBS_DIR . 'xmlseclibs.php';
+
+require_once(XMLSECLIBS_DIR . 'xmlseclibs.php');
+
 
 define('ONELOGIN_SAML_DIR', './../src/OneLogin/Saml/');
-require ONELOGIN_SAML_DIR . 'AuthRequest.php';
-require ONELOGIN_SAML_DIR . 'Response.php';
-require ONELOGIN_SAML_DIR . 'Settings.php';
-require ONELOGIN_SAML_DIR . 'XmlSec.php';
+require_once(ONELOGIN_SAML_DIR . 'AuthRequest.php');
+require_once(ONELOGIN_SAML_DIR . 'Response.php');
+require_once(ONELOGIN_SAML_DIR . 'Settings.php');
+require_once(ONELOGIN_SAML_DIR . 'XmlSec.php');
 
 $settings = new OneLogin_Saml_Settings();
 
 // When using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
-$settings->idpSingleSignOnUrl = 'https://app.onelogin.com/saml/signon/6171';
+$settings->idpSingleSignOnUrl = 'https://idp.junyo.com/idp/saml2/idp/SSOService.php';
 
 // The certificate for the users account in the IdP
 $settings->idpPublicCertificate = <<<CERTIFICATE
 -----BEGIN CERTIFICATE-----
-MIIBrTCCAaGgAwIBAgIBATADBgEAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApD
-YWxpZm9ybmlhMRUwEwYDVQQHDAxTYW50YSBNb25pY2ExETAPBgNVBAoMCE9uZUxv
-Z2luMRkwFwYDVQQDDBBhcHAub25lbG9naW4uY29tMB4XDTEwMDMwOTA5NTgzNFoX
-DTE1MDMwOTA5NTgzNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3Ju
-aWExFTATBgNVBAcMDFNhbnRhIE1vbmljYTERMA8GA1UECgwIT25lTG9naW4xGTAX
-BgNVBAMMEGFwcC5vbmVsb2dpbi5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
-AoGBANtmwriqGBbZy5Dwy2CmJEtHEENVPoATCZP3UDESRDQmXy9Q0Kq1lBt+KyV4
-kJNHYAAQ9egLGWQ8/1atkPBye5s9fxROtf8VO3uk/x/X5VSRODIrhFISGmKUnVXa
-UhLFIXkGSCAIVfoR5S2ggdfpINKUWGsWS/lEzLNYMBkURXuVAgMBAAEwAwYBAAMB
-AA==
+MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMC
+Tk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYD
+VQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG
+9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4
+MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xi
+ZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2Zl
+aWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5v
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LO
+NoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHIS
+KOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d
+1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8
+BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7n
+bK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2Qar
+Q4/67OZfHd7R+POBXhophSMv1ZOo
 -----END CERTIFICATE-----
 CERTIFICATE;
 
 // The URL where to the SAML Response/SAML Assertion will be posted
-$settings->spReturnUrl = 'http://localhost/php-saml/consume.php';
+$settings->spReturnUrl = 'http://localhost/php-saml/demo/consume.php';
 
 // Name of this application
-$settings->spIssuer = 'php-saml';
+$settings->spIssuer = 'php-saml-demo';
 
 // Tells the IdP to return the email address of the current user
 $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_EMAIL_ADDRESS;
