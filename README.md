@@ -1,23 +1,30 @@
-= Installing: Development Environment =
+Installing: Development Environment
+===================================
+
 To install locally:
+
 * clone this repository
 * put (or symbolic-link) this repo in a place where it is accessible at: http://localhost/php-saml/
-``` sh
-# for example on Mac OSX: 
-cd ~/src
-git clone git://github.com/junyoed/php-saml.git
 
-# make sure Web Sharing is on, or that PHP is serving this directory for some reason
-cd /Library/WebServer/Documents
-ln -s ~/src/php-saml/ php-saml
+```sh
+    # for example on Mac OSX: 
+    cd ~/src
+    git clone git://github.com/junyoed/php-saml.git
+
+    # make sure Web Sharing is on, or that PHP is serving this directory for some reason
+    cd /Library/WebServer/Documents
+    ln -s ~/src/php-saml/ php-saml
 ```
-* in a web browser, go to http://localhost/php-saml/index.php
-* choose "auth google"
-* log in as the user you were given by Junyo
+
+ * in a web browser, go to http://localhost/php-saml/index.php
+ * choose "auth google"
+ * log in as the user you were given by Junyo
 
 You should be redirected to a page that has a message like "You are: <GUID>".  This GUID is the Junyo ID you got from the provisioning API and represents the logged in user.
 
-= Setting up for Production = 
+Setting up for Production
+=========================
+
 Several properties found in demo/settings.php need to be changed before you go to production.
 
 1. $settings->spReturnUrl
@@ -28,9 +35,8 @@ This should identity your application specifically. A URI, often of the format: 
 
 One note: there is a mapping from this value to acceptable return URLs, so this must be specific to your application.
 
-
-
-----
+General
+=======
 
 The files in demo are sample code to help
 demonstrate how this library should work. In order to use them, you can
