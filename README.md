@@ -4,6 +4,10 @@ To install locally:
 * put (or symbolic-link) this repo in a place where it is accessible at: http://localhost/php-saml/
 ``` sh
 # for example on Mac OSX: 
+cd ~/src
+git clone git://github.com/junyoed/php-saml.git
+
+# make sure Web Sharing is on, or that PHP is serving this directory for some reason
 cd /Library/WebServer/Documents
 ln -s ~/src/php-saml/ php-saml
 ```
