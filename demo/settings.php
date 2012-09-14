@@ -19,13 +19,13 @@
  */
 
 define('XMLSECLIBS_DIR', './../ext/xmlseclibs/');
-require XMLSECLIBS_DIR . 'xmlseclibs.php';
+require_once XMLSECLIBS_DIR . 'xmlseclibs.php';
 
 define('ONELOGIN_SAML_DIR', './../src/OneLogin/Saml/');
-require ONELOGIN_SAML_DIR . 'AuthRequest.php';
-require ONELOGIN_SAML_DIR . 'Response.php';
-require ONELOGIN_SAML_DIR . 'Settings.php';
-require ONELOGIN_SAML_DIR . 'XmlSec.php';
+require_once ONELOGIN_SAML_DIR . 'AuthRequest.php';
+require_once ONELOGIN_SAML_DIR . 'Response.php';
+require_once ONELOGIN_SAML_DIR . 'Settings.php';
+require_once ONELOGIN_SAML_DIR . 'XmlSec.php';
 
 $settings = new OneLogin_Saml_Settings();
 
