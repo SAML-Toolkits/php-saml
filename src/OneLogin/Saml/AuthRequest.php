@@ -34,7 +34,8 @@ class OneLogin_Saml_AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
-
+        $assertionConsumerServiceURL = rawurlencode($this->_settings->spReturnUrl);
+        
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -43,7 +44,7 @@ class OneLogin_Saml_AuthRequest
     Version="2.0"
     IssueInstant="$issueInstant"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
+    AssertionConsumerServiceURL="{$assertionConsumerServiceURL}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
     <samlp:NameIDPolicy
         Format="{$this->_settings->requestedNameIdFormat}"
