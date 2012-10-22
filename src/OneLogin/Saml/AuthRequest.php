@@ -34,7 +34,7 @@ class OneLogin_Saml_AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
-        $assertionConsumerServiceURL = rawurlencode($this->_settings->spReturnUrl);
+        $assertionConsumerServiceURL = $this->_settings->spReturnUrl;
         
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
