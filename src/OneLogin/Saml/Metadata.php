@@ -31,7 +31,6 @@ class OneLogin_Saml_Metadata
     public function getXml()
     {
         $validUntil = $this->_getMetadataValidTimestamp();
-        $assertionConsumerServiceURL = rawurlencode($this->_settings->spReturnUrl);
 
         return <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
@@ -41,7 +40,7 @@ class OneLogin_Saml_Metadata
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                                     Location="{$assertionConsumerServiceURL}"
+                                     Location="{$this->_settings->spReturnUrl}"
                                      index="1"/>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
