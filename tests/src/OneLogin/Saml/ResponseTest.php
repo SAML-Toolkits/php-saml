@@ -59,4 +59,20 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('test@onelogin.com', $response->getNameId());
     }
+
+    public function testGetSessionNotOnOrAfter()
+    {
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response1.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertEquals(1290203857, $response->getSessionNotOnOrAfter());
+        
+        // An assertion that do not specified Session timeout should return NULL
+        
+        $assertion = file_get_contents(TEST_ROOT . '/responses/response2.xml.base64');
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+
+        $this->assertNull($response->getSessionNotOnOrAfter());
+    }
+    
 }
