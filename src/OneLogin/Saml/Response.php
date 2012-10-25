@@ -57,6 +57,24 @@ class OneLogin_Saml_Response
         return $entries->item(0)->nodeValue;
     }
 
+    /**
+     * Get the SessionNotOnOrAfter attribute, as Unix Epoc, from the
+     * AuthnStatement element.
+     * Using this attribute, the IdP suggests the local session expiration
+     * time.
+     * 
+     * @return The SessionNotOnOrAfter as unix epoc or NULL if not present
+     */
+    public function getSessionNotOnOrAfter()
+    {
+        $entries = $this->_queryAssertion('/saml:AuthnStatement[@SessionNotOnOrAfter]');
+        if ($entries->length == 0) {
+            return NULL;
+        }
+        $notOnOrAfter = $entries->item(0)->getAttribute('SessionNotOnOrAfter');
+        return strtotime($notOnOrAfter);
+    }
+
     public function getAttributes()
     {
         $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
