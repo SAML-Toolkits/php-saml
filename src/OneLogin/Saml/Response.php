@@ -68,7 +68,7 @@ class OneLogin_Saml_Response
 
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
-                if ($childNode->tagName === 'saml:AttributeValue'){
+                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === 'saml:AttributeValue'){
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
