@@ -110,11 +110,20 @@ class OneLogin_Saml_Response
         $signatureQuery = '/samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
         $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
         if (!$assertionReferenceNode) {
-            throw new Exception('Unable to query assertion, no Signature Reference found?');
+        	// is the response signed as a whole?
+        	$signatureQuery = '/samlp:Response/ds:Signature/ds:SignedInfo/ds:Reference';
+        	$assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
+        	if (!$assertionReferenceNode) {
+        		throw new Exception('Unable to query assertion or response, no Signature Reference found?');	
+        	}
+        	$id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+        	
+        	$nameQuery = "/samlp:Response[@ID='$id']/saml:Assertion" . $assertionXpath;
+        } else {
+	        $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+	
+	        $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']" . $assertionXpath;
         }
-        $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
-
-        $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']" . $assertionXpath;
         return $xpath->query($nameQuery);
     }
 }
