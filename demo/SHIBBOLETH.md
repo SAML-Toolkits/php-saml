@@ -1,6 +1,6 @@
 # Using the SSO demo with a Shibboleth IdP
 
-Marco Ferrante, University of Genoa (IT)/CTS GARR-IDEM, 2013
+Marco Ferrante, University of Genoa (IT), 2013
 
 This doc presumes that your Shibboleth 2.3.x IdP is located on the host myidp.mydomain
 and the IdP configuration is left as in the distribution package as possible.
@@ -46,24 +46,26 @@ If your IdP is already configured to load relying parties metadata from a local 
 just add the demo SP metadata to it. Otherwise, create an XML file in your Shibboleth
 installazion such as `$IDP_HOME/metadata/demo.xml`:
 
-  <EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:schemaLocation="urn:oasis:names:tc:SAML:2.0:metadata sstc-saml-schema-metadata-2.0.xsd
-			urn:mace:shibboleth:metadata:1.0 shibboleth-metadata-1.0.xsd http://www.w3.org/2001/04/xmlenc# xenc-schema.xsd
-			http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd">
-		<!-- Copy here the demo SP metadata form https://mysp.mydomain/php-saml-master/demo/metadata.php -->
-		<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-				validUntil="2013-04-06T17:04:01Z" entityID="php-saml">
-			<md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-				<md:NameIDFormat>
-					urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-				</md:NameIDFormat>
-				<md:AssertionConsumerService
-					Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-					Location="http://mysp.mydomain/php-saml-master/demo/consume.php" index="1"/>
-			</md:SPSSODescriptor>
-		</md:EntityDescriptor>
-	</EntitiesDescriptor>
+    <EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:oasis:names:tc:SAML:2.0:metadata sstc-saml-schema-metadata-2.0.xsd
+            urn:mace:shibboleth:metadata:1.0 shibboleth-metadata-1.0.xsd http://www.w3.org/2001/04/xmlenc# xenc-schema.xsd
+            http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd">
+	
+        <!-- Copy here the demo SP metadata form https://mysp.mydomain/php-saml-master/demo/metadata.php -->
+        <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                validUntil="2013-04-06T17:04:01Z" entityID="php-saml">
+            <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                <md:NameIDFormat>
+                    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+                </md:NameIDFormat>
+                <md:AssertionConsumerService
+                        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                        Location="http://mysp.mydomain/php-saml-master/demo/consume.php"
+                        index="1"/>
+                </md:SPSSODescriptor>
+            </md:EntityDescriptor>
+        </EntitiesDescriptor>
 
 Be aware that demo SP metadata have a TTL of one week: adjust the value in the `validUntil`
 attribute if you plan longer tests.
@@ -71,13 +73,12 @@ attribute if you plan longer tests.
 Now, edit the `$IDP_HOME/conf/relying-party.xml` file; just after the `DefaultRelyingParty`
 add element, add:
 
-	<rp:RelyingParty id="php-saml"
-                  provider="https://myidp.mydomain/idp/shibboleth"
-                  defaultSigningCredentialRef="IdPCredential" >
+    <rp:RelyingParty id="php-saml"
+              provider="https://myidp.mydomain/idp/shibboleth"
+              defaultSigningCredentialRef="IdPCredential" >
        <rp:ProfileConfiguration xsi:type="saml:SAML2SSOProfile"
-                             encryptNameIds="never"
-                             encryptAssertions="never"
-                             />
+                  encryptNameIds="never"
+                  encryptAssertions="never" />
     </rp:RelyingParty>
 
 This is due because the php-saml library doesn't support assertion encryption,
@@ -86,11 +87,11 @@ If you have create the SP metadata file, add the reference to it in
 the same `relying-party.xml`: in the `MetadataProvider[ChainingMetadataProvider]` element
 
     <metadata:MetadataProvider id="ShibbolethMetadata" xsi:type="metadata:ChainingMetadataProvider">
-	<!-- other providers -->
+        <!-- other providers -->
 		
-	<metadata:MetadataProvider id="PHP-demo" xsi:type="metadata:FilesystemMetadataProvider"
-		   metadataFile="/opt/shibboleth-idp/metadata/demo.xml"
-		   maxRefreshDelay="P1D" />
+        <metadata:MetadataProvider id="PHP-demo" xsi:type="metadata:FilesystemMetadataProvider"
+                metadataFile="/opt/shibboleth-idp/metadata/demo.xml"
+                maxRefreshDelay="P1D" />
 					
     </metadata:MetadataProvider>
 	
@@ -101,17 +102,17 @@ uncomment the `AttributeDefinition` relative to email and add the encoder:
         <resolver:Dependency ref="myLDAP" />
         <resolver:AttributeEncoder xsi:type="enc:SAML1String" name="urn:mace:dir:attribute-def:mail" />
         <resolver:AttributeEncoder xsi:type="enc:SAML2String" name="urn:oid:0.9.2342.19200300.100.1.3" friendlyName="mail" />
-	<!-- For php-saml -->
-	<resolver:AttributeEncoder xsi:type="enc:SAML2StringNameID" nameFormat="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" />
+        <!-- For php-saml -->
+        <resolver:AttributeEncoder xsi:type="enc:SAML2StringNameID" nameFormat="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" />
     </resolver:AttributeDefinition>
 	
 Finally, let the new NameID be passed to the SP; in the `$IDP_HOME/conf/attribute-filter.xml` file,
 add the following policy:
 
     <afp:AttributeFilterPolicy id="test-php-saml">
-	<afp:PolicyRequirementRule xsi:type="basic:AttributeRequesterString" value="php-saml" />
-	<afp:AttributeRule attributeID="email">
+        <afp:PolicyRequirementRule xsi:type="basic:AttributeRequesterString" value="php-saml" />
+        <afp:AttributeRule attributeID="email">
             <afp:PermitValueRule xsi:type="basic:ANY" />
-	</afp:AttributeRule>
+        </afp:AttributeRule>
     </afp:AttributeFilterPolicy>
 
