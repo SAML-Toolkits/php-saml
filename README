@@ -7,3 +7,5 @@ x509 certificate.
 
 There is more information in this post: 
 http://support.onelogin.com/entries/268420-saml-toolkit-for-php
+
+To try the demo with a Shibboleth IdP, see thew SHIBBOLETH file inside the demo directory.
