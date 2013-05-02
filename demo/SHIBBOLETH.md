@@ -2,15 +2,15 @@
 
 Marco Ferrante, University of Genoa (IT)/CTS GARR-IDEM, 2013
 
-Assumes your Shibboleth 2.3.x IdP is located at myidp.mydomain and the IdP
-configuration is as plain as possible.
+This doc presumes that your Shibboleth 2.3.x IdP is located on the host myidp.mydomain
+and the IdP configuration is left as in the distribution package as possible.
 
-## Configure OneLogin SSO demo
+## Configure php-saml SSO demo
 
-Access to the IdP metadata by opening the page https://myidp.mydomain/idp/shibboleth
+To access the IdP metadata, open the page https://myidp.mydomain/idp/shibboleth
 
 Edit the demo/settings.php file to prepare your demo Service Provider (SP)
-as follow.
+as follow. The SP is located on the host mysp.mydomain.
 
 Set the IdP SSO service location URL:
 
@@ -65,7 +65,7 @@ installazion such as `$IDP_HOME/metadata/demo.xml`:
 		</md:EntityDescriptor>
 	</EntitiesDescriptor>
 
-Be aware that demo SP metadata have a TTL of one week: adjust the value in `validUntil`
+Be aware that demo SP metadata have a TTL of one week: adjust the value in the `validUntil`
 attribute if you plan longer tests.
 
 Now, edit the `$IDP_HOME/conf/relying-party.xml` file; just after the `DefaultRelyingParty`
@@ -80,19 +80,19 @@ add element, add:
                              />
     </rp:RelyingParty>
 
-This is due because the OneLogin PHP library doesn't support assertion encryption,
+This is due because the php-saml library doesn't support assertion encryption,
 the default behaviour for a Shibboleth IdP.
 If you have create the SP metadata file, add the reference to it in
 the same `relying-party.xml`: in the `MetadataProvider[ChainingMetadataProvider]` element
 
     <metadata:MetadataProvider id="ShibbolethMetadata" xsi:type="metadata:ChainingMetadataProvider">
-		<!-- other providers -->
+	<!-- other providers -->
 		
-		<metadata:MetadataProvider id="PHP-demo" xsi:type="metadata:FilesystemMetadataProvider"
-						   metadataFile="/opt/shibboleth-idp/metadata/demo.xml"
-						   maxRefreshDelay="P1D" />
+	<metadata:MetadataProvider id="PHP-demo" xsi:type="metadata:FilesystemMetadataProvider"
+		   metadataFile="/opt/shibboleth-idp/metadata/demo.xml"
+		   maxRefreshDelay="P1D" />
 					
-	</metadata:MetadataProvider>
+    </metadata:MetadataProvider>
 	
 Then define the email address as a valid NameID; in the `$IDP_HOME/conf/attribute-resolver.xml` file,
 uncomment the `AttributeDefinition` relative to email and add the encoder:
@@ -101,17 +101,17 @@ uncomment the `AttributeDefinition` relative to email and add the encoder:
         <resolver:Dependency ref="myLDAP" />
         <resolver:AttributeEncoder xsi:type="enc:SAML1String" name="urn:mace:dir:attribute-def:mail" />
         <resolver:AttributeEncoder xsi:type="enc:SAML2String" name="urn:oid:0.9.2342.19200300.100.1.3" friendlyName="mail" />
-		<!-- For php-saml -->
-		<resolver:AttributeEncoder xsi:type="enc:SAML2StringNameID" nameFormat="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" />
+	<!-- For php-saml -->
+	<resolver:AttributeEncoder xsi:type="enc:SAML2StringNameID" nameFormat="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" />
     </resolver:AttributeDefinition>
 	
 Finally, let the new NameID be passed to the SP; in the `$IDP_HOME/conf/attribute-filter.xml` file,
 add the following policy:
 
-	<afp:AttributeFilterPolicy id="test-php-saml">
-		<afp:PolicyRequirementRule xsi:type="basic:AttributeRequesterString" value="php-saml" />
-		<afp:AttributeRule attributeID="email">
-			<afp:PermitValueRule xsi:type="basic:ANY" />
-		</afp:AttributeRule>
-	</afp:AttributeFilterPolicy>
+    <afp:AttributeFilterPolicy id="test-php-saml">
+	<afp:PolicyRequirementRule xsi:type="basic:AttributeRequesterString" value="php-saml" />
+	<afp:AttributeRule attributeID="email">
+            <afp:PermitValueRule xsi:type="basic:ANY" />
+	</afp:AttributeRule>
+    </afp:AttributeFilterPolicy>
 
