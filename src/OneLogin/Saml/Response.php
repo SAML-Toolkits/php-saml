@@ -85,10 +85,9 @@ class OneLogin_Saml_Response
             $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
 
             $attributeValues = array();
-            foreach ($entry->childNodes as $childNode) {
-            	                if ($childNode->nodeType == XML_ELEMENT_NODE && preg_match('/([a-z0-9]*[:])?AttributeValue/', $childNode->tagName)){
-                    $attributeValues[] = $childNode->nodeValue;
-                }
+            $children = $entry->getElementsByTagNameNS('urn:oasis:names:tc:SAML:2.0:assertion', 'AttributeValue');
+            foreach ($children as $childNode) {
+                $attributeValues[] = $childNode->nodeValue;
             }
 
             $attributes[$attributeName] = $attributeValues;
