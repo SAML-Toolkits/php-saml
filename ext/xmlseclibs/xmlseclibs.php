@@ -1489,7 +1489,7 @@ class XMLSecEnc {
                             if ($x509certNodes = $child->getElementsByTagName('X509Certificate')) {
                                 if ($x509certNodes->length > 0) {
                                     $x509cert = $x509certNodes->item(0)->textContent;
-                                    $x509cert = str_replace(array("\r", "\n"), "", $x509cert);
+                                    $x509cert = str_replace(array("\r", "\n", " ", "\t"), "", $x509cert);
                                     $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
                                     $objBaseKey->loadKey($x509cert, FALSE, TRUE);
                                 }
