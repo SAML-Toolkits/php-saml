@@ -32,13 +32,38 @@ class OneLogin_Saml_Metadata
     {
         $validUntil = $this->_getMetadataValidTimestamp();
 
+        $certificate = '';
+        if (!empty($this->_settings->spPublicCertificate))
+        {
+            if (empty($this->_settings->spPrivateKey))
+            {
+                throw new Exception('A SP certificate is useless without the private key');
+            }
+                $x509cert = str_replace(array('-----BEGIN CERTIFICATE-----',
+                    '-----END CERTIFICATE-----',
+                    "\r", "\n", " ", "\t"), '', $this->_settings->spPublicCertificate);
+                $certData = chunk_split($x509cert, 64, "\n");
+                $certificate = <<<TEMPLATE
+        <md:KeyDescriptor use="encryption">
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:X509Data>
+                    <ds:X509Certificate>
+$certData                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+        </md:KeyDescriptor>
+        
+TEMPLATE;
+        }
+        
         return <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      validUntil="$validUntil"
                      entityID="{$this->_settings->spIssuer}">
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-        <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
+        {$certificate}<md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                                      Location="{$this->_settings->spReturnUrl}"
                                      index="1"/>

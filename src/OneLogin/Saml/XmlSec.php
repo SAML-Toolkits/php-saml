@@ -38,6 +38,9 @@ class OneLogin_Saml_XmlSec
 
     /**
      * Verify that the document only contains a single Assertion
+     * 
+     * According Interoperable SAML 2.0 Web Browser SSO Deployment Profile,
+     * par. 9.2, the response MUST contain exactly one assertion.
      *
      * @return bool TRUE if the document passes.
      */
@@ -61,10 +64,10 @@ class OneLogin_Saml_XmlSec
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
             if ($nbAttribute && strtotime($nbAttribute->textContent) > time() + self::CLOCK_SKEW_SECONDS) {
-                return false;
+                return FALSE;
             }
             if ($naAttribute && strtotime($naAttribute->textContent) <= time() - self::CLOCK_SKEW_SECONDS) {
-                return false;
+                return FALSE;
             }
         }
         return true;

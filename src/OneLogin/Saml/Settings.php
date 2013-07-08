@@ -40,7 +40,7 @@ class OneLogin_Saml_Settings
     public $spIssuer = 'php-saml';
     
     /**
-     * The SP private key use3d to encrypt the asssertion.
+     * The SP private key used to encrypt the assertion.
      */
     public $spPrivateKey = '';
 
