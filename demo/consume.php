@@ -15,6 +15,11 @@ require 'settings.php';
 $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
 try {
+    if ($samlResponse->getDestination()
+            && $samlResponse->getDestination() != $settings->spReturnUrl) {
+        throw new Exception('This is not the intended destination');
+    }
+    
     if ($samlResponse->isValid()) {
         echo 'You are: ' . $samlResponse->getNameId() . '<br>';
         $attributes = $samlResponse->getAttributes();

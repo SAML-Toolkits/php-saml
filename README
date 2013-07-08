@@ -1,3 +1,7 @@
+Basic implementation of a SAML 2.0 Service Provider
+
+Partially support the "Interoperable SAML 2.0 Web Browser SSO Deployment Profile" http://saml2int.org/profile
+
 The files in demo are sample code to help
 demonstrate how this library should work. In order to use them, you can
 unpack this library in your website directory.
@@ -8,4 +12,5 @@ x509 certificate.
 There is more information in this post: 
 http://support.onelogin.com/entries/268420-saml-toolkit-for-php
 
-To try the demo with a Shibboleth IdP, see thew SHIBBOLETH file inside the demo directory.
+To try the demo with a Shibboleth IdP, see thew SHIBBOLETH file inside the demo
+directory.
