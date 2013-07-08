@@ -38,6 +38,16 @@ class OneLogin_Saml_Settings
      * @var string
      */
     public $spIssuer = 'php-saml';
+    
+    /**
+     * The SP private key use3d to encrypt the asssertion.
+     */
+    public $spPrivateKey = '';
+
+    /**
+     * The SP x509 certificate.
+     */
+    public $spPublicCertificate = '';
 
     /**
      * Specifies what format to return the authentication token, i.e, the email address.
