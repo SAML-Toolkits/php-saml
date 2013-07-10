@@ -47,7 +47,7 @@ will produce encrypted assertions, as required e.g. by the "Interoperable SAML
 To deal with encrypted assertions, you need a pair of private key and X.509
 certificate. You can generate them using OpenSSL:
 
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
+    openssl req -x509 -nodes -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
 
 and then copy key.pem and cert.pem in Settings the fields `spPrivateKey` and 
 `spPublicCertificate` including the armour delimiters `----BEGIN *-----` and
@@ -76,8 +76,8 @@ installazion such as `$IDP_HOME/metadata/demo.xml`:
                     <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
                         <ds:X509Data>
                             <ds:X509Certificate>
-MIIBqTCCARICCQCbWvHIgIkD+DANBgkqhkiG9w0BAQQFADAZMRcwFQYDVQQDEw5w
-...
+    MIIBqTCCARICCQCbWvHIgIkD+DANBgkqhkiG9w0BAQQFADAZMRcwFQYDVQQDEw5w
+    ...
                             </ds:X509Certificate>
                         </ds:X509Data>
                     </ds:KeyInfo>
