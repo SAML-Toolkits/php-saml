@@ -6,6 +6,12 @@
 class OneLogin_Saml_XmlSec
 {
     /**
+     * Acceptable skew between SP and IdP clocks.
+     * See SAML Version 2.0 Errata 05, Errata E92 
+     */
+    const CLOCK_SKEW_SECONDS = 180; // 3 minutes
+    
+    /**
      * A SamlResponse class provided to the constructor.
      * @var OneLogin_Saml_Settings
      */
@@ -32,6 +38,9 @@ class OneLogin_Saml_XmlSec
 
     /**
      * Verify that the document only contains a single Assertion
+     * 
+     * According Interoperable SAML 2.0 Web Browser SSO Deployment Profile,
+     * par. 9.2, the response MUST contain exactly one assertion.
      *
      * @return bool TRUE if the document passes.
      */
@@ -54,11 +63,11 @@ class OneLogin_Saml_XmlSec
         for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if ($nbAttribute && strtotime($nbAttribute->textContent) > time()) {
-                return false;
+            if ($nbAttribute && strtotime($nbAttribute->textContent) > time() + self::CLOCK_SKEW_SECONDS) {
+                return FALSE;
             }
-            if ($naAttribute && strtotime($naAttribute->textContent) <= time()) {
-                return false;
+            if ($naAttribute && strtotime($naAttribute->textContent) <= time() - self::CLOCK_SKEW_SECONDS) {
+                return FALSE;
             }
         }
         return true;
