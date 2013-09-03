@@ -58,7 +58,12 @@ AUTHNREQUEST;
         $base64Request = base64_encode($deflatedRequest);
         $encodedRequest = urlencode($base64Request);
 
-        return $this->_settings->idpSingleSignOnUrl . "?SAMLRequest=" . $encodedRequest;
+        if (strstr($this->_settings->idpSingleSignOnUrl, "?") !== false) {
+           $sep = '&';
+        } else {
+           $sep = '?';
+        }
+        return $this->_settings->idpSingleSignOnUrl . "{$sep}SAMLRequest=" . $encodedRequest;
     }
 
     protected function _generateUniqueID()
