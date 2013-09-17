@@ -114,7 +114,7 @@ class OneLogin_Saml_Response
         }
         $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
 
-        $nameQuery = "/samlp:Response//*[@ID='$id']//saml:Assertion" . $assertionXpath;
+        $nameQuery = "//*[@ID='$id']//saml:Assertion" . $assertionXpath;
         return $xpath->query($nameQuery);
     }
 }
