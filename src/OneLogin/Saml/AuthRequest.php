@@ -77,10 +77,7 @@ AUTHNREQUEST;
 
     protected function _getTimestamp()
     {
-        $defaultTimezone = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-        $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ");
-        date_default_timezone_set($defaultTimezone);
-        return $timestamp;
+	$timestamp = new DateTime("now", new DateTimeZone('UTC'));
+	return $timestamp->format('Y-m-d\TH:i:s\Z');
     }
 }
