@@ -5,7 +5,7 @@
     "keywords": ["saml"],
     "autoload": {
         "psr-0": {
-            "OneLogin_Saml_": "src/OneLogin/Saml/"
+            "OneLogin_Saml_": "src/"
         }
     }
 }
