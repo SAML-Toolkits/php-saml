@@ -4,8 +4,6 @@
     "license": "BSD-3-Clause",
     "keywords": ["saml"],
     "autoload": {
-        "psr-0": {
-            "OneLogin_Saml_": "src/"
-        }
+        "classmap": ["src/", "ext/"]
     }
 }
