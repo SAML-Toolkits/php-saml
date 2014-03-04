@@ -1,0 +1,9 @@
+{
+    "name": "onelogin/php-saml",
+    "description": "Simple SAML toolkit for PHP",
+    "license": "BSD-3-Clause",
+    "keywords": ["saml"],
+    "autoload": {
+        "classmap": ["src/", "ext/"]
+    }
+}
