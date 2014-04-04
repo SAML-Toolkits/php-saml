@@ -54,14 +54,28 @@ class OneLogin_Saml_XmlSec
         for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if ($nbAttribute && strtotime($nbAttribute->textContent) > time()) {
+            $time = $this->getCurrentUTCTime();
+            if ($nbAttribute && strtotime($nbAttribute->textContent) > $time) {
                 return false;
             }
-            if ($naAttribute && strtotime($naAttribute->textContent) <= time()) {
+            if ($naAttribute && strtotime($naAttribute->textContent) <= $time) {
                 return false;
             }
         }
         return true;
+    }
+    
+    /**
+     * Get the current UTC time in microseconds since the Unix Epoch.
+     * @return string
+     */
+    protected function getCurrentUTCTime()
+    {
+        $timeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        $time = time();
+        date_default_timezone_set($timeZone);
+        return $time;
     }
 
     /**
