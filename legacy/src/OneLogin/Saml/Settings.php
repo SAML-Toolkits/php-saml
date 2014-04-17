@@ -1,14 +1,11 @@
 <?php
+
 /**
- * @author AlexanderC <self@alexanderc.me>
- * @date 4/18/14
- * @time 12:24 AM
+ * Holds SAML settings for the SamlResponse and SamlAuthRequest classes.
+ *
+ * These settings need to be filled in by the user prior to being used.
  */
-
-namespace OneLogin\Saml;
-
-
-class Settings
+class OneLogin_Saml_Settings
 {
     const NAMEID_EMAIL_ADDRESS                 = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress';
     const NAMEID_X509_SUBJECT_NAME             = 'urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName';
@@ -47,4 +44,4 @@ class Settings
      * @var string
      */
     public $requestedNameIdFormat = self::NAMEID_EMAIL_ADDRESS;
-} 
+}

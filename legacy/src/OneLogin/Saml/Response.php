@@ -1,17 +1,12 @@
 <?php
+
 /**
- * @author AlexanderC <self@alexanderc.me>
- * @date 4/18/14
- * @time 12:23 AM
+ * Parse the SAML response and maintain the XML for it.
  */
-
-namespace OneLogin\Saml;
-
-
-class Response
+class OneLogin_Saml_Response
 {
     /**
-     * @var Settings
+     * @var OneLogin_Saml_Settings
      */
     protected $_settings;
 
@@ -30,10 +25,10 @@ class Response
     /**
      * Construct the response object.
      *
-     * @param Settings $settings Settings containing the necessary X.509 certificate to decode the XML.
+     * @param OneLogin_Saml_Settings $settings Settings containing the necessary X.509 certificate to decode the XML.
      * @param string $assertion A UUEncoded SAML assertion from the IdP.
      */
-    public function __construct(Settings $settings, $assertion)
+    public function __construct(OneLogin_Saml_Settings $settings, $assertion)
     {
         $this->_settings = $settings;
         $this->assertion = base64_decode($assertion);
@@ -49,8 +44,7 @@ class Response
      */
     public function isValid()
     {
-        $xmlSec = new XmlSec($this->_settings, $this);
-
+        $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
         return $xmlSec->isValid();
     }
 
@@ -60,7 +54,6 @@ class Response
     public function getNameId()
     {
         $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
-
         return $entries->item(0)->nodeValue;
     }
 
@@ -69,17 +62,16 @@ class Response
      * AuthnStatement element.
      * Using this attribute, the IdP suggests the local session expiration
      * time.
-     *
+     * 
      * @return The SessionNotOnOrAfter as unix epoc or NULL if not present
      */
     public function getSessionNotOnOrAfter()
     {
         $entries = $this->_queryAssertion('/saml:AuthnStatement[@SessionNotOnOrAfter]');
-        if($entries->length == 0) {
-            return null;
+        if ($entries->length == 0) {
+            return NULL;
         }
         $notOnOrAfter = $entries->item(0)->getAttribute('SessionNotOnOrAfter');
-
         return strtotime($notOnOrAfter);
     }
 
@@ -89,19 +81,18 @@ class Response
 
         $attributes = array();
         /** @var $entry DOMNode */
-        foreach($entries as $entry) {
+        foreach ($entries as $entry) {
             $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
 
             $attributeValues = array();
-            foreach($entry->childNodes as $childNode) {
-                if($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === 'saml:AttributeValue') {
+            foreach ($entry->childNodes as $childNode) {
+                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === 'saml:AttributeValue'){
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
 
             $attributes[$attributeName] = $attributeValues;
         }
-
         return $attributes;
     }
 
@@ -112,19 +103,18 @@ class Response
     protected function _queryAssertion($assertionXpath)
     {
         $xpath = new DOMXPath($this->document);
-        $xpath->registerNamespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
-        $xpath->registerNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+        $xpath->registerNamespace('samlp'   , 'urn:oasis:names:tc:SAML:2.0:protocol');
+        $xpath->registerNamespace('saml'    , 'urn:oasis:names:tc:SAML:2.0:assertion');
+        $xpath->registerNamespace('ds'      , 'http://www.w3.org/2000/09/xmldsig#');
 
         $signatureQuery = '/samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
         $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
-        if(!$assertionReferenceNode) {
+        if (!$assertionReferenceNode) {
             throw new Exception('Unable to query assertion, no Signature Reference found?');
         }
         $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
 
         $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']" . $assertionXpath;
-
         return $xpath->query($nameQuery);
     }
-} 
+}

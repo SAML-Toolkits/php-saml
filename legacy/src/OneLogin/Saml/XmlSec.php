@@ -1,21 +1,13 @@
 <?php
+
 /**
- * @author AlexanderC <self@alexanderc.me>
- * @date 4/18/14
- * @time 12:25 AM
+ * Determine if the SAML response is valid using a provided x509 certificate.
  */
-
-namespace OneLogin\Saml;
-
-
-use XmlSec\XMLSecEnc;
-use XmlSec\XMLSecurityDSig;
-
-class XmlSec
+class OneLogin_Saml_XmlSec
 {
     /**
      * A SamlResponse class provided to the constructor.
-     * @var Settings
+     * @var OneLogin_Saml_Settings
      */
     protected $_settings;
 
@@ -28,11 +20,11 @@ class XmlSec
     /**
      * Construct the SamlXmlSec object.
      *
-     * @param Settings $settings A SamlResponse settings object containing the necessary
+     * @param OneLogin_Saml_Settings $settings A SamlResponse settings object containing the necessary
      *                                          x509 certicate to test the document.
-     * @param Response $response The document to test.
+     * @param OneLogin_Saml_Response $response The document to test.
      */
-    public function __construct(Settings $settings, Response $response)
+    public function __construct(OneLogin_Saml_Settings $settings, OneLogin_Saml_Response $response)
     {
         $this->_settings = $settings;
         $this->_document = clone $response->document;
@@ -47,7 +39,6 @@ class XmlSec
     {
         $rootNode = $this->_document;
         $assertionNodes = $rootNode->getElementsByTagName('Assertion');
-
         return ($assertionNodes->length == 1);
     }
 
@@ -60,17 +51,16 @@ class XmlSec
     {
         $rootNode = $this->_document;
         $timestampNodes = $rootNode->getElementsByTagName('Conditions');
-        for($i = 0; $i < $timestampNodes->length; $i++) {
+        for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if($nbAttribute && strtotime($nbAttribute->textContent) > time()) {
+            if ($nbAttribute && strtotime($nbAttribute->textContent) > time()) {
                 return false;
             }
-            if($naAttribute && strtotime($naAttribute->textContent) <= time()) {
+            if ($naAttribute && strtotime($naAttribute->textContent) <= time()) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -83,37 +73,37 @@ class XmlSec
         $objXMLSecDSig = new XMLSecurityDSig();
 
         $objDSig = $objXMLSecDSig->locateSignature($this->_document);
-        if(!$objDSig) {
+        if (!$objDSig) {
             throw new Exception('Cannot locate Signature Node');
         }
         $objXMLSecDSig->canonicalizeSignedInfo();
         $objXMLSecDSig->idKeys = array('ID');
 
         $retVal = $objXMLSecDSig->validateReference();
-        if(!$retVal) {
+        if (!$retVal) {
             throw new Exception('Reference Validation Failed');
         }
 
         $singleAssertion = $this->validateNumAssertions();
-        if(!$singleAssertion) {
+        if (!$singleAssertion) {
             throw new Exception('Multiple assertions are not supported');
         }
 
         $validTimestamps = $this->validateTimestamps();
-        if(!$validTimestamps) {
+        if (!$validTimestamps) {
             throw new Exception('Timing issues (please check your clock settings)
             ');
         }
 
         $objKey = $objXMLSecDSig->locateKey();
-        if(!$objKey) {
+        if (!$objKey) {
             throw new Exception('We have no idea about the key');
         }
 
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
 
-        $objKey->loadKey($this->_settings->idpPublicCertificate, false, true);
+        $objKey->loadKey($this->_settings->idpPublicCertificate, FALSE, TRUE);
 
         return ($objXMLSecDSig->verify($objKey) === 1);
     }
-} 
+}
