@@ -1,9 +1,33 @@
-The files in demo are sample code to help
-demonstrate how this library should work. In order to use them, you can
-unpack this library in your website directory.
-
-You will need to modify the settings.php file to set the proper URLs and
-x509 certificate.
-
-There is more information in this post: 
+The rewritten php-saml library, check url...
 http://support.onelogin.com/entries/268420-saml-toolkit-for-php
+
+Example:
+<?php
+
+use OneLogin\Saml\Settings;
+use OneLogin\Saml\AuthRequest;
+use OneLogin\Saml\Response;
+
+$settings = new Settings();
+$settings->idpSingleSignOnUrl = 'https://the-sso-provider.com'; // The URL to submit SAML authentication requests to.
+$settings->idpPublicCertificate = file_get_contents("cert.pem"); // The x509 certificate used to authenticate the request.
+$settings->spReturnUrl = "http://localhost:8080/manageResponse.php"; // The URL where to the SAML Response/SAML Assertion will be posted.
+$settings->spIssuer = "some-app-id"; // The name of the application.
+
+$request = new AuthRequest($settings);
+$authUrl = $request->getRedirectUrl();
+
+header("Location: " . $authUrl);
+exit;
+
+// now we are redirected to the SSO provider and than back...
+// now when we are back- just continue...
+
+$response = new Response($settings, $_POST['SAMLResponse']);
+
+if($response->isValid()) {
+    $response->getNameId(); // user id
+    $response->getAttributes(); // additional attributes
+    $response->getSessionNotOnOrAfter(); // time the session is valid until (Unix timestamp)
+}
+

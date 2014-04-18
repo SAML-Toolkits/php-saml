@@ -1,31 +1,26 @@
 <?php
+require_once('Settings.php');
 /**
- * @author AlexanderC <self@alexanderc.me>
- * @date 4/18/14
- * @time 12:21 AM
+ * Create a SAML authorization request.
  */
-
-namespace OneLogin\Saml;
-
-
-class AuthRequest
+class OneLogin_Saml_AuthRequest
 {
     const ID_PREFIX = 'ONELOGIN';
 
     /**
      * A SamlResponse class provided to the constructor.
-     * @var Settings
+     * @var OneLogin_Saml_Settings
      */
     protected $_settings;
 
     /**
      * Construct the response object.
      *
-     * @param Settings $settings
+     * @param OneLogin_Saml_Settings $settings
      *   A SamlResponse settings object containing the necessary
      *   x509 certicate to decode the XML.
      */
-    public function __construct(Settings $settings)
+    public function __construct(OneLogin_Saml_Settings $settings)
     {
         $this->_settings = $settings;
     }
@@ -39,7 +34,7 @@ class AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
-
+        
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -68,7 +63,7 @@ AUTHNREQUEST;
 
     protected function _generateUniqueID()
     {
-        return self::ID_PREFIX . sha1(uniqid(mt_rand(), true));
+        return self::ID_PREFIX . sha1(uniqid(mt_rand(), TRUE));
     }
 
     protected function _getTimestamp()
@@ -77,7 +72,6 @@ AUTHNREQUEST;
         date_default_timezone_set('UTC');
         $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ");
         date_default_timezone_set($defaultTimezone);
-
         return $timestamp;
     }
-} 
+}

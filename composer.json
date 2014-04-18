@@ -1,0 +1,21 @@
+{
+    "name": "alexanderc/php-saml",
+    "description": "A freshly ported php-saml library",
+    "minimum-stability": "stable",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "AlexanderC",
+            "email": "self@alexanderc.me"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "OneLogin\\": "src/OneLogin",
+            "XmlSec\\": "src/XmlSec"
+        }
+    }
+}

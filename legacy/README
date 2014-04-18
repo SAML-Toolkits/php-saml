@@ -1,0 +1,9 @@
+The files in demo are sample code to help
+demonstrate how this library should work. In order to use them, you can
+unpack this library in your website directory.
+
+You will need to modify the settings.php file to set the proper URLs and
+x509 certificate.
+
+There is more information in this post: 
+http://support.onelogin.com/entries/268420-saml-toolkit-for-php

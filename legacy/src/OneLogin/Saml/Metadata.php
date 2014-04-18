@@ -1,14 +1,9 @@
 <?php
+
 /**
- * @author AlexanderC <self@alexanderc.me>
- * @date 4/18/14
- * @time 12:22 AM
+ * Create SAML2 Metadata documents
  */
-
-namespace OneLogin\Saml;
-
-
-class Metadata
+class OneLogin_Saml_Metadata
 {
     /**
      * How long should the metadata be valid?
@@ -17,15 +12,15 @@ class Metadata
 
     /**
      * Service settings
-     * @var Settings
+     * @var OneLogin_Saml_Settings
      */
     protected $_settings;
 
     /**
      * Create a new Metadata document
-     * @param Settings $settings
+     * @param OneLogin_Saml_Settings $settings
      */
-    public function __construct(Settings $settings)
+    public function __construct(OneLogin_Saml_Settings $settings)
     {
         $this->_settings = $settings;
     }
@@ -58,7 +53,6 @@ METADATA_TEMPLATE;
         date_default_timezone_set('UTC');
         $time = strftime("%Y-%m-%dT%H:%M:%SZ", time() + self::VALIDITY_SECONDS);
         date_default_timezone_set($timeZone);
-
         return $time;
     }
-} 
+}
