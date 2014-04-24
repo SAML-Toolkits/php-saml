@@ -1,7 +1,4 @@
-# PHP SAML [![Build Status](https://secure.travis-ci.org/onelogin/php-saml.png)](http://travis-ci.org/onelogin/php-saml)
-
-Onelogin's SAML PHP Toolkit
-===========================
+# Onelogin's SAML PHP Toolkit [![Build Status](https://api.travis-ci.org/onelogin/php-saml.png?branch=master)](http://travis-ci.org/onelogin/php-saml)
 
 Add SAML support to your PHP softwares using this library.
 Forget those complicated libraries and use that open source library provided

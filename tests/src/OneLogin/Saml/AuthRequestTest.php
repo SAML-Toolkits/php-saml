@@ -57,18 +57,23 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
     */
     public function testGetMetadataValidTimestamp()
     {
-        $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
-        $method = $reflectionClass->getMethod('_getTimestamp');
-        $method->setAccessible(true);
+        if (class_exists('ReflectionClass')) {
+            $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
+            $method = $reflectionClass->getMethod('_getTimestamp');
+ 
+            if (method_exists($method,'setAccessible')) {
+                $method->setAccessible(true);
 
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
+                $settingsDir = TEST_ROOT .'/settings/';
+                include $settingsDir.'settings1.php';
 
-        $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
+                $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
 
-        $time = time();
-        $timestamp = $method->invoke($metadata);
-        $this->assertEquals(strtotime($timestamp), $time);
+                $time = time();
+                $timestamp = $method->invoke($metadata);
+                $this->assertEquals(strtotime($timestamp), $time);
+            }
+        }
     }
 
     /**
@@ -78,20 +83,25 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
     */
     public function testGenerateUniqueID()
     {
-        $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
-        $method = $reflectionClass->getMethod('_generateUniqueID');
-        $method->setAccessible(true);
+        if (class_exists('ReflectionClass')) {
+            $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
+            $method = $reflectionClass->getMethod('_generateUniqueID');
 
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
+            if (method_exists($method,'setAccessible')) {
+                $method->setAccessible(true);
 
-        $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
+                $settingsDir = TEST_ROOT .'/settings/';
+                include $settingsDir.'settings1.php';
 
-        $id = $method->invoke($metadata);
-        $id2 = $method->invoke($metadata);
-        $this->assertNotEmpty($id);
-        $this->assertNotEmpty($id2);
-        $this->assertNotEquals($id, $id2);
-        $this->assertContains('ONELOGIN', $id);
+                $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
+
+                $id = $method->invoke($metadata);
+                $id2 = $method->invoke($metadata);
+                $this->assertNotEmpty($id);
+                $this->assertNotEmpty($id2);
+                $this->assertNotEquals($id, $id2);
+                $this->assertContains('ONELOGIN', $id);
+            }
+        }
     }
 }

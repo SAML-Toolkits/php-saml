@@ -81,17 +81,22 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
     */
     public function testGetMetadataValidTimestamp()
     {
-        $reflectionClass = new ReflectionClass("OneLogin_Saml_Metadata");
-        $method = $reflectionClass->getMethod('_getMetadataValidTimestamp');
-        $method->setAccessible(true);
+        if (class_exists('ReflectionClass')) {
+            $reflectionClass = new ReflectionClass("OneLogin_Saml_Metadata");
+            $method = $reflectionClass->getMethod('_getMetadataValidTimestamp');
 
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
+            if (method_exists($method,'setAccessible')) {
+                $method->setAccessible(true);
 
-        $metadata = new OneLogin_Saml_Metadata($settingsInfo);
+                $settingsDir = TEST_ROOT .'/settings/';
+                include $settingsDir.'settings1.php';
 
-        $time = time()+ OneLogin_Saml_Metadata::VALIDITY_SECONDS;
-        $validTimestamp = $method->invoke($metadata);
-        $this->assertEquals(strtotime($validTimestamp), $time);
+                $metadata = new OneLogin_Saml_Metadata($settingsInfo);
+
+                $time = time()+ OneLogin_Saml_Metadata::VALIDITY_SECONDS;
+                $validTimestamp = $method->invoke($metadata);
+                $this->assertEquals(strtotime($validTimestamp), $time);
+            }
+        }
     }
 }
