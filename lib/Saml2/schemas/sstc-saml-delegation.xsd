@@ -1,0 +1,40 @@
+<schema
+    targetNamespace="urn:oasis:names:tc:SAML:2.0:conditions:delegation"
+    xmlns:del="urn:oasis:names:tc:SAML:2.0:conditions:delegation"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="unqualified"
+    attributeFormDefault="unqualified"
+    blockDefault="substitution"
+    version="2.0">
+    <annotation>
+        <documentation>
+            Document identifier: sstc-saml-delegation
+            Location: http://www.oasis-open.org/committees/documents.php?wg_abbrev=security
+            Revision history:
+            V1.0 (February 2009):
+              Initial version.
+        </documentation>
+    </annotation>
+    <import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
+        schemaLocation="saml-schema-assertion-2.0.xsd"/>
+    <complexType name="DelegationRestrictionType">
+        <complexContent>
+            <extension base="saml:ConditionAbstractType">
+                <sequence>
+                    <element ref="del:Delegate" maxOccurs="unbounded"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+    <element name="Delegate" type="del:DelegateType"/>
+    <complexType name="DelegateType">
+        <choice>
+            <element ref="saml:BaseID"/>
+            <element ref="saml:NameID"/>
+            <element ref="saml:EncryptedID"/>
+        </choice>
+        <attribute name="DelegationInstant" type="dateTime" use="optional"/>
+        <attribute name="ConfirmationMethod" type="anyURI" use="optional"/>
+    </complexType>
+</schema>

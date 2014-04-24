@@ -1,0 +1,23 @@
+<schema
+    targetNamespace="urn:oasis:names:tc:SAML:profiles:SSO:request-init"
+    xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="unqualified"
+    attributeFormDefault="unqualified"
+    blockDefault="substitution"
+    version="1.0">
+    <annotation>
+        <documentation>
+            Document identifier: sstc-request-initiation
+            Location: http://www.oasis-open.org/committees/documents.php?wg_abbrev=security
+            Revision history:
+            V1.0 (March 2010):
+              Initial version.
+        </documentation>
+    </annotation>
+    <import namespace="urn:oasis:names:tc:SAML:2.0:metadata"
+        schemaLocation="saml-schema-metadata-2.0.xsd"/>
+    <element name="RequestInitiator" type="md:EndpointType"/>
+</schema>
+

@@ -1,2 +1,12 @@
 *.swp
+*~
 .DS_Store
+/settings.php
+/demo1/settings.php
+/demo-old/settings.php
+/certs/sp.key
+/certs/sp.crt
+/certs/metadata.key
+/certs/metadata.crt
+/vendor
+/composer.lock

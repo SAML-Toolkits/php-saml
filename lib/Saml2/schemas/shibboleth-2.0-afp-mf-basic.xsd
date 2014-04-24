@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema targetNamespace="urn:mace:shibboleth:2.0:afp:mf:basic"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:basic="urn:mace:shibboleth:2.0:afp:mf:basic"
+    xmlns:afp="urn:mace:shibboleth:2.0:afp"
+    elementFormDefault="qualified"
+    version="2.1">
+
+    <import namespace="urn:mace:shibboleth:2.0:afp" schemaLocation="shibboleth-2.0-afp.xsd" />
+
+    <!-- Blanket Match Function -->
+    <complexType name="ANY">
+        <annotation>
+            <documentation>A match function that evaluates to true.</documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType" />
+        </complexContent>
+    </complexType>
+
+    <!--  Boolean Match Functions -->
+    <complexType name="AND">
+        <annotation>
+            <documentation>
+                A match function that performs a logical AND on the results of all contained matching functions.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <choice minOccurs="2" maxOccurs="unbounded">
+                    <element name="Rule" type="afp:MatchFunctorType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                    <element name="RuleReference" type="afp:ReferenceType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                </choice>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="OR">
+        <annotation>
+            <documentation>
+                A match function that performs a logical OR on the results of all contained matching functions.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <choice minOccurs="2" maxOccurs="unbounded">
+                    <element name="Rule" type="afp:MatchFunctorType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                    <element name="RuleReference" type="afp:ReferenceType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                </choice>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="NOT">
+        <annotation>
+            <documentation>
+                A match function that performs a logical NOT on the result of the contained matching function.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <choice>
+                    <element name="Rule" type="afp:MatchFunctorType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                    <element name="RuleReference" type="afp:ReferenceType">
+                        <annotation>
+                            <documentation>
+                                The set of match function rules to be ANDed.
+                            </documentation>
+                        </annotation>
+                    </element>
+                </choice>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <!--  Literal String Match Functions -->
+    <complexType name="AttributeRequesterString">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute request against the specified value.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:StringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeIssuerString">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute issuer against the specified value.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:StringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="PrincipalNameString">
+        <annotation>
+            <documentation>A match function that matches the principal name against the specified value.</documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:StringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AuthenticationMethodString">
+        <annotation>
+            <documentation>
+                A match function that matches the authentication method against the specified value.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:StringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeValueString">
+        <annotation>
+            <documentation>
+                A match function that matches the value of an attribute against the specified value. This match
+                evaluates to true if the attribute contains the specified value.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:AttributeTargetedStringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeScopeString">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute scope against the specified value.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:AttributeTargetedStringMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeTargetedStringMatchType" abstract="true">
+        <complexContent>
+            <extension base="basic:StringMatchType">
+                <attribute name="attributeID" type="string">
+                    <annotation>
+                        <documentation>
+                            The ID of the attribute whose value should be matched. If no attribute ID is specified the
+                            ID of the containing attribute rule is assumed.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="StringMatchType" abstract="true">
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <attribute name="value" type="string" use="required">
+                    <annotation>
+                        <documentation>The string value to match.</documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="ignoreCase" type="boolean">
+                    <annotation>
+                        <documentation>
+                            A boolean flag indicating whether case should be ignored when evaluating the match.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <!--  Regular Expression Match Functions -->
+    <complexType name="AttributeRequesterRegex">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute requester against the specified regular expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:RegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeIssuerRegex">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute issuer against the specified regular expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:RegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="PrincipalNameRegex">
+        <annotation>
+            <documentation>
+                A match function that matches the principal name against the specified regular expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:RegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AuthenticationMethodRegex">
+        <annotation>
+            <documentation>
+                A match function that matches the authentication method against the specified regular expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:RegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeValueRegex">
+        <annotation>
+            <documentation>
+                A match function that matches an attribute value against the specified regular expression. This function
+                evaluates to true if any value matches the given expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:AttributeTargetedRegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeScopeRegex">
+        <annotation>
+            <documentation>
+                A match function that matches the attribute scope against the specified regular expression.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="basic:AttributeTargetedRegexMatchType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="AttributeTargetedRegexMatchType" abstract="true">
+        <complexContent>
+            <extension base="basic:RegexMatchType">
+                <attribute name="attributeID" type="string">
+                    <annotation>
+                        <documentation>
+                            The ID of the attribute whose value should be matched. If no attribute ID is specified the
+                            ID of the containing attribute rule is assumed.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="RegexMatchType" abstract="true">
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <attribute name="regex" type="string" use="required">
+                    <annotation>
+                        <documentation>The regular expression values are matched against.</documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="options" type="string">
+                    <annotation>
+                        <documentation>The regular expression options to apply.</documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <!-- Misc. Functions -->
+    <complexType name="Script">
+        <annotation>
+            <documentation>
+                A match function that evaluates a script to determine if some criteria is met. The script MUST return a
+                boolean.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <choice>
+                    <element name="Script" type="string" minOccurs="0">
+                        <annotation>
+                            <documentation>The script to evaluate to construct the attribute.</documentation>
+                        </annotation>
+                    </element>
+                    <element name="ScriptFile" type="string" minOccurs="0">
+                        <annotation>
+                            <documentation>
+                                The filesystem path to the script to evaluate to construct the attribute.
+                            </documentation>
+                        </annotation>
+                    </element>
+                </choice>
+                <attribute name="language" type="string">
+                    <annotation>
+                        <documentation>
+                            The JSR-233 name for the scripting language that will be used. By default "javascript" is
+                            supported.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="NumberOfAttributeValues">
+        <annotation>
+            <documentation>
+                A match function that evaluates to true if the given attribute has as a number of values that falls
+                between the minimum and maximum. This method may be used as a sanity check to ensure that an unexpected
+                number of values did not come from the attribute resolver and be released.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <attribute name="attributeID" type="string" use="required">
+                    <annotation>
+                        <documentation>The ID of the attribute whose value should be matched.</documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="minimum" type="nonNegativeInteger">
+                    <annotation>
+                        <documentation>Minimum number of values an attribute may have.</documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="maximum" type="positiveInteger">
+                    <annotation>
+                        <documentation>Maximum number of values an attribute may have.</documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:mace:shibboleth:2.0:sp:notify"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:notify="urn:mace:shibboleth:2.0:sp:notify"
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        elementFormDefault="qualified">
+
+    <annotation>
+        <documentation>
+            Defines local application notification protocol used by SP.
+        </documentation>
+    </annotation>
+
+    <import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
+        schemaLocation="saml-schema-assertion-2.0.xsd"/>
+
+    <import namespace="urn:oasis:names:tc:SAML:2.0:protocol"
+        schemaLocation="saml-schema-protocol-2.0.xsd"/>
+
+    <simpleType name="string">
+        <restriction base="string">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+    
+    <element name="OK" type="notify:OKType"/>
+    <complexType name="OKType">
+        <sequence/>
+    </complexType>
+
+    <element name="LogoutNotification" type="notify:LogoutNotificationType"/>
+    <complexType name="LogoutNotificationType">
+        <annotation>
+            <documentation>Notifies application of a logout event.</documentation>
+        </annotation>
+        <sequence>
+            <element name="SessionID" type="notify:string" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="type">
+            <simpleType>
+                <restriction base="string">
+                    <enumeration value="local"/>
+                    <enumeration value="global"/>
+                </restriction>
+            </simpleType>
+        </attribute>
+    </complexType>
+
+    <element name="NameIDNotification" type="notify:NameIDNotificationType"/>
+    <complexType name="NameIDNotificationType">
+        <annotation>
+            <documentation>Notifies application of a NameID management event.</documentation>
+        </annotation>
+        <sequence>
+            <element ref="saml:NameID"/>
+            <choice>
+                <element ref="samlp:NewID"/>
+                <element ref="samlp:Terminate"/>
+            </choice>
+        </sequence>
+    </complexType>
+
+</schema>

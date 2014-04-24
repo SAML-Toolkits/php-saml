@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:mace:shibboleth:2.0:attribute-map"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:am="urn:mace:shibboleth:2.0:attribute-map"
+        xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+        elementFormDefault="qualified"
+        version="2.3">
+
+    <import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd" />
+
+    <annotation>
+        <documentation>
+            This schema maps SAML attributes into Shibboleth internal attributes.
+        </documentation>
+    </annotation>
+
+    <simpleType name="string">
+        <restriction base="string">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="anyURI">
+        <restriction base="anyURI">
+            <minLength value="1"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="listOfStrings">
+        <list itemType="am:string"/>
+    </simpleType>
+
+    <complexType name="PluggableType">
+        <sequence>
+            <any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="type" type="am:string" use="required"/>
+        <anyAttribute namespace="##any" processContents="lax"/>
+    </complexType>
+    
+    <element name="Attributes">
+        <annotation>
+            <documentation>The set of SAML 1/2 attribute mappings.</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element name="MetadataProvider" type="am:PluggableType" minOccurs="0"/>
+                <element name="TrustEngine" type="am:PluggableType" minOccurs="0"/>
+                <element name="AttributeFilter" type="am:PluggableType" minOccurs="0"/>
+                <element name="Attribute" type="am:AttributeType" maxOccurs="unbounded"/>
+                <element ref="ds:Signature" minOccurs="0"/>
+            </sequence>
+            <attribute name="metadataPolicyId" type="am:string"/>
+        </complexType>
+    </element>
+
+    <complexType name="AttributeType">
+        <annotation>
+            <documentation>Rule for mapping a SAML 1/2 attribute to an internal attribute.</documentation>
+        </annotation>
+        <sequence>
+            <element name="AttributeDecoder" type="am:AttributeDecoderType" minOccurs="0"/>
+        </sequence>
+        <attribute name="id" type="am:string" use="required">
+            <annotation>
+                <documentation>The internal attribute ID to which this SAML attribute maps.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="aliases" type="am:listOfStrings">
+            <annotation>
+                <documentation>Optional aliases for the internal attribute to which this SAML attribute maps.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="name" type="am:string" use="required">
+            <annotation>
+                <documentation>The SAML 1 AttributeName or SAML 2 Name of the attribute.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="nameFormat" type="am:string">
+            <annotation>
+                <documentation>The SAML 1 Namespace or SAML 2 NameFormat of the attribute.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="isRequested" type="boolean">
+          <annotation>
+            <documentation>Marks an attribute as requested by the service.</documentation>
+          </annotation>
+        </attribute>
+        <attribute name="isRequired" type="boolean">
+          <annotation>
+            <documentation>Marks an attribute as required by the service.</documentation>
+          </annotation>
+        </attribute>
+    </complexType>
+    
+    <complexType name="AttributeDecoderType" abstract="true">
+        <annotation>
+            <documentation>
+                Decodes a SAML attribute into its Shibboleth-internal representation.
+            </documentation>
+        </annotation>
+        <attribute name="caseSensitive" type="boolean">
+            <annotation>
+                <documentation>
+                    Flag controlling case sensitivity when comparisons to the attribute's values are done.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="internal" type="boolean">
+            <annotation>
+                <documentation>Flag controlling whether the resulting attribute should be exported for CGI use.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="hashAlg" type="am:string">
+            <annotation>
+                <documentation>
+                    Crypto-provider-specific name of hash algorithm to use,
+                    turning the decoded result into a simple string.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+    
+    <complexType name="StringAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with string values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType" />
+        </complexContent>
+    </complexType>
+
+    <complexType name="ScopedAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with scoped values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType">
+                <attribute name="scopeDelimiter" type="am:string">
+                    <annotation>
+                        <documentation>
+                            The character(s) used to delimit the scoped information from the scope.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+    
+    <complexType name="NameIDAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with NameID values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType">
+                <attribute name="formatter" type="am:string">
+                    <annotation>
+                        <documentation>
+                            The pattern used to generate string versions of the attribute's values.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="defaultQualifiers" type="boolean">
+                    <annotation>
+                        <documentation>
+                            Flag controlling whether to default in values for NameQualifier/SPNameQualifier if not set.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="NameIDFromScopedAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with scoped values that produces a NameID attribute with
+                the scope dropped and the NameQualifiers defaulted.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:ScopedAttributeDecoder">
+                <attribute name="format" type="am:anyURI">
+                    <annotation>
+                        <documentation>
+                            Value to use as the NameID Format.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="defaultQualifiers" type="boolean">
+                    <annotation>
+                        <documentation>
+                            Flag controlling whether to default in values for NameQualifier/SPNameQualifier if not set.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="formatter" type="am:string">
+                    <annotation>
+                        <documentation>
+                            The pattern used to generate string versions of the attribute's values.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="KeyInfoAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with ds:KeyInfo values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType">
+                <sequence>
+                    <element name="KeyInfoResolver" type="am:PluggableType" minOccurs="0"/>
+                </sequence>
+                <attribute name="hash" type="boolean">
+                    <annotation>
+                        <documentation>
+                            Flag controlling whether to hash keys before base64-encoding them.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="keyInfoHashAlg" type="am:string">
+                    <annotation>
+                        <documentation>
+                            Crypto-provider-specific name of hash algorithm to use.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="XMLAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for directly serializing XML values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="DOMAttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for extracting information from XML values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType">
+                <sequence>
+                    <element name="Mapping" minOccurs="0">
+                        <annotation>
+                            <documentation>Optional transform to turn qualified XML names into string names.</documentation>
+                        </annotation>
+                        <complexType>
+                            <attribute name="from" type="QName" use="required"/>
+                            <attribute name="to" type="am:string" use="required"/>
+                        </complexType>
+                    </element>
+                </sequence>
+                <attribute name="formatter" type="am:string">
+                    <annotation>
+                        <documentation>
+                            The pattern used to generate strings from the XML.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Base64AttributeDecoder">
+        <annotation>
+            <documentation>
+                Decoder for attributes with base64-encoded string values.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="am:AttributeDecoderType" />
+        </complexContent>
+    </complexType>
+
+</schema>

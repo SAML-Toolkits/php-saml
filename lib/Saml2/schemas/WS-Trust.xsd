@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+Modified copy of WS-Trust schema that only contains WS-Fed PRP-relevant content. 
+ -->
+
+<!--
+
+Copyright Notice
+
+(c) 2001-2005 Actional Corporation, BEA Systems, Inc., 
+Computer Associates International, Inc., International Business Machines Corporation, 
+Layer 7 Technologies, Microsoft Corporation, Netegrity, Inc., Oblix Inc.,
+OpenNetwork Technologies Inc., Ping Identity Corporation, Reactivity Inc., 
+RSA Security Inc., and VeriSign Inc.
+All rights reserved. 
+
+Permission to copy and display the WS-Trust Specification (the "Specification", which 
+includes WSDL and schema documents), in any medium without fee or royalty 
+is hereby granted, provided that you include the following on ALL copies of the 
+Specification, that you make:
+
+1.  A link or URL to the Specification at one of the Authors' websites
+2. The copyright notice as shown in the Specification.
+
+IBM, Microsoft and Actional, BEA, Computer Associates, Layer 7, Netegrity, Oblix, 
+OpenNetwork, Ping Identity, Reactivity, and Verisign (collectively, the "Authors") each 
+agree to grant you a license, under royalty-free and otherwise reasonable, 
+non-discriminatory terms and conditions, to their respective essential patent claims 
+that they deem necessary to implement the Specification.
+
+THE SPECIFICATION IS PROVIDED "AS IS," AND THE AUTHORS MAKE 
+NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT 
+NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF 
+THE SPECIFICATION ARE SUITABLE FOR ANY PURPOSE; NOR THAT THE 
+IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY 
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+THE AUTHORS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, 
+INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO ANY 
+USE OR DISTRIBUTION OF THE SPECIFICATION.
+
+The name and trademarks of the Authors may NOT be used in any manner, 
+including advertising or publicity pertaining to the Specification or 
+its contents without specific, written prior permission. Title to 
+copyright in the Specification will at all times remain with the Authors.
+
+No other rights are granted by implication, estoppel or otherwise.
+
+-->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'
+		   xmlns:wst='http://schemas.xmlsoap.org/ws/2005/02/trust'
+		   targetNamespace='http://schemas.xmlsoap.org/ws/2005/02/trust' 
+		   elementFormDefault='qualified' >
+
+  <!-- WS-Trust Section 5.2 -->
+  <xs:element name='RequestSecurityTokenResponse' type='wst:RequestSecurityTokenResponseType' />
+  <xs:complexType name='RequestSecurityTokenResponseType' >
+	<xs:annotation>
+	  <xs:documentation>
+		Actual content model is non-deterministic, hence wildcard. The following shows intended content model:
+
+		<xs:element ref='wst:TokenType' minOccurs='0' />
+		<xs:element ref='wst:RequestType' />
+		<xs:element ref='wst:RequestedSecurityToken'  minOccurs='0' />
+		<xs:element ref='wsp:AppliesTo' minOccurs='0' /> 
+		<xs:element ref='wst:RequestedAttachedReference' minOccurs='0' />
+		<xs:element ref='wst:RequestedUnattachedReference' minOccurs='0' />
+		<xs:element ref='wst:RequestedProofToken' minOccurs='0' />
+		<xs:element ref='wst:Entropy' minOccurs='0' />
+		<xs:element ref='wst:Lifetime' minOccurs='0' />
+		<xs:element ref='wst:Status' minOccurs='0' />
+		<xs:element ref='wst:AllowPostdating' minOccurs='0' />
+		<xs:element ref='wst:Renewing' minOccurs='0' />
+		<xs:element ref='wst:OnBehalfOf' minOccurs='0' />
+		<xs:element ref='wst:Issuer' minOccurs='0' />
+		<xs:element ref='wst:AuthenticationType' minOccurs='0' />
+		<xs:element ref='wst:Authenticator' minOccurs='0' />
+		<xs:element ref='wst:KeyType' minOccurs='0' />
+		<xs:element ref='wst:KeySize' minOccurs='0' />
+		<xs:element ref='wst:SignatureAlgorithm' minOccurs='0' />
+		<xs:element ref='wst:Encryption' minOccurs='0' />
+		<xs:element ref='wst:EncryptionAlgorithm' minOccurs='0' />
+		<xs:element ref='wst:CanonicalizationAlgorithm' minOccurs='0' />
+		<xs:element ref='wst:ProofEncryption' minOccurs='0' />
+		<xs:element ref='wst:UseKey' minOccurs='0' />
+		<xs:element ref='wst:SignWith' minOccurs='0' />
+		<xs:element ref='wst:EncryptWith' minOccurs='0' />
+		<xs:element ref='wst:DelegateTo' minOccurs='0' />
+		<xs:element ref='wst:Forwardable' minOccurs='0' />
+		<xs:element ref='wst:Delegatable' minOccurs='0' />
+		<xs:element ref='wsp:Policy' minOccurs='0' />
+		<xs:element ref='wsp:PolicyReference' minOccurs='0' />
+		<xs:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+
+	  </xs:documentation>
+	</xs:annotation>
+	<xs:sequence>
+	  <xs:any namespace='##any' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+	</xs:sequence>
+	<xs:attribute name='Context' type='xs:anyURI' use='optional' />
+	<xs:anyAttribute namespace='##other' processContents='lax' />
+  </xs:complexType>
+
+  <xs:element name='RequestedSecurityToken' type='wst:RequestedSecurityTokenType' />
+  <xs:complexType name='RequestedSecurityTokenType' >
+	<xs:sequence>
+	  <xs:any namespace='##any' processContents='lax' />
+	</xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
