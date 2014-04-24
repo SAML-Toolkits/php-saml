@@ -6,7 +6,7 @@ $basePath = dirname(dirname(__FILE__));
 
 require_once $basePath.'/_toolkit_loader.php';
 
-if (!defined('TEST_ROOT')) define('TEST_ROOT', __DIR__);
+if (!defined('TEST_ROOT')) define('TEST_ROOT', dirname(__FILE__));
 
 if (!defined('XMLSECLIBS_DIR')) define('XMLSECLIBS_DIR', $basePath.'/extlib/xmlseclibs/');
 require_once XMLSECLIBS_DIR . 'xmlseclibs.php';
