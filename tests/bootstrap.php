@@ -2,14 +2,16 @@
 
 ob_start();
 
-require_once '../_toolkit_loader.php';
+$basePath = dirname(dirname(__FILE__));
+
+require_once $basePath.'/_toolkit_loader.php';
 
 if (!defined('TEST_ROOT')) define('TEST_ROOT', __DIR__);
 
-if (!defined('XMLSECLIBS_DIR')) define('XMLSECLIBS_DIR', '../extlib/xmlseclibs/');
+if (!defined('XMLSECLIBS_DIR')) define('XMLSECLIBS_DIR', $basePath.'/extlib/xmlseclibs/');
 require_once XMLSECLIBS_DIR . 'xmlseclibs.php';
 
-if (!defined('ONELOGIN_SAML_DIR')) define('ONELOGIN_SAML_DIR', '../lib/Saml/');
+if (!defined('ONELOGIN_SAML_DIR')) define('ONELOGIN_SAML_DIR', $basePath.'/lib/Saml/');
 require_once ONELOGIN_SAML_DIR . 'AuthRequest.php';
 require_once ONELOGIN_SAML_DIR . 'Response.php';
 require_once ONELOGIN_SAML_DIR . 'Settings.php';
