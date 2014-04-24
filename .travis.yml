@@ -4,6 +4,5 @@ php:
   - 5.5
   - 5.4
   - 5.3
-  - 5.2
 
 script: phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
