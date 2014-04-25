@@ -56,27 +56,51 @@ Key features:
  * **Popular** - OneLogin's customers use it. Many PHP SAML plugins uses it.
 
 
-Download
---------
+Installation
+------------
+
+### Dependences ###
+
+ * php >= 5.3.3
+ * openssl. Install the openssl library. Handle x509 certificates.
+ * mcrypt. Install that library and its php driver if you gonna handle
+   encrypted data. (nameID, assertions)
+
+### Code ###
+
+#### Option 1. Download from github ####
 
 The toolkit is hosted on github. You can download it from:
 
  * Lastest release: https://github.com/onelogin/php-saml/releases/tag/v2.0.0
  * Master repo: https://github.com/onelogin/php-saml/tree/master
+ 
+Copy the core of the library inside the php application. (each application has its
+structure so take your time to locate the PHP SAML toolkit in the best place).
+See the "Guide to add SAML support to my app" to know how.
 
+#### Option 2. Composer ####
 
-Installation
-------------
+The toolkit supports [composer][1]. You can find the onelogin/php-saml package at https://packagist.org/packages/onelogin/php-saml
 
-  1. Dependences:
-    * php >= 5.3.3
-    * openssl. Install the openssl library. Handle x509 certificates.
-    * mcrypt. Install that library and its php driver if you gonna handle
-      encrypted data. (nameID, assertions)
-  2. Code. Copy the core of the library inside the php application.
-     (each application has its structure so take your time to locate the
-     PHP SAML toolkit in the best place). See the "Guide to add SAML support
-     to my app" to know how.
+In order to import the saml toolkit to your current php project, just add to the composer.json file this require:
+
+ "onelogin/php-saml": "master-dev"
+
+Done that, execute:
+```
+ composer install
+```
+
+you will find at the "vendor" folder a new folder named *onelogin* and inside the *php-saml*.
+
+Composer will automatically handle the libraries (with require "vendor/autoload.php" you will load all the vendor libraries).
+
+**Important** In this option, the x509 certs must be stored at *vendor/onelogin/php-saml/certs*
+and settings file should be stored at *vendor/onelogin/php-saml*.
+But could be easier to use the "array method" to provide settings info (explained later)
+
+  [1]: https://getcomposer.org/
 
 
 Compatibility
