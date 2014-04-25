@@ -8,6 +8,6 @@
 /certs/sp.crt
 /certs/metadata.key
 /certs/metadata.crt
-/test/reports
+/test/build
 /vendor
 /composer.lock

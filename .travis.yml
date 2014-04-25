@@ -6,3 +6,5 @@ php:
   - 5.3
 
 script: phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+
+after_script: vendor/satooshi/php-coveralls/composer/bin/coveralls --config .coveralls.yml
