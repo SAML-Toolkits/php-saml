@@ -6,5 +6,18 @@ php:
   - 5.3
 
 script: phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+	php vendor/bin/phpcpd --exclude vendor .
+	echo "---------------------------------------------------"
+	echo "----------------GLOBAL LOC-------------------------"
+        echo "---------------------------------------------------"
+        php vendor/bin/phploc . --exclude vendor
+        echo "---------------------------------------------------"
+        echo "----------------LIB LOC----------------------------"
+        echo "---------------------------------------------------"
+        php vendor/bin/phploc lib/. --exclude vendor
 
-after_script: php vendor/bin/coveralls --config .coveralls.yml -v
+after_script: 
+	export TRAVIS=https://travis-ci.org/onelogin/php-saml
+	echo $TRAVIS
+	echo $TRAVIS_JOB_ID
+	php vendor/bin/coveralls --config .coveralls.yml -v
