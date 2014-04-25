@@ -7,4 +7,4 @@ php:
 
 script: phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
 
-after_script: vendor/satooshi/php-coveralls/composer/bin/coveralls --config .coveralls.yml
+after_script: php vendor/bin/coveralls --config .coveralls.yml -v
