@@ -10,7 +10,7 @@ require_once dirname(dirname(__FILE__)).'/_toolkit_loader.php';
 
 require_once 'settings.php';
 
-$auth = new Onelogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 if (isset($_GET['sso'])) {
     $auth->login();
@@ -34,7 +34,7 @@ if (isset($_GET['sso'])) {
     }
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
-    if (isset($_POST['RelayState']) && Onelogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);
     }
 } else if (isset($_GET['sls'])) {

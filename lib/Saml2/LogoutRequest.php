@@ -4,7 +4,7 @@
  * SAML 2 Logout Request
  *
  */
-class Onelogin_Saml2_LogoutRequest
+class OneLogin_Saml2_LogoutRequest
 {
     /**
      * Object that represents the setting info
@@ -31,16 +31,16 @@ class Onelogin_Saml2_LogoutRequest
         $idpData = $this->_settings->getIdPData();
         $security = $this->_settings->getSecurityData();
 
-        $id = Onelogin_Saml2_Utils::generateUniqueID();
-        $nameIdValue = Onelogin_Saml2_Utils::generateUniqueID();
-        $issueInstant = Onelogin_Saml2_Utils::parseTime2SAML(time());
+        $id = OneLogin_Saml2_Utils::generateUniqueID();
+        $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
+        $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
         
         $key = null;
         if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
             $key = $idpData['x509cert'];
         }
 
-        $nameId = Onelogin_Saml2_Utils::generateNameId(
+        $nameId = OneLogin_Saml2_Utils::generateNameId(
             $nameIdValue,
             $spData['entityId'],
             $spData['NameIDFormat'],
@@ -112,7 +112,7 @@ LOGOUTREQUEST;
             $dom->loadXML($request);
         }
 
-        $encryptedEntries = Onelogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:EncryptedID');
+        $encryptedEntries = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:EncryptedID');
 
         if ($encryptedEntries->length == 1) {
             $encryptedDataNodes = $encryptedEntries->item(0)->getElementsByTagName('EncryptedData');
@@ -128,7 +128,7 @@ LOGOUTREQUEST;
             $nameId = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey);
 
         } else {
-            $entries = Onelogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
+            $entries = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
             if ($entries->length == 1) {
                 $nameId = $entries->item(0);
             }
@@ -180,7 +180,7 @@ LOGOUTREQUEST;
         }
 
         $issuer = null;
-        $issuerNodes = Onelogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:Issuer');
+        $issuerNodes = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:Issuer');
         if ($issuerNodes->length == 1) {
             $issuer = $issuerNodes->item(0)->textContent;
         }
@@ -204,7 +204,7 @@ LOGOUTREQUEST;
         }
 
         $sessionIndexes = array();
-        $sessionIndexNodes = Onelogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/samlp:SessionIndex');
+        $sessionIndexNodes = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/samlp:SessionIndex');
         foreach ($sessionIndexNodes as $sessionIndexNode) {
             $sessionIndexes[] = $sessionIndexNode->textContent;
         }
@@ -234,14 +234,14 @@ LOGOUTREQUEST;
 
             if ($settings->isStrict()) {
 
-                $res = Onelogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $debug);
+                $res = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $debug);
                 if (!$res instanceof DOMDocument) {
                     throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
                 }
 
                 $security = $settings->getSecurityData();
 
-                $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
                 // Check NotOnOrAfter
                 if ($dom->documentElement->hasAttribute('NotOnOrAfter')) {

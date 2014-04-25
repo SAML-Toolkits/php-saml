@@ -20,16 +20,16 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the Onelogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
     * The creation of a deflated SAML Request
     *
-    * @covers Onelogin_Saml2_AuthnRequest
+    * @covers OneLogin_Saml2_AuthnRequest
     */
     public function testCreateDeflatedSAMLRequestURLParameter()
     {
-        $authnRequest = new Onelogin_Saml2_AuthnRequest($this->_settings, false, false);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, false, false);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
-        $authUrl = Onelogin_Saml2_Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
+        $authUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
         $this->assertRegExp('#^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=#', $authUrl);
         parse_str(parse_url($authUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -40,10 +40,10 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the Onelogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
     * The creation of a deflated SAML Request
     *
-    * @covers Onelogin_Saml2_AuthnRequest
+    * @covers OneLogin_Saml2_AuthnRequest
     */
     public function testCreateEncSAMLRequest()
     {
@@ -61,9 +61,9 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
-        $authnRequest = new Onelogin_Saml2_AuthnRequest($settings);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
-        $authUrl = Onelogin_Saml2_Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
+        $authUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
         $this->assertRegExp('#^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=#', $authUrl);
         parse_str(parse_url($authUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.

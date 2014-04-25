@@ -5,7 +5,7 @@
  *
  * Defines the Error class
  */
-class Onelogin_Saml2_Error extends Exception
+class OneLogin_Saml2_Error extends Exception
 {
     // Errors
     const SETTINGS_FILE_NOT_FOUND = 0;
@@ -34,7 +34,7 @@ class Onelogin_Saml2_Error extends Exception
         assert('is_string($msg)');
         assert('is_int($code)');
 
-        $message = Onelogin_Saml2_Utils::t($msg, $args);
+        $message = OneLogin_Saml2_Utils::t($msg, $args);
 
         parent::__construct($message, $code);
     }

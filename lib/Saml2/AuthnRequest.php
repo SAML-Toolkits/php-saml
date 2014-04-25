@@ -4,12 +4,12 @@
  * SAML 2 Authentication Request
  *
  */
-class Onelogin_Saml2_AuthnRequest
+class OneLogin_Saml2_AuthnRequest
 {
 
     /**
      * Object that represents the setting info
-     * @var Onelogin_Saml2_Settings
+     * @var OneLogin_Saml2_Settings
      */
     protected $_settings;
 
@@ -32,12 +32,12 @@ class Onelogin_Saml2_AuthnRequest
         $idpData = $this->_settings->getIdPData();
         $security = $this->_settings->getSecurityData();
 
-        $id = Onelogin_Saml2_Utils::generateUniqueID();
-        $issueInstant = Onelogin_Saml2_Utils::parseTime2SAML(time());
+        $id = OneLogin_Saml2_Utils::generateUniqueID();
+        $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
         
         $nameIDPolicyFormat = $spData['NameIDFormat'];
         if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
-            $nameIDPolicyFormat = Onelogin_Saml2_Constants::NAMEID_ENCRYPTED;
+            $nameIDPolicyFormat = OneLogin_Saml2_Constants::NAMEID_ENCRYPTED;
         }
 
         $providerNameStr = '';

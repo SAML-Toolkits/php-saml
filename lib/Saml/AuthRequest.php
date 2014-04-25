@@ -4,19 +4,19 @@ class OneLogin_Saml_AuthRequest
 {
 
     /**
-     * @var Onelogin_Saml2_Auth object
+     * @var OneLogin_Saml2_Auth object
      */
     protected $auth;
 
     /**
-     * Constructs the Onelogin_Saml2_Auth, initializing
+     * Constructs the OneLogin_Saml2_Auth, initializing
      * the SP SAML instance.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      */
     public function __construct($settings)
     {
-        $this->auth = new Onelogin_Saml2_Auth($settings);
+        $this->auth = new OneLogin_Saml2_Auth($settings);
     }
 
     /**
@@ -28,20 +28,20 @@ class OneLogin_Saml_AuthRequest
     public function getRedirectUrl($returnTo = null)
     {
         $settings = $this->auth->getSettings();
-        $authnRequest = new Onelogin_Saml2_AuthnRequest($settings);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         }
-        $url = Onelogin_Saml2_Utils::redirect($this->auth->getSSOurl(), $parameters, true);
+        $url = OneLogin_Saml2_Utils::redirect($this->auth->getSSOurl(), $parameters, true);
         return $url;
     }
 
     protected function _generateUniqueID()
     {
-        return Onelogin_Saml2_Utils::generateUniqueID();
+        return OneLogin_Saml2_Utils::generateUniqueID();
     }
 
     protected function _getTimestamp()

@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    Onelogin&#039;s SAML PHP Toolkit &raquo; \Onelogin_Saml2_AuthnRequest
+    <title>    OneLogin&#039;s SAML PHP Toolkit &raquo; \OneLogin_Saml2_Metadata
 </title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
@@ -33,7 +33,7 @@
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span> <span class="icon-bar"></span>
                     <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">Onelogin&#039;s SAML PHP Toolkit</a>
+                <a class="brand" href="../index.html">OneLogin&#039;s SAML PHP Toolkit</a>
 
                 <div class="nav-collapse">
                     <ul class="nav">
@@ -46,7 +46,7 @@
                         </li>
                         <li class="dropdown" id="classes-menu">
                             <a href="../namespaces/default.html">Classes</a>
-                        </li>                         
+                        </li> 
                         <li class="dropdown" id="charts-menu">
                             <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
                                 Charts <b class="caret"></b>
@@ -99,14 +99,22 @@
             <i class="icon-custom icon-method"></i> Methods
             <ul>
                                                                                                     <li class="method public">
-        <a href="#method___construct" title="__construct :: Constructs the AuthnRequest object.">
-            <span class="description">Constructs the AuthnRequest object.</span><pre>__construct</pre>
+        <a href="#method_builder" title="builder :: Generates the metadata of the SP based on the settings">
+            <span class="description">Generates the metadata of the SP based on the settings</span><pre>builder</pre>
         </a>
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_getRequest" title="getRequest :: Returns deflated, base64 encoded, unsigned AuthnRequest.">
-            <span class="description">Returns deflated, base64 encoded, unsigned AuthnRequest.</span><pre>getRequest</pre>
+        <a href="#method_signMetadata" title="signMetadata :: Signs the metadata with the key/cert provided">
+            <span class="description">Signs the metadata with the key/cert provided</span><pre>signMetadata</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_addX509KeyDescriptors" title="addX509KeyDescriptors :: Adds the x509 descriptors (sign/encriptation) to the metadata
+The same cert will be used for sign/encrypt">
+            <span class="description">Adds the x509 descriptors (sign/encriptation) to the metadata
+The same cert will be used for sign/encrypt</span><pre>addX509KeyDescriptors</pre>
         </a>
     </li>
 
@@ -114,15 +122,25 @@
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                    </ul>
+                                                                                                                                                        </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                    </ul>
+                                                                                                                                                        </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
             <ul>
+                                <li class="constant ">
+                    <a href="#constant_TIME_VALID" title="TIME_VALID :: ">
+                        <span class="description"></span><pre>TIME_VALID</pre>
+                    </a>
+                </li>
+                                <li class="constant ">
+                    <a href="#constant_TIME_CACHED" title="TIME_CACHED :: ">
+                        <span class="description"></span><pre>TIME_CACHED</pre>
+                    </a>
+                </li>
                             </ul>
         </li>
     </ul>
@@ -132,10 +150,10 @@
 
         <div class="span8">
             <div class="element class">
-                <h1>Onelogin_Saml2_AuthnRequest</h1>
+                <h1>OneLogin_Saml2_Metadata</h1>
                 <small style="display: block; text-align: right">
                                                         </small>
-                <p class="short_description">SAML 2 Authentication Request</p>
+                <p class="short_description">Metadata lib of OneLogin PHP Toolkit</p>
                 <div class="details">
                     <div class="long_description">
                         
@@ -144,24 +162,17 @@
                                                                                                                                                                                                                                                             </table>
 
                     <h3><i class="icon-custom icon-method"></i> Methods</h3>
-                                                                <a id="method___construct"></a>
-                        <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
-                            <h2>Constructs the AuthnRequest object.</h2>
-                            <pre>__construct(\OneLogin_Saml2_Settings $settings) </pre>
+                                                                <a id="method_builder"></a>
+                        <div class="element clickable method public  method_builder" data-toggle="collapse" data-target=".method_builder .collapse">
+                            <h2>Generates the metadata of the SP based on the settings</h2>
+                            <pre>builder(string $sp, string $authnsign = false, string $wsign = false, \DateTime $validUntil = null, \Timestamp $cacheDuration = null, array $contacts = array(), array $organization = array()) : string</pre>
                             <div class="labels">
-                                                                                                                                                                                            </div>
+                                                                <span class="label">static</span>                                                                                                                            </div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
                                                                                     <tr>
                                                 <th>
                                                     
@@ -173,19 +184,45 @@
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
-                                                <h4>$settings</h4>
-                                                <code>\OneLogin_Saml2_Settings</code><p><p>Settings</p></p>
+                                                <h4>$sp</h4>
+                                                <code>string</code><p><p>The SP data</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$authnsign</h4>
+                                                <code>string</code><p><p>authnRequestsSigned attribute</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$wsign</h4>
+                                                <code>string</code><p><p>wantAssertionsSigned attribute</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$validUntil</h4>
+                                                <code>\DateTime</code><p><p>Metadata's valid time</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$cacheDuration</h4>
+                                                <code>\Timestamp</code><p><p>Duration of the cache in seconds</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$contacts</h4>
+                                                <code>array</code><p><p>Contacts info</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$organization</h4>
+                                                <code>array</code><p><p>Organization ingo</p></p>
                                             </div>
                                                                             
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>SAML Metadata XML</p></p>
                                                                     </div>
                             </div>
                         </div>
-                                            <a id="method_getRequest"></a>
-                        <div class="element clickable method public  method_getRequest" data-toggle="collapse" data-target=".method_getRequest .collapse">
-                            <h2>Returns deflated, base64 encoded, unsigned AuthnRequest.</h2>
-                            <pre>getRequest() </pre>
+                                            <a id="method_signMetadata"></a>
+                        <div class="element clickable method public  method_signMetadata" data-toggle="collapse" data-target=".method_signMetadata .collapse">
+                            <h2>Signs the metadata with the key/cert provided</h2>
+                            <pre>signMetadata(string $metadata, string $key, string $cert) : string</pre>
                             <div class="labels">
-                                                                                                                                                                                            </div>
+                                                                <span class="label">static</span>                                                                                                                            </div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"></div>
@@ -198,13 +235,39 @@
                                                 <td>
                                                                                                     </td>
                                             </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$metadata</h4>
+                                                <code>string</code><p><p>SAML Metadata XML</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$key</h4>
+                                                <code>string</code><p><p>x509 key</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$cert</h4>
+                                                <code>string</code><p><p>x509 cert</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>Signed Metadata</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_addX509KeyDescriptors"></a>
+                        <div class="element clickable method public  method_addX509KeyDescriptors" data-toggle="collapse" data-target=".method_addX509KeyDescriptors .collapse">
+                            <h2>Adds the x509 descriptors (sign/encriptation) to the metadata
+The same cert will be used for sign/encrypt</h2>
+                            <pre>addX509KeyDescriptors(string $metadata, string $cert) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
                                                                                     <tr>
                                                 <th>
                                                     
@@ -214,30 +277,38 @@
                                             </tr>
                                                                             </table>
 
-                                    
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$metadata</h4>
+                                                <code>string</code><p><p>SAML Metadata XML</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$cert</h4>
+                                                <code>string</code><p><p>x509 cert</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>Metadata with KeyDescriptors</p></p>
                                                                     </div>
                             </div>
                         </div>
                     
-                    
-                                                                <h3><i class="icon-custom icon-property"></i> Properties</h3>
-                                                    <a id="property__settings"> </a>
-                            <div class="element clickable property  protected property__settings" data-toggle="collapse" data-target=".property__settings .collapse">
-                                <h2>Object that represents the setting info</h2>
-                                <pre>_settings : \Onelogin_Saml2_Settings</pre>
+                                            <h3><i class="icon-custom icon-constant"></i> Constants</h3>
+                                                    <a id="constant_TIME_VALID"> </a>
+                            <div class="element clickable constant  constant_TIME_VALID" data-toggle="collapse" data-target=".constant_TIME_VALID .collapse">
+                                <h2>TIME_VALID</h2>
+                                <pre>TIME_VALID</pre>
                                 <div class="labels">
-                                                                                                        </div>
+                                                                    </div>
                                 <div class="row collapse">
                                     <div class="detail-description">
                                         <div class="long_description"></div>
-
                                         <table class="table">
                                                                                             <tr>
                                                     <th>
-                                                        var
+                                                        
                                                     </th>
                                                     <td>
-                                                                                                                    
                                                                                                             </td>
                                                 </tr>
                                                                                             <tr>
@@ -248,29 +319,24 @@
                                                                                                             </td>
                                                 </tr>
                                                                                     </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code><a href="../classes/Onelogin_Saml2_Settings.html">\Onelogin_Saml2_Settings</a></code>
-                                                                            </div>
+                                    </div>
                                 </div>
                             </div>
-                                                    <a id="property__authnRequest"> </a>
-                            <div class="element clickable property  private property__authnRequest" data-toggle="collapse" data-target=".property__authnRequest .collapse">
-                                <h2>SAML AuthNRequest string</h2>
-                                <pre>_authnRequest : string</pre>
+                                                    <a id="constant_TIME_CACHED"> </a>
+                            <div class="element clickable constant  constant_TIME_CACHED" data-toggle="collapse" data-target=".constant_TIME_CACHED .collapse">
+                                <h2>TIME_CACHED</h2>
+                                <pre>TIME_CACHED</pre>
                                 <div class="labels">
-                                                                                                        </div>
+                                                                    </div>
                                 <div class="row collapse">
                                     <div class="detail-description">
                                         <div class="long_description"></div>
-
                                         <table class="table">
                                                                                             <tr>
                                                     <th>
-                                                        var
+                                                        
                                                     </th>
                                                     <td>
-                                                                                                                    
                                                                                                             </td>
                                                 </tr>
                                                                                             <tr>
@@ -281,22 +347,20 @@
                                                                                                             </td>
                                                 </tr>
                                                                                     </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
+                                    </div>
                                 </div>
                             </div>
-                                                            </div>
+                                            
+                                                        </div>
             </div>
-            <a id="\Onelogin_Saml2_AuthnRequest"></a>
+            <a id="\OneLogin_Saml2_Metadata"></a>
             <ul class="breadcrumb">
                 <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
                     
     
     <li><span class="divider">\</span><a href="../namespaces/default.html">\</a></li>
 
-                <li class="active"><span class="divider">\</span><a href="../classes/Onelogin_Saml2_AuthnRequest.html">Onelogin_Saml2_AuthnRequest</a></li>
+                <li class="active"><span class="divider">\</span><a href="../classes/OneLogin_Saml2_Metadata.html">OneLogin_Saml2_Metadata</a></li>
             </ul>
         </div>
     </div>
@@ -307,7 +371,7 @@
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Mon, 14 Apr 2014 20:25:56 +0100.<br/>
+            generated on Mon, 14 Apr 2014 20:25:55 +0100.<br/>
     </footer>
     </body>
 </html>

@@ -12,7 +12,7 @@ class OneLogin_Saml_Response extends OneLogin_Saml2_Response
      */
     public function __construct($oldSettings, $assertion)
     {
-        $auth = new Onelogin_Saml2_Auth($oldSettings);
+        $auth = new OneLogin_Saml2_Auth($oldSettings);
         $settings = $auth->getSettings();
         parent::__construct($settings, $assertion);
     }

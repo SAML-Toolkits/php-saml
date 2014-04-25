@@ -4,7 +4,7 @@
  * Main class of OneLogin's PHP Toolkit
  *
  */
-class Onelogin_Saml2_Auth
+class OneLogin_Saml2_Auth
 {
 
     /**
@@ -49,7 +49,7 @@ class Onelogin_Saml2_Auth
      */
     public function __construct($oldSettings = null)
     {
-        $this->_settings = new Onelogin_Saml2_Settings($oldSettings);
+        $this->_settings = new OneLogin_Saml2_Settings($oldSettings);
     }
 
     /**
@@ -96,9 +96,9 @@ class Onelogin_Saml2_Auth
             }
         } else {
             $this->_errors[] = 'invalid_binding';
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 'SAML Response not found, Only supported HTTP_POST Binding',
-                Onelogin_Saml2_Error::SAML_RESPONSE_NOT_FOUND
+                OneLogin_Saml2_Error::SAML_RESPONSE_NOT_FOUND
             );
         }
     }
@@ -116,7 +116,7 @@ class Onelogin_Saml2_Auth
             $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
             if (!$logoutResponse->isValid($requestId)) {
                 $this->_errors[] = 'invalid_logout_response';
-            } else if ($logoutResponse->getStatus() !== Onelogin_Saml2_Constants::STATUS_SUCCESS) {
+            } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
             } else {
                 if (!$keepLocalSession) {
@@ -126,14 +126,14 @@ class Onelogin_Saml2_Auth
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
             $decoded = base64_decode($_GET['SAMLRequest']);
             $request = gzinflate($decoded);
-            if (!Onelogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
+            if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
                 $this->_errors[] = 'invalid_logout_request';
             } else {
                 if (!$keepLocalSession) {
                     OneLogin_Saml2_Utils::deleteLocalSession();
                 }
 
-                $inResponseTo = Onelogin_Saml2_LogoutRequest::getID($request);
+                $inResponseTo = OneLogin_Saml2_LogoutRequest::getID($request);
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
                 $logoutResponse = $responseBuilder->getResponse();
@@ -154,9 +154,9 @@ class Onelogin_Saml2_Auth
             }
         } else {
             $this->_errors[] = 'invalid_binding';
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 'SAML LogoutRequest/LogoutResponse not found. Only supported HTTP_REDIRECT Binding',
-                Onelogin_Saml2_Error::SAML_LOGOUTMESSAGE_NOT_FOUND
+                OneLogin_Saml2_Error::SAML_LOGOUTMESSAGE_NOT_FOUND
             );
         }
     }
@@ -177,7 +177,7 @@ class Onelogin_Saml2_Auth
             $url = $_REQUEST['RelayState'];
         }
 
-        Onelogin_Saml2_Utils::redirect($url, $parameters);
+        OneLogin_Saml2_Utils::redirect($url, $parameters);
     }
 
     /**
@@ -245,7 +245,7 @@ class Onelogin_Saml2_Auth
      */
     public function login($returnTo = null)
     {
-        $authnRequest = new Onelogin_Saml2_AuthnRequest($this->_settings);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
 
         $samlRequest = $authnRequest->getRequest();
         $parameters = array('SAMLRequest' => $samlRequest);
@@ -253,7 +253,7 @@ class Onelogin_Saml2_Auth
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         }
 
         $security = $this->_settings->getSecurityData();
@@ -274,13 +274,13 @@ class Onelogin_Saml2_Auth
     {
         $sloUrl = $this->getSLOurl();
         if (!isset($sloUrl)) {
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 'The IdP does not support Single Log Out',
-                Onelogin_Saml2_Error::SAML_SINGLE_LOGOUT_NOT_SUPPORTED
+                OneLogin_Saml2_Error::SAML_SINGLE_LOGOUT_NOT_SUPPORTED
             );
         }
 
-        $logoutRequest = new Onelogin_Saml2_LogoutRequest($this->_settings);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings);
 
         $samlRequest = $logoutRequest->getRequest();
 
@@ -288,7 +288,7 @@ class Onelogin_Saml2_Auth
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         }
 
         $security = $this->_settings->getSecurityData();
@@ -338,9 +338,9 @@ class Onelogin_Saml2_Auth
     public function buildRequestSignature($samlRequest, $relayState)
     {
         if (!$this->_settings->checkSPCerts()) {
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 "Trying to sign the SAML Request but can't load the SP certs",
-                Onelogin_Saml2_Error::SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
             );
         }        
 
@@ -367,9 +367,9 @@ class Onelogin_Saml2_Auth
     public function buildResponseSignature($samlResponse, $relayState)
     {
         if (!$this->_settings->checkSPCerts()) {
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 "Trying to sign the SAML Response but can't load the SP certs",
-                Onelogin_Saml2_Error::SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
             );
         }
 

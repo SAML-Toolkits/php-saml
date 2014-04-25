@@ -6,7 +6,7 @@
  * Defines several often used methods
  */
 
-class Onelogin_Saml2_Utils
+class OneLogin_Saml2_Utils
 {
     /**
     * Translates any string. Accepts args  
@@ -122,9 +122,9 @@ class Onelogin_Saml2_Utils
 
         /* Verify that the URL is to a http or https site. */
         if (!preg_match('@^https?://@i', $url)) {
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
-                Onelogin_Saml2_Error::REDIRECT_INVALID_URL
+                OneLogin_Saml2_Error::REDIRECT_INVALID_URL
             );
         }
 
@@ -480,9 +480,9 @@ class Onelogin_Saml2_Utils
     public static function query($dom, $query, $context = null)
     {
         $xpath = new DOMXPath($dom);
-        $xpath->registerNamespace('samlp', Onelogin_Saml2_Constants::NS_SAMLP);
-        $xpath->registerNamespace('saml', Onelogin_Saml2_Constants::NS_SAML);
-        $xpath->registerNamespace('ds', Onelogin_Saml2_Constants::NS_DS);
+        $xpath->registerNamespace('samlp', OneLogin_Saml2_Constants::NS_SAMLP);
+        $xpath->registerNamespace('saml', OneLogin_Saml2_Constants::NS_SAML);
+        $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
 
         if (isset($context)) {
             $res = $xpath->query($query, $context);
@@ -844,8 +844,8 @@ class Onelogin_Saml2_Utils
             return ($objXMLSecDSig->verify($objKey) === 1);
         } else {
             $domCert = $objKey->getX509Certificate();
-            $domCertFingerprint = Onelogin_Saml2_Utils::calculateX509Fingerprint($domCert);
-            if (Onelogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
+            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert);
+            if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
                 return false;
             } else {
                 $objKey->loadKey($domCert, false, true);

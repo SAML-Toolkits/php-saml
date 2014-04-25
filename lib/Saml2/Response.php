@@ -106,14 +106,14 @@ class OneLogin_Saml2_Response
 
             if ($this->_settings->isStrict()) {
 
-                $res = Onelogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                 if (!$res instanceof DOMDocument) {
                     throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
                 }
 
                 $security = $this->_settings->getSecurityData();
 
-                $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
                 
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
@@ -189,7 +189,7 @@ class OneLogin_Saml2_Response
                 $anySubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
                 foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != Onelogin_Saml2_Constants::CM_BEARER) {
+                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != OneLogin_Saml2_Constants::CM_BEARER) {
                         continue;
                     }
                     $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
@@ -253,7 +253,7 @@ class OneLogin_Saml2_Response
                     }
                 }
 
-                if (!Onelogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
+                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
             }
@@ -274,9 +274,9 @@ class OneLogin_Saml2_Response
      */
     public function checkStatus()
     {
-        $status = Onelogin_Saml2_Utils::getStatus($this->document);
+        $status = OneLogin_Saml2_Utils::getStatus($this->document);
 
-        if (isset($status['code']) && $status['code'] !== Onelogin_Saml2_Constants::STATUS_SUCCESS) {
+        if (isset($status['code']) && $status['code'] !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
             $explodedCode = explode(':', $status['code']);
             $printableCode = array_pop($explodedCode);
 
@@ -484,10 +484,10 @@ class OneLogin_Saml2_Response
         for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if ($nbAttribute && Onelogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + Onelogin_Saml2_Constants::ALOWED_CLOCK_DRIFT) {
+            if ($nbAttribute && Onelogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALOWED_CLOCK_DRIFT) {
                 return false;
             }
-            if ($naAttribute && Onelogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + Onelogin_Saml2_Constants::ALOWED_CLOCK_DRIFT <= time()) {
+            if ($naAttribute && Onelogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALOWED_CLOCK_DRIFT <= time()) {
                 return false;
             }
         }
@@ -546,7 +546,7 @@ class OneLogin_Saml2_Response
      */
     private function _query($query)
     {
-        return Onelogin_Saml2_Utils::query($this->document, $query);
+        return OneLogin_Saml2_Utils::query($this->document, $query);
     }
 
     /**

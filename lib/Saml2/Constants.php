@@ -5,7 +5,7 @@
  *
  * Defines all required constants
  */
-class Onelogin_Saml2_Constants
+class OneLogin_Saml2_Constants
 {
     // Value added to the current time in time condition validations
     const ALOWED_CLOCK_DRIFT = 180;  // 3 min in seconds

@@ -8,7 +8,7 @@ class OneLogin_Saml_Metadata
 
     public function __construct($settings=null)
     {
-        $auth = new Onelogin_Saml2_Auth($settings);
+        $auth = new OneLogin_Saml2_Auth($settings);
         $this->_settings = $auth->getSettings();
     }
 

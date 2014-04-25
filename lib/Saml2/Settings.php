@@ -5,7 +5,7 @@
  *
  */
 
-class Onelogin_Saml2_Settings
+class OneLogin_Saml2_Settings
 {
     /**
      * List of paths.
@@ -87,18 +87,18 @@ class Onelogin_Saml2_Settings
 
         if (!isset($settings)) {
             if (!$this->_loadSettingsFromFile()) {
-                throw new Onelogin_Saml2_Error(
+                throw new OneLogin_Saml2_Error(
                     'Invalid file settings: %s',
-                    Onelogin_Saml2_Error::SETTINGS_INVALID,
+                    OneLogin_Saml2_Error::SETTINGS_INVALID,
                     array(implode(', ', $this->_errors))
                 );
             }
             $this->_addDefaultValues();
         } else if (is_array($settings)) {
             if (!$this->_loadSettingsFromArray($settings)) {
-                throw new Onelogin_Saml2_Error(
+                throw new OneLogin_Saml2_Error(
                     'Invalid array settings: %s',
-                    Onelogin_Saml2_Error::SETTINGS_INVALID,
+                    OneLogin_Saml2_Error::SETTINGS_INVALID,
                     array(implode(', ', $this->_errors))
                 );
             }
@@ -241,9 +241,9 @@ class Onelogin_Saml2_Settings
         $filename = $this->getConfigPath().'settings.php';
 
         if (!file_exists($filename)) {
-            throw new Onelogin_Saml2_Error(
+            throw new OneLogin_Saml2_Error(
                 'Settings file not found: %s',
-                Onelogin_Saml2_Error::SETTINGS_FILE_NOT_FOUND,
+                OneLogin_Saml2_Error::SETTINGS_FILE_NOT_FOUND,
                 array($filename)
             );
         }
@@ -269,15 +269,15 @@ class Onelogin_Saml2_Settings
     private function _addDefaultValues()
     {
         if (!isset($this->_sp['assertionConsumerService']['binding'])) {
-            $this->_sp['assertionConsumerService']['binding'] = Onelogin_Saml2_Constants::BINDING_HTTP_POST;
+            $this->_sp['assertionConsumerService']['binding'] = OneLogin_Saml2_Constants::BINDING_HTTP_POST;
         }
         if (isset($this->_sp['singleLogoutService']) && !isset($this->_sp['singleLogoutService']['binding'])) {
-            $this->_sp['singleLogoutService']['binding'] = Onelogin_Saml2_Constants::BINDING_HTTP_REDIRECT;
+            $this->_sp['singleLogoutService']['binding'] = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT;
         }
 
         // Related to nameID
         if (!isset($this->_sp['NameIDFormat'])) {
-            $this->_sp['NameIDFormat'] = Onelogin_Saml2_Constants::NAMEID_PERSISTENT;
+            $this->_sp['NameIDFormat'] = OneLogin_Saml2_Constants::NAMEID_PERSISTENT;
         }
         if (!isset($this->_security['nameIdEncrypted'])) {
             $this->_security['nameIdEncrypted'] = false;
@@ -564,12 +564,12 @@ class Onelogin_Saml2_Settings
      */
     public function getSPMetadata()
     {
-        $metadata = Onelogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
+        $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
 
         $cert = $this->getSPcert();
 
         if (!empty($cert)) {
-            $metadata = Onelogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert);
+            $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert);
         }
 
         //Sign Metadata
@@ -581,9 +581,9 @@ class Onelogin_Saml2_Settings
                 if (!isset($this->_security['signMetadata']['keyFileName'])
                     || !isset($this->_security['signMetadata']['certFileName'])
                 ) {
-                    throw new Onelogin_Saml2_Error(
+                    throw new OneLogin_Saml2_Error(
                         'Invalid Setting: signMetadata value of the sp is not valid',
-                        Onelogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
+                        OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
                     );
                 }
                 $keyFileName = $this->_security['signMetadata']['keyFileName'];
@@ -593,23 +593,23 @@ class Onelogin_Saml2_Settings
             $certMetadataFile = $this->_paths['cert'].$certFileName;
 
             if (!file_exists($keyMetadataFile)) {
-                throw new Onelogin_Saml2_Error(
+                throw new OneLogin_Saml2_Error(
                     'Private key file not found: %s',
-                    Onelogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
+                    OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
                     array($keyMetadataFile)
                 );
             }
             
             if (!file_exists($certMetadataFile)) {
-                throw new Onelogin_Saml2_Error(
+                throw new OneLogin_Saml2_Error(
                     'Public cert file not found: %s',
-                    Onelogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
+                    OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
                     array($certMetadataFile)
                 );
             }
             $keyMetadata = file_get_contents($keyMetadataFile);
             $certMetadata = file_get_contents($certMetadataFile);
-            $metadata = Onelogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata);
+            $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata);
         }
         return $metadata;
     }
@@ -626,7 +626,7 @@ class Onelogin_Saml2_Settings
         assert('is_string($xml)');
 
         $errors = array();
-        $res = Onelogin_Saml2_Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug);
+        $res = OneLogin_Saml2_Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug);
         if (!$res instanceof DOMDocument) {
             $errors[] = $res;
         } else {
@@ -638,13 +638,13 @@ class Onelogin_Saml2_Settings
                 $validUntil = $cacheDuration = $expireTime = null;
 
                 if ($element->hasAttribute('validUntil')) {
-                    $validUntil = Onelogin_Saml2_Utils::parseSAML2Time($element->getAttribute('validUntil'));
+                    $validUntil = OneLogin_Saml2_Utils::parseSAML2Time($element->getAttribute('validUntil'));
                 }
                 if ($element->hasAttribute('cacheDuration')) {
                     $cacheDuration = $element->getAttribute('cacheDuration');
                 }
 
-                $expireTime = Onelogin_Saml2_Utils::getExpireTime($cacheDuration, $validUntil);
+                $expireTime = OneLogin_Saml2_Utils::getExpireTime($cacheDuration, $validUntil);
                 if (isset($expireTime) && time() > $expireTime) {
                     $errors[] = 'expired_xml';
                 }

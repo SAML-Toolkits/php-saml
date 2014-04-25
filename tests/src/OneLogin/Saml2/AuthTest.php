@@ -17,7 +17,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         include $settingsDir.'settings1.php';
 
         $this->_settingsInfo = $settingsInfo;
-        $this->_auth = new Onelogin_Saml2_Auth($settingsInfo);
+        $this->_auth = new OneLogin_Saml2_Auth($settingsInfo);
     }
 
     /**
@@ -117,7 +117,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $message = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
 
         $plainMessage = base64_decode($message);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
 
         $_POST['SAMLResponse'] = base64_encode($plainMessage);
@@ -154,7 +154,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $message = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
 
         $plainMessage = base64_decode($message);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
 
         $_POST['SAMLResponse'] = base64_encode($plainMessage);
@@ -281,7 +281,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -304,7 +304,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -332,7 +332,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -370,7 +370,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -450,7 +450,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -475,7 +475,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -542,7 +542,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -582,13 +582,13 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['logoutResponseSigned'] = true;
 
-        $auth = new Onelogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
 
         // In order to avoid the destination problem
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -689,7 +689,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['authnRequestsSigned'] = true;
 
-        $auth = new Onelogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -788,7 +788,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['logoutRequestSigned'] = true;
 
-        $auth = new Onelogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -826,7 +826,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         unset($settingsInfo['idp']['singleLogoutService']);
 
-        $auth = new Onelogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
         try {
             $returnTo = 'http://example.com/returnto';

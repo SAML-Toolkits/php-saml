@@ -583,7 +583,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_audience.xml.base64');
 
         $plainMessage = base64_decode($xml);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
@@ -608,7 +608,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     */
     public function testIsInValidIssuer()
     {
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_issuer_assertion.xml.base64');
 
@@ -657,7 +657,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_sessionindex.xml.base64');
 
         $plainMessage = base64_decode($xml);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
@@ -682,7 +682,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     */
     public function testIsInValidSubjectConfirmation()
     {
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_subjectconfirmation_method.xml.base64');
         $plainMessage = base64_decode($xml);
@@ -794,7 +794,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
 
         $plainMessage = base64_decode($xml);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
@@ -826,7 +826,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
         $plainMessage = base64_decode($xml);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
@@ -899,7 +899,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
         $plainMessage = base64_decode($xml);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
@@ -1016,7 +1016,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['idp']['certFingerprint'] = Onelogin_Saml2_Utils::calculateX509Fingerprint($settingsInfo['idp']['x509cert']);
+        $settingsInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($settingsInfo['idp']['x509cert']);
         $settingsInfo['idp']['x509cert'] = null;
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
@@ -1056,7 +1056,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         // In order to avoid the destination problem
         $plainMessage4 = base64_decode($xml4);
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage4 = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage4);
         $message4 = base64_encode($plainMessage4);
 

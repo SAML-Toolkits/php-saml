@@ -20,9 +20,9 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the Onelogin_Saml2_LogoutResponse Constructor. 
+    * Tests the OneLogin_Saml2_LogoutResponse Constructor. 
     *
-    * @covers Onelogin_Saml2_LogoutResponse
+    * @covers OneLogin_Saml2_LogoutResponse
     */
     public function testConstructor()
     {
@@ -32,19 +32,19 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the Onelogin_Saml2_LogoutResponse Constructor. 
+    * Tests the OneLogin_Saml2_LogoutResponse Constructor. 
     * The creation of a deflated SAML Logout Response
     *
-    * @covers Onelogin_Saml2_LogoutResponse
+    * @covers OneLogin_Saml2_LogoutResponse
     */
     public function testCreateDeflatedSAMLLogoutResponseURLParameter()
     {
         $inResponseTo = 'ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e';
-        $responseBuilder = new Onelogin_Saml2_LogoutResponse($this->_settings);
+        $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
         $responseBuilder->build($inResponseTo);
         $parameters = array('SAMLResponse' => $responseBuilder->getResponse());
 
-        $logoutUrl = Onelogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
 
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
@@ -56,16 +56,16 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getStatus method of the Onelogin_Saml2_LogoutResponse
+    * Tests the getStatus method of the OneLogin_Saml2_LogoutResponse
     *
-    * @covers Onelogin_Saml2_LogoutResponse::getStatus
+    * @covers OneLogin_Saml2_LogoutResponse::getStatus
     */
     public function testGetStatus()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
         $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
         $status = $response->getStatus();
-        $this->assertEquals($status, Onelogin_Saml2_Constants::STATUS_SUCCESS);
+        $this->assertEquals($status, OneLogin_Saml2_Constants::STATUS_SUCCESS);
 
         $message2 = file_get_contents(TEST_ROOT . '/data/logout_responses/invalids/no_status.xml.base64');
         $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message2);
@@ -73,9 +73,9 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getIssuer of the Onelogin_Saml2_LogoutResponse
+    * Tests the getIssuer of the OneLogin_Saml2_LogoutResponse
     *
-    * @covers Onelogin_Saml2_LogoutResponse::getIssuer
+    * @covers OneLogin_Saml2_LogoutResponse::getIssuer
     */
     public function testGetIssuer()
     {
@@ -87,7 +87,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the private method _query of the Onelogin_Saml2_LogoutResponse
+    * Tests the private method _query of the OneLogin_Saml2_LogoutResponse
     *
     */
     public function testQuery()
@@ -100,17 +100,17 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
    /**
-    * Tests the isValid method of the Onelogin_Saml2_LogoutResponse
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     * Case invalid request Id
     *
-    * @covers Onelogin_Saml2_LogoutResponse::isValid
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
     public function testIsInValidRequestId()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
@@ -131,17 +131,17 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
    /**
-    * Tests the isValid method of the Onelogin_Saml2_LogoutResponse
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     * Case invalid Issuer
     *
-    * @covers Onelogin_Saml2_LogoutResponse::isValid
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
     public function testIsInValidIssuer()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $plainMessage = str_replace('http://idp.example.com/', 'http://invalid.issuer.example.com', $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
@@ -161,10 +161,10 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
    /**
-    * Tests the isValid method of the Onelogin_Saml2_LogoutResponse
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     * Case invalid Destination
     *
-    * @covers Onelogin_Saml2_LogoutResponse::isValid
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
     public function testIsInValidDestination()
     {
@@ -185,13 +185,13 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
    /**
-    * Tests the isValid method of the Onelogin_Saml2_LogoutResponse
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     *
-    * @covers Onelogin_Saml2_LogoutResponse::isValid
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
     public function testIsInValidSign()
     {
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
         $this->_settings->setStrict(false);
         $_GET = array (
@@ -308,9 +308,9 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the isValid method of the Onelogin_Saml2_LogoutResponse
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     *
-    * @covers Onelogin_Saml2_LogoutResponse::isValid
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
     public function testIsValid()
     {
@@ -330,7 +330,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         }
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message3 = base64_encode(gzdeflate($plainMessage));
 

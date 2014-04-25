@@ -17,11 +17,11 @@ if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutServic
     throw new Exception("The IdP does not support Single Log Out");
 }
 
-$logoutRequest = new Onelogin_Saml2_LogoutRequest($settings);
+$logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
 $samlRequest = $logoutRequest->getRequest();
 
 $parameters = array('SAMLRequest' => $samlRequest);
 
-$url = Onelogin_Saml2_Utils::redirect($sloUrl, $parameters, true);
+$url = OneLogin_Saml2_Utils::redirect($sloUrl, $parameters, true);
 
 header("Location: $url");

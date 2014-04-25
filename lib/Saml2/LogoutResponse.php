@@ -90,7 +90,7 @@ class OneLogin_Saml2_LogoutResponse
 
             if ($this->_settings->isStrict()) {
 
-                $res = Onelogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                 if (!$res instanceof DOMDocument) {
                     throw new Exception("Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd");
                 }
@@ -111,7 +111,7 @@ class OneLogin_Saml2_LogoutResponse
                     throw new Exception("Invalid issuer in the Logout Request");
                 }
 
-                $currentURL = Onelogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
@@ -178,7 +178,7 @@ class OneLogin_Saml2_LogoutResponse
      */
     private function _query($query)
     {
-        return Onelogin_Saml2_Utils::query($this->document, $query);
+        return OneLogin_Saml2_Utils::query($this->document, $query);
 
     }
 
@@ -193,8 +193,8 @@ class OneLogin_Saml2_LogoutResponse
         $spData = $this->_settings->getSPData();
         $idpData = $this->_settings->getIdPData();
 
-        $id = Onelogin_Saml2_Utils::generateUniqueID();
-        $issueInstant = Onelogin_Saml2_Utils::parseTime2SAML(time());
+        $id = OneLogin_Saml2_Utils::generateUniqueID();
+        $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"

@@ -17,16 +17,16 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 	setlocale(LC_MESSAGES, 'en_US');
 
         $msg = 'test';
-        $translatedMsg = Onelogin_Saml2_Utils::t($msg);
+        $translatedMsg = OneLogin_Saml2_Utils::t($msg);
         $this->assertEquals('test', $translatedMsg);
 
         setlocale(LC_MESSAGES, 'es_ES');
 
-        $translatedMsg = Onelogin_Saml2_Utils::t($msg);
+        $translatedMsg = OneLogin_Saml2_Utils::t($msg);
         $this->assertEquals('prueba', $translatedMsg);
 
         $newmsg = 'test2: %s';
-        $translatedMsgArgs = Onelogin_Saml2_Utils::t($newmsg, array('arg'));
+        $translatedMsgArgs = OneLogin_Saml2_Utils::t($newmsg, array('arg'));
         $this->assertEquals('prueba2: arg', $translatedMsgArgs);
     }
 */
@@ -39,22 +39,22 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     public function testValidateXML()
     {
         $metadataUnloaded = '<xml><EntityDescriptor>';
-        $this->assertEquals(Onelogin_Saml2_Utils::validateXML($metadataUnloaded, 'saml-schema-metadata-2.0.xsd'), 'unloaded_xml');
+        $this->assertEquals(OneLogin_Saml2_Utils::validateXML($metadataUnloaded, 'saml-schema-metadata-2.0.xsd'), 'unloaded_xml');
 
         $metadataInvalid = file_get_contents(TEST_ROOT .'/data/metadata/noentity_metadata_settings1.xml');
-        $this->assertEquals(Onelogin_Saml2_Utils::validateXML($metadataInvalid, 'saml-schema-metadata-2.0.xsd'), 'invalid_xml');
+        $this->assertEquals(OneLogin_Saml2_Utils::validateXML($metadataInvalid, 'saml-schema-metadata-2.0.xsd'), 'invalid_xml');
 
         $metadataExpired = file_get_contents(TEST_ROOT .'/data/metadata/expired_metadata_settings1.xml');
-        $res = Onelogin_Saml2_Utils::validateXML($metadataExpired, 'saml-schema-metadata-2.0.xsd');
+        $res = OneLogin_Saml2_Utils::validateXML($metadataExpired, 'saml-schema-metadata-2.0.xsd');
         $this->assertTrue($res instanceof DOMDocument);
 
         $metadataOk = file_get_contents(TEST_ROOT .'/data/metadata/metadata_settings1.xml');
-        $res2 = Onelogin_Saml2_Utils::validateXML($metadataOk, 'saml-schema-metadata-2.0.xsd');
+        $res2 = OneLogin_Saml2_Utils::validateXML($metadataOk, 'saml-schema-metadata-2.0.xsd');
         $this->assertTrue($res instanceof DOMDocument);
 
         $dom = new DOMDocument;
         $dom->load($metadataOk);
-        $res2 = Onelogin_Saml2_Utils::validateXML($dom, 'saml-schema-metadata-2.0.xsd');
+        $res2 = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-metadata-2.0.xsd');
         $this->assertTrue($res instanceof DOMDocument);
     }
 
@@ -265,14 +265,14 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $dom->loadXML($xml);
 
         $status = OneLogin_Saml2_Utils::getStatus($dom);
-        $this->assertEquals(Onelogin_Saml2_Constants::STATUS_SUCCESS, $status['code']);
+        $this->assertEquals(OneLogin_Saml2_Constants::STATUS_SUCCESS, $status['code']);
 
         $xml2 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/status_code_responder.xml.base64'));
         $dom2 = new DOMDocument();
         $dom2->loadXML($xml2);
 
         $status2 = OneLogin_Saml2_Utils::getStatus($dom2);
-        $this->assertEquals(Onelogin_Saml2_Constants::STATUS_RESPONDER, $status2['code']);
+        $this->assertEquals(OneLogin_Saml2_Constants::STATUS_RESPONDER, $status2['code']);
         $this->assertEmpty($status2['msg']);
 
         $xml3 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/status_code_responer_and_msg.xml.base64'));
@@ -280,7 +280,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $dom3->loadXML($xml3);
 
         $status3 = OneLogin_Saml2_Utils::getStatus($dom3);
-        $this->assertEquals(Onelogin_Saml2_Constants::STATUS_RESPONDER, $status3['code']);
+        $this->assertEquals(OneLogin_Saml2_Constants::STATUS_RESPONDER, $status3['code']);
         $this->assertEquals('something_is_wrong', $status3['msg']);
 
         $xmlInv = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/no_status.xml.base64'));
@@ -442,7 +442,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $entityId = 'http://stuff.com/endpoints/metadata.php';
         $nameIDFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified';
 
-        $nameId = Onelogin_Saml2_Utils::generateNameId(
+        $nameId = OneLogin_Saml2_Utils::generateNameId(
             $nameIdValue,
             $entityId,
             $nameIDFormat
@@ -458,7 +458,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $x509cert = $settingsInfo['idp']['x509cert'];
         $key = OneLogin_Saml2_Utils::formatCert($x509cert);
 
-        $nameIdEnc = Onelogin_Saml2_Utils::generateNameId(
+        $nameIdEnc = OneLogin_Saml2_Utils::generateNameId(
             $nameIdValue,
             $entityId,
             $nameIDFormat,
