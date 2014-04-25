@@ -783,6 +783,29 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
     }
 
+/**
+    * Somtimes IdPs uses datetimes with miliseconds, this
+    * test is to verify that the toolkit supports them
+    * @covers OneLogin_Saml2_Response::isValid
+    */
+    public function testDatetimeWithMiliseconds()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response_with_miliseconds.xm.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertTrue($response->isValid());
+
+        $this->_settings->setStrict(true);
+
+        $plainMessage = base64_decode($xml);
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
+        $message = base64_encode($plainMessage);
+
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $message);
+
+        $this->assertTrue($response2->isValid());
+    }
+
     /**
     * Tests the isValid method of the OneLogin_Saml2_Response class
     * Case Invalid Response, Invalid requestID
