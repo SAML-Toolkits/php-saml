@@ -5,26 +5,18 @@ php:
   - 5.4
   - 5.3
 
+before_install:
+ - curl -s https://getcomposer.org/installer | php
+ - php composer.phar install --prefer-source --dev --no-interaction
+
 script:
   - phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
-  - php vendor/bin/phpcpd --exclude vendor .
-  - echo "---------------------------------------------------"
-  - echo "----------------GLOBAL LOC-------------------------"
-  - echo "---------------------------------------------------"
+  - php vendor/bin/phpcpd --exclude tests --exclude vendor .
   - php vendor/bin/phploc . --exclude vendor
-  - echo "---------------------------------------------------"
-  - echo "----------------LIB LOC----------------------------"
-  - echo "---------------------------------------------------"
-  - php vendor/bin/phploc lib/. --exclude vendor
+  - php vendor/bin/phploc lib/.
   - mkdir -p tests/build/dependences
-  - echo "---------------------------------------------------"
-  - echo "-------Generating some code metrics----------------"
-  - echo "---------------------------------------------------"
-  - vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
-  - echo "---------------------------------------------------"
-  - echo "-------- -------Check code-------------------------"
-  - echo "---------------------------------------------------"
-  - vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
+  - php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
+  - php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
 
 after_script:
   - export TRAVIS=https://travis-ci.org/onelogin/php-saml
