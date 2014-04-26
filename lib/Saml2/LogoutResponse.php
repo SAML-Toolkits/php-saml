@@ -101,7 +101,7 @@ class OneLogin_Saml2_LogoutResponse
                 if (isset($requestId) && $this->document->documentElement->hasAttribute('InResponseTo')) {
                     $inResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                     if ($requestId != $inResponseTo) {
-                        throw new Exception("The InResponseTo of the Logout Response: $InResponseTo, does not match the ID of the Logout request sent by the SP: $requestId");
+                        throw new Exception("The InResponseTo of the Logout Response: $inResponseTo, does not match the ID of the Logout request sent by the SP: $requestId");
                     }
                 }
 

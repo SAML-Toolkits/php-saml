@@ -85,7 +85,7 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
             $reflectionClass = new ReflectionClass("OneLogin_Saml_Metadata");
             $method = $reflectionClass->getMethod('_getMetadataValidTimestamp');
 
-            if (method_exists($method,'setAccessible')) {
+            if (method_exists($method, 'setAccessible')) {
                 $method->setAccessible(true);
 
                 $settingsDir = TEST_ROOT .'/settings/';

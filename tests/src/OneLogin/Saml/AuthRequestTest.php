@@ -61,7 +61,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
             $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
             $method = $reflectionClass->getMethod('_getTimestamp');
  
-            if (method_exists($method,'setAccessible')) {
+            if (method_exists($method, 'setAccessible')) {
                 $method->setAccessible(true);
 
                 $settingsDir = TEST_ROOT .'/settings/';
@@ -87,7 +87,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
             $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
             $method = $reflectionClass->getMethod('_generateUniqueID');
 
-            if (method_exists($method,'setAccessible')) {
+            if (method_exists($method, 'setAccessible')) {
                 $method->setAccessible(true);
 
                 $settingsDir = TEST_ROOT .'/settings/';

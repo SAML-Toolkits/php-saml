@@ -735,15 +735,15 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $dom2 = new DOMDocument();
         $dom2->loadXML($xmlResponseMsgSigned);
-        $AssertElem = $dom2->firstChild->firstChild->nextSibling->nextSibling;
-        $this->assertTrue(OneLogin_Saml2_Utils::validateSign($AssertElem, $cert));
+        $assertElem = $dom2->firstChild->firstChild->nextSibling->nextSibling;
+        $this->assertTrue(OneLogin_Saml2_Utils::validateSign($assertElem, $cert));
 
         $dom3 = new DOMDocument();
         $dom3->loadXML($xmlResponseMsgSigned);
         $dom3->firstChild->firstChild->nodeValue = 'https://example.com/other-idp';
-        $AssertElem2 = $dom3->firstChild->firstChild->nextSibling->nextSibling;
+        $assertElem2 = $dom3->firstChild->firstChild->nextSibling->nextSibling;
         try {
-            $this->assertTrue(OneLogin_Saml2_Utils::validateSign($AssertElem2, $cert));
+            $this->assertTrue(OneLogin_Saml2_Utils::validateSign($assertElem2, $cert));
             $this->assertTrue(false);
         } catch (Exception $e) {
             $this->assertContains('Reference validation failed', $e->getMessage());

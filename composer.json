@@ -23,7 +23,9 @@
     "require-dev": {
         "satooshi/php-coveralls": "dev-master",
         "sebastian/phpcpd": "*",
-        "phploc/phploc": "*"     
+        "phploc/phploc": "*",
+        "pdepend/pdepend" : "1.1.0",
+        "squizlabs/php_codesniffer": "*"
     },
     "suggest": {
         "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",

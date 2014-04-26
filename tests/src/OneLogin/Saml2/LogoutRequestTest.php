@@ -142,9 +142,9 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedNameIdData, $nameIdData4);
 
-        $InvRequest = file_get_contents(TEST_ROOT . '/data/logout_requests/invalids/no_nameId.xml');
+        $invRequest = file_get_contents(TEST_ROOT . '/data/logout_requests/invalids/no_nameId.xml');
         try {
-            $nameIdData3 = OneLogin_Saml2_LogoutRequest::getNameIdData($InvRequest);
+            $nameIdData3 = OneLogin_Saml2_LogoutRequest::getNameIdData($invRequest);
             $this->assertFalse(true);
         } catch (Exception $e) {
             $this->assertContains('Not NameID found in the Logout Request', $e->getMessage());
