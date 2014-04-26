@@ -6,30 +6,28 @@ php:
   - 5.3
 
 script:
-    phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
-    php vendor/bin/phpcpd --exclude vendor .
-    echo "---------------------------------------------------"
-    echo "----------------GLOBAL LOC-------------------------"
-    echo "---------------------------------------------------"
-    php vendor/bin/phploc . --exclude vendor
-    echo "---------------------------------------------------"
-    echo "----------------LIB LOC----------------------------"
-    echo "---------------------------------------------------"
-    php vendor/bin/phploc lib/. --exclude vendor
-    mkdir -p tests/build/dependences
-    echo "---------------------------------------------------"
-    echo "-------Generating some code metrics----------------"
-    echo "---------------------------------------------------"
-    vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
-    echo "---------------------------------------------------"
-    echo "-------- -------Check code-------------------------"
-    echo "---------------------------------------------------"
-    vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src    
+  - phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+  - php vendor/bin/phpcpd --exclude vendor .
+  - echo "---------------------------------------------------"
+  - echo "----------------GLOBAL LOC-------------------------"
+  - echo "---------------------------------------------------"
+  - php vendor/bin/phploc . --exclude vendor
+  - echo "---------------------------------------------------"
+  - echo "----------------LIB LOC----------------------------"
+  - echo "---------------------------------------------------"
+  - php vendor/bin/phploc lib/. --exclude vendor
+  - mkdir -p tests/build/dependences
+  - echo "---------------------------------------------------"
+  - echo "-------Generating some code metrics----------------"
+  - echo "---------------------------------------------------"
+  - vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
+  - echo "---------------------------------------------------"
+  - echo "-------- -------Check code-------------------------"
+  - echo "---------------------------------------------------"
+  - vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
 
-after_script:    
-    export TRAVIS=https://travis-ci.org/onelogin/php-saml
-    echo $TRAVIS
-    echo $TRAVIS_JOB_ID
-    php vendor/bin/coveralls --config .coveralls.yml -v
-
-
+after_script:
+  - export TRAVIS=https://travis-ci.org/onelogin/php-saml
+  - echo $TRAVIS
+  - echo $TRAVIS_JOB_ID
+  - php vendor/bin/coveralls --config .coveralls.yml -v
