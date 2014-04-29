@@ -84,7 +84,7 @@ class OneLogin_Saml2_Response
 
             $singleAssertion = $this->validateNumAssertions();
             if (!$singleAssertion) {
-                throw new Exception('Multiple assertions are not supported');
+                throw new Exception('SAML Response must contain 1 assertion');
             }
 
             $status = $this->checkStatus();

@@ -521,7 +521,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertEquals('Multiple assertions are not supported', $e->getMessage());
+            $this->assertEquals('SAML Response must contain 1 assertion', $e->getMessage());
         }
     }
 
