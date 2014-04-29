@@ -88,7 +88,7 @@ LOGOUTREQUEST;
             $dom = $request;
         } else {
             $dom = new DOMDocument();
-            $dom->loadXML($request);
+            $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
         }
 
         $id = $dom->documentElement->getAttribute('ID');
@@ -109,7 +109,7 @@ LOGOUTREQUEST;
             $dom = $request;
         } else {
             $dom = new DOMDocument();
-            $dom->loadXML($request);
+            $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
         }
 
         $encryptedEntries = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:EncryptedID');
@@ -176,7 +176,7 @@ LOGOUTREQUEST;
             $dom = $request;
         } else {
             $dom = new DOMDocument();
-            $dom->loadXML($request);
+            $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
         }
 
         $issuer = null;
@@ -200,7 +200,7 @@ LOGOUTREQUEST;
             $dom = $request;
         } else {
             $dom = new DOMDocument();
-            $dom->loadXML($request);
+            $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
         }
 
         $sessionIndexes = array();
@@ -226,7 +226,7 @@ LOGOUTREQUEST;
                 $dom = $request;
             } else {
                 $dom = new DOMDocument();
-                $dom->loadXML($request);
+                $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
             }
 
             $idpData = $settings->getIdPData();

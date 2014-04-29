@@ -32,6 +32,72 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 */
 
     /**
+    * Tests the loadXML method of the OneLogin_Saml2_Utils
+    *
+    * @covers OneLogin_Saml2_Utils::loadXML
+    */
+    public function testLoadXML()
+    {
+        $dom = new DOMDocument();
+
+        $metadataUnloaded = '<xml><EntityDescriptor>';
+        $res1 = OneLogin_Saml2_Utils::loadXML($dom, $metadataUnloaded);
+        $this->assertFalse($res1);
+
+        $metadataInvalid = file_get_contents(TEST_ROOT .'/data/metadata/noentity_metadata_settings1.xml');
+        $res2 = OneLogin_Saml2_Utils::loadXML($dom, $metadataInvalid);
+        $this->assertTrue($res2 instanceof DOMDocument);
+
+        $metadataOk = file_get_contents(TEST_ROOT .'/data/metadata/metadata_settings1.xml');
+        $res3 = OneLogin_Saml2_Utils::loadXML($dom, $metadataOk);
+        $this->assertTrue($res3 instanceof DOMDocument);
+    }
+
+    /**
+    * Tests the loadXML method of the OneLogin_Saml2_Utils
+    *
+    * @covers OneLogin_Saml2_Utils::loadXML
+    */
+    public function testXMLAttacks()
+    {
+        $dom = new DOMDocument();
+
+        $attackXXE = '<?xml version="1.0" encoding="ISO-8859-1"?>
+                      <!DOCTYPE foo [  
+                      <!ELEMENT foo ANY >
+                      <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
+        try {
+            $res = OneLogin_Saml2_Utils::loadXML($dom, $attackXXE);
+            $this->assertTrue(false);
+        } catch (Exception $e) {
+            $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+        }
+
+        $xmlWithDTD = '<?xml version="1.0"?>
+                          <!DOCTYPE results [
+                            <!ELEMENT results (result+)>
+                            <!ELEMENT result (#PCDATA)>
+                          ]>
+                          <results>
+                            <result>test</result>
+                          </results>';
+        $res2 = OneLogin_Saml2_Utils::loadXML($dom, $xmlWithDTD);
+        $this->assertTrue($res2 instanceof DOMDocument);
+
+        $attackXEE = '<?xml version="1.0"?>
+                      <!DOCTYPE results [<!ENTITY harmless "completely harmless">]>
+                      <results>
+                        <result>This result is &harmless;</result>
+                      </results>';
+        try {
+            $res3 = OneLogin_Saml2_Utils::loadXML($dom, $attackXEE);
+            $this->assertTrue(false);
+        } catch (Exception $e) {
+            $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+        }
+    }
+
+    /**
     * Tests the validateXML method of the OneLogin_Saml2_Utils
     *
     * @covers OneLogin_Saml2_Utils::validateXML

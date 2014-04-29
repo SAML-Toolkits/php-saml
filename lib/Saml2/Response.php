@@ -51,7 +51,7 @@ class OneLogin_Saml2_Response
         $this->response = base64_decode($response);
 
         $this->document = new DOMDocument();
-        $this->document->loadXML($this->response);
+        $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->response);
 
         // Quick check for the presence of EncryptedAssertion
         $encryptedAssertionNodes = $this->document->getElementsByTagName('EncryptedAssertion');
@@ -108,6 +108,7 @@ class OneLogin_Saml2_Response
 
                 $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                 if (!$res instanceof DOMDocument) {
+                    print_r($res);
                     throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
                 }
 

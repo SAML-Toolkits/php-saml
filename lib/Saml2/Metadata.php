@@ -132,8 +132,9 @@ METADATA_TEMPLATE;
     {
         $xml = new DOMDocument();
         try {
-            if (!$xml->loadXML($metadata)) {
-                throw new Exception('Error parsing metadata.');
+            $xml = OneLogin_Saml2_Utils::loadXML($xml, $metadata);
+            if (!$xml) {
+                throw new Exception('Error parsing metadata');    
             }
         } catch (Exception $e) {
             throw new Exception('Error parsing metadata. '.$e->getMessage());

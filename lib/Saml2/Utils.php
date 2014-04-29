@@ -32,6 +32,37 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * This function load an XML string in a save way.
+     * Prevent XEE/XXE Attacks
+     *
+     * @param DOMDocument $dom The document where load the xml.
+     * @param string      $xml The XML string to be loaded.
+     *
+     * @throws DOMExceptions
+     *
+     * @return DOMDocument $dom The result of load the XML at the DomDocument
+     */
+    public static function loadXML($dom, $xml)
+    {
+        assert('$dom instanceof DOMDocument');
+        assert('is_string($xml)');
+
+        if (strpos($xml, '<!ENTITY') !== false) {
+            throw new Exception('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks');
+        }
+
+        $oldEntityLoader = libxml_disable_entity_loader(true);
+        $res = $dom->loadXML($xml);
+        libxml_disable_entity_loader($oldEntityLoader);
+
+        if (!$res) {
+            return false;
+        } else {
+            return $dom;
+        }
+    }
+
+    /**
      * This function attempts to validate an XML string against the specified schema.
      *
      * It will parse the string into a DOM document and validate this document against the schema.
@@ -54,14 +85,18 @@ class OneLogin_Saml2_Utils
             $dom = $xml;
         } else {
             $dom = new DOMDocument;
-            if (!$dom->loadXML($xml)) {
+            $dom = self::loadXML($dom, $xml);
+            if (!$dom) {
                 return 'unloaded_xml';
             }
         }
 
         $schemaFile = dirname(__FILE__).'/schemas/' . $schema;
+        $oldEntityLoader = libxml_disable_entity_loader(false);
+        $res = $dom->schemaValidate($schemaFile);
+        libxml_disable_entity_loader($oldEntityLoader);
+        if (!$res) {
 
-        if (!$dom->schemaValidate($schemaFile)) {
             $xmlErrors = libxml_get_errors();
             syslog(LOG_INFO, 'Error validating the metadata: '.var_export($xmlErrors, true));
 
@@ -73,6 +108,7 @@ class OneLogin_Saml2_Utils
 
             return 'invalid_xml';
         }
+
 
         return $dom;
     }
@@ -720,9 +756,11 @@ class OneLogin_Saml2_Utils
 
         $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
         $newDoc = new DOMDocument();
-        if (!$newDoc->loadXML($xml)) {
+        $newDoc = self::loadXML($newDoc, $xml);
+        if (!$newDoc) {
             throw new Exception('Failed to parse decrypted XML. Maybe the wrong sharedkey was used?');
         }
+ 
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new Exception('Missing encrypted element.');
@@ -744,11 +782,8 @@ class OneLogin_Saml2_Utils
             $dom = $xml;
         } else {
             $dom = new DOMDocument();
-            try {
-                if (!$dom->loadXML($xml)) {
-                    throw new Exception('Error parsing xml string.');
-                }
-            } catch (Exception $e) {
+            $dom = self::loadXML($dom, $xml);
+            if (!$dom) {
                 throw new Exception('Error parsing xml string. '.$e->getMessage());
             }
         }
@@ -812,7 +847,7 @@ class OneLogin_Saml2_Utils
             $dom = clone $xml->ownerDocument;
         } else {
             $dom = new DOMDocument();
-            $dom->loadXML($xml);
+            $dom = self::loadXML($dom, $xml);
         }
 
 
