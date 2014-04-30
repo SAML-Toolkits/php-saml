@@ -519,6 +519,7 @@ class OneLogin_Saml2_Utils
         $xpath->registerNamespace('samlp', OneLogin_Saml2_Constants::NS_SAMLP);
         $xpath->registerNamespace('saml', OneLogin_Saml2_Constants::NS_SAML);
         $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
+        $xpath->registerNamespace('xenc', OneLogin_Saml2_Constants::NS_XENC);
 
         if (isset($context)) {
             $res = $xpath->query($query, $context);
@@ -784,7 +785,7 @@ class OneLogin_Saml2_Utils
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
             if (!$dom) {
-                throw new Exception('Error parsing xml string. '.$e->getMessage());
+                throw new Exception('Error parsing xml string');
             }
         }
 

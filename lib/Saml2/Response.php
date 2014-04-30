@@ -511,10 +511,10 @@ class OneLogin_Saml2_Response
             $xpath = new DOMXPath($this->document);
         }
 
-        $xpath->registerNamespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
-        $xpath->registerNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
-        $xpath->registerNamespace('xenc', 'http://www.w3.org/2001/04/xmlenc#');
+        $xpath->registerNamespace('samlp', OneLogin_Saml2_Constants::NS_SAMLP);
+        $xpath->registerNamespace('saml', OneLogin_Saml2_Constants::NS_SAML);
+        $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
+        $xpath->registerNamespace('xenc', OneLogin_Saml2_Constants::NS_XENC);
 
         $assertionNode = $this->encrypted ? '/samlp:Response/saml:EncryptedAssertion/saml:Assertion'
                 : '/samlp:Response/saml:Assertion';
