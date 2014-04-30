@@ -641,7 +641,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $hostname = OneLogin_Saml2_Utils::getSelfHost();
-            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname/usr/local/bin/phpunit");
+            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname".$_SERVER["PHP_SELF"]);;
         }
     }
 
@@ -739,7 +739,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $hostname = OneLogin_Saml2_Utils::getSelfHost();
-            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname/usr/local/bin/phpunit");
+            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname".$_SERVER["PHP_SELF"]);
         }
     }
 
