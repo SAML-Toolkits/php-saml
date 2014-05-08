@@ -64,9 +64,10 @@ Installation
 ### Dependences ###
 
  * php >= 5.3.3
- * openssl. Install the openssl library. Handle x509 certificates.
+ * openssl. Install the openssl library. It handles x509 certificates.
  * mcrypt. Install that library and its php driver if you gonna handle
    encrypted data. (nameID, assertions)
+ * gettext. Install that library and its php driver. It handles translations.
 
 ### Code ###
 
