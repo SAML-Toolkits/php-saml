@@ -64,6 +64,7 @@ PROVIDERNAME;
     Version="2.0"
 {$providerNameStr}
     IssueInstant="$issueInstant"
+    Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
