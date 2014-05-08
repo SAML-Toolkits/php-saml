@@ -126,6 +126,14 @@ We recommend that you migrate the old code to the new one to be able to use
 the new features that the new library Saml2 carries.
 
 
+Namespaces
+----------
+
+If you using the library at a framework like Symphony2 that contains
+namespaces, remember that calls to the class must be done adding a \ to the
+start, for example to use the static method getSelfURLNoQuery use:
+\OneLogin_Saml2_Utils::getSelfURLNoQuery()
+
 Getting started
 ---------------
 
