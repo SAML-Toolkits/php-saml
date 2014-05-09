@@ -320,6 +320,22 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the getSelfRoutedURLNoQuery method of the OneLogin_Saml2_Utils
+    *
+    * @covers OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery
+    */
+    public function getSelfRoutedURLNoQuery()
+    {
+        $url = OneLogin_Saml2_Utils::getSelfURLhost();
+        $_SERVER['REQUEST_URI'] = 'example1/route?x=test';
+        $_SERVER['QUERY_STRING'] = '?x=test';
+
+        $url .= 'example1/route';
+
+        $this->assertEquals($url, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+    }
+
+    /**
     * Gets the status of a message
     *
     * @covers OneLogin_Saml2_Utils::getStatus

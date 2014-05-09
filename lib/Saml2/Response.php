@@ -160,8 +160,11 @@ class OneLogin_Saml2_Response
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
                     if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new Exception("The response was received at $currentURL instead of $destination");
+                        if (strpos($destination, $currentURL) !== 0) {
+                            $currentURLrouted = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+                            if (strpos($destination, $currentURLrouted) !== 0) {
+                                throw new Exception("The response was received at $currentURL instead of $destination");
+                            }
                         }
                     }
                 }

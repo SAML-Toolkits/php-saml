@@ -291,11 +291,32 @@ class OneLogin_Saml2_Utils
     {
 
         $selfURLhost = self::getSelfURLhost();
-        $selfURLhost .= $_SERVER['SCRIPT_NAME'];
+        $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
         if (isset($_SERVER['PATH_INFO'])) {
-            $selfURLhost .= $_SERVER['PATH_INFO'];
+            $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
-        return $selfURLhost;
+        return $selfURLNoQuery;
+    }
+
+    /**
+     * Returns the routed URL of the current host + current view.
+     *
+     * @return string
+     */
+    public static function getSelfRoutedURLNoQuery()
+    {
+
+        $selfURLhost = self::getSelfURLhost();
+        $route = '';
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $route = $_SERVER['REQUEST_URI'];
+            if (!empty($_SERVER['QUERY_STRING'])) {
+                $route = str_replace($_SERVER['QUERY_STRING'], '', $route); 
+            }
+        }
+
+        $selfRoutedURLNoQuery = $selfURLhost . $route;
+        return $selfRoutedURLNoQuery;
     }
 
     /**
