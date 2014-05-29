@@ -132,7 +132,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     public function testFormatCert()
     {
         $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
+        include $settingsDir.'settings2.php';
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
@@ -153,6 +153,59 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('-----BEGIN CERTIFICATE-----', $formatedCert3);
         $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert3);
         $this->assertEquals(strlen($cert), 860);
+
+
+        $cert2 = $settingsInfo['sp']['x509cert'];
+        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $cert);
+        $this->assertNotContains('-----END CERTIFICATE-----', $cert);
+        $this->assertEquals(strlen($cert), 860);
+
+        $formatedCert4 = OneLogin_Saml2_Utils::formatCert($cert);
+        $this->assertContains('-----BEGIN CERTIFICATE-----', $formatedCert4);
+        $this->assertContains('-----END CERTIFICATE-----', $formatedCert4);
+
+        $formatedCert5 = OneLogin_Saml2_Utils::formatCert($cert, true);
+        $this->assertEquals($formatedCert4, $formatedCert5);
+
+
+        $formatedCert6 = OneLogin_Saml2_Utils::formatCert($cert, false);
+        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $formatedCert6);
+        $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert6);
+        $this->assertEquals(strlen($cert2), 860);
+
+    }
+
+    /**
+    * Tests the formatPrivateKey method of the OneLogin_Saml2_Utils
+    *
+    * @covers OneLogin_Saml2_Utils::formatPrivateKey
+    */
+    public function testFormatPrivateKey()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $key = $settingsInfo['sp']['privateKey'];
+
+        $this->assertNotContains('-----BEGIN RSA PRIVATE KEY-----', $key);
+        $this->assertNotContains('-----END RSA PRIVATE KEY-----', $key);
+        $this->assertEquals(strlen($key), 816);
+
+        $formatedKey1 = OneLogin_Saml2_Utils::formatPrivateKey($key);
+        $this->assertContains('-----BEGIN RSA PRIVATE KEY-----', $formatedKey1);
+        $this->assertContains('-----END RSA PRIVATE KEY-----', $formatedKey1);
+
+        $formatedKey2 = OneLogin_Saml2_Utils::formatPrivateKey($key, true);
+        $this->assertEquals($formatedKey1, $formatedKey2);
+
+
+        $formatedKey3 = OneLogin_Saml2_Utils::formatPrivateKey($key, false);
+
+        $this->assertNotContains('-----BEGIN RSA PRIVATE KEY-----', $formatedKey3);
+        $this->assertNotContains('-----END RSA PRIVATE KEY-----', $formatedKey3);
+        $this->assertEquals(strlen($key), 816);
     }
 
     /**

@@ -289,7 +289,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response9->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertContains('The Message of the Logout Response is not signed and the SP require it', $e->getMessage());
+            $this->assertContains('The Message of the Logout Response is not signed and the SP requires it', $e->getMessage());
         }
 
         $_GET['Signature'] = $oldSignature;

@@ -128,20 +128,14 @@ class OneLogin_Saml2_Response
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
-                    throw new Exception("The assertion of the Response is not encrypted and the SP require it");
+                    throw new Exception("The assertion of the Response is not encrypted and the SP requires it");
                 }
 
                 if ($security['wantNameIdEncrypted']) {
                     $encryptedIdNodes = $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData');
                     if ($encryptedIdNodes->length == 0) {
-                        throw new Exception("The NameID of the Response is not encrypted and the SP require it");
+                        throw new Exception("The NameID of the Response is not encrypted and the SP requires it");
                     }
-                }
-
-                // Check that there is at least one AttributeStatement
-                $attributeStatementNode = $this->_queryAssertion('/saml:AttributeStatement');
-                if ($attributeStatementNode->length == 0) {
-                    throw new Exception("There is no AttributeStatement on the Response");
                 }
 
                 // Validate Asserion timestamps
@@ -209,7 +203,7 @@ class OneLogin_Saml2_Response
                         }
                         if ($scnData->hasAttribute('Recipient')) {
                             $recipient = $scnData->getAttribute('Recipient');
-                            if (strpos($recipient, $currentURL) === false) {
+                            if (!empty($recipient) && strpos($recipient, $currentURL) === false) {
                                 continue;
                             }
                         }
@@ -235,11 +229,11 @@ class OneLogin_Saml2_Response
                 }
 
                 if ($security['wantAssertionsSigned'] && !in_array('saml:Assertion', $signedElements)) {
-                    throw new Exception("The Assertion of the Response is not signed and the SP require it");
+                    throw new Exception("The Assertion of the Response is not signed and the SP requires it");
                 }
                 
                 if ($security['wantMessagesSigned'] && !in_array('samlp:Response', $signedElements)) {
-                    throw new Exception("The Message of the Response is not signed and the SP require it");
+                    throw new Exception("The Message of the Response is not signed and the SP requires it");
                 }
             }
 
@@ -304,7 +298,10 @@ class OneLogin_Saml2_Response
 
         $entries = $this->_queryAssertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience');
         foreach ($entries as $entry) {
-            $audiences[] = $entry->textContent;
+            $value = trim($entry->textContent);
+            if (!empty($value)) {
+                $audiences[] = $value;
+            }
         }
 
         return array_unique($audiences);

@@ -103,10 +103,18 @@ class OneLogin_Saml2_Settings
                 );
             }
         } else {
-            $this->_loadSettingsFromArray($settings->getValues());
+            if (!$this->_loadSettingsFromArray($settings->getValues())) {
+                throw new OneLogin_Saml2_Error(
+                    'Invalid array settings: %s',
+                    OneLogin_Saml2_Error::SETTINGS_INVALID,
+                    array(implode(', ', $this->_errors))
+                );
+            }
         }
 
         $this->formatIdPCert();
+        $this->formatSPCert();
+        $this->formatSPKey();
     }
 
     /**
@@ -198,11 +206,16 @@ class OneLogin_Saml2_Settings
      */
     private function _loadSettingsFromArray($settings)
     {
+        if (isset($settings['sp'])) {
+            $this->_sp = $settings['sp'];
+        }
+        if (isset($settings['idp'])) {
+            $this->_idp = $settings['idp'];
+        }
+
         $errors = $this->checkSettings($settings);
         if (empty($errors)) {
             $this->_errors = array();
-            $this->_sp = $settings['sp'];
-            $this->_idp = $settings['idp'];
 
             if (isset($settings['strict'])) {
                 $this->_strict = $settings['strict'];
@@ -319,6 +332,13 @@ class OneLogin_Saml2_Settings
         if (!isset($this->_idp['certFingerprint'])) {
             $this->_idp['certFingerprint'] = '';
         }
+
+        if (!isset($this->_sp['x509cert'])) {
+            $this->_sp['x509cert'] = '';
+        }
+        if (!isset($this->_sp['privateKey'])) {
+            $this->_sp['privateKey'] = '';
+        }
     }
 
     /**
@@ -408,7 +428,7 @@ class OneLogin_Saml2_Settings
                 || (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted'] == true))
                 && !$this->checkSPCerts()
             ) {
-                $errors[] = 'sp_cert_not_found_and_required';
+                $errors[] = 'sp_certs_not_found_and_required';
             }
 
             $existsX509 = isset($settings['idp']) && isset($settings['idp']['x509cert']) && !empty($settings['idp']['x509cert']);
@@ -481,11 +501,14 @@ class OneLogin_Saml2_Settings
     public function getSPkey()
     {
         $key = null;
+        if (isset($this->_sp['privateKey']) && !empty($this->_sp['privateKey'])) {
+            $key = $this->_sp['privateKey'];
+        } else {
+            $keyFile = $this->_paths['cert'].'sp.key';
 
-        $keyFile = $this->_paths['cert'].'sp.key';
-
-        if (file_exists($keyFile)) {
-            $key = file_get_contents($keyFile);
+            if (file_exists($keyFile)) {
+                $key = file_get_contents($keyFile);
+            }
         }
         return $key;
     }
@@ -499,10 +522,14 @@ class OneLogin_Saml2_Settings
     {
         $cert = null;
 
-        $certFile = $this->_paths['cert'].'sp.crt';
+        if (isset($this->_sp['x509cert']) && !empty($this->_sp['x509cert'])) {
+            $cert = $this->_sp['x509cert'];
+        } else {
+            $certFile = $this->_paths['cert'].'sp.crt';
 
-        if (file_exists($certFile)) {
-            $cert = file_get_contents($certFile);
+            if (file_exists($certFile)) {
+                $cert = file_get_contents($certFile);
+            }
         }
         return $cert;
     }
@@ -575,8 +602,22 @@ class OneLogin_Saml2_Settings
         //Sign Metadata
         if (isset($this->_security['signMetadata']) && $this->_security['signMetadata'] !== false) {
             if ($this->_security['signMetadata'] === true) {
-                $keyFileName = 'sp.key';
-                $certFileName = 'sp.crt';
+                $keyMetadata = $this->getSPkey();
+                $certMetadata = $cert;
+
+                if (!$keyMetadata) {
+                    throw new OneLogin_Saml2_Error(
+                        'Private key not found.',
+                        OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
+                    );
+                }
+                
+                if (!$certMetadata) {
+                    throw new OneLogin_Saml2_Error(
+                        'Public cert file not found.',
+                        OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND
+                    );
+                }
             } else {
                 if (!isset($this->_security['signMetadata']['keyFileName'])
                     || !isset($this->_security['signMetadata']['certFileName'])
@@ -588,27 +629,30 @@ class OneLogin_Saml2_Settings
                 }
                 $keyFileName = $this->_security['signMetadata']['keyFileName'];
                 $certFileName = $this->_security['signMetadata']['certFileName'];
-            }
-            $keyMetadataFile = $this->_paths['cert'].$keyFileName;
-            $certMetadataFile = $this->_paths['cert'].$certFileName;
 
-            if (!file_exists($keyMetadataFile)) {
-                throw new OneLogin_Saml2_Error(
-                    'Private key file not found: %s',
-                    OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
-                    array($keyMetadataFile)
-                );
-            }
+                $keyMetadataFile = $this->_paths['cert'].$keyFileName;
+                $certMetadataFile = $this->_paths['cert'].$certFileName;
             
-            if (!file_exists($certMetadataFile)) {
-                throw new OneLogin_Saml2_Error(
-                    'Public cert file not found: %s',
-                    OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
-                    array($certMetadataFile)
-                );
+
+                if (!file_exists($keyMetadataFile)) {
+                    throw new OneLogin_Saml2_Error(
+                        'Private key file not found: %s',
+                        OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
+                        array($keyMetadataFile)
+                    );
+                }
+                
+                if (!file_exists($certMetadataFile)) {
+                    throw new OneLogin_Saml2_Error(
+                        'Public cert file not found: %s',
+                        OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
+                        array($certMetadataFile)
+                    );
+                }
+                $keyMetadata = file_get_contents($keyMetadataFile);
+                $certMetadata = file_get_contents($certMetadataFile);
             }
-            $keyMetadata = file_get_contents($keyMetadataFile);
-            $certMetadata = file_get_contents($certMetadataFile);
+
             $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata);
         }
         return $metadata;
@@ -661,6 +705,26 @@ class OneLogin_Saml2_Settings
     {
         if (isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = OneLogin_Saml2_Utils::formatCert($this->_idp['x509cert']);
+        }
+    }
+
+    /**
+     * Formats the SP cert.
+     */
+    public function formatSPCert()
+    {
+        if (isset($this->_sp['x509cert'])) {
+            $this->_sp['x509cert'] = OneLogin_Saml2_Utils::formatCert($this->_sp['x509cert']);
+        }
+    }
+
+    /**
+     * Formats the SP key.
+     */
+    public function formatSPKey()
+    {
+        if (isset($this->_sp['privateKey'])) {
+            $this->_sp['privateKey'] = OneLogin_Saml2_Utils::formatPrivateKey($this->_sp['privateKey']);
         }
     }
 

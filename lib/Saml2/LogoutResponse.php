@@ -125,7 +125,7 @@ class OneLogin_Saml2_LogoutResponse
 
                 if ($security['wantMessagesSigned']) {
                     if (!isset($_GET['Signature'])) {
-                        throw new Exception("The Message of the Logout Response is not signed and the SP require it");
+                        throw new Exception("The Message of the Logout Response is not signed and the SP requires it");
                     }
                 }
             }

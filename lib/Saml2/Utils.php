@@ -139,6 +139,31 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * Returns a private key (adding header & footer if required).
+     *
+     * @param string  $key   A private key
+     * @param boolean $heads True if we want to include head and footer
+     *
+     * @return string Formated private key
+     */
+
+    public static function formatPrivateKey($key, $heads = true)
+    {
+        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        if (!empty($key)) {
+            $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
+            $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
+            $key = str_replace(' ', '', $key);
+
+            if ($heads) {
+                $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+            }
+
+        }
+        return $key;
+    }
+
+    /**
      * Executes a redirection to the provided url (or return the target url).
      *
      * @param string  $url        The target url
@@ -311,7 +336,7 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
-                $route = str_replace($_SERVER['QUERY_STRING'], '', $route); 
+                $route = str_replace($_SERVER['QUERY_STRING'], '', $route);
             }
         }
 

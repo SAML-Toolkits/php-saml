@@ -879,7 +879,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response4->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertEquals('The Assertion of the Response is not signed and the SP require it', $e->getMessage());
+            $this->assertEquals('The Assertion of the Response is not signed and the SP requires it', $e->getMessage());
         }
 
         $settingsInfo['security']['wantAssertionsSigned'] = false;
@@ -908,7 +908,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response8->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertEquals('The Message of the Response is not signed and the SP require it', $e->getMessage());
+            $this->assertEquals('The Message of the Response is not signed and the SP requires it', $e->getMessage());
         }
     }
 
@@ -947,7 +947,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response3->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertEquals('The assertion of the Response is not encrypted and the SP require it', $e->getMessage());
+            $this->assertEquals('The assertion of the Response is not encrypted and the SP requires it', $e->getMessage());
         }
 
         $settingsInfo['security']['wantAssertionsEncrypted'] = false;
@@ -964,7 +964,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $valid = $response4->isValid();
             $this->assertFalse($valid);
         } catch (Exception $e) {
-            $this->assertEquals('The NameID of the Response are not encrypted and the SP require it', $e->getMessage());
+            $this->assertEquals('The NameID of the Response are not encrypted and the SP requires it', $e->getMessage());
         }
     }
 
