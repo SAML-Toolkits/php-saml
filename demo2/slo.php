@@ -8,16 +8,16 @@
 
 require_once '../_toolkit_loader.php';
 
-$settings = new OneLogin_Saml2_Settings();
+$samlSettings = new OneLogin_Saml2_Settings();
 
-$idpData = $settings->getIdPData();
+$idpData = $samlSettings->getIdPData();
 if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['url'])) {
     $sloUrl = $idpData['singleLogoutService']['url'];
 } else {
     throw new Exception("The IdP does not support Single Log Out");
 }
 
-$logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+$logoutRequest = new OneLogin_Saml2_LogoutRequest($samlSettings);
 $samlRequest = $logoutRequest->getRequest();
 
 $parameters = array('SAMLRequest' => $samlRequest);
