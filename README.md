@@ -270,7 +270,7 @@ $settings = array (
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports this endpoint for the 
-            // HTTP-Redirect binding only.
+            // HTTP-POST binding only.
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         ),
         // Specifies info about where and how the <Logout Response> message MUST be
