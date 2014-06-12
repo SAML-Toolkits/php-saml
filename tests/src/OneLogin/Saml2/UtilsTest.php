@@ -555,16 +555,23 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $attributeStatement = $attributeStatementNodes->item(0);
         $this->assertEquals('saml:AttributeStatement', $attributeStatement->tagName);
 
-        $attributeStatementNodes2 = OneLogin_Saml2_Utils::query($dom, '/saml:AttributeStatement', $assertion);
-        $this->assertEquals($attributeStatementNodes, $attributeStatementNodes2);
+        $attributeStatementNodes2 = OneLogin_Saml2_Utils::query($dom, './saml:AttributeStatement', $assertion);
+        $this->assertEquals(1, $attributeStatementNodes2->length);
+        $attributeStatement2 = $attributeStatementNodes2->item(0);
+        $this->assertEquals($attributeStatement, $attributeStatement2);
 
         $signatureNodes = OneLogin_Saml2_Utils::query($dom, '/samlp:Response/ds:Signature');
         $this->assertEquals(1, $signatureNodes->length);
         $signature = $signatureNodes->item(0);
         $this->assertEquals('ds:Signature', $signature->tagName);
 
-        $signatureNodes2 = OneLogin_Saml2_Utils::query($dom, '/ds:Signature', $assertion);
-        $this->assertEquals(0, $signatureNodes2->length);
+        $signatureNodes2 = OneLogin_Saml2_Utils::query($dom, './ds:Signature', $assertion);
+        $this->assertEquals(1, $signatureNodes2->length);
+        $signature2 = $signatureNodes2->item(0);
+        $this->assertEquals($signature, $signature2);
+
+        $signatureNodes3 = OneLogin_Saml2_Utils::query($dom, './ds:SignatureValue', $assertion);
+        $this->assertEquals(0, $signatureNodes3->length);
     }
 
     /**
