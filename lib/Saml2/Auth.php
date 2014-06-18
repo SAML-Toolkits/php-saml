@@ -252,7 +252,7 @@ class OneLogin_Saml2_Auth
         $idpData = $this->_settings->getIdPData();
 
         if (isset($idpData['parameters'])) {
-            assert('is_array($idpData[\'parameters\']))');
+            assert('is_array($idpData[\'parameters\'])');
 
             foreach ($idpData['parameters'] as $key => $val) {
                 assert('is_string($key)');
