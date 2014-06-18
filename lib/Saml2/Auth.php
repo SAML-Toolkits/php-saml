@@ -249,10 +249,12 @@ class OneLogin_Saml2_Auth
         assert('is_array($parameters)');
 
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
-        if (isset($this->_settings['parameters'])) {
-            assert('is_array($this->_settings[\'parameters\']))');
+        $idpData = $this->_settings->getIdPData();
 
-            foreach ($this->_settings['parameters'] as $key => $val) {
+        if (isset($idpData['parameters'])) {
+            assert('is_array($idpData[\'parameters\']))');
+
+            foreach ($idpData['parameters'] as $key => $val) {
                 assert('is_string($key)');
                 assert('is_string($val) || is_number($val)');
 
