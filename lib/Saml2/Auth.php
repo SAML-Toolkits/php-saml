@@ -256,7 +256,7 @@ class OneLogin_Saml2_Auth
 
             foreach ($idpData['parameters'] as $key => $val) {
                 assert('is_string($key)');
-                assert('is_string($val) || is_number($val)');
+                assert('is_string($val) || is_numeric($val)');
 
                 $parameters[$key] = $val;
             }
