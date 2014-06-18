@@ -244,7 +244,7 @@ class OneLogin_Saml2_Auth
      * @param string $returnTo   The target URL the user should be returned to after login.
      * @param array  $parameters An array of additional parameters to send through to the IdP
      */
-    public function login($returnTo = null, $parameters = [])
+    public function login($returnTo = null, $parameters = array())
     {
         assert('is_array($parameters)');
 
