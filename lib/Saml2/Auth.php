@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -241,14 +241,29 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SSO process.
      *
-     * @param string $returnTo The target URL the user should be returned to after login.
+     * @param string $returnTo   The target URL the user should be returned to after login.
+     * @param array  $parameters An array of additional parameters to send through to the IdP
      */
-    public function login($returnTo = null)
+    public function login($returnTo = null, $parameters = array())
     {
+        assert('is_array($parameters)');
+
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
+        $idpData = $this->_settings->getIdPData();
+
+        if (isset($idpData['parameters'])) {
+            assert('is_array($idpData[\'parameters\'])');
+
+            foreach ($idpData['parameters'] as $key => $val) {
+                assert('is_string($key)');
+                assert('is_string($val) || is_numeric($val)');
+
+                $parameters[$key] = $val;
+            }
+        }
 
         $samlRequest = $authnRequest->getRequest();
-        $parameters = array('SAMLRequest' => $samlRequest);
+        $parameters['SAMLRequest'] = $samlRequest;
 
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
@@ -333,7 +348,7 @@ class OneLogin_Saml2_Auth
      * @param string $samlRequest The SAML Request
      * @param string $relayState  The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildRequestSignature($samlRequest, $relayState)
     {
@@ -342,7 +357,7 @@ class OneLogin_Saml2_Auth
                 "Trying to sign the SAML Request but can't load the SP certs",
                 OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
             );
-        }        
+        }
 
         $key = $this->_settings->getSPkey();
 
@@ -360,9 +375,9 @@ class OneLogin_Saml2_Auth
      * Generates the Signature for a SAML Response
      *
      * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $relayState   The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState)
     {
