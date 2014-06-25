@@ -117,6 +117,12 @@
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_formatPrivateKey" title="formatPrivateKey :: Returns a private key (adding header &amp; footer if required).">
+            <span class="description">Returns a a private key (adding header &amp; footer if required).</span><pre>formatPrivateKey</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_redirect" title="redirect :: Executes a redirection to the provided url (or return the target url).">
             <span class="description">Executes a redirection to the provided url (or return the target url).</span><pre>redirect</pre>
         </a>
@@ -391,6 +397,43 @@ to a UNIX timestamp. The sub-second part is ignored.</span><pre>parseSAML2Time</
                                                                     </div>
                             </div>
                         </div>
+                                            <a id="formatPrivateKey"></a>
+                        <div class="element clickable method public  method_formatPrivateKey" data-toggle="collapse" data-target=".method_formatPrivateKey .collapse">
+                            <h2>Returns a private key (adding header &amp; footer if required).</h2>
+                            <pre>formatPrivateKey(string $key, boolean $heads = true) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$key</h4>
+                                                <code>string</code><p><p>A private key</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$heads</h4>
+                                                <code>boolean</code><p><p>True if we want to include head and footer</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>$rsaKey Formated private key</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
+
                                             <a id="method_redirect"></a>
                         <div class="element clickable method public  method_redirect" data-toggle="collapse" data-target=".method_redirect .collapse">
                             <h2>Executes a redirection to the provided url (or return the target url).</h2>

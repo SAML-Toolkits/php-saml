@@ -144,23 +144,23 @@ class OneLogin_Saml2_Utils
      * @param string  $key   A private key
      * @param boolean $heads True if we want to include head and footer
      *
-     * @return string Formated private key
+     * @return string $rsaKey Formated private key
      */
 
     public static function formatPrivateKey($key, $heads = true)
     {
-        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
-        if (!empty($key)) {
-            $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
-            $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
-            $key = str_replace(' ', '', $key);
+        $rsaKey = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        if (!empty($rsaKey)) {
+            $rsaKey = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $rsaKey);
+            $rsaKey = str_replace('-----END RSA PRIVATE KEY-----', "", $rsaKey);
+            $rsaKey = str_replace(' ', '', $rsaKey);
 
             if ($heads) {
-                $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+                $rsaKey = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($rsaKey, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
             }
 
         }
-        return $key;
+        return $rsaKey;
     }
 
     /**

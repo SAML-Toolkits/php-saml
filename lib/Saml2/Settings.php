@@ -719,7 +719,7 @@ class OneLogin_Saml2_Settings
     }
 
     /**
-     * Formats the SP key.
+     * Formats the SP private key.
      */
     public function formatSPKey()
     {

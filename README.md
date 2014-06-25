@@ -151,10 +151,13 @@ SAML requires a x.509 cert to sign and encrypt elements like NameID, Message,
 Assertion, Metadata.
 
 If our environment requires sign or encrypt support, this folder may contain
-the x.509 info that the SP will use:
+the x509 cert and the private key that the SP will use:
 
  * **sp.crt** The public cert of the SP
  * **sp.key** The privake key of the SP
+
+Or also we can provide those data in the setting file at the $settings['sp']['x509cert']
+and the $settings['sp']['privateKey'].
 
 Sometimes we could need a signature on the metadata published by the SP, in
 this case we could use the x.509 cert previously mentioned or use a new x.509
@@ -287,6 +290,11 @@ $settings = array (
         // represent the requested subject.
         // Take a look on lib/Saml2/Constants.php to see the NameIdFormat supported.
         'nameIdFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        // Usually x509cert and privateKey of the SP are provided by files placed at
+        // the certs folder. But we can also provide them with the following parameters
+        'x509cert' => '',
+        'privateKey' > '',
+
     ),
 
     // Identity Provider Data that we want connected with our SP.
@@ -1018,6 +1026,8 @@ Configuration of the OneLogin PHP Toolkit
  * **getSPMetadata** Gets the SP metadata. The XML representation.
  * **validateMetadata** Validates an XML SP Metadata.
  * **formatIdPCert** Formats the IdP cert.
+ * **formatSPCert** Formats the SP cert.   
+ * **formatSPKey** Formats the SP private key.
  * **getErrors** Returns an array with the errors, the array is empty when
    the settings is ok.
  * **setStrict** Activates or deactivates the strict mode.
@@ -1040,6 +1050,7 @@ Auxiliary class that contains several methods
  * **validateXML** This function attempts to validate an XML string against
    the specified schema.
  * **formatCert** Returns a x509 cert (adding header & footer if required).
+ * **formatPrivateKey** returns a RSA private key (adding header & footer if required).
  * **redirect** Executes a redirection to the provided url (or return the
    target url).
  * **isHTTPS** Checks if https or http.
