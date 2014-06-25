@@ -241,14 +241,17 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SSO process.
      *
-     * @param string $returnTo The target URL the user should be returned to after login.
+     * @param string $returnTo   The target URL the user should be returned to after login.
+     * @param array  $parameters Extra parameters to be added to the GET
      */
-    public function login($returnTo = null)
+    public function login($returnTo = null, $parameters = array())
     {
+        assert('is_array($parameters)');
+
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
 
         $samlRequest = $authnRequest->getRequest();
-        $parameters = array('SAMLRequest' => $samlRequest);
+        $parameters['SAMLRequest'] = $samlRequest;
 
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
@@ -269,9 +272,12 @@ class OneLogin_Saml2_Auth
      * Initiates the SLO process.
      *
      * @param string $returnTo The target URL the user should be returned to after logout.
+     * @param array  $parameters Extra parameters to be added to the GET     
      */
-    public function logout($returnTo = null)
+    public function logout($returnTo = null, $parameters = array())
     {
+        assert('is_array($parameters)');
+
         $sloUrl = $this->getSLOurl();
         if (!isset($sloUrl)) {
             throw new OneLogin_Saml2_Error(
@@ -284,7 +290,7 @@ class OneLogin_Saml2_Auth
 
         $samlRequest = $logoutRequest->getRequest();
 
-        $parameters = array('SAMLRequest' => $samlRequest);
+        $parameters['SAMLRequest'] = $samlRequest;
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
@@ -333,7 +339,7 @@ class OneLogin_Saml2_Auth
      * @param string $samlRequest The SAML Request
      * @param string $relayState  The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildRequestSignature($samlRequest, $relayState)
     {
@@ -342,7 +348,7 @@ class OneLogin_Saml2_Auth
                 "Trying to sign the SAML Request but can't load the SP certs",
                 OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
             );
-        }        
+        }
 
         $key = $this->_settings->getSPkey();
 

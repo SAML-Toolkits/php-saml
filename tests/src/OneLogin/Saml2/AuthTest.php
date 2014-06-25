@@ -618,7 +618,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the login method of the OneLogin_Saml2_Auth class
-    * Case Login with no parameters. An AuthnRequest is built an redirect executed
+    * Case Login with no parameters. An AuthnRequest is built an redirection executed
     *
     * @covers OneLogin_Saml2_Auth::login
     * @runInSeparateProcess
@@ -641,14 +641,14 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $hostname = OneLogin_Saml2_Utils::getSelfHost();
-            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname".$_SERVER["PHP_SELF"]);;
+            $this->assertEquals($parsedQuery['RelayState'], "http://$hostname".$_SERVER["PHP_SELF"]);
         }
     }
 
     /**
     * Tests the login method of the OneLogin_Saml2_Auth class
-    * Case Login with relayState. An AuthnRequest is built with a the RelayState in
-    * the assertion is built and redirect executed
+    * Case Login with relayState. An AuthnRequest is built. GET with SAMLRequest, 
+    * and RelayState. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::login
     * @runInSeparateProcess
@@ -672,6 +672,42 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
+        }
+    }
+
+    /**
+    * Tests the login method of the OneLogin_Saml2_Auth class
+    * Case Login with $elaySate and $parameters. An AuthnRequest is built. GET with
+    * SAMLRequest, RelayState and extra parameters in the GET. A redirection is executed
+    *
+    * @covers OneLogin_Saml2_Auth::login
+    * @runInSeparateProcess
+    */
+    public function testLoginWithRelayStateAndParameters()
+    {
+        try {
+            $relayState = 'http://sp.example.com';
+            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+
+            // The Header of the redirect produces an Exception
+            $this->_auth->login($relayState, $parameters);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+            $this->assertArrayHasKey('RelayState', $parsedQuery);
+            $this->assertEquals($parsedQuery['RelayState'], $relayState);
+            $this->assertArrayHasKey('test1', $parsedQuery);
+            $this->assertArrayHasKey('test2', $parsedQuery);
+            $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
+            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
         }
     }
 
@@ -745,8 +781,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the logout method of the OneLogin_Saml2_Auth class
-    * Case Logout with relayState. A logout Request with a the RelayState in
-    * the assertion is built and redirect executed
+    * Case Logout with relayState. A logout Request is build. GET with SAMLRequest,
+    * RelayState. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::logout
     * @runInSeparateProcess
@@ -770,6 +806,42 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
+        }
+    }
+
+    /**
+    * Tests the logout method of the OneLogin_Saml2_Auth class
+    * Case Logout with relayState. A logout Request is build. GET with SAMLRequest,
+    * RelayState and extra parameters. A redirection is executed
+    *
+    * @covers OneLogin_Saml2_Auth::logout
+    * @runInSeparateProcess
+    */
+    public function testLogoutWithRelayStateAndParameters()
+    {
+        try {
+            $relayState = 'http://sp.example.com';
+            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+
+            // The Header of the redirect produces an Exception
+            $this->_auth->logout($relayState, $parameters);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+            $this->assertArrayHasKey('RelayState', $parsedQuery);
+            $this->assertEquals($parsedQuery['RelayState'], $relayState);
+            $this->assertArrayHasKey('test1', $parsedQuery);
+            $this->assertArrayHasKey('test2', $parsedQuery);
+            $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
+            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);            
         }
     }
 
