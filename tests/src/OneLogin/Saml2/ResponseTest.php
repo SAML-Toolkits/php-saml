@@ -40,6 +40,22 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($responseEnc instanceof OneLogin_Saml2_Response);
     }
 
+    public function testNamespaces()
+    {
+        $xml = base64_encode(file_get_contents(TEST_ROOT . '/data/responses/open_saml_response.xml'));
+
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+
+        $attributes = $response->getAttributes();
+
+        $this->assertNotEmpty($attributes);
+
+        $this->assertEquals(array('FirstName','LastName'), array_keys($attributes));
+
+        $this->assertEquals('Someone', $attributes['FirstName'][0]);
+        $this->assertEquals('Special', $attributes['LastName'][0]);
+    }
+
     /**
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
