@@ -444,9 +444,7 @@ class OneLogin_Saml2_Response
         foreach ($entries as $entry) {
             $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
 
-            $AttributeValueNodes = $entry->attributes->getNamedItem('Name')->nodeValue;
             $attributeValues = array();
-
             foreach ($entry->childNodes as $childNode) {
                 if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $childNode->prefix.':AttributeValue') {
                     $attributeValues[] = $childNode->nodeValue;
