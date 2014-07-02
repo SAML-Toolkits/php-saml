@@ -87,7 +87,7 @@ class OneLogin_Saml2_Response
                 throw new Exception('SAML Response must contain 1 assertion');
             }
 
-            $status = $this->checkStatus();
+            $status = $this->checkStatus();lib/Saml2/Response.php
 
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
@@ -108,7 +108,6 @@ class OneLogin_Saml2_Response
 
                 $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                 if (!$res instanceof DOMDocument) {
-                    print_r($res);
                     throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
                 }
 
