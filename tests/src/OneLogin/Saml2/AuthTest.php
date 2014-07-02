@@ -841,7 +841,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('test1', $parsedQuery);
             $this->assertArrayHasKey('test2', $parsedQuery);
             $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
-            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);            
+            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
         }
     }
 

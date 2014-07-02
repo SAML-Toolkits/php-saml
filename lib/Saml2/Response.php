@@ -87,7 +87,7 @@ class OneLogin_Saml2_Response
                 throw new Exception('SAML Response must contain 1 assertion');
             }
 
-            $status = $this->checkStatus();lib/Saml2/Response.php
+            $status = $this->checkStatus();
 
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
