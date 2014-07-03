@@ -123,8 +123,11 @@ load the Logout Response.</span><pre>__construct</pre>
             <span class="description">Determines if the SAML LogoutResponse is valid</span><pre>isValid</pre>
         </a>
     </li>
-
-                                                                                                                                                                <li class="method public">
+                                                                                                        <li class="method public">
+        <a href="#method_getError" title="getError :: After execute a validation process, if fails this method returns the cause.">
+            <span class="description">After execute a validation process, if fails this method returns the cause.</span><pre>getError</pre>
+        </a>
+    </li>                                                                                                                                                                                                                        <li class="method public">
         <a href="#method_build" title="build :: Generates a Logout Response object.">
             <span class="description">Generates a Logout Response object.</span><pre>build</pre>
         </a>
@@ -282,12 +285,106 @@ load the Logout Response.</h2>
                                                                     </div>
                             </div>
                         </div>
+
+                                            <a id="method_getError"></a>
+                        <div class="element clickable method public  method_getError" data-toggle="collapse" data-target=".method_getError .collapse">
+                            <h2>After execute a validation process, if fails this method returns the cause.</h2>
+                            <pre>getError() : string</pre>
+                            <div class="labels"></div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table"><tr>
+                                                            <th>
+                                                                throws
+                                                            </th>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th></th>
+                                                            <td></td>
+                                                        </tr>
+                                    </table>
+                                    <h3>Response</h3>
+                                        <code>string</code><p><p>Cause</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
+<a id="method_build"></a>
+                        <div class="element clickable method public  method_build" data-toggle="collapse" data-target=".method_build .collapse">
+                            <h2>Generates a Logout Response object.</h2>
+                            <pre>build(string $inResponseTo) </pre>
+                            <div class="labels">                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$inResponseTo</h4>
+                                                <code>string</code><p><p>InResponseTo value for the Logout Response.</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getResponse"></a>
+                        <div class="element clickable method public  method_getResponse" data-toggle="collapse" data-target=".method_getResponse .collapse">
+                            <h2>Returns a Logout Response object.</h2>
+                            <pre>getResponse() : string</pre>
+                            <div class="labels">                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>Logout Response deflated and base64 encoded</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
                                             <a id="method_isValid"></a>
                         <div class="element clickable method public  method_isValid" data-toggle="collapse" data-target=".method_isValid .collapse">
                             <h2>Determines if the SAML LogoutResponse is valid</h2>
                             <pre>isValid(string $requestId = null) : bool</pre>
                             <div class="labels">
-                                                                                                                                                                                            </div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"></div>
@@ -326,8 +423,7 @@ load the Logout Response.</h2>
                         <div class="element clickable method private  method__query" data-toggle="collapse" data-target=".method__query .collapse">
                             <h2>Extracts a node from the DOMDocument (Logout Response Menssage)</h2>
                             <pre>_query(string $query) : \DOMNodeList</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
+                            <div class="labels">                                                                                                                                      </div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"></div>
@@ -353,77 +449,7 @@ load the Logout Response.</h2>
                                                                     </div>
                             </div>
                         </div>
-                                            <a id="method_build"></a>
-                        <div class="element clickable method public  method_build" data-toggle="collapse" data-target=".method_build .collapse">
-                            <h2>Generates a Logout Response object.</h2>
-                            <pre>build(string $inResponseTo) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$inResponseTo</h4>
-                                                <code>string</code><p><p>InResponseTo value for the Logout Response.</p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-                        </div>
-                                            <a id="method_getResponse"></a>
-                        <div class="element clickable method public  method_getResponse" data-toggle="collapse" data-target=".method_getResponse .collapse">
-                            <h2>Returns a Logout Response object.</h2>
-                            <pre>getResponse() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                            </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p><p>Logout Response deflated and base64 encoded</p></p>
-                                                                    </div>
-                            </div>
-                        </div>
-                    
-                    
+                    </div>
                                                                 <h3><i class="icon-custom icon-property"></i> Properties</h3>
                                                     <a id="property__settings"> </a>
                             <div class="element clickable property  protected property__settings" data-toggle="collapse" data-target=".property__settings .collapse">

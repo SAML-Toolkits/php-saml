@@ -145,6 +145,11 @@
             <span class="description">Checks if the Logout Request recieved is valid.</span><pre>isValid</pre>
         </a>
     </li>
+                                                                                                        <li class="method public">
+        <a href="#method_getError" title="getError :: After execute a validation process, if fails this method returns the cause.">
+            <span class="description">After execute a validation process, if fails this method returns the cause.</span><pre>getError</pre>
+        </a>
+    </li>
 
                                                 </ul>
         </li>
@@ -183,7 +188,7 @@
                                                                 <a id="method___construct"></a>
                         <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
                             <h2>Constructs the Logout Request object.</h2>
-                            <pre>__construct(\OneLogin_Saml2_Settings $settings) </pre>
+                            <pre>__construct(\OneLogin_Saml2_Settings $settings, string $request = null) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
                             <div class="row collapse">
@@ -211,6 +216,8 @@
                                                                                     <div class="subelement argument">
                                                 <h4>$settings</h4>
                                                 <code>\OneLogin_Saml2_Settings</code><p><p>Settings</p></p>
+                                                <h4>$request</h4>
+                                                <code>string</code><p><p>A UUEncoded Logout Request</p></p>
                                             </div>
                                                                             
                                                                     </div>
@@ -412,6 +419,33 @@
                                                                     </div>
                             </div>
                         </div>
+
+                                            <a id="method_getError"></a>
+                        <div class="element clickable method public  method_getError" data-toggle="collapse" data-target=".method_getError .collapse">
+                            <h2>After execute a validation process, if fails this method returns the cause.</h2>
+                            <pre>getError() : string</pre>
+                            <div class="labels"></div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table"><tr>
+                                                            <th>
+                                                                throws
+                                                            </th>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th></th>
+                                                            <td></td>
+                                                        </tr>
+                                    </table>
+                                    <h3>Response</h3>
+                                        <code>string</code><p><p>Cause</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
                                             <a id="method_isValid"></a>
                         <div class="element clickable method public  method_isValid" data-toggle="collapse" data-target=".method_isValid .collapse">
                             <h2>Checks if the Logout Request recieved is valid.</h2>
@@ -451,8 +485,6 @@
                                                                     </div>
                             </div>
                         </div>
-                    
-                    
                                                                 <h3><i class="icon-custom icon-property"></i> Properties</h3>
                                                     <a id="property__settings"> </a>
                             <div class="element clickable property  protected property__settings" data-toggle="collapse" data-target=".property__settings .collapse">

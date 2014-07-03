@@ -851,7 +851,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
     }
 }
 
-if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.  
+if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
     if (!empty($_SESSION['samlUserdata'])) {
         $attributes = $_SESSION['samlUserdata'];
         echo 'You have the following attributes:<br>';
@@ -976,6 +976,7 @@ SAML 2 Authentication Response class
    Assertion (encrypted or not).
  * **validateTimestamps** Verifies that the document is still valid according
    Conditions Element.
+ * **getError** After execute a validation process, if fails this method returns the cause
 
 ##### OneLogin_Saml2_LogoutRequest - LogoutRequest.php #####
 
@@ -989,6 +990,7 @@ SAML 2 Logout Request class
  * **getIssuer** Gets the Issuer of the Logout Request.
  * **getSessionIndexes** Gets the SessionIndexes from the Logout Request.
  * **isValid** Checks if the Logout Request recieved is valid.
+ * **getError** After execute a validation process, if fails this method returns the cause
 
 ##### OneLogin_Saml2_LogoutResponse - LogoutResponse.php #####
 
@@ -1000,7 +1002,8 @@ SAML 2 Logout Response class
  * **getStatus** Gets the Status of the Logout Response.
  * **isValid** Determines if the SAML LogoutResponse is valid
  * **build** Generates a Logout Response object.
- * **getResponse** Returns a Logout Response object.    
+ * **getResponse** Returns a Logout Response object.
+ * **getError** After execute a validation process, if fails this method returns the cause
 
 ##### OneLogin_Saml2_Settings - Settings.php #####
 
@@ -1009,7 +1012,7 @@ Configuration of the OneLogin PHP Toolkit
  * **OneLogin_Saml2_Settings**  Initializes the settings: Sets the paths of
    the different folders and Loads settings info from settings file or
    array/object provided
- * **checkSettings** Checks the settings info.   
+ * **checkSettings** Checks the settings info.
  * **getBasePath** Returns base path.
  * **getCertPath** Returns cert path.
  * **getLibPath** Returns lib path.
@@ -1026,7 +1029,7 @@ Configuration of the OneLogin PHP Toolkit
  * **getSPMetadata** Gets the SP metadata. The XML representation.
  * **validateMetadata** Validates an XML SP Metadata.
  * **formatIdPCert** Formats the IdP cert.
- * **formatSPCert** Formats the SP cert.   
+ * **formatSPCert** Formats the SP cert.
  * **formatSPKey** Formats the SP private key.
  * **getErrors** Returns an array with the errors, the array is empty when
    the settings is ok.

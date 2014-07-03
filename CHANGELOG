@@ -1,0 +1,25 @@
+CHANGELOG
+=========
+
+v.2.1.0
+-------
+
+* The isValid method of the Logout Request is now non-static. (affects processSLO method of Auth.php)
+* Logout Request constructor now accepts encoded logout requests
+* Now after validate a message, if fails a method getError of the object will return the cause
+* Fix typos
+* Added extra parameters option to login and logout methods.
+* Improve Test (new test, use the new getError method for testing)
+* Bugfix namespace problem when getting Attributes
+
+
+v.2.0.0
+-------
+
+New PHP SAML Toolkit (SLO, Sign, Encryptation)
+
+
+v.1.0.0
+-------
+
+Old PHP SAML Toolkit

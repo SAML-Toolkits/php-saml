@@ -124,16 +124,14 @@ class OneLogin_Saml2_Auth
                 }
             }
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
-            $decoded = base64_decode($_GET['SAMLRequest']);
-            $request = gzinflate($decoded);
-            if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
+            $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
+            if (!$logoutRequest->isValid()) {
                 $this->_errors[] = 'invalid_logout_request';
             } else {
                 if (!$keepLocalSession) {
                     OneLogin_Saml2_Utils::deleteLocalSession();
                 }
-
-                $inResponseTo = OneLogin_Saml2_LogoutRequest::getID($request);
+                $inResponseTo = OneLogin_Saml2_LogoutRequest::getID(gzinflate(base64_decode($_GET['SAMLRequest'])));
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
                 $logoutResponse = $responseBuilder->getResponse();
