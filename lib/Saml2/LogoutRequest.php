@@ -268,7 +268,7 @@ LOGOUTREQUEST;
                     }
                 }
 
-                $nameId = $this->getNameId($dom);
+                $nameId = $this->getNameId($dom, $this->_settings->getSPkey());
 
                 // Check issuer
                 $issuer = $this->getIssuer($dom);
