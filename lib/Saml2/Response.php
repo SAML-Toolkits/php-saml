@@ -89,12 +89,12 @@ class OneLogin_Saml2_Response
                 throw new Exception('Missing ID attribute on SAML Response');
             }
 
+            $status = $this->checkStatus();
+
             $singleAssertion = $this->validateNumAssertions();
             if (!$singleAssertion) {
                 throw new Exception('SAML Response must contain 1 assertion');
             }
-
-            $status = $this->checkStatus();
 
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
