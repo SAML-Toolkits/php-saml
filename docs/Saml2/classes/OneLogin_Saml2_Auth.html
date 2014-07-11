@@ -153,7 +153,11 @@ or to the url that we defined in our SSO Request.</span><pre>redirectTo</pre>
             <span class="description">Returns the nameID</span><pre>getNameId</pre>
         </a>
     </li>
-
+                                                                                                        <li class="method public">
+        <a href="#method_getSessionIndex" title="getSessionIndex :: Returns the sessionIndex">
+            <span class="description">The SessionIndex of the assertion</span><pre>getSessionIndex</pre>
+        </a>
+    </li>
                                                                                                         <li class="method public">
         <a href="#method_getErrors" title="getErrors :: Returns if there were any error">
             <span class="description">Returns if there were any error</span><pre>getErrors</pre>
@@ -523,8 +527,7 @@ or to the url that we defined in our SSO Request.</h2>
                         <div class="element clickable method public  method_getNameId" data-toggle="collapse" data-target=".method_getNameId .collapse">
                             <h2>Returns the nameID</h2>
                             <pre>getNameId() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
+                            <div class="labels">                                                                                                                                                                                            </div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"></div>
@@ -552,6 +555,41 @@ or to the url that we defined in our SSO Request.</h2>
                                                                     </div>
                             </div>
                         </div>
+
+                            <a id="method_getSessionIndex"></a>
+                        <div class="element clickable method public  method_getSessionIndex" data-toggle="collapse" data-target=".method_getSessionIndex .collapse">
+                            <h2>Returns the SessionIndex</h2>
+                            <pre>getSessionIndex() : string</pre>
+                            <div class="labels">                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p><p>The SessionIndex of the assertion</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
+
                                             <a id="method_getErrors"></a>
                         <div class="element clickable method public  method_getErrors" data-toggle="collapse" data-target=".method_getErrors .collapse">
                             <h2>Returns if there were any error</h2>
@@ -683,6 +721,10 @@ or to the url that we defined in our SSO Request.</h2>
                                                                                     <div class="subelement argument">
                                                 <h4>$returnTo</h4>
                                                 <code>string</code><p><p>The target URL the user should be returned to after logout.</p></p>
+                                                <h4>$parameters</h4>
+                                                <code>array</code><p><p>Extra parameters to be added to the GET.</p></p>
+                                                <h4>$sessionIndex</h4>
+                                                <code>string</code><p><p>The SessionIndex (taken from the SAML Response in the SSO process).</p></p>
                                             </div>
                                                                             
                                                                     </div>
@@ -959,6 +1001,39 @@ or to the url that we defined in our SSO Request.</h2>
                                                                             </div>
                                 </div>
                             </div>
+                                                    <a id="property__sessionIndex"> </a>
+                            <div class="element clickable property  private property__sessionIndex" data-toggle="collapse" data-target=".property__sessionIndex .collapse">
+                                <h2>SessionIndex. When the user is logged, this stored the from the AuthnStatement of the SAML Response.</h2>
+                                <pre>_sessionIndex : string</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                            <tr>
+                                                    <th>
+                                                        
+                                                    </th>
+                                                    <td>
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>boolean</code>
+                                                                            </div>
+                                </div>
+                            </div>                            
                                                     <a id="property__errors"> </a>
                             <div class="element clickable property  private property__errors" data-toggle="collapse" data-target=".property__errors .collapse">
                                 <h2>If any error.</h2>

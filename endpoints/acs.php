@@ -25,6 +25,7 @@ if (!$auth->isAuthenticated()) {
 }
 
 $_SESSION['samlUserdata'] = $auth->getAttributes();
+$_SESSION['IdPSessionIndex'] = $auth->getSessionIndex();
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
     $auth->redirectTo($_POST['RelayState']);
 }
@@ -42,6 +43,9 @@ if (!empty($attributes)) {
         echo '</ul></td></tr>';
     }
     echo '</tbody></table>';
+    if (!empty($_SESSION['IdPSessionIndex'])) {
+        echo '<p>The SessionIndex of the IdP is: '.$_SESSION['IdPSessionIndex'].'</p>';
+    }
 } else {
     echo _('Attributes not found');
 }

@@ -6,6 +6,8 @@
  * IdP with an SLO request.
  */
 
+session_start();
+
 require_once '../_toolkit_loader.php';
 
 $samlSettings = new OneLogin_Saml2_Settings();
@@ -17,7 +19,12 @@ if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutServic
     throw new Exception("The IdP does not support Single Log Out");
 }
 
-$logoutRequest = new OneLogin_Saml2_LogoutRequest($samlSettings);
+if (isset($_SESSION['IdPSessionIndex']) && !empty($_SESSION['IdPSessionIndex'])) {
+    $logoutRequest = new OneLogin_Saml2_LogoutRequest($samlSettings, null, $_SESSION['IdPSessionIndex']);
+} else {
+    $logoutRequest = new OneLogin_Saml2_LogoutRequest($samlSettings);
+}
+
 $samlRequest = $logoutRequest->getRequest();
 
 $parameters = array('SAMLRequest' => $samlRequest);

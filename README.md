@@ -941,6 +941,7 @@ Main class of OneLogin PHP Toolkit
  * **getAttributes** Returns the set of SAML attributes.
  * **getAttribute** Returns the requested SAML attribute
  * **getNameId** Returns the nameID
+ * **getSessionIndex** Gets the SessionIndex from the AuthnStatement.
  * **getErrors** Returns if there were any error 
  * **getSSOurl** Gets the SSO url.
  * **getSLOurl** Gets the SLO url.

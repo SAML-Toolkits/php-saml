@@ -35,6 +35,13 @@ class OneLogin_Saml2_Auth
      */
     private $_authenticated = false;
 
+
+    /**
+     * SessionIndex. When the user is logged, this stored the 
+     * from the AuthnStatement of the SAML Response
+     */
+    private $_sessionIndex;
+
     /**
      * If any error.
      *
@@ -91,6 +98,7 @@ class OneLogin_Saml2_Auth
                 $this->_attributes = $response->getAttributes();
                 $this->_nameid = $response->getNameId();
                 $this->_authenticated = true;
+                $this->_sessionIndex = $response->getSessionIndex();
             } else {
                 $this->_errors[] = 'invalid_response';
             }
@@ -106,7 +114,7 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @param boolean $keepLocalSession When false will destroy the local session, otherwise will destroy it
+     * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
      * @param string  $requestId        The ID of the LogoutRequest sent by this SP to the IdP
      */
     public function processSLO($keepLocalSession = false, $requestId = null)
@@ -209,6 +217,16 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Returns the SessionIndex
+     *
+     * @return string  The SessionIndex of the assertion
+     */
+    public function getSessionIndex()
+    {
+        return $this->_sessionIndex;
+    }
+
+    /**
      * Returns if there were any error
      *
      * @return array  Errors
@@ -270,9 +288,10 @@ class OneLogin_Saml2_Auth
      * Initiates the SLO process.
      *
      * @param string $returnTo The target URL the user should be returned to after logout.
-     * @param array  $parameters Extra parameters to be added to the GET     
+     * @param array  $parameters Extra parameters to be added to the GET
+     * @param string $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
      */
-    public function logout($returnTo = null, $parameters = array())
+    public function logout($returnTo = null, $parameters = array(), $sessionIndex = null)
     {
         assert('is_array($parameters)');
 
@@ -284,7 +303,7 @@ class OneLogin_Saml2_Auth
             );
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $sessionIndex);
 
         $samlRequest = $logoutRequest->getRequest();
 

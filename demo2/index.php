@@ -38,6 +38,9 @@ if (!isset($_SESSION['samlUserdata'])) {
             echo '</ul></td></tr>';
         }
         echo '</tbody></table>';
+        if (!empty($_SESSION['IdPSessionIndex'])) {
+            echo '<p>The SessionIndex of the IdP is: '.$_SESSION['IdPSessionIndex'].'</p>';
+        }
     } else {
         echo "<p>You don't have any attribute</p>";
     }

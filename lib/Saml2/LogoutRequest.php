@@ -29,13 +29,15 @@ class OneLogin_Saml2_LogoutRequest
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param string                  $response A UUEncoded Logout Request.
+     * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
      *
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $sessionIndex = null)
     {
+
         $this->_settings = $settings;
 
-        if (!isset($request)) {
+        if (!isset($request) || empty($request)) {
 
             $spData = $this->_settings->getSPData();
             $idpData = $this->_settings->getIdPData();
@@ -57,6 +59,8 @@ class OneLogin_Saml2_LogoutRequest
                 $key
             );
 
+            $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
+
             $logoutRequest = <<<LOGOUTREQUEST
 <samlp:LogoutRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -67,6 +71,7 @@ class OneLogin_Saml2_LogoutRequest
     Destination="{$idpData['singleLogoutService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
     {$nameId}
+    {$sessionIndexStr}
 </samlp:LogoutRequest>
 LOGOUTREQUEST;
         } else {
@@ -202,6 +207,9 @@ LOGOUTREQUEST;
 
     /**
      * Gets the SessionIndexes from the Logout Request.
+     * Notice: Our Constructor only support 1 SessionIndex but this parser
+     *         extracts an array of all the  SessionIndex found on a  
+     *         Logout Request, that could be many.
      *
      * @param string|DOMDocument $request Logout Request Message
      * 

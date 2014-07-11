@@ -26,7 +26,7 @@ class OneLogin_Saml2_LogoutResponse
     public $document;
 
     /**
-    * After execute a validation process, this var contains the cause
+    * After execute a validation process, if it fails, this var contains the cause
     * @var string
     */
     private $_error;
