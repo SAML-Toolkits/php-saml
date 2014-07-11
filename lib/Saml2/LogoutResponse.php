@@ -43,7 +43,12 @@ class OneLogin_Saml2_LogoutResponse
         $this->_settings = $settings;
         if ($response) {
             $decoded = base64_decode($response);
-            $this->_logoutResponse = gzinflate($decoded);
+            $inflated = @gzinflate($decoded);
+            if ($inflated != false) {
+                $this->_logoutResponse = $inflated;
+            } else {
+                $this->_logoutResponse = $decoded;
+            }
             $this->document = new DOMDocument();
             $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->_logoutResponse);
         }

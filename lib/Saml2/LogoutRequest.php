@@ -76,7 +76,13 @@ class OneLogin_Saml2_LogoutRequest
 LOGOUTREQUEST;
         } else {
             $decoded = base64_decode($request);
-            $logoutRequest = gzinflate($decoded);
+            // We try to inflate
+            $inflated = @gzinflate($decoded);
+            if ($inflated != false) {
+                $logoutRequest = $inflated;
+            } else {
+                $logoutRequest = $decoded;
+            }
         }
         $this->_logoutRequest = $logoutRequest;
     }
