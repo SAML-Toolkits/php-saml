@@ -39,7 +39,8 @@ class OneLogin_Saml2_Metadata
         if (isset($sp['singleLogoutService'])) {
             $sls = <<<SLS_TEMPLATE
         <md:SingleLogoutService Binding="{$sp['singleLogoutService']['binding']}"
-                                     Location="{$sp['singleLogoutService']['url']}" />
+                                Location="{$sp['singleLogoutService']['url']}" />
+
 SLS_TEMPLATE;
         }
 
@@ -59,13 +60,14 @@ SLS_TEMPLATE;
         if (!empty($organization)) {
             $organizationInfo = array();
             foreach ($organization as $lang => $info) {
-                $organizationInfo[] = <<<CONTACT
+                $organizationInfo[] = <<<ORGANIZATION
+
     <md:Organization>
        <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
        <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
        <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
     </md:Organization>
-CONTACT;
+ORGANIZATION;
             }
             $strOrganization = implode("\n", $organizationInfo);
         }
@@ -81,7 +83,7 @@ CONTACT;
     </md:ContactPerson>
 CONTACT;
             }
-            $strContacts = implode("\n", $contactsInfo);
+            $strContacts = "\n".implode("\n", $contactsInfo);
         }
 
         $metadata = <<<METADATA_TEMPLATE
@@ -95,10 +97,7 @@ CONTACT;
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
                                      Location="{$sp['assertionConsumerService']['url']}"
                                      index="1" />
-{$sls}
-    </md:SPSSODescriptor>
-{$strOrganization}
-{$strContacts}
+{$sls}    </md:SPSSODescriptor>{$strOrganization}{$strContacts}
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
 
@@ -134,7 +133,7 @@ METADATA_TEMPLATE;
         try {
             $xml = OneLogin_Saml2_Utils::loadXML($xml, $metadata);
             if (!$xml) {
-                throw new Exception('Error parsing metadata');    
+                throw new Exception('Error parsing metadata');
             }
         } catch (Exception $e) {
             throw new Exception('Error parsing metadata. '.$e->getMessage());
