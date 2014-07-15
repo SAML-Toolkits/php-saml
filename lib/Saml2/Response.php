@@ -120,7 +120,7 @@ class OneLogin_Saml2_Response
 
                 $security = $this->_settings->getSecurityData();
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
                 
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');

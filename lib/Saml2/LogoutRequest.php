@@ -262,7 +262,7 @@ LOGOUTREQUEST;
 
                 $security = $this->_settings->getSecurityData();
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter
                 if ($dom->documentElement->hasAttribute('NotOnOrAfter')) {

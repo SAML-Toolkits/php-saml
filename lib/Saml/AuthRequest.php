@@ -33,7 +33,7 @@ class OneLogin_Saml_AuthRequest
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
         }
         $url = OneLogin_Saml2_Utils::redirect($this->auth->getSSOurl(), $parameters, true);
         return $url;

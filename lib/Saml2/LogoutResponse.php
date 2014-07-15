@@ -123,7 +123,7 @@ class OneLogin_Saml2_LogoutResponse
                     throw new Exception("Invalid issuer in the Logout Request");
                 }
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
