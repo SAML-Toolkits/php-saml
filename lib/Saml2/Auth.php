@@ -272,7 +272,7 @@ class OneLogin_Saml2_Auth
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
         }
 
         $security = $this->_settings->getSecurityData();
@@ -311,7 +311,7 @@ class OneLogin_Saml2_Auth
         if (!empty($returnTo)) {
             $parameters['RelayState'] = $returnTo;
         } else {
-            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+            $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
         }
 
         $security = $this->_settings->getSecurityData();

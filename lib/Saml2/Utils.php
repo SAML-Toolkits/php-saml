@@ -337,6 +337,9 @@ class OneLogin_Saml2_Utils
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
                 $route = str_replace($_SERVER['QUERY_STRING'], '', $route);
+                if (substr($route, -1) == '?') {
+                    $route = substr($route, 0, -1);
+                }
             }
         }
 

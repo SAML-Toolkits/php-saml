@@ -163,7 +163,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
 
         $this->assertFalse($response2->isValid());
-        $this->assertEquals('Invalid issuer in the Logout Request', $response2->getError());
+        $this->assertEquals('Invalid issuer in the Logout Response', $response2->getError());
     }
 
    /**
@@ -183,7 +183,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $this->_settings->setStrict(true);
         $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutRequest was received at', $response2->getError());
+        $this->assertContains('The LogoutResponse was received at', $response2->getError());
     }
 
    /**
@@ -209,7 +209,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $this->_settings->setStrict(true);
         $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('Invalid issuer in the Logout Request', $response2->getError());
+        $this->assertContains('Invalid issuer in the Logout Response', $response2->getError());
 
         $this->_settings->setStrict(false);
         $oldSignature = $_GET['Signature'];
@@ -293,7 +293,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $this->_settings->setStrict(true);
         $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutRequest was received at', $response2->getError());
+        $this->assertContains('The LogoutResponse was received at', $response2->getError());
 
         $plainMessage = gzinflate(base64_decode($message));
         $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();

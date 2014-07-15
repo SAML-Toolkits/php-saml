@@ -120,7 +120,7 @@ class OneLogin_Saml2_LogoutResponse
                 // Check issuer
                 $issuer = $this->getIssuer();
                 if (empty($issuer) || $issuer != $idPEntityId) {
-                    throw new Exception("Invalid issuer in the Logout Request");
+                    throw new Exception("Invalid issuer in the Logout Response");
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
@@ -130,7 +130,7 @@ class OneLogin_Saml2_LogoutResponse
                     $destination = $this->document->documentElement->getAttribute('Destination');
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) === false) {
-                            throw new Exception("The LogoutRequest was received at $currentURL instead of $destination");
+                            throw new Exception("The LogoutResponse was received at $currentURL instead of $destination");
                         }
                     }
                 }
