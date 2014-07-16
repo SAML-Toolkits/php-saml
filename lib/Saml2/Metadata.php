@@ -23,7 +23,7 @@ class OneLogin_Saml2_Metadata
      *
      * @return string SAML Metadata XML
      */
-    public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array())
+    public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
     {
 
         if (!isset($validUntil)) {
@@ -130,6 +130,8 @@ METADATA_TEMPLATE;
     public static function addX509KeyDescriptors($metadata, $cert)
     {
         $xml = new DOMDocument();
+        $xml->preserveWhiteSpace = false;
+        $xml->formatOutput = true;
         try {
             $xml = OneLogin_Saml2_Utils::loadXML($xml, $metadata);
             if (!$xml) {

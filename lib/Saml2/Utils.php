@@ -806,6 +806,8 @@ class OneLogin_Saml2_Utils
 
         $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
         $newDoc = new DOMDocument();
+        $newDoc->preserveWhiteSpace = false;
+        $newDoc->formatOutput = true;
         $newDoc = self::loadXML($newDoc, $xml);
         if (!$newDoc) {
             throw new Exception('Failed to parse decrypted XML. Maybe the wrong sharedkey was used?');
