@@ -149,18 +149,28 @@ class OneLogin_Saml2_Utils
 
     public static function formatPrivateKey($key, $heads = true)
     {
-        $rsaKey = str_replace(array("\x0D", "\r", "\n"), "", $key);
-        if (!empty($rsaKey)) {
-            $rsaKey = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $rsaKey);
-            $rsaKey = str_replace('-----END RSA PRIVATE KEY-----', "", $rsaKey);
-            $rsaKey = str_replace(' ', '', $rsaKey);
+        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        if (!empty($key)) {
 
-            if ($heads) {
-                $rsaKey = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($rsaKey, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+            if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
+                $key = str_replace('-----BEGIN PRIVATE KEY-----', "", $key);
+                $key = str_replace('-----END PRIVATE KEY-----', "", $key);
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
+                }
+            } else {
+                $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
+                $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+                }
             }
-
         }
-        return $rsaKey;
+        return $key;
     }
 
     /**
