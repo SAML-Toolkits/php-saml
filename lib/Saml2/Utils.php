@@ -950,4 +950,17 @@ class OneLogin_Saml2_Utils
             }
         }
     }
+    
+    /**
+     * Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]
+     *
+     * @param string The param to-be extracted
+     */
+    public static function extractOriginalQueryParam ($name)
+    {
+        $index = strpos($_SERVER['QUERY_STRING'], $name.'=');
+        $substring = substr($_SERVER['QUERY_STRING'], $index + strlen($name) + 1);
+        $end = strpos($substring, '&');
+        return $end ? substr($substring, 0, strpos($substring, '&')) : $substring;
+    }
 }
