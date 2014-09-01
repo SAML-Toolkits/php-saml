@@ -72,11 +72,17 @@ PROVIDERNAME;
         Format="{$nameIDPolicyFormat}"
         AllowCreate="true">
     </samlp:NameIDPolicy>
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>    
-</samlp:AuthnRequest>
 AUTHNREQUEST;
+        if (!isset($security['allowedAuthContexts'])) 
+            $security['allowedAuthContexts'] = array('urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport');
+        if($security['allowedAuthContexts'] && is_array($security['allowedAuthContexts']))
+        {
+            $request .= '<samlp:RequestedAuthnContext Comparison="exact">'."\n";
+            foreach($security['allowedAuthContexts'] as $authCtx) 
+                $request .= '<saml:AuthnContextClassRef>'.$authCtx."</saml:AuthnContextClassRef>\n";
+            $request .= '</samlp:RequestedAuthnContext> '."\n";
+        }
+        $request .= '</samlp:AuthnRequest>';
 
         $this->_authnRequest = $request;
     }
