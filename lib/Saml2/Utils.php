@@ -798,7 +798,26 @@ class OneLogin_Saml2_Utils
 
             $encKey = $symmetricKeyInfo->encryptedCtx;
             $symmetricKeyInfo->key = $inputKey->key;
+            $keySize = $symmetricKey->getSymmetricKeySize();
+            if ($keySize === NULL) {
+                // To protect against "key oracle" attacks 
+                throw new Exception('Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, TRUE));
+            }
+
             $key = $encKey->decryptKey($symmetricKeyInfo);
+            if (strlen($key) != $keySize) {
+                $encryptedKey = $encKey->getCipherValue();
+                $pkey = openssl_pkey_get_details($symmetricKeyInfo->key);
+                $pkey = sha1(serialize($pkey), TRUE);
+                $key = sha1($encryptedKey . $pkey, TRUE);
+
+                /* Make sure that the key has the correct length. */
+                if (strlen($key) > $keySize) {
+                    $key = substr($key, 0, $keySize);
+                } elseif (strlen($key) < $keySize) {
+                    $key = str_pad($key, $keySize);
+                }
+            }
             $symmetricKey->loadkey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorith();
