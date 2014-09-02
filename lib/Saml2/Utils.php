@@ -839,7 +839,7 @@ class OneLogin_Saml2_Utils
         $newDoc->formatOutput = true;
         $newDoc = self::loadXML($newDoc, $xml);
         if (!$newDoc) {
-            throw new Exception('Failed to parse decrypted XML. Maybe the wrong sharedkey was used?');
+            throw new Exception('Failed to parse decrypted XML.');
         }
  
         $decryptedElement = $newDoc->firstChild->firstChild;
