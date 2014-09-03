@@ -1081,6 +1081,7 @@ Auxiliary class that contains several methods
  * **generateNameId** Generates a nameID.
  * **getStatus** Gets Status from a Response.
  * **decryptElement** Decrypts an encrypted element.
+ * **castKey** Converts a XMLSecurityKey to the correct algorithm.
  * **addSign** Adds signature key and senders certificate to an element 
    (Message or Assertion).
  * **validateSign** Validates a signature (Message or Assertion).

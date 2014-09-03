@@ -850,6 +850,35 @@ class OneLogin_Saml2_Utils
         return $decryptedElement;
     }
 
+     /**
+    * Converts a XMLSecurityKey to the correct algorithm.
+    *
+    * @param XMLSecurityKey $key The key.
+    * @param string $algorithm The desired algorithm.
+    * @param string $type Public or private key, defaults to public.
+    * @return XMLSecurityKey The new key.
+    * @throws Exception
+    */
+    public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
+    {
+        assert('is_string($algorithm)');
+        assert('$type === "public" || $type === "private"');
+        // do nothing if algorithm is already the type of the key
+        if ($key->type === $algorithm) {
+            return $key;
+        }
+        $keyInfo = openssl_pkey_get_details($key->key);
+        if ($keyInfo === FALSE) {
+            throw new Exception('Unable to get key details from XMLSecurityKey.');
+        }
+        if (!isset($keyInfo['key'])) {
+            throw new Exception('Missing key in public key details.');
+        }
+        $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
+        $newKey->loadKey($keyInfo['key']);
+        return $newKey;
+    }
+
     /**
      * Adds signature key and senders certificate to an element (Message or Assertion).
      *
@@ -930,7 +959,6 @@ class OneLogin_Saml2_Utils
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
         }
-
 
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');

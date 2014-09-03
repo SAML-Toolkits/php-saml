@@ -305,10 +305,6 @@ LOGOUTREQUEST;
                     $signAlg = $_GET['SigAlg'];
                 }
 
-                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
-                    throw new Exception('Invalid signAlg in the recieved Logout Request');
-                }
-
                 $signedQuery = 'SAMLRequest='.urlencode($_GET['SAMLRequest']);
                 if (isset($_GET['RelayState'])) {
                     $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
@@ -322,6 +318,14 @@ LOGOUTREQUEST;
 
                 $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
                 $objKey->loadKey($cert, false, true);
+
+                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+                    try {
+                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg,'public');
+                    } catch (Exception $e) {
+                        throw new Exception('Invalid signAlg in the recieved Logout Request');
+                    }
+                }
 
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
                     throw new Exception('Signature validation failed. Logout Request rejected');
