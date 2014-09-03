@@ -243,6 +243,12 @@ to a UNIX timestamp. The sub-second part is ignored.</span><pre>parseSAML2Time</
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_castKey" title="castKey :: Converts a XMLSecurityKey to the correct algorithm.">
+            <span class="description">Converts a XMLSecurityKey to the correct algorithm.</span><pre>castKey</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_addSign" title="addSign :: Adds signature key and senders certificate to an element (Message or Assertion).">
             <span class="description">Adds signature key and senders certificate to an element (Message or Assertion).</span><pre>addSign</pre>
         </a>
@@ -1089,6 +1095,54 @@ to a UNIX timestamp. The sub-second part is ignored.</h2>
                                                                     </div>
                             </div>
                         </div>
+
+
+                                            <a id="method_castKey"></a>
+                        <div class="element clickable method public  method_castKey" data-toggle="collapse" data-target=".method_castKey .collapse">
+                            <h2>Converts a XMLSecurityKey to the correct algorithm.</h2>
+                            <pre>castKey(XMLSecurityKey $key, $algorithm, $type = 'public')</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$key</h4>
+                                                <code>XMLSecurityKey</code><p><p>The key</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$algorithm</h4>
+                                                <code>string</code><p><p>The desired algorithm</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$type</h4>
+                                                <code>string</code><p><p>Public or private key, defaults to public.</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+
+
                                             <a id="method_addSign"></a>
                         <div class="element clickable method public  method_addSign" data-toggle="collapse" data-target=".method_addSign .collapse">
                             <h2>Adds signature key and senders certificate to an element (Message or Assertion).</h2>

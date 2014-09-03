@@ -20,6 +20,12 @@ class OneLogin_Saml2_AuthnRequest
     private $_authnRequest;
 
     /**
+     * SAML AuthNRequest ID.
+     * @var string
+     */
+    private $_id;
+
+    /**
      * Constructs the AuthnRequest object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
@@ -78,6 +84,7 @@ PROVIDERNAME;
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 
+        $this->_id = $id;
         $this->_authnRequest = $request;
     }
 
@@ -90,5 +97,15 @@ AUTHNREQUEST;
         $deflatedRequest = gzdeflate($this->_authnRequest);
         $base64Request = base64_encode($deflatedRequest);
         return $base64Request;
+    }
+
+    /**
+     * Returns the AuthNRequest ID.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->_id;
     }
 }

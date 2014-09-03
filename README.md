@@ -956,6 +956,7 @@ SAML 2 Authentication Request class
 
  * **OneLogin_Saml2_Auth** Constructs the AuthnRequest object.
  * **getRequest** Returns deflated, base64 encoded, unsigned AuthnRequest.
+ * **getId** Returns the AuthNRequest ID.
 
 ##### OneLogin_Saml2_Response - Response.php #####
 

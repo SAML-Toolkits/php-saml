@@ -165,7 +165,7 @@ class OneLogin_Saml2_LogoutResponse
 
                 if ($signAlg != XMLSecurityKey::RSA_SHA1) {
                     try {
-                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg,'public');
+                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
                     } catch (Exception $e) {
                         throw new Exception('Invalid signAlg in the recieved Logout Response');
                     }
