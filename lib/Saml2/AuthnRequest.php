@@ -76,8 +76,7 @@ PROVIDERNAME;
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
     <samlp:NameIDPolicy
         Format="{$nameIDPolicyFormat}"
-        AllowCreate="true">
-    </samlp:NameIDPolicy>
+        AllowCreate="true" />
     <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>    
