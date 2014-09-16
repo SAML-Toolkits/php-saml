@@ -47,16 +47,16 @@ class OneLogin_Saml2_LogoutRequest
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
             
-            $key = null;
+            $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
-                $key = $idpData['x509cert'];
+                $cert = $idpData['x509cert'];
             }
 
             $nameId = OneLogin_Saml2_Utils::generateNameId(
                 $nameIdValue,
                 $spData['entityId'],
                 $spData['NameIDFormat'],
-                $key
+                $cert
             );
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
