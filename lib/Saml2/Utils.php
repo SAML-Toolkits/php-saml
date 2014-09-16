@@ -674,11 +674,11 @@ class OneLogin_Saml2_Utils
      * @param string $value  fingerprint
      * @param string $spnq   SP Name Qualifier
      * @param string $format SP Format
-     * @param string $key    SP Key to encrypt the nameID
+     * @param string $cert   IdP Public cert to encrypt the nameID
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $key = null)
+    public static function generateNameId($value, $spnq, $format, $cert = null)
     {
 
         $doc = new DOMDocument();
@@ -690,9 +690,9 @@ class OneLogin_Saml2_Utils
 
         $doc->appendChild($nameId);
 
-        if (!empty($key)) {
+        if (!empty($cert)) {
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
-            $seckey->loadKey($key);
+            $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
             $enc->setNode($nameId);
