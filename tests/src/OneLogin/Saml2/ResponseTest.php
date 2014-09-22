@@ -309,6 +309,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
         try {
             $nameId = $response->getNameId();
+            $this->assertFalse($response->isValid());
             $this->assertNotEquals('root@example.com', $nameId);
         } catch (Exception $e) {
             $this->assertNotEmpty($e->getMessage(), 'Trying to get NameId on an unsigned assertion fails');
