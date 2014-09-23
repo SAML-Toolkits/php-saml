@@ -261,7 +261,7 @@ class OneLogin_Saml2_Response
                     $documentToValidate = $signNodes->item(0)->parentNode;
                     if ($this->encrypted) {
                         $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:EncryptedAssertion/saml:Assertion/saml:Subject/saml:EncryptedID');
-                        if ($encryptedIDNodes->length > 0) {                        
+                        if ($encryptedIDNodes->length > 0) {
                             throw new Exception('Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.');
                         }
                     }
