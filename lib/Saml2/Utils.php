@@ -19,11 +19,14 @@ class OneLogin_Saml2_Utils
     public static function t($msg, $args = array())
     {
         assert('is_string($msg)');
+        if (extension_loaded('gettext')) {
+            bindtextdomain("phptoolkit", dirname(dirname(dirname(__FILE__))).'/locale');
+            textdomain('phptoolkit');
 
-        bindtextdomain("phptoolkit", dirname(dirname(dirname(__FILE__))).'/locale');
-        textdomain('phptoolkit');
-
-        $translatedMsg = gettext($msg);
+            $translatedMsg = gettext($msg);
+        } else {
+            $translatedMsg = $msg;
+        }
         if (!empty($args)) {
             $params = array_merge(array($translatedMsg), $args);
             $translatedMsg = call_user_func_array('sprintf', $params);
