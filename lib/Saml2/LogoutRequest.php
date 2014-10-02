@@ -286,7 +286,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = $this->getIssuer($dom);
-                if (empty($issuer) || $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new Exception("Invalid issuer in the Logout Request");
                 }
 

@@ -119,7 +119,7 @@ class OneLogin_Saml2_LogoutResponse
 
                 // Check issuer
                 $issuer = $this->getIssuer();
-                if (empty($issuer) || $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new Exception("Invalid issuer in the Logout Response");
                 }
 

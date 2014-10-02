@@ -223,8 +223,10 @@ class OneLogin_Saml2_Utils
                 $param = urlencode($name) . '=' . urlencode($value);
             }
 
-            $url .= $paramPrefix . $param;
-            $paramPrefix = '&';
+            if (!empty($param)) {
+                $url .= $paramPrefix . $param;
+                $paramPrefix = '&';
+            }
         }
 
         if ($stay) {
@@ -799,17 +801,17 @@ class OneLogin_Saml2_Utils
             $encKey = $symmetricKeyInfo->encryptedCtx;
             $symmetricKeyInfo->key = $inputKey->key;
             $keySize = $symmetricKey->getSymmetricKeySize();
-            if ($keySize === NULL) {
-                // To protect against "key oracle" attacks 
-                throw new Exception('Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, TRUE));
+            if ($keySize === null) {
+                // To protect against "key oracle" attacks
+                throw new Exception('Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, true));
             }
 
             $key = $encKey->decryptKey($symmetricKeyInfo);
             if (strlen($key) != $keySize) {
                 $encryptedKey = $encKey->getCipherValue();
                 $pkey = openssl_pkey_get_details($symmetricKeyInfo->key);
-                $pkey = sha1(serialize($pkey), TRUE);
-                $key = sha1($encryptedKey . $pkey, TRUE);
+                $pkey = sha1(serialize($pkey), true);
+                $key = sha1($encryptedKey . $pkey, true);
 
                 /* Make sure that the key has the correct length. */
                 if (strlen($key) > $keySize) {
@@ -868,7 +870,7 @@ class OneLogin_Saml2_Utils
             return $key;
         }
         $keyInfo = openssl_pkey_get_details($key->key);
-        if ($keyInfo === FALSE) {
+        if ($keyInfo === false) {
             throw new Exception('Unable to get key details from XMLSecurityKey.');
         }
         if (!isset($keyInfo['key'])) {

@@ -256,6 +256,15 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $targetUrl7 = OneLogin_Saml2_Utils::redirect($url, $parameters2, true);
         $this->assertEquals("http://$hostname/example?alphavalue=a&numvalue[]=1&numvalue[]=2&testing", $targetUrl7);
+
+        $parameters3 = array (
+            'alphavalue' => 'a',
+            'emptynumvaluelist' => array (),
+            'numvaluelist' => array (''),
+        );
+
+        $targetUrl8 = OneLogin_Saml2_Utils::redirect($url, $parameters3, true);
+        $this->assertEquals("http://$hostname/example?alphavalue=a&numvaluelist[]=", $targetUrl8);
     }
 
     /**
