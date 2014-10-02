@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+v.2.2.0
+-------
+* Fix bug with Encrypted nameID on LogoutRequest
+* Fixed usability bug. SP will inform about AuthFail status after process a Response.
+* Added SessionIndex support on LogoutRequest, and know is accesible from the Auth class.
+* LogoutRequest and LogoutResponse classes now accept non deflated xml
+* Improved the XML metadata/ Decrypted Assertion output. (prettyprint)
+* Fix bug in formatPrivateKey method, the key could be not RSA
+* Explicit warning message for signed element problem
+* Decrypt method improved
+* Support more algorithm at the SigAlg in the Signed LogoutRequests and LogoutResponses
+* AuthNRequest now stores ID (it can be retrieved later)
+* Fixed a typo on the 'NameIdPolicy' attribute that appeared at the README and settings_example file.
+
 v.2.1.0
 -------
 
