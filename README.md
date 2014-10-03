@@ -44,7 +44,7 @@ Supports:
  * Assertion signature.
  * Message signature: AuthNRequest, LogoutRequest, LogoutResponses.
  * Enable an Assertion Consumer Service endpoint.
- * Enable an Single Logour Service endpoint.
+ * Enable a Single Logout Service endpoint.
  * Publish the SP metadata (which can be signed).
 
 Key features:
