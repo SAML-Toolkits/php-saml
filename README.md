@@ -75,7 +75,7 @@ Installation
 
 The toolkit is hosted on github. You can download it from:
 
- * Lastest release: https://github.com/onelogin/php-saml/releases/tag/v2.0.0
+ * Lastest release: https://github.com/onelogin/php-saml/releases/latest
  * Master repo: https://github.com/onelogin/php-saml/tree/master
  
 Copy the core of the library inside the php application. (each application has its
