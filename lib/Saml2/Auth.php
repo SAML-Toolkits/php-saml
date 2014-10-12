@@ -296,7 +296,7 @@ class OneLogin_Saml2_Auth
         assert('is_array($parameters)');
 
         $sloUrl = $this->getSLOurl();
-        if (!isset($sloUrl)) {
+        if (empty($sloUrl)) {
             throw new OneLogin_Saml2_Error(
                 'The IdP does not support Single Log Out',
                 OneLogin_Saml2_Error::SAML_SINGLE_LOGOUT_NOT_SUPPORTED
