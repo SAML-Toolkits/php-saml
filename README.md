@@ -544,8 +544,8 @@ try {
 The getSPMetadata will return the metadata signed or not based
 on the security info of the advanced_settings.php ('signMetadata').
 
-Before the XML metadata is exposed, a validation takes place to ensure
-that the info to be provided is authorized.
+Before the XML metadata is exposed, a check takes place to ensure
+that the info to be provided is valid.
 
 
 ##### Attribute Consumer Service(ACS) endpoints/acs.php #####
@@ -698,9 +698,8 @@ if (empty($errors)) {
 }
 ```
 
-If the SLS endpoints receives an Logout Request, the request is
-validated, the session is closed and a Logout Response is sent
-to the SLS endpoint of the idP.
+If the SLS endpoints receives a Logout Response, the response is
+validated and the session could be closed
 
 ```php
 // part of the processSLO method
@@ -717,9 +716,9 @@ if (!$logoutResponse->isValid($requestId)) {
 }
 ```
 
-If the SLS endpoints receives a Logout Response, the response is
-validated and the session is closed, but if a RelayState is
-provided a redirection take place.
+If the SLS endpoints receives an Logout Request, the request is
+validated, the session is closed and a Logout Response is sent
+to the SLS endpoint of the idP.
 
 ```php
 // part of the processSLO method
