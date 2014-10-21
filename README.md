@@ -949,11 +949,11 @@ Main class of OneLogin PHP Toolkit
  * **getSettings** Returns the settings info
  * **setStrict** Set the strict mode active/disable
 
-##### OneLogin_Saml2_Auth - AuthnRequest.php #####
+##### OneLogin_Saml2_AuthnRequest - AuthnRequest.php #####
 
 SAML 2 Authentication Request class
 
- * **OneLogin_Saml2_Auth** Constructs the AuthnRequest object.
+ * **OneLogin_Saml2_AuthnRequest** Constructs the AuthnRequest object.
  * **getRequest** Returns deflated, base64 encoded, unsigned AuthnRequest.
  * **getId** Returns the AuthNRequest ID.
 
