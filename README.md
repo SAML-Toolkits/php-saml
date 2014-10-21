@@ -757,7 +757,7 @@ If we don't want that processSLO to destroy the session, pass a true
 parameter to the processSLO method
 
 ```php
-$keepLocalSession = true,
+$keepLocalSession = True;
 $auth->processSLO($keepLocalSession);
 ```
 
