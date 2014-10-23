@@ -1145,14 +1145,14 @@ metadata.php file. Configure the IdP based on that information.
     2.2 in the second link we access to (attrs.php) have the same process 
     described at 2.1 with the diference that as RelayState is set the attrs.php
 
-3. The SAML Response is processed in the ACS (index.php?acs), if the Response
-   is not valid, the process stops here and a message is shown. Otherwise we
-   are redirected to the RelayState view. a) index.php or b) attrs.php
+ 3. The SAML Response is processed in the ACS (index.php?acs), if the Response
+    is not valid, the process stops here and a message is shown. Otherwise we
+    are redirected to the RelayState view. a) index.php or b) attrs.php
 
-4. We are logged in the app and the user attributes are showed. 
-   At this point, we can test the single log out functionality.
+ 4. We are logged in the app and the user attributes are showed. 
+    At this point, we can test the single log out functionality.
 
-5. The single log out funcionality could be tested by 2 ways.
+ 5. The single log out funcionality could be tested by 2 ways.
 
     5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a
     Logout Request is sent to the IdP, the session at the IdP is closed and 
