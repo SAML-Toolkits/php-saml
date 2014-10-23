@@ -1126,7 +1126,7 @@ _toolkit_loader.php located at the base folder of the toolkit.
 ### IdP setup ###
 
 Once the SP is configured, the metadata of the SP is published at the
-metadata.php file. After that, configure the IdP based on that information.
+metadata.php file. Configure the IdP based on that information.
 
 
 ### How it works ###
