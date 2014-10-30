@@ -241,11 +241,11 @@ class OneLogin_Saml2_Response
                     throw new Exception("A valid SubjectConfirmation was not found on this Response");
                 }
 
-                if ($security['wantAssertionsSigned'] && !in_array('saml:Assertion', $signedElements)) {
+                if ($security['wantAssertionsSigned'] && !in_array('Assertion', $signedElements)) {
                     throw new Exception("The Assertion of the Response is not signed and the SP requires it");
                 }
-                
-                if ($security['wantMessagesSigned'] && !in_array('samlp:Response', $signedElements)) {
+
+                if ($security['wantMessagesSigned'] && !in_array('Response', $signedElements)) {
                     throw new Exception("The Message of the Response is not signed and the SP requires it");
                 }
             }
