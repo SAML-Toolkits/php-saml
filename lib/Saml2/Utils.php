@@ -927,8 +927,8 @@ class OneLogin_Saml2_Utils
         $objXMLSecDSig->add509Cert($cert, true);
 
         $insertBefore = $rootNode->firstChild;
-        $messageTypes = array('samlp:AuthnRequest', 'samlp:Response', 'samlp:LogoutRequest','samlp:LogoutResponse');
-        if (in_array($rootNode->tagName, $messageTypes)) {
+        $messageTypes = array('AuthnRequest', 'Response', 'LogoutRequest','LogoutResponse');
+        if (in_array($rootNode->localName, $messageTypes)) {
             $issuerNodes = self::query($dom, '/'.$rootNode->tagName.'/saml:Issuer');
             if ($issuerNodes->length == 1) {
                 $insertBefore = $issuerNodes->item(0)->nextSibling;
