@@ -58,6 +58,9 @@ class OneLogin_Saml2_Response
 
         $this->document = new DOMDocument();
         $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->response);
+        if (!$this->document) {
+            throw new Exception('SAML Response could not be processed');
+        }
 
         // Quick check for the presence of EncryptedAssertion
         $encryptedAssertionNodes = $this->document->getElementsByTagName('EncryptedAssertion');

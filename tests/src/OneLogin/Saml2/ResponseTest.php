@@ -950,6 +950,20 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the isValid method of the OneLogin_Saml2_Response
+    * Case response with different namespace
+    *
+    * @covers OneLogin_Saml2_Response::isValid
+    */
+    public function testNamespaceIsValid()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_namespaces.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+
+        $this->assertTrue($response->isValid());
+    }
+
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_Response
     * Case valid response
     *
     * @covers OneLogin_Saml2_Response::isValid
