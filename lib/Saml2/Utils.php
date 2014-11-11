@@ -383,6 +383,19 @@ class OneLogin_Saml2_Utils
         return $selfURLhost . $requestURI;
     }
 
+     /**
+     * Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]
+     *
+     * @param string The param to-be extracted
+     */
+    public static function extractOriginalQueryParam ($name)
+    {
+        $index = strpos($_SERVER['QUERY_STRING'], $name.'=');
+        $substring = substr($_SERVER['QUERY_STRING'], $index + strlen($name) + 1);
+        $end = strpos($substring, '&');
+        return $end ? substr($substring, 0, strpos($substring, '&')) : $substring;
+    }
+
     /**
      * Generates an unique string (used for example as ID for assertions).
      *

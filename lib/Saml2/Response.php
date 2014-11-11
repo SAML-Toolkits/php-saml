@@ -466,7 +466,8 @@ class OneLogin_Saml2_Response
 
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $childNode->prefix.':AttributeValue') {
+                $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
+                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
@@ -630,7 +631,6 @@ class OneLogin_Saml2_Response
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }
-       
         $decrypt = $objenc->decryptNode($objKey, true);
         if ($decrypt instanceof DOMDocument) {
             return $decrypt;

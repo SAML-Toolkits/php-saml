@@ -117,12 +117,12 @@ class OneLogin_Saml2_Auth
      * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
      * @param string  $requestId        The ID of the LogoutRequest sent by this SP to the IdP
      */
-    public function processSLO($keepLocalSession = false, $requestId = null)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer=false)
     {
         $this->_errors = array();
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
             $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
-            if (!$logoutResponse->isValid($requestId)) {
+            if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
             } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
@@ -133,7 +133,7 @@ class OneLogin_Saml2_Auth
             }
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
-            if (!$logoutRequest->isValid()) {
+            if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
             } else {
                 if (!$keepLocalSession) {

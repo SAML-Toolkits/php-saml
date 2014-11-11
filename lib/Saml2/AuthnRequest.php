@@ -62,6 +62,23 @@ PROVIDERNAME;
             }
         }
 
+        $requestedAuthnStr = '';
+        if (isset($security['requestedAuthnContext']) && $security['requestedAuthnContext'] !== false) {
+            if ($security['requestedAuthnContext'] === true) {
+                $requestedAuthnStr = <<<REQUESTEDAUTHN
+    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+    </samlp:RequestedAuthnContext>
+REQUESTEDAUTHN;
+            } else {
+                $requestedAuthnStr .= "    <samlp:RequestedAuthnContext Comparison=\"exact\">\n";
+                foreach ($security['requestedAuthnContext'] as $contextValue) {
+                    $requestedAuthnStr .= "        <saml:AuthnContextClassRef>".$contextValue."</saml:AuthnContextClassRef>\n";
+                }
+                $requestedAuthnStr .= '    </samlp:RequestedAuthnContext>';
+            }
+        }
+
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -77,9 +94,7 @@ PROVIDERNAME;
     <samlp:NameIDPolicy
         Format="{$nameIDPolicyFormat}"
         AllowCreate="true" />
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>    
+{$requestedAuthnStr}
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 

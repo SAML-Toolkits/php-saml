@@ -92,7 +92,7 @@ class OneLogin_Saml2_LogoutResponse
      * @throws Exception
      * @return bool Returns if the SAML LogoutResponse is or not valid
      */
-    public function isValid($requestId = null)
+    public function isValid($requestId = null, $retrieveParametersFromServer=false)
     {
         $this->_error = null;
         try {
@@ -149,11 +149,19 @@ class OneLogin_Saml2_LogoutResponse
                     $signAlg = $_GET['SigAlg'];
                 }
 
-                $signedQuery = 'SAMLResponse='.urlencode($_GET['SAMLResponse']);
-                if (isset($_GET['RelayState'])) {
-                    $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
+                if ($retrieveParametersFromServer) {
+                    $signedQuery = 'SAMLResponse='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SAMLResponse');
+                    if (isset($_GET['RelayState'])) {
+                        $signedQuery .= '&RelayState='.OneLogin_Saml2_Utils::extractOriginalQueryParam('RelayState');
+                    }
+                    $signedQuery .= '&SigAlg='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SigAlg');
+                } else {
+                    $signedQuery = 'SAMLResponse='.urlencode($_GET['SAMLResponse']);
+                    if (isset($_GET['RelayState'])) {
+                        $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
+                    }
+                    $signedQuery .= '&SigAlg='.urlencode($signAlg);
                 }
-                $signedQuery .= '&SigAlg='.urlencode($signAlg);
 
                 if (!isset($idpData['x509cert']) || empty($idpData['x509cert'])) {
                     throw new Exception('In order to validate the sign on the Logout Response, the x509cert of the IdP is required');
