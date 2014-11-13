@@ -50,6 +50,13 @@ class OneLogin_Saml2_Auth
     private $_errors = array();
 
     /**
+     * Reason of the last error.
+     *
+     * @var string
+     */
+    private $_errorReason;
+
+    /**
      * Initializes the SP SAML instance.
      *
      * @param array $oldSettings Setting data
@@ -101,6 +108,7 @@ class OneLogin_Saml2_Auth
                 $this->_sessionIndex = $response->getSessionIndex();
             } else {
                 $this->_errors[] = 'invalid_response';
+                $this->_errorReason = $response->getError();
             }
         } else {
             $this->_errors[] = 'invalid_binding';
@@ -124,6 +132,7 @@ class OneLogin_Saml2_Auth
             $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
+                $this->_errorReason = $logoutResponse->getError();
             } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
             } else {
@@ -135,6 +144,7 @@ class OneLogin_Saml2_Auth
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
+                $this->_errorReason = $logoutRequest->getError();
             } else {
                 if (!$keepLocalSession) {
                     OneLogin_Saml2_Utils::deleteLocalSession();
@@ -234,6 +244,16 @@ class OneLogin_Saml2_Auth
     public function getErrors()
     {
         return $this->_errors;
+    }
+
+    /**
+     * Returns the reason for the last error
+     *
+     * @return string  Error reason
+     */
+    public function getLastErrorReason()
+    {
+        return $this->$_errorReason;
     }
 
     /**

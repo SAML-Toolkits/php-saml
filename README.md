@@ -1041,6 +1041,7 @@ Configuration of the OneLogin PHP Toolkit
  * **formatSPKey** Formats the SP private key.
  * **getErrors** Returns an array with the errors, the array is empty when
    the settings is ok.
+ * **getLastErrorReason*** Returns the reason of the last error
  * **setStrict** Activates or deactivates the strict mode.
  * **isStrict** Returns if the 'strict' mode is active.
  * **isDebugActive** Returns if the debug is active.
