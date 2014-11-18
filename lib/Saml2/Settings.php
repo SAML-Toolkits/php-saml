@@ -772,4 +772,15 @@ class OneLogin_Saml2_Settings
     {
         return $this->_debug;
     }
+
+    /**
+     * Sets the IdP certificate.
+     *
+     * @param string $value IdP certificate
+     */
+    public function setIdPCert($cert)
+    {
+      $this->_idp['x509cert'] = $cert;
+      $this->formatIdPCert();
+    }
 }
