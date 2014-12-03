@@ -253,7 +253,7 @@ class OneLogin_Saml2_Auth
      */
     public function getLastErrorReason()
     {
-        return $this->$_errorReason;
+        return $this->_errorReason;
     }
 
     /**
