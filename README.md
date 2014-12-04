@@ -503,9 +503,7 @@ The AuthNRequest will be sent signed or unsigned based on the security info
 of the advanced_settings.php ('authnRequestsSigned').
 
 
-The IdP will return the response to the Attribute Consumer Service of the SP. If we do not set a 'url' param in 
-the login method and we are using the default ACS provided by the toolkit (endpoints/acs.php), then the ACS 
-endpoint will redirect the user to the file that launched the SSO request. 
+The IdP will then return the SAML Response to the user's client. The client is then forwarded to the Attribute Consumer Service of the SP with this information. If we do not set a 'url' param in the login method and we are using the default ACS provided by the toolkit (endpoints/acs.php), then the ACS endpoint will redirect the user to the file that launched the SSO request. 
 
 We can set an 'returnTo' url to change the workflow and redirect the user to the other PHP file.
 
@@ -557,7 +555,7 @@ that the info to be provided is valid.
 
 ##### Attribute Consumer Service(ACS) endpoints/acs.php #####
 
-This code handles the SAML response that the IdP returns to the SP.
+This code handles the SAML response that the IdP forwards to the SP through the user's client.
 
 ```php
 <?php
@@ -673,9 +671,10 @@ print_r($auth->getAttribute('cn'));
 ```
 
 
-Before trying to get an attribute, check that the user is authenticated. If the user isn't 
-authenticated, an empty array will be returned. For example, if we call
-to getAttributes before a $auth->processResponse, the getAttributes() will return
+Before trying to get an attribute, check that the user is
+authenticated. If the user isn't authenticated, an empty
+array will be returned. For example, if we call to getAttributes
+before a $auth->processResponse, the getAttributes() will return
 an empty array.
 
 
@@ -708,6 +707,8 @@ if (empty($errors)) {
 If the SLS endpoints receives a Logout Response, the response is
 validated and the session could be closed
 
+
+
 ```php
 // part of the processSLO method
 
@@ -723,9 +724,9 @@ if (!$logoutResponse->isValid($requestId)) {
 }
 ```
 
-If the SLS endpoints receives an Logout Request, the request is
-validated, the session is closed and a Logout Response is sent
-to the SLS endpoint of the idP.
+If the SLS endpoints receives an Logout Request, the request is validated,
+the session is closed and a Logout Response is sent to the SLS endpoint of
+the IdP.
 
 ```php
 // part of the processSLO method
@@ -786,11 +787,14 @@ $auth->logout();   // Method that sent the Logout Request.
 The Logout Request will be sent signed or unsigned based on the security
 info of the advanced_settings.php ('logoutRequestSigned').
 
-The IdP will return the Logout Response to the Single Logout Service of the SP.
-If we do not set an 'url' param in the logout method and are using the default SLS provided 
-by the toolkit (endpoints/sls.php), then the SLS endpoint will redirect the user to the file that launched the SLO request.
+The IdP will return the Logout Response through the user's client to the
+Single Logout Service of the SP. 
+If we do not set an 'url' param in the logout method and are using the
+default SLS provided  by the toolkit (endpoints/sls.php), then the SLS
+endpoint will redirect the user to the file that launched the SLO request.
 
-We can set an 'returnTo' url to change the workflow and redirect the user to other php file.
+We can set an 'returnTo' url to change the workflow and redirect the user
+to other php file.
 
 ```php
 $newTargetUrl = 'http://example.com/loggedOut.php';
@@ -1146,8 +1150,8 @@ metadata.php file. Configure the IdP based on that information.
  
     2.1 in the first link, we access to (index.php?sso) an AuthNRequest
     is sent to the IdP, we authenticate at the IdP and then a Response is sent
-    to the SP, specifically the Assertion Consumer Service view: index.php?acs,
-    notice that a RelayState parameter is set to the url that initiated the
+    through the user's client to the SP, specifically the Assertion Consumer Service view: index.php?acs.
+    Notice that a RelayState parameter is set to the url that initiated the
     process, the index.php view.
 
     2.2 in the second link we access to (attrs.php) have the same process 
@@ -1164,10 +1168,10 @@ metadata.php file. Configure the IdP based on that information.
 
     5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a
     Logout Request is sent to the IdP, the session at the IdP is closed and 
-    replies to the SP a Logout Response (sent to the Single Logout Service
-    endpoint). The SLS endpoint (index.php?sls)of the SP process the Logout
-    Response and if is valid, close the user session of the local app. Notice
-    that the SLO Workflow starts and ends at the SP.
+    replies through the client to the SP with a Logout Response (sent to the
+    Single Logout Service endpoint). The SLS endpoint (index.php?sls)of the SP
+    process the Logout Response and if is valid, close the user session of the
+    local app. Notice that the SLO Workflow starts and ends at the SP.
    
     5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP
     side, the logout process is initiated at the idP, sends a Logout 
