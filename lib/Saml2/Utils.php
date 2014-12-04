@@ -762,7 +762,11 @@ class OneLogin_Saml2_Utils
 
         $messageEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', $statusEntry->item(0));
         if ($messageEntry->length == 0) {
-            $status['msg'] = '';
+            if ($codeEntry->length > 1) {
+                $status['msg'] = $codeEntry->item(1)->getAttribute('Value');
+            } else {
+                $status['msg'] = '';
+            }
         } else {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
