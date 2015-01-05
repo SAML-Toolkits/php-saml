@@ -273,6 +273,8 @@ class OneLogin_Saml2_Response
                 if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
+            } else {
+                throw new Exception('No Signature found. SAML Response rejected');
             }
             return true;
         } catch (Exception $e) {
