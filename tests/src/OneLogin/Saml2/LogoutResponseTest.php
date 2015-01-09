@@ -106,6 +106,12 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     */
     public function testGetError()
     {
+        $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
+        $requestId = 'invalid_request_id';
+        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $this->_settings->setStrict(true);
+        $this->assertFalse($response->isValid($requestId));
+        $this->assertEquals($response->getError(), 'The InResponseTo of the Logout Response: ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e, does not match the ID of the Logout request sent by the SP: invalid_request_id');
 
     }
 

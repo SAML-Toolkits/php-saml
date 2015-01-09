@@ -92,6 +92,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getNameId
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
+    * @covers OneLogin_Saml2_Auth::getLastErrorReason    
     */
     public function testProcessResponseInvalid()
     {
@@ -106,6 +107,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->_auth->getSessionIndex());
         $this->assertNull($this->_auth->getAttribute('uid'));
         $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
+        $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
     }
 
     /**
@@ -127,15 +129,15 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $requestId = 'invalid';
         $this->_auth->processResponse($requestId);
 
-        $this->assertEmpty($this->_auth->getErrors());
+        $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
 
         $this->_auth->setStrict(true);
         $this->_auth->processResponse($requestId);
-        $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
+        $this->assertEquals("The InResponseTo of the Response: _57bcbf70-7b1f-012e-c821-782bcb13bb38, does not match the ID of the AuthNRequest sent by the SP: invalid", $this->_auth->getLastErrorReason());
 
         $validRequestId = '_57bcbf70-7b1f-012e-c821-782bcb13bb38';
         $this->_auth->processResponse($validRequestId);
-        $this->assertEmpty($this->_auth->getErrors());
+        $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
     }
 
     /**
@@ -154,29 +156,18 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     */
     public function testProcessResponseValid()
     {
-        $message = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
-
-        $plainMessage = base64_decode($message);
-        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
-        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
-
-        $_POST['SAMLResponse'] = base64_encode($plainMessage);
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $_POST['SAMLResponse'] = $message;
 
         $this->_auth->processResponse();
-
         $this->assertTrue($this->_auth->isAuthenticated());
-        $this->assertEmpty($this->_auth->getErrors());
-        $this->assertEquals('someone@example.com', $this->_auth->getNameId());
+        $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $this->_auth->getNameId());
         $attributes = $this->_auth->getAttributes();
         $this->assertNotEmpty($attributes);
         $this->assertEquals($this->_auth->getAttribute('mail'), $attributes['mail']);
         $sessionIndex = $this->_auth->getSessionIndex();
         $this->assertNotNull($sessionIndex);
-        $this->assertEquals('_51be37965feb5579d803141076936dc2e9d1d98ebf', $sessionIndex);
-
-        $this->_auth->setStrict(true);
-        $this->_auth->processResponse();
-        $this->assertEmpty($this->_auth->getErrors());
+        $this->assertEquals('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', $sessionIndex);
     }
 
     /**

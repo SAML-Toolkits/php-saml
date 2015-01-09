@@ -75,6 +75,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     /**
     * Tests getCertPath method of the OneLogin_Saml2_Settings
     *
+    * @covers OneLogin_Saml2_Settings::getBasePath
     * @covers OneLogin_Saml2_Settings::getCertPath
     */
     public function testGetCertPath()
@@ -390,6 +391,33 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             $this->assertContains('Public cert file not found', $e->getMessage());
         }
+    }
+
+
+    /**
+    * Tests the setIdPCert method of the OneLogin_Saml2_Settings
+    *
+    * @covers OneLogin_Saml2_Settings::setIdPCert
+    */
+    public function testSetIdPCert()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $cert = $settingsInfo['idp']['x509cert'];
+        unset($settingsInfo['idp']['x509cert']);
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+        $this->assertEquals($idpData['x509cert'], '');
+
+        $settings->setIdPCert($cert);
+        $idpData2 = $settings->getIdPData();
+        $this->assertNotEquals($idpData2['x509cert'], '');
+        $this->assertNotEquals($idpData2['x509cert'], $cert);
+
+        $formatedCert = OneLogin_Saml2_Utils::formatCert($cert);
+        $this->assertEquals($idpData2['x509cert'], $formatedCert);
     }
 
     /**
