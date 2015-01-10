@@ -29,10 +29,11 @@ class OneLogin_Saml2_LogoutRequest
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param string                  $response A UUEncoded Logout Request.
+     * @param string                  $nameId   The NameID that will be set in the LogoutRequest.
      * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
      *
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $sessionIndex = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null)
     {
 
         $this->_settings = $settings;
@@ -52,10 +53,17 @@ class OneLogin_Saml2_LogoutRequest
                 $cert = $idpData['x509cert'];
             }
 
-            $nameId = OneLogin_Saml2_Utils::generateNameId(
-                $nameIdValue,
+            if (!empty($nameId)) {
+                $nameIdFormat = $spData['NameIDFormat'];
+            } else {
+                $nameId = $idpData['entityId'];
+                $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
+            }
+
+            $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
+                $nameId,
                 $spData['entityId'],
-                $spData['NameIDFormat'],
+                $nameIdFormat,
                 $cert
             );
 
@@ -70,7 +78,7 @@ class OneLogin_Saml2_LogoutRequest
     IssueInstant="{$issueInstant}"
     Destination="{$idpData['singleLogoutService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
-    {$nameId}
+    {$nameIdObj}
     {$sessionIndexStr}
 </samlp:LogoutRequest>
 LOGOUTREQUEST;

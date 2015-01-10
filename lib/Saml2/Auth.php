@@ -307,11 +307,12 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SLO process.
      *
-     * @param string $returnTo The target URL the user should be returned to after logout.
-     * @param array  $parameters Extra parameters to be added to the GET
-     * @param string $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param string $returnTo      The target URL the user should be returned to after logout.
+     * @param array  $parameters    Extra parameters to be added to the GET
+     * @param string $nameId        The NameID that will be set in the LogoutRequest.
+     * @param string $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
      */
-    public function logout($returnTo = null, $parameters = array(), $sessionIndex = null)
+    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null)
     {
         assert('is_array($parameters)');
 
@@ -323,7 +324,11 @@ class OneLogin_Saml2_Auth
             );
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $sessionIndex);
+        if (empty($nameId) && !empty($this->_nameid)) {
+            $nameId = $this->_nameid;
+        }
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex);
 
         $samlRequest = $logoutRequest->getRequest();
 

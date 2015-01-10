@@ -842,19 +842,20 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the logout method of the OneLogin_Saml2_Auth class
-    * Case Logout with relayState + SessionIndex. A logout Request is build. GET with SAMLRequest
-    * and Sessionindex. A redirection is executed
+    * Case Logout with relayState + NameID + SessionIndex. A logout Request is build. GET with SAMLRequest.
+    * A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::logout
     * @runInSeparateProcess
     */
-    public function testLogoutWithSessionIndex()
+    public function testLogoutWithNameIdAndSessionIndex()
     {
         try {
             $relayState = 'http://sp.example.com';
             // The Header of the redirect produces an Exception
+            $nameId = 'my_name_id';
             $sessionIndex = '_51be37965feb5579d803141076936dc2e9d1d98ebf';
-            $this->_auth->logout(null, array(), $sessionIndex);
+            $this->_auth->logout(null, array(), $nameId, $sessionIndex);
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
@@ -866,6 +867,41 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
             $this->assertContains($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        }
+    }
+
+    /**
+    * Tests the logout method of the OneLogin_Saml2_Auth class
+    * Case nameID loaded after process SAML Response
+    *
+    * @covers OneLogin_Saml2_Auth::logout
+    * @runInSeparateProcess
+    */
+    public function testLogoutNameID()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+        $this->_auth->processResponse();
+        $nameIdFromResponse = $this->_auth->getNameId();
+
+        try {
+            $nameId = 'my_name_id';
+            $this->_auth->logout();
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+
+            $logoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+            $nameIdFromRequest = OneLogin_Saml2_LogoutRequest::getNameId($logoutRequest);
+            $this->assertEquals($nameIdFromResponse, $nameIdFromRequest);
         }
     }
 

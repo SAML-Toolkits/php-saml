@@ -165,6 +165,13 @@ or to the url that we defined in our SSO Request.</span><pre>redirectTo</pre>
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_getLastErrorReason" title="getLastErrorReason :: Returns the reason for the last error">
+            <span class="description">Returns the reason for the last error</span><pre>getLastErrorReason</pre>
+        </a>
+    </li>
+
+
+                                                                                                        <li class="method public">
         <a href="#method_getAttribute" title="getAttribute :: Returns the requested SAML attribute">
             <span class="description">Returns the requested SAML attribute</span><pre>getAttribute</pre>
         </a>
@@ -623,10 +630,45 @@ or to the url that we defined in our SSO Request.</h2>
                                                                     </div>
                             </div>
                         </div>
+
+                                    <a id="method_getLastErrorReason"></a>
+                        <div class="element clickable method public  method_getLastErrorReason" data-toggle="collapse" data-target=".method_getLastErrorReason .collapse">
+                            <h2>Returns the reason for the last error</h2>
+                            <pre>getLastErrorReason() : string</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>String</code><p><p>Error</p></p>
+                                                                    </div>
+                            </div>
+                        </div>
+
                                             <a id="method_getAttribute"></a>
                         <div class="element clickable method public  method_getAttribute" data-toggle="collapse" data-target=".method_getAttribute .collapse">
                             <h2>Returns the requested SAML attribute</h2>
-                            <pre>getAttribute(string $name) : NULL</pre>
+                            <pre>getAttribute(string $name) : NULL || Array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
                             <div class="row collapse">
@@ -693,7 +735,7 @@ or to the url that we defined in our SSO Request.</h2>
                                             <a id="method_logout"></a>
                         <div class="element clickable method public  method_logout" data-toggle="collapse" data-target=".method_logout .collapse">
                             <h2>Initiates the SLO process.</h2>
-                            <pre>logout(string $returnTo = null) </pre>
+                            <pre>logout(string $returnTo = null, array $parameters = array(), string $nameId = null, string $sessionIndex = null) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
                             <div class="row collapse">
@@ -723,6 +765,8 @@ or to the url that we defined in our SSO Request.</h2>
                                                 <code>string</code><p><p>The target URL the user should be returned to after logout.</p></p>
                                                 <h4>$parameters</h4>
                                                 <code>array</code><p><p>Extra parameters to be added to the GET.</p></p>
+                                                <h4>$nameId</h4>
+                                                <code>string</code><p><p>The NameID that will be set in the LogoutRequest.</p></p>
                                                 <h4>$sessionIndex</h4>
                                                 <code>string</code><p><p>The SessionIndex (taken from the SAML Response in the SSO process).</p></p>
                                             </div>

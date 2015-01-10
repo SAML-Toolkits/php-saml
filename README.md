@@ -494,7 +494,7 @@ In order to send an AuthNRequest to the IdP:
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once(TOOLKIT_PATH . '_toolkit_loader.php');   // We load the SAML2 lib
 
-$auth = new OneLogin_Saml_Auth(); // Constructor of the SP, loads settings.php
+$auth = new OneLogin_Saml2_Auth(); // Constructor of the SP, loads settings.php
                                   // and advanced_settings.php
 $auth->login();   // Method that sent the AuthNRequest
 ```
@@ -509,7 +509,7 @@ We can set an 'returnTo' url to change the workflow and redirect the user to the
 
 ```php
 $newTargetUrl = 'http://example.com/consume2.php';
-$auth = new OneLogin_Saml_Auth();
+$auth = new OneLogin_Saml2_Auth();
 $auth->login($newTargetUrl);
 ```
 
@@ -779,10 +779,16 @@ In order to send a Logout Request to the IdP:
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once(TOOLKIT_PATH . '_toolkit_loader.php');
 
-$auth = new OneLogin_Saml_Auth();
+$auth = new OneLogin_Saml2_Auth();
 
 $auth->logout();   // Method that sent the Logout Request.
 ```
+
+Also there are 2 optional parameters that can be set:
+
+* name_id. That will be used to build the LogoutRequest. If not name_id parameter is set and the auth object processed a 
+SAML Response with a NameId, then this NameId will be used.
+* session_index. SessionIndex that identifies the session of the user.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the advanced_settings.php ('logoutRequestSigned').
@@ -798,7 +804,7 @@ to other php file.
 
 ```php
 $newTargetUrl = 'http://example.com/loggedOut.php';
-$auth = new OneLogin_Saml_Auth();
+$auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
 ```
 

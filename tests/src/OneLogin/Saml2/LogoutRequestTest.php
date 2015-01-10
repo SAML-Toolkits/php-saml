@@ -87,7 +87,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, null, $sessionIndex);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, null, null, $sessionIndex);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
         $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
