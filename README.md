@@ -134,6 +134,14 @@ namespaces, remember that calls to the class must be done by adding a \ to the
 start, for example to use the static method getSelfURLNoQuery use:
 \OneLogin_Saml2_Utils::getSelfURLNoQuery()
 
+
+Security warning
+----------------
+
+In production, the **strict** parameter MUST be set as **"true"**. Otherwise 
+your environment is not secure and will be exposed to attacks.
+
+
 Getting started
 ---------------
 

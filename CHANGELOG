@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+v.2.3.0
+-------
+* Resolve namespace problem. Some IdPs uses saml2p:Response and saml2:Assertion instead of samlp:Response saml:Assertion.
+* Improve test and documentation.
+* Improve ADFS compatibility.
+* Remove unnecessary XSDs files.
+* Make available the reason for the saml message invalidation.
+* Adding ability to set idp cert once the Setting object initialized.
+* Fix status info issue.
+* Reject SAML Response if not signed and strict = false.
+* Support NameId and SessionIndex in LogoutRequest.
+* Add ForceAuh and IsPassive support.
+
 v.2.2.0
 -------
 * Fix bug with Encrypted nameID on LogoutRequest
