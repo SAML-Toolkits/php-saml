@@ -30,7 +30,7 @@ class OneLogin_Saml2_AuthnRequest
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      */
-    public function __construct(OneLogin_Saml2_Settings $settings)
+    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false)
     {
         $this->_settings = $settings;
 
@@ -62,6 +62,22 @@ PROVIDERNAME;
             }
         }
 
+        $forceAuthnStr = '';
+        if ($forceAuthn) {
+            $forceAuthnStr = <<<FORCEAUTHN
+
+    ForceAuthn="true"
+FORCEAUTHN;
+        }
+
+        $isPassiveStr = '';
+        if ($isPassive) {
+            $isPassiveStr = <<<ISPASSIVE
+
+    IsPassive="true"
+ISPASSIVE;
+        }
+
         $requestedAuthnStr = '';
         if (isset($security['requestedAuthnContext']) && $security['requestedAuthnContext'] !== false) {
             if ($security['requestedAuthnContext'] === true) {
@@ -85,7 +101,7 @@ REQUESTEDAUTHN;
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     ID="$id"
     Version="2.0"
-{$providerNameStr}
+{$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"

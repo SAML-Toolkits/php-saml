@@ -513,6 +513,12 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->login($newTargetUrl);
 ```
 
+The login method can recieve 3 more optional parameters:
+
+* $parameters  An array of parameters that will be added to the GET in the HTTP-Redirect.
+* $forceAuthn  When true the AuthNReuqest will set the ForceAuthn='true'
+* $isPassive   When true the AuthNReuqest will set the Ispassive='true'
+
 #### The SP Endpoints ####
 
 Related to the SP there are 3 important views: The metadata view, the ACS view and the SLS view. The toolkit 

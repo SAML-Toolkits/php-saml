@@ -747,6 +747,168 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the login method of the OneLogin_Saml2_Auth class
+    * Case Logout with no parameters. A AuthN Request is built with ForceAuthn and redirect executed
+    *
+    * @covers OneLogin_Saml2_Auth::login
+    * @runInSeparateProcess
+    */
+    public function testLoginForceAuthN()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['authnRequestsSigned'] = true;
+
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+            $encodedRequest = $parsedQuery['SAMLRequest'];
+            $decoded = base64_decode($encodedRequest);
+            $request = gzinflate($decoded);
+            $this->assertNotContains('ForceAuthn="true"', $request);
+        }
+        
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+
+            $auth->login($returnTo, array(), false, false);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace2 = $e->getTrace();
+            $targetUrl2 = getUrlFromRedirect($trace2);
+            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+
+            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+            $decoded2 = base64_decode($encodedRequest2);
+            $request2 = gzinflate($decoded2);
+            $this->assertNotContains('ForceAuthn="true"', $request2);
+        }
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo, array(), true, false);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace3 = $e->getTrace();
+            $targetUrl3 = getUrlFromRedirect($trace3);
+            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+
+            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+            $decoded3 = base64_decode($encodedRequest3);
+            $request3 = gzinflate($decoded3);
+            $this->assertContains('ForceAuthn="true"', $request3);
+        }
+
+    }
+
+    /**
+    * Tests the login method of the OneLogin_Saml2_Auth class
+    * Case Logout with no parameters. A AuthN Request is built with IsPassive and redirect executed
+    *
+    * @covers OneLogin_Saml2_Auth::login
+    * @runInSeparateProcess
+    */
+    public function testLoginIsPassive()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['authnRequestsSigned'] = true;
+
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+            $encodedRequest = $parsedQuery['SAMLRequest'];
+            $decoded = base64_decode($encodedRequest);
+            $request = gzinflate($decoded);
+            $this->assertNotContains('IsPassive="true"', $request);
+        }
+        
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo, array(), false, false);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace2 = $e->getTrace();
+            $targetUrl2 = getUrlFromRedirect($trace2);
+            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+
+            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+            $decoded2 = base64_decode($encodedRequest2);
+            $request2 = gzinflate($decoded2);
+            $this->assertNotContains('IsPassive="true"', $request2);
+        }
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo, array(), false, true);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace3 = $e->getTrace();
+            $targetUrl3 = getUrlFromRedirect($trace3);
+            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+
+            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+            $decoded3 = base64_decode($encodedRequest3);
+            $request3 = gzinflate($decoded3);
+            $this->assertContains('IsPassive="true"', $request3);
+        }
+    }
+
+    /**
     * Tests the logout method of the OneLogin_Saml2_Auth class
     * Case Logout with no parameters. A logout Request is built and redirect executed
     *

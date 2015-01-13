@@ -125,7 +125,7 @@ class OneLogin_Saml2_Auth
      * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
      * @param string  $requestId        The ID of the LogoutRequest sent by this SP to the IdP
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer=false)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false)
     {
         $this->_errors = array();
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
@@ -280,11 +280,11 @@ class OneLogin_Saml2_Auth
      * @param string $returnTo   The target URL the user should be returned to after login.
      * @param array  $parameters Extra parameters to be added to the GET
      */
-    public function login($returnTo = null, $parameters = array())
+    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
         assert('is_array($parameters)');
 
-        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive);
 
         $samlRequest = $authnRequest->getRequest();
         $parameters['SAMLRequest'] = $samlRequest;

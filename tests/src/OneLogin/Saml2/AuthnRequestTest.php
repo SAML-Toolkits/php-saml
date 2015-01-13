@@ -27,7 +27,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     */
     public function testCreateDeflatedSAMLRequestURLParameter()
     {
-        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, false, false);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
         $authUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
         $this->assertRegExp('#^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=#', $authUrl);
@@ -39,13 +39,19 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $this->assertRegExp('#^<samlp:AuthnRequest#', $inflated);
     }
 
+    /**
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * The creation of a deflated SAML Request with AuthNContext
+    *
+    * @covers OneLogin_Saml2_AuthnRequest
+    */
     public function testAuthNContext()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings, false, false);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
         $encodedRequest = $authnRequest->getRequest();
         $decoded = base64_decode($encodedRequest);
         $request = gzinflate($decoded);
@@ -54,7 +60,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['requestedAuthnContext']= true;
         $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
-        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings2, false, false);
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings2);
         $encodedRequest2 = $authnRequest2->getRequest();
         $decoded2 = base64_decode($encodedRequest2);
         $request2 = gzinflate($decoded2);
@@ -63,7 +69,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['requestedAuthnContext'] = false;
         $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
-        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings3, false, false);
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings3);
         $encodedRequest3 = $authnRequest3->getRequest();
         $decoded3 = base64_decode($encodedRequest3);
         $request3 = gzinflate($decoded3);
@@ -72,7 +78,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['requestedAuthnContext']= array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509');
         $settings4 = new OneLogin_Saml2_Settings($settingsInfo);
-        $authnRequest4 = new OneLogin_Saml2_AuthnRequest($settings4, false, false);
+        $authnRequest4 = new OneLogin_Saml2_AuthnRequest($settings4);
         $encodedRequest4 = $authnRequest4->getRequest();
         $decoded4 = base64_decode($encodedRequest4);
         $request4 = gzinflate($decoded4);
@@ -80,6 +86,68 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>', $request4);
         $this->assertContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef>', $request4);
         $this->assertContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:X509</saml:AuthnContextClassRef>', $request4);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * The creation of a deflated SAML Request with ForceAuthn
+    *
+    * @covers OneLogin_Saml2_AuthnRequest
+    */
+    public function testForceAuthN()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('ForceAuthn="true"', $request);
+
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings, false, false);
+        $encodedRequest2 = $authnRequest2->getRequest();
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertNotContains('ForceAuthn="true"', $request2);
+
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings, true, false);
+        $encodedRequest3 = $authnRequest3->getRequest();
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('ForceAuthn="true"', $request3);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * The creation of a deflated SAML Request with isPassive
+    *
+    * @covers OneLogin_Saml2_AuthnRequest
+    */
+    public function testIsPassive()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('IsPassive="true"', $request);
+
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings, false, false);
+        $encodedRequest2 = $authnRequest2->getRequest();
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertNotContains('IsPassive="true"', $request2);
+
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings, false, true);
+        $encodedRequest3 = $authnRequest3->getRequest();
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('IsPassive="true"', $request3);
     }
 
     /**
