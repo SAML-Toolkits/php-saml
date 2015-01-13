@@ -699,7 +699,7 @@ or to the url that we defined in our SSO Request.</h2>
                                             <a id="method_login"></a>
                         <div class="element clickable method public  method_login" data-toggle="collapse" data-target=".method_login .collapse">
                             <h2>Initiates the SSO process.</h2>
-                            <pre>login(string $returnTo = null) </pre>
+                            <pre>login(string $returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
                             <div class="row collapse">
@@ -727,6 +727,12 @@ or to the url that we defined in our SSO Request.</h2>
                                                                                     <div class="subelement argument">
                                                 <h4>$returnTo</h4>
                                                 <code>string</code><p><p>The target URL the user should be returned to after login.</p></p>
+                                                <h4>$parameters</h4>
+                                                <code>array</code><p><p>Extra parameters to be added to the GET.</p></p>
+                                                <h4>$forceAuthn</h4>
+                                                <code>bool</code><p><p>When true the AuthNReuqest will set the ForceAuthn='true'.</p></p>
+                                                <h4>$isPassive</h4>
+                                                <code>bool</code><p><p>When true the AuthNReuqest will set the Ispassive='true'.</p></p>
                                             </div>
                                                                             
                                                                     </div>

@@ -63,10 +63,10 @@ Installation
 
 ### Dependences ###
 
- * php >= 5.3.3
+ * php >= 5.3.3 And some core extensions as like php-xml, php-date, php-zlib.
  * openssl. Install the openssl library. It handles x509 certificates.
  * mcrypt. Install that library and its php driver if you gonna handle
-   encrypted data. (nameID, assertions)
+   encrypted data. (nameID, assertions).
  * gettext. Install that library and its php driver. It handles translations.
 
 ### Code ###

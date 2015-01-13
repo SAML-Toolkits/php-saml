@@ -153,7 +153,7 @@
                                                                 <a id="method___construct"></a>
                         <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
                             <h2>Constructs the AuthnRequest object.</h2>
-                            <pre>__construct(\OneLogin_Saml2_Settings $settings) </pre>
+                            <pre>__construct(\OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false) </pre>
                             <div class="labels"></div>
                             <div class="row collapse">
                                 <div class="detail-description">
@@ -180,6 +180,10 @@
                                                                                     <div class="subelement argument">
                                                 <h4>$settings</h4>
                                                 <code>\OneLogin_Saml2_Settings</code><p><p>Settings</p></p>
+                                                <h4>$forceAuthn</h4>
+                                                <code>bool</code><p><p>When true the AuthNReuqest will set the ForceAuthn='true'.</p></p>
+                                                <h4>$isPassive</h4>
+                                                <code>bool</code><p><p>When true the AuthNReuqest will set the Ispassive='true'.</p></p>
                                             </div>
                                                                             
                                                                     </div>

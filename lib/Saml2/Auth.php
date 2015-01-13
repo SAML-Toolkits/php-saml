@@ -279,6 +279,9 @@ class OneLogin_Saml2_Auth
      *
      * @param string $returnTo   The target URL the user should be returned to after login.
      * @param array  $parameters Extra parameters to be added to the GET
+     * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
+     * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
+     *  
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
