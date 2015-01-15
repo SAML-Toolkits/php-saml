@@ -116,12 +116,20 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $metadataOk = file_get_contents(TEST_ROOT .'/data/metadata/metadata_settings1.xml');
         $res2 = OneLogin_Saml2_Utils::validateXML($metadataOk, 'saml-schema-metadata-2.0.xsd');
-        $this->assertTrue($res instanceof DOMDocument);
+        $this->assertTrue($res2 instanceof DOMDocument);
+
+        $metadataBadOrder = file_get_contents(TEST_ROOT .'/data/metadata/metadata_bad_order_settings1.xml');
+        $res3 = OneLogin_Saml2_Utils::validateXML($metadataBadOrder, 'saml-schema-metadata-2.0.xsd');
+        $this->assertFalse($res3 instanceof DOMDocument);
+
+        $metadataSigned = file_get_contents(TEST_ROOT .'/data/metadata/signed_metadata_settings1.xml');
+        $res4 = OneLogin_Saml2_Utils::validateXML($metadataSigned, 'saml-schema-metadata-2.0.xsd');
+        $this->assertTrue($res4 instanceof DOMDocument);
 
         $dom = new DOMDocument;
-        $dom->load($metadataOk);
-        $res2 = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-metadata-2.0.xsd');
-        $this->assertTrue($res instanceof DOMDocument);
+        OneLogin_Saml2_Utils::loadXML($dom, $metadataOk);
+        $res5 = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-metadata-2.0.xsd');
+        $this->assertTrue($res5 instanceof DOMDocument);
     }
 
     /**

@@ -440,6 +440,24 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+    * Case valid signed metadata
+    *
+    * @covers OneLogin_Saml2_Settings::validateMetadata
+    */
+    public function testValidateSignedMetadata()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $metadata = file_get_contents(TEST_ROOT . '/data/metadata/signed_metadata_settings1.xml');
+
+        $this->assertEmpty($settings->validateMetadata($metadata));
+    }
+
+    /**
+    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
     * Case expired metadata
     *
     * @covers OneLogin_Saml2_Settings::validateMetadata
@@ -488,7 +506,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case invalid xml metadata
+    * Case invalid xml metadata: No entity
     *
     * @covers OneLogin_Saml2_Settings::validateMetadata
     */
@@ -500,6 +518,26 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
         $metadata = file_get_contents(TEST_ROOT . '/data/metadata/noentity_metadata_settings1.xml');
+
+        $errors = $settings->validateMetadata($metadata);
+        $this->assertNotEmpty($errors);
+        $this->assertContains('invalid_xml', $errors);
+    }
+
+    /**
+    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+    * Case invalid xml metadata: Wrong order
+    *
+    * @covers OneLogin_Saml2_Settings::validateMetadata
+    */
+    public function testValidateMetadataWrongOrder()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $metadata = file_get_contents(TEST_ROOT . '/data/metadata/metadata_bad_order_settings1.xml');
 
         $errors = $settings->validateMetadata($metadata);
         $this->assertNotEmpty($errors);

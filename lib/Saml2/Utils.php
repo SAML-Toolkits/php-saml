@@ -85,6 +85,7 @@ class OneLogin_Saml2_Utils
         libxml_use_internal_errors(true);
 
         if ($xml instanceof DOMDocument) {
+            print_r('entra');exit();
             $dom = $xml;
         } else {
             $dom = new DOMDocument;

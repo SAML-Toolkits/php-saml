@@ -247,8 +247,6 @@
                 <sequence>
                     <element ref="md:AssertionConsumerService" maxOccurs="unbounded"/>
                     <element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
-                    <element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
-                    <element ref="md:KeyDescriptor" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
                 <attribute name="AuthnRequestsSigned" type="boolean" use="optional"/>
                 <attribute name="WantAssertionsSigned" type="boolean" use="optional"/>
@@ -327,7 +325,6 @@
             <element ref="ds:Signature" minOccurs="0"/>
             <element ref="md:Extensions" minOccurs="0"/>
             <element ref="md:AffiliateMember" maxOccurs="unbounded"/>
-            <element ref="md:KeyDescriptor" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="affiliationOwnerID" type="md:entityIDType" use="required"/>
         <attribute name="validUntil" type="dateTime" use="optional"/>

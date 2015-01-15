@@ -698,6 +698,8 @@ class OneLogin_Saml2_Settings
             }
         }
 
+        // TODO: Support Metadata Sign Validation
+
         return $errors;
     }
 
