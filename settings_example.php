@@ -55,8 +55,9 @@ $settings = array (
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  Onelogin Toolkit supports for this endpoint the
-            // HTTP-POST binding only
-            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            // HTTP-POST and HTTP-Artifact bindings, the latter of which
+            // is only supported if you have cURL installed.
+            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         ),
         // SLO endpoint info of the IdP.
         'singleLogoutService' => array (
@@ -67,6 +68,16 @@ $settings = array (
             // HTTP-Redirect binding only
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
+
+        // ARS endpoint of the IdP (Artifact Resolution Service)
+        'artifactResolutionService' => array(
+            // ARS endpoint
+            'url' => 'http://localhost/simplesaml/saml2/idp/ArtifactResolutionService.php',
+
+            // Binding for the ARS, this is always SOAP
+            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP'
+        ),
+
         // Public x509 certificate of the IdP
         'x509cert' => '',
         /*

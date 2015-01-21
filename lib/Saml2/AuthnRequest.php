@@ -30,7 +30,7 @@ class OneLogin_Saml2_AuthnRequest
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true' 
+     * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false)
     {
@@ -42,7 +42,7 @@ class OneLogin_Saml2_AuthnRequest
 
         $id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
-        
+
         $nameIDPolicyFormat = $spData['NameIDFormat'];
         if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
             $nameIDPolicyFormat = OneLogin_Saml2_Constants::NAMEID_ENCRYPTED;
@@ -59,7 +59,7 @@ class OneLogin_Saml2_AuthnRequest
             }
             if (isset($organizationData[$lang]['displayname']) && !empty($organizationData[$lang]['displayname'])) {
                 $providerNameStr = <<<PROVIDERNAME
-    ProviderName="{$organizationData[$lang]['displayname']}" 
+    ProviderName="{$organizationData[$lang]['displayname']}"
 PROVIDERNAME;
             }
         }
@@ -106,7 +106,7 @@ REQUESTEDAUTHN;
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
-    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+    ProtocolBinding="{$idpData['singleSignOnService']['binding']}"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
     <samlp:NameIDPolicy
