@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -37,7 +37,7 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored the
      * from the AuthnStatement of the SAML Response
      */
     private $_sessionIndex;
@@ -93,14 +93,14 @@ class OneLogin_Saml2_Auth
      * Process the SAML Response sent by the IdP.
      *
      * @param string $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     * @throws OneLogin_Saml2_Error
      */
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
-        if (isset($_POST) && isset($_POST['SAMLResponse'])) {
-            // AuthnResponse -- HTTP_POST Binding
+        if (!empty($_POST['SAMLResponse'])) {
+            // HTTP_POST Binding
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
-
             if ($response->isValid($requestId)) {
                 $this->_attributes = $response->getAttributes();
                 $this->_nameid = $response->getNameId();
@@ -110,6 +110,9 @@ class OneLogin_Saml2_Auth
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
             }
+        } elseif (!empty($_GET['SAMLart'])) {
+            // HTTP Artifact Binding
+            $this->_resolveArtifact($_GET['SAMLart']);
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(
@@ -117,6 +120,47 @@ class OneLogin_Saml2_Auth
                 OneLogin_Saml2_Error::SAML_RESPONSE_NOT_FOUND
             );
         }
+    }
+
+    /**
+     * Performs artifact resolution
+     * @param string $encodedArtifact
+     * @throws OneLogin_Saml2_Error
+     */
+    protected function _resolveArtifact($encodedArtifact) {
+        if (!($destination = $this->getARSurl())) {
+            throw new OneLogin_Saml2_Error(
+                'Missing artifact resolution service URL.',
+                OneLogin_Saml2_Error::SETTINGS_INVALID
+            );
+        }
+
+        $idpData = $this->_settings->getIdPData();
+        $artifact = base64_decode($encodedArtifact);
+        //$endpointIndex = bin2hex(substr($artifact, 2, 2));
+        $sourceId = bin2hex(substr($artifact, 4, 20));
+
+        if ($sourceId !== sha1($idpData['entityId'])) {
+            throw new OneLogin_Saml2_Error(
+                'Invalid IdP Source',
+                OneLogin_Saml2_Error::SAML_ARS_SOURCE_INVALID
+            );
+        }
+
+        $options = array(
+            'uri' => $idpData['entityId'],
+            'location' => $destination
+        );
+
+        $client = new SoapClient(null, $options);
+        $request = new OneLogin_Saml2_ArtifactResolveRequest($this->_settings, $destination, $encodedArtifact);
+        $rootXml = $request->getXML(true);
+
+        $version = '1.1';
+        $action = 'http://www.oasis-open.org/committees/security';
+
+        $response = $client->__doRequest($rootXml, $destination, $action, $version);
+        var_dump($response);
     }
 
     /**
@@ -281,7 +325,7 @@ class OneLogin_Saml2_Auth
      * @param array  $parameters Extra parameters to be added to the GET
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
-     *  
+     *
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
@@ -364,6 +408,19 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Gets the ARS url.
+     *
+     * @return string|false The url of the Artifact Resolution Service,
+     *                      or false if it is not set.
+     */
+    public function getARSurl()
+    {
+        $idpData = $this->_settings->getIdPData();
+        return isset($idpData['singleSignOnService']['url']) ?
+            $idpData['singleSignOnService']['url'] : false;
+    }
+
+    /**
      * Gets the SLO url.
      *
      * @return string The url of the Single Logout Service
@@ -411,9 +468,9 @@ class OneLogin_Saml2_Auth
      * Generates the Signature for a SAML Response
      *
      * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $relayState   The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState)
     {
