@@ -120,7 +120,7 @@ class OneLogin_Saml2_Auth
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(
-                'SAML Response not found, Only supported HTTP_POST Binding',
+                'SAML Response not found, Only supporting HTTP-POST and HTTP-Artifact Bindings',
                 OneLogin_Saml2_Error::SAML_RESPONSE_NOT_FOUND
             );
         }
