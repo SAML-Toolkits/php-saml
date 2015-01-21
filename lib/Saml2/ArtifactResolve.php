@@ -65,7 +65,7 @@ class OneLogin_Saml2_ArtifactResolve
         $root->appendChild($issuer);
 
         // Add the artifact
-        $artifactTag = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAML, 'samlp:Artifact', $artifact);
+        $artifactTag = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAMLP, 'samlp:Artifact', $artifact);
         $this->_signatureBefore = $artifactTag;
         $root->appendChild($artifactTag);
     }

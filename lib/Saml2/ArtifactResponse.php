@@ -56,8 +56,10 @@ class OneLogin_Saml2_ArtifactResponse
             );
         }
 
+        // No need to parse the XML again - use the existing assertion document
         $responseDocument = new DOMDocument();
-        $responseDocument->importNode($response->item(0), true);
+        $import = $responseDocument->importNode($response->item(0), true);
+        $responseDocument->appendChild($import);
         $this->_assertionResponse = new OneLogin_Saml2_Response($settings, $responseDocument);
     }
 
