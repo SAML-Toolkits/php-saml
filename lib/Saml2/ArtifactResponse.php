@@ -1,8 +1,8 @@
 <?php
 /**
- * SAML 2 Artifact Resolve Request
+ * SAML 2 Artifact Response
  */
-class OneLogin_Saml2_ArtifactResolveResponse
+class OneLogin_Saml2_ArtifactResponse
 {
     /**
      * @var bool
@@ -13,6 +13,11 @@ class OneLogin_Saml2_ArtifactResolveResponse
      * @var string
      */
     protected $_statusCode = null;
+
+    /**
+     * @var OneLogin_Saml2_Response
+     */
+    protected $_assertionResponse;
 
     /**
      * Constructs the SAML Response object.
@@ -43,7 +48,17 @@ class OneLogin_Saml2_ArtifactResolveResponse
 
         $this->_statusCode = $this->_extract($xpath, '//protocol:Status/protocol:StatusCode/@Value');
 
-        // TODO Process the assertion
+        $response = $xpath->query('//protocol:Response');
+        if ($response->length != 1) {
+            throw new OneLogin_Saml2_Error(
+                'Invalid number of response nodes in ArtifactResponse.',
+                OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
+            );
+        }
+
+        $responseDocument = new DOMDocument();
+        $responseDocument->importNode($response->item(0), true);
+        $this->_assertionResponse = new OneLogin_Saml2_Response($settings, $responseDocument);
     }
 
     /**
@@ -68,5 +83,13 @@ class OneLogin_Saml2_ArtifactResolveResponse
      */
     public function getStatusCode() {
         return $this->_statusCode;
+    }
+
+    /**
+     * The result of the embedded assertion response.
+     * @return OneLogin_Saml2_Response
+     */
+    public function getAssertionResponse() {
+        return $this->_assertionResponse;
     }
 }

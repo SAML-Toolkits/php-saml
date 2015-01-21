@@ -2,7 +2,7 @@
 /**
  * SAML 2 Artifact Resolve Request
  */
-class OneLogin_Saml2_ArtifactResolveRequest
+class OneLogin_Saml2_ArtifactResolve
 {
     /**
      * @var string
@@ -65,7 +65,7 @@ class OneLogin_Saml2_ArtifactResolveRequest
         $root->appendChild($issuer);
 
         // Add the artifact
-        $artifactTag = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAML, 'saml:Artifact', $artifact);
+        $artifactTag = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAML, 'samlp:Artifact', $artifact);
         $this->_signatureBefore = $artifactTag;
         $root->appendChild($artifactTag);
     }

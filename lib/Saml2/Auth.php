@@ -98,9 +98,16 @@ class OneLogin_Saml2_Auth
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
+        $response = null;
         if (!empty($_POST['SAMLResponse'])) {
             // HTTP_POST Binding
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
+        } elseif (!empty($_REQUEST['SAMLart'])) {
+            // HTTP Artifact Binding
+            $response = $this->_resolveArtifact($_REQUEST['SAMLart']);
+        }
+
+        if ($response) {
             if ($response->isValid($requestId)) {
                 $this->_attributes = $response->getAttributes();
                 $this->_nameid = $response->getNameId();
@@ -110,9 +117,6 @@ class OneLogin_Saml2_Auth
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
             }
-        } elseif (!empty($_REQUEST['SAMLart'])) {
-            // HTTP Artifact Binding
-            $this->_resolveArtifact($_REQUEST['SAMLart']);
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(
@@ -125,6 +129,7 @@ class OneLogin_Saml2_Auth
     /**
      * Performs artifact resolution
      * @param string $encodedArtifact
+     * @return OneLogin_Saml2_Response
      * @throws OneLogin_Saml2_Error
      */
     protected function _resolveArtifact($encodedArtifact) {
@@ -137,7 +142,6 @@ class OneLogin_Saml2_Auth
 
         $idpData = $this->_settings->getIdPData();
         $artifact = base64_decode($encodedArtifact);
-        $endpointIndex = bin2hex(substr($artifact, 2, 2));
         $sourceId = bin2hex(substr($artifact, 4, 20));
 
         if ($sourceId !== sha1($idpData['entityId'])) {
@@ -147,7 +151,7 @@ class OneLogin_Saml2_Auth
             );
         }
 
-        $request = new OneLogin_Saml2_ArtifactResolveRequest($this->_settings, $destination, $encodedArtifact);
+        $request = new OneLogin_Saml2_ArtifactResolve($this->_settings, $destination, $encodedArtifact);
         $rootXml = $request->getXML(true);
 
         $xml = <<<ARS
@@ -178,13 +182,15 @@ ARS;
             );
         }
 
-        $response = new OneLogin_Saml2_ArtifactResolveResponse($this->_settings, $out);
+        $response = new OneLogin_Saml2_ArtifactResponse($this->_settings, $out);
         if (!$response->isSuccessful()) {
             throw new OneLogin_Saml2_Error(
                 'Invalid ARS response. Error message: '.$response->getStatusCode(),
                 OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
             );
         }
+
+        return $response->getAssertionResponse();
     }
 
     /**
