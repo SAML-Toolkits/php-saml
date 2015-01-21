@@ -110,9 +110,9 @@ class OneLogin_Saml2_Auth
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
             }
-        } elseif (!empty($_GET['SAMLart'])) {
+        } elseif (!empty($_REQUEST['SAMLart'])) {
             // HTTP Artifact Binding
-            $this->_resolveArtifact($_GET['SAMLart']);
+            $this->_resolveArtifact($_REQUEST['SAMLart']);
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(
@@ -137,7 +137,7 @@ class OneLogin_Saml2_Auth
 
         $idpData = $this->_settings->getIdPData();
         $artifact = base64_decode($encodedArtifact);
-        //$endpointIndex = bin2hex(substr($artifact, 2, 2));
+        $endpointIndex = bin2hex(substr($artifact, 2, 2));
         $sourceId = bin2hex(substr($artifact, 4, 20));
 
         if ($sourceId !== sha1($idpData['entityId'])) {
@@ -147,20 +147,44 @@ class OneLogin_Saml2_Auth
             );
         }
 
-        $options = array(
-            'uri' => $idpData['entityId'],
-            'location' => $destination
-        );
-
-        $client = new SoapClient(null, $options);
         $request = new OneLogin_Saml2_ArtifactResolveRequest($this->_settings, $destination, $encodedArtifact);
         $rootXml = $request->getXML(true);
 
-        $version = '1.1';
-        $action = 'http://www.oasis-open.org/committees/security';
+        $xml = <<<ARS
+<?xml version="1.0"?>
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Header/>
+    <soap-env:Body>$rootXml</soap-env:Body>
+</soap-env:Envelope>
+ARS;
 
-        $response = $client->__doRequest($rootXml, $destination, $action, $version);
-        var_dump($response);
+        // POST the data using cURL
+        // TODO support basic auth
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $destination);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/soap+xml',
+            'Accept' => 'application/soap+xml'
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $out = curl_exec($ch);
+        curl_close($ch);
+
+        if ($out === false) {
+            throw new OneLogin_Saml2_Error(
+                'Could not retrieve ARS response.',
+                OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
+            );
+        }
+
+        $response = new OneLogin_Saml2_ArtifactResolveResponse($this->_settings, $out);
+        if (!$response->isSuccessful()) {
+            throw new OneLogin_Saml2_Error(
+                'Invalid ARS response. Error message: '.$response->getStatusCode(),
+                OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
+            );
+        }
     }
 
     /**
@@ -416,8 +440,8 @@ class OneLogin_Saml2_Auth
     public function getARSurl()
     {
         $idpData = $this->_settings->getIdPData();
-        return isset($idpData['singleSignOnService']['url']) ?
-            $idpData['singleSignOnService']['url'] : false;
+        return isset($idpData['artifactResolutionService']['url']) ?
+            $idpData['artifactResolutionService']['url'] : false;
     }
 
     /**

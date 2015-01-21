@@ -48,9 +48,8 @@ class OneLogin_Saml2_ArtifactResolveRequest
         $this->_settings = $settings;
         $spData = $settings->getSPData();
 
-        $ns = 'urn:oasis:names:tc:SAML:2.0:protocol';
         $this->_document = $document = new DOMDocument();
-        $this->_root = $root = $document->createElementNS($ns, 'samlp:ArtifactResolve');
+        $this->_root = $root = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAMLP, 'samlp:ArtifactResolve');
         $document->appendChild($root);
 
         // Root attributes
@@ -62,11 +61,11 @@ class OneLogin_Saml2_ArtifactResolveRequest
         $root->setAttribute('Destination', $destination);
 
         // Add the issuer
-        $issuer = $document->createElementNS($ns, 'saml:Issuer', $spData['entityId']);
+        $issuer = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAML, 'saml:Issuer', $spData['entityId']);
         $root->appendChild($issuer);
 
         // Add the artifact
-        $artifactTag = $document->createElementNS($ns, 'saml:Artifact', $artifact);
+        $artifactTag = $document->createElementNS(OneLogin_Saml2_Constants::NS_SAML, 'saml:Artifact', $artifact);
         $this->_signatureBefore = $artifactTag;
         $root->appendChild($artifactTag);
     }
@@ -117,6 +116,6 @@ class OneLogin_Saml2_ArtifactResolveRequest
         }
 
         $xmlSig->insertSignature($this->_root, $this->_signatureBefore);
-        return $root ? $this->_root : $this->_document->saveXML();
+        return $this->_document->saveXML($root ? $this->_root : null);
     }
 }
