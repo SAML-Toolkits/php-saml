@@ -16,12 +16,15 @@ $settings = array (
         'entityId' => '',
         // Specifies info about where and how the <AuthnResponse> message MUST be
         // returned to the requester, in this case our SP.
+        // Multiple bindings are supported, but for simplicity you only specify
+        // just one here, which is the one you want to use with the IdP. Make
+        // sure it matches up with a binding the IdP supports.
         'assertionConsumerService' => array (
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  Onelogin Toolkit supports for this endpoint the
-            // HTTP-Redirect binding only
+            // HTTP-POST and HTTP-Artifact bindings
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         ),
         // Specifies info about where and how the <Logout Response> message MUST be
