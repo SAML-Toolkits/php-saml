@@ -167,9 +167,12 @@ ARS;
         curl_setopt($ch, CURLOPT_URL, $destination);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+
+        // Using text/xml here rather than application/soap+xml
+        // because it breaks on some servers.
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/soap+xml',
-            'Accept' => 'application/soap+xml'
+            'Content-Type: text/xml',
+            'Accept' => 'text/xml'
         ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $out = curl_exec($ch);
