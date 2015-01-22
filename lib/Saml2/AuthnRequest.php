@@ -106,7 +106,7 @@ REQUESTEDAUTHN;
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
-    ProtocolBinding="{$idpData['singleSignOnService']['binding']}"
+    ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
     <samlp:NameIDPolicy
