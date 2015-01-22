@@ -170,10 +170,7 @@ ARS;
 
         // Using text/xml here rather than application/soap+xml
         // because it breaks on some servers.
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: text/xml',
-            'Accept' => 'text/xml'
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $out = curl_exec($ch);
         curl_close($ch);
