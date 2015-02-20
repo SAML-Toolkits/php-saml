@@ -260,8 +260,8 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
-        if (isset($_SERVER["X-Forwarded-Port"])) {
-            $portnumber = $_SERVER["X-Forwarded-Port"];
+        if (isset($_SERVER["X-FORWARDED-PORT"])) {
+            $portnumber = $_SERVER["X-FORWARDED-PORT"];
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         }
