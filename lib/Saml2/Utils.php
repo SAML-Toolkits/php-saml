@@ -260,19 +260,14 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
-        if (isset($_SERVER["SERVER_PORT"])) {
+        if (isset($_SERVER["X-Forwarded-Port"])) {
+            $portnumber = $_SERVER["X-Forwarded-Port"];
+        } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
-            $port = ':' . $portnumber;
+        }
 
-            if ($protocol == 'http') {
-                if ($portnumber == '80') {
-                    $port = '';
-                }
-            } elseif ($protocol == 'https') {
-                if ($portnumber == '443') {
-                    $port = '';
-                }
-            }
+        if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
+            $port = ':' . $portnumber;
         }
 
         return $protocol."://" . $currenthost . $port;
