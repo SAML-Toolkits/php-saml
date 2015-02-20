@@ -123,11 +123,13 @@ class OneLogin_Saml2_Response
 
             if ($this->_settings->isStrict()) {
 
-                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                if (!$res instanceof DOMDocument) {
-                    throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
+                if ($security['wantValidateXML']) {
+                  $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                  if (!$res instanceof DOMDocument) {
+                      throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
+                  }
                 }
-
+                
                 $security = $this->_settings->getSecurityData();
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();

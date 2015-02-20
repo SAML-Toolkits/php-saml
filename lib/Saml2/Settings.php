@@ -329,6 +329,11 @@ class OneLogin_Saml2_Settings
             $this->_security['wantNameIdEncrypted'] = false;
         }
 
+        // xml validation expected
+        if (!isset($this->_security['wantValidateXML'])) {
+          $this->_security['wantValidateXML'] = true;
+        }
+
         if (!isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = '';
         }
