@@ -315,10 +315,9 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        $isHttps = (!empty($_SERVER['HTTPS'])
-                    && $_SERVER['HTTPS'] !== 'off'
+        $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
                     || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-        );
+                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
         return $isHttps;
     }
 
