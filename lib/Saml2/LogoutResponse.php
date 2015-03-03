@@ -101,13 +101,14 @@ class OneLogin_Saml2_LogoutResponse
             $idPEntityId = $idpData['entityId'];
 
             if ($this->_settings->isStrict()) {
-
-                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                if (!$res instanceof DOMDocument) {
-                    throw new Exception("Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd");
-                }
-
                 $security = $this->_settings->getSecurityData();
+
+                if ($security['wantXMLValidation']) {
+                    $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    if (!$res instanceof DOMDocument) {
+                        throw new Exception("Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd");
+                    }
+                }
 
                 // Check if the InResponseTo of the Logout Response matchs the ID of the Logout Request (requestId) if provided
                 if (isset($requestId) && $this->document->documentElement->hasAttribute('InResponseTo')) {

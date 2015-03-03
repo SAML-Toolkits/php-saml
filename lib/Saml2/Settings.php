@@ -329,6 +329,13 @@ class OneLogin_Saml2_Settings
             $this->_security['wantNameIdEncrypted'] = false;
         }
 
+        // XML validation
+        if (!isset($this->_security['wantXMLValidation'])) {
+            $this->_security['wantXMLValidation'] = true;
+        }
+
+        // Certificates / Private key /Fingerprint
+
         if (!isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = '';
         }

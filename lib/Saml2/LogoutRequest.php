@@ -262,14 +262,15 @@ LOGOUTREQUEST;
             $idPEntityId = $idpData['entityId'];
 
             if ($this->_settings->isStrict()) {
-
-                $res = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                if (!$res instanceof DOMDocument) {
-                    throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
-                }
-
                 $security = $this->_settings->getSecurityData();
 
+                if ($security['wantXMLValidation']) {
+                    $res = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    if (!$res instanceof DOMDocument) {
+                        throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
+                    }
+                }
+                
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter

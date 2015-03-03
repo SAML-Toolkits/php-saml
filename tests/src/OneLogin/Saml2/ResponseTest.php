@@ -543,6 +543,44 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the isValid method of the OneLogin_Saml2_Response
+    * Case invalid xml
+    *
+    * @covers OneLogin_Saml2_Response::isValid
+    */
+    public function testIsInValidWrongXML()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['wantXMLValidation'] = false;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings->setStrict(false);
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_xml.xml.base64');
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+
+        $this->assertTrue($response->isValid());
+
+        $settings->setStrict(true);
+        $response2 = new OneLogin_Saml2_Response($settings, $xml);
+        $response2->isValid();
+        $this->assertNotEquals('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd', $response2->getError());
+
+        $settingsInfo['security']['wantXMLValidation'] = true;
+        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings2->setStrict(false);
+        $response3 = new OneLogin_Saml2_Response($settings2, $xml);
+        $this->assertTrue($response3->isValid());
+
+        $settings2->setStrict(true);
+        $response4 = new OneLogin_Saml2_Response($settings2, $xml);
+        $this->assertFalse($response4->isValid());
+        $this->assertEquals('Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd', $response4->getError());
+    }
+
+    /**
     * Tests the isValid method of the OneLogin_Saml2_Response class
     * Case Invalid Response, Invalid Destination
     *

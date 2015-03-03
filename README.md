@@ -399,6 +399,10 @@ $advancedSettings = array (
         // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
         // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
         'requestedAuthnContext' => true,
+
+        // Indicates if the SP will validate all received xmls.
+        // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
+        'wantXMLValidation' => true,
     ),
 
     // Contact information template, it is recommended to suply a
@@ -503,7 +507,7 @@ define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once(TOOLKIT_PATH . '_toolkit_loader.php');   // We load the SAML2 lib
 
 $auth = new OneLogin_Saml2_Auth(); // Constructor of the SP, loads settings.php
-                                  // and advanced_settings.php
+                                   // and advanced_settings.php
 $auth->login();   // Method that sent the AuthNRequest
 ```
 

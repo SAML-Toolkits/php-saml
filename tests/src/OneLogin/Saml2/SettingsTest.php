@@ -617,7 +617,60 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('signMetadata', $security);
         $this->assertArrayHasKey('wantMessagesSigned', $security);
         $this->assertArrayHasKey('wantAssertionsSigned', $security);
+        $this->assertArrayHasKey('wantAssertionsEncrypted', $security);
         $this->assertArrayHasKey('wantNameIdEncrypted', $security);
+        $this->assertArrayHasKey('requestedAuthnContext', $security);
+        $this->assertArrayHasKey('wantXMLValidation', $security);
+    }
+
+    /**
+    * Tests default values of Security advanced sesettings
+    *
+    * @covers OneLogin_Saml2_Settings::getSecurityData
+    */
+    public function testGetDefaultSecurityValues()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        unset($settingsInfo['security']);
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $security = $settings->getSecurityData();
+        $this->assertNotEmpty($security);
+
+        $this->assertArrayHasKey('nameIdEncrypted', $security);
+        $this->assertFalse($security['nameIdEncrypted']);
+
+        $this->assertArrayHasKey('authnRequestsSigned', $security);
+        $this->assertFalse($security['authnRequestsSigned']);
+
+        $this->assertArrayHasKey('logoutRequestSigned', $security);
+        $this->assertFalse($security['logoutRequestSigned']);
+
+        $this->assertArrayHasKey('logoutResponseSigned', $security);
+        $this->assertFalse($security['logoutResponseSigned']);
+
+        $this->assertArrayHasKey('signMetadata', $security);
+        $this->assertFalse($security['signMetadata']);
+
+        $this->assertArrayHasKey('wantMessagesSigned', $security);
+        $this->assertFalse($security['wantMessagesSigned']);
+
+        $this->assertArrayHasKey('wantAssertionsSigned', $security);
+        $this->assertFalse($security['wantAssertionsSigned']);
+
+        $this->assertArrayHasKey('wantAssertionsEncrypted', $security);
+        $this->assertFalse($security['wantAssertionsEncrypted']);
+
+        $this->assertArrayHasKey('wantNameIdEncrypted', $security);
+        $this->assertFalse($security['wantNameIdEncrypted']);
+
+        $this->assertArrayHasKey('requestedAuthnContext', $security);
+        $this->assertTrue($security['requestedAuthnContext']);
+
+        $this->assertArrayHasKey('wantXMLValidation', $security);
+        $this->assertTrue($security['wantXMLValidation']);
     }
 
     /**
