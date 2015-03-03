@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+ 
+v.2.4.0
+-------
+* Fix wrong element order in generated metadata
+* Added SLO with nameID and SessionIndex in demo1
+* Improve isHTTPS method in order to support HTTP_X_FORWARDED_PORT
+* Set optional the XMLvalidation (enable/disable it with wantXMLValidation security setting)
 
 v.2.3.0
 -------
