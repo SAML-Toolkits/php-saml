@@ -758,7 +758,7 @@ if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
         OneLogin_Saml2_Utils::deleteLocalSession();
     }
 
-    $inResponseTo = OneLogin_Saml2_LogoutRequest::getID($request);
+    $inResponseTo = $request->id;
     $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
     $responseBuilder->build($inResponseTo);
     $logoutResponse = $responseBuilder->getResponse();
@@ -1020,7 +1020,7 @@ SAML 2 Logout Request class
 
  * **OneLogin_Saml2_LogoutRequest** Constructs the Logout Request object.
  * **getRequest** Returns the Logout Request defated, base64encoded, unsigned
- * **getID** Returns the ID of the Logout Request.
+ * **getID** Returns the ID of the Logout Request. (If you have the object you can access to the id attribute)
  * **getNameIdData** Gets the NameID Data of the the Logout Request.
  * **getNameId** Gets the NameID of the Logout Request.
  * **getIssuer** Gets the Issuer of the Logout Request.

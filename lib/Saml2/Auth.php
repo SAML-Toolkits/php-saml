@@ -149,7 +149,7 @@ class OneLogin_Saml2_Auth
                 if (!$keepLocalSession) {
                     OneLogin_Saml2_Utils::deleteLocalSession();
                 }
-                $inResponseTo = OneLogin_Saml2_LogoutRequest::getID(gzinflate(base64_decode($_GET['SAMLRequest'])));
+                $inResponseTo = $logoutRequest->id;
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
                 $logoutResponse = $responseBuilder->getResponse();
