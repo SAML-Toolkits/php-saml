@@ -69,6 +69,8 @@ Installation
    encrypted data. (nameID, assertions).
  * gettext. Install that library and its php driver. It handles translations.
 
+Since [PHP 5.3 is officially unssuported](http://php.net/eol.php) we recommend you to use a newer PHP version.
+
 ### Code ###
 
 #### Option 1. Download from github ####
