@@ -332,11 +332,17 @@ $settings = array (
         ),
         // Public x509 certificate of the IdP
         'x509cert' => '',
-        /* 
+        /*
          *  Instead of use the whole x509cert you can use a fingerprint
-         *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it)
+         *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
+         *   or add for example the -sha256 , -sha384 or -sha512 parameter)
+         *
+         *  If a fingerprint is provided, then the certFingerprintAlgorithm is required in order to
+         *  let the toolkit know which algorithm was used. Possible values: sha1, sha256, sha384 or sha512
+         *  'sha1' is the default value.
          */
         // 'certFingerprint' => '',
+        // 'certFingerprintAlgorithm' => 'sha1',
     ),
 );
 ```

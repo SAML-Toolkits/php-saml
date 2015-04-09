@@ -634,7 +634,7 @@ class OneLogin_Saml2_Utils
      *
      * @return string Formated fingerprint
      */
-    public static function calculateX509Fingerprint($x509cert)
+    public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
         assert('is_string($x509cert)');
 
@@ -659,11 +659,20 @@ class OneLogin_Saml2_Utils
                 $data .= $line;
             }
         }
+        $decoded_data = base64_decode($data);
 
-        /* $data now contains the certificate as a base64-encoded string. The fingerprint
-         * of the certificate is the sha1-hash of the certificate.
-         */
-        return strtolower(sha1(base64_decode($data)));
+        switch ($alg) {
+            case 'sha512':
+            case 'sha384':
+            case 'sha256':
+                $fingerprint = hash($alg, $decoded_data, FALSE);
+                break;
+            case 'sha1':
+            default:
+                $fingerprint = strtolower(sha1($decoded_data));
+                break;
+        }
+        return $fingerprint;
     }
 
     /**
@@ -962,11 +971,12 @@ class OneLogin_Saml2_Utils
     /**
      * Validates a signature (Message or Assertion).
      *
-     * @param string|DomDocument $xml         The element we should validate
-     * @param string|null        $cert        The pubic cert
-     * @param string|null        $fingerprint The fingerprint of the public cert
+     * @param string|DomDocument $xml            The element we should validate
+     * @param string|null        $cert           The pubic cert
+     * @param string|null        $fingerprint    The fingerprint of the public cert
+     * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
      */
-    public static function validateSign ($xml, $cert = null, $fingerprint = null)
+    public static function validateSign ($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
@@ -1005,7 +1015,7 @@ class OneLogin_Saml2_Utils
             return ($objXMLSecDSig->verify($objKey) === 1);
         } else {
             $domCert = $objKey->getX509Certificate();
-            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert);
+            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
             if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
                 return false;
             } else {

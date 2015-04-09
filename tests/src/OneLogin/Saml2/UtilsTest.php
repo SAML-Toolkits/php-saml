@@ -704,6 +704,14 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertNull(OneLogin_Saml2_Utils::calculateX509Fingerprint($key));
 
         $this->assertEquals('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert));
+
+        $this->assertEquals('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha1'));
+
+        $this->assertEquals('c51cfa06c7a49767f6eab18238eae1c56708e29264da3d11f538a12cd2c357ba', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha256'));
+
+        $this->assertEquals('bc5826e6f9429247254bae5e3c650e6968a36a62d23075eb168134978d88600559c10830c28711b2c29c7947c0c2eb1d', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha384'));
+
+        $this->assertEquals('3db29251b97559c67988ea0754cb0573fc409b6f75d89282d57cfb75089539b0bbdb2dcd9ec6e032549ecbc466439d5992e18db2cf5494ca2fe1b2e16f348dff', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha512'));
     }
 
     /**
@@ -875,10 +883,14 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $idpData = $settings->getIdPData();
         $cert = $idpData['x509cert'];
         $fingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert);
+        $fingerprint256 = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha256');
 
         $xmlMetadataSigned = file_get_contents(TEST_ROOT . '/data/metadata/signed_metadata_settings1.xml');
         $this->assertTrue(OneLogin_Saml2_Utils::validateSign($xmlMetadataSigned, $cert));
         $this->assertTrue(OneLogin_Saml2_Utils::validateSign($xmlMetadataSigned, null, $fingerprint));
+        $this->assertTrue(OneLogin_Saml2_Utils::validateSign($xmlMetadataSigned, null, $fingerprint, 'sha1'));
+        $this->assertFalse(OneLogin_Saml2_Utils::validateSign($xmlMetadataSigned, null, $fingerprint, 'sha256'));
+        $this->assertTrue(OneLogin_Saml2_Utils::validateSign($xmlMetadataSigned, null, $fingerprint256, 'sha256'));
 
         $xmlResponseMsgSigned = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64'));
         $this->assertTrue(OneLogin_Saml2_Utils::validateSign($xmlResponseMsgSigned, $cert));
