@@ -257,6 +257,7 @@ class OneLogin_Saml2_Response
             if (!empty($signedElements)) {
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
+                $fingerprintalg = $idpData['certFingerprintAlgorithm'];
 
                 // Only validates the first signed element
                 if (in_array('Response', $signedElements)) {
@@ -271,7 +272,7 @@ class OneLogin_Saml2_Response
                     }
                 }
 
-                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
+                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint, $fingerprintalg)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
             } else {
