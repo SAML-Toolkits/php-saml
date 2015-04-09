@@ -659,17 +659,17 @@ class OneLogin_Saml2_Utils
                 $data .= $line;
             }
         }
-        $decoded_data = base64_decode($data);
+        $decodedData = base64_decode($data);
 
         switch ($alg) {
             case 'sha512':
             case 'sha384':
             case 'sha256':
-                $fingerprint = hash($alg, $decoded_data, FALSE);
+                $fingerprint = hash($alg, $decodedData, FALSE);
                 break;
             case 'sha1':
             default:
-                $fingerprint = strtolower(sha1($decoded_data));
+                $fingerprint = strtolower(sha1($decodedData));
                 break;
         }
         return $fingerprint;
