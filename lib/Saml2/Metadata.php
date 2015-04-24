@@ -13,14 +13,14 @@ class OneLogin_Saml2_Metadata
     /**
      * Generates the metadata of the SP based on the settings
      *
-     * @param string    $sp            The SP data
-     * @param string    $authnsign     authnRequestsSigned attribute
-     * @param string    $wsign         wantAssertionsSigned attribute 
-     * @param DateTime  $validUntil    Metadata's valid time
-     * @param Timestamp $cacheDuration Duration of the cache in seconds
-     * @param array     $contacts      Contacts info
-     * @param array     $organization  Organization ingo
-     *
+     * @param array         $sp            The SP data
+     * @param bool|string   $authnsign     authnRequestsSigned attribute
+     * @param bool|string   $wsign         wantAssertionsSigned attribute
+     * @param DateTime|null $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
+     * @param array         $contacts      Contacts info
+     * @param array         $organization  Organization ingo
+     * @param array         $attributes
      * @return string SAML Metadata XML
      */
     public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())

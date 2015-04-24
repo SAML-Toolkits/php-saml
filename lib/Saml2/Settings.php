@@ -77,9 +77,9 @@ class OneLogin_Saml2_Settings
      * - Sets the paths of the different folders
      * - Loads settings info from settings file or array/object provided
      *
-     * @param array|object $settings SAML Toolkit Settings
-     * 
-     * @exceptions Throws error exception if any settings parameter is invalid
+     * @param array|object|null $settings SAML Toolkit Settings
+     *
+     * @throws OneLogin_Saml2_Error If any settings parameter is invalid
      */
     public function __construct($settings = null)
     {
@@ -248,6 +248,7 @@ class OneLogin_Saml2_Settings
      * Loads settings info from the settings file
      *
      * @return boolean  True if the settings info is valid
+     * @throws OneLogin_Saml2_Error
      */
     private function _loadSettingsFromFile()
     {
@@ -601,6 +602,8 @@ class OneLogin_Saml2_Settings
      * Gets the SP metadata. The XML representation.
      *
      * @return string  SP metadata (xml)
+     * @throws Exception
+     * @throws OneLogin_Saml2_Error
      */
     public function getSPMetadata()
     {

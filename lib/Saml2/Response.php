@@ -33,15 +33,15 @@ class OneLogin_Saml2_Response
     public $decryptedDocument;
 
     /**
-    * The response contains an encrypted assertion.
-    * @var boolean
-    */
+     * The response contains an encrypted assertion.
+     * @var boolean
+     */
     public $encrypted = false;
 
     /**
-    * After validation, if it fail this var has the cause of the problem
-    * @var string
-    */
+     * After validation, if it fail this var has the cause of the problem
+     * @var string
+     */
     private $_error;
 
     /**
@@ -49,6 +49,8 @@ class OneLogin_Saml2_Response
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
      * @param string                  $response A UUEncoded SAML response from the IdP.
+     *
+     * @throws Exception
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response)
     {
@@ -72,13 +74,14 @@ class OneLogin_Saml2_Response
     }
 
     /**
-    * Determines if the SAML Response is valid using the certificate.
-    *
-    * @param string $requestId The ID of the AuthNRequest sent by this SP to the IdP
-    *
-    * @throws Exception
-    * @return bool Validate the document
-    */
+     * Determines if the SAML Response is valid using the certificate.
+     *
+     * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     *
+     * @return bool Validate the document
+     *
+     * @throws Exception
+     */
     public function isValid($requestId = null)
     {
         $this->_error = null;
@@ -408,7 +411,7 @@ class OneLogin_Saml2_Response
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
      * 
-     * @return DateTime|null The SessionNotOnOrAfter value
+     * @return int|null The SessionNotOnOrAfter value
      */
     public function getSessionNotOnOrAfter()
     {
@@ -545,8 +548,9 @@ class OneLogin_Saml2_Response
      *
      * @param string $assertionXpath Xpath Expresion
      *
-     * @throws Exception
      * @return DOMNodeList The queried node
+     *
+     * @throws Exception
      */
     private function _queryAssertion($assertionXpath)
     {
@@ -598,10 +602,11 @@ class OneLogin_Saml2_Response
     /**
      * Decrypts the Assertion (DOMDocument)
      *
-     * @param string $dom DomDocument
+     * @param DomNode $dom DomDocument
+     *
+     * @return DOMDocument Decrypted Assertion
      *
      * @throws Exception
-     * @return DOMDocument Decrypted Assertion
      */
     private function _decryptAssertion($dom)
     {

@@ -12,7 +12,7 @@ class OneLogin_Saml2_Utils
     * Translates any string. Accepts args  
     *
     * @param string $msg  Message to be translated
-    * @param array  $args Arguments
+    * @param array|null $args Arguments
     * 
     * @return string $translatedMsg  Translated text
     */
@@ -41,7 +41,7 @@ class OneLogin_Saml2_Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
-     * @throws DOMExceptions
+     * @throws Exception
      *
      * @return DOMDocument $dom The result of load the XML at the DomDocument
      */
@@ -70,11 +70,11 @@ class OneLogin_Saml2_Utils
      *
      * It will parse the string into a DOM document and validate this document against the schema.
      *
-     * @param string  $xml    The XML string or document which should be validated.
-     * @param string  $schema The schema filename which should be used.
-     * @param boolean $debug  To disable/enable the debug mode
+     * @param string|DOMDocument $xml    The XML string or document which should be validated.
+     * @param string             $schema The schema filename which should be used.
+     * @param boolean            $debug  To disable/enable the debug mode
      *
-     * @return string | DOMDocument $dom  string that explains the problem or the DOMDocument
+     * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
      */
     public static function validateXML($xml, $schema, $debug = false)
     {
@@ -179,11 +179,13 @@ class OneLogin_Saml2_Utils
     /**
      * Executes a redirection to the provided url (or return the target url).
      *
-     * @param string  $url        The target url
-     * @param array   $parameters Extra parameters to be passed as part of the url
-     * @param boolean $stay       True if we want to stay (returns the url string) False to redirect
+     * @param string       $url        The target url
+     * @param array        $parameters Extra parameters to be passed as part of the url
+     * @param bool         $stay       True if we want to stay (returns the url string) False to redirect
      *
-     * @return string $url
+     * @return string|null $url
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public static function redirect($url, $parameters = array(), $stay = false)
     {
@@ -377,10 +379,12 @@ class OneLogin_Saml2_Utils
         return $selfURLhost . $requestURI;
     }
 
-     /**
+    /**
      * Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]
      *
-     * @param string The param to-be extracted
+     * @param string $name The param to-be extracted
+     *
+     * @return string
      */
     public static function extractOriginalQueryParam ($name)
     {
@@ -406,7 +410,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $time The time we should convert (DateTime).
      *
-     * @return $timestamp SAML2 timestamp.
+     * @return string $timestamp SAML2 timestamp.
      */
     public static function parseTime2SAML($time)
     {
@@ -423,7 +427,9 @@ class OneLogin_Saml2_Utils
      *
      * @param string $time The time we should convert (SAML Timestamp).
      *
-     * @return $timestamp  Converted to a unix timestamp.
+     * @return int $timestamp  Converted to a unix timestamp.
+     *
+     * @throws Exception
      */
     public static function parseSAML2Time($time)
     {
@@ -462,12 +468,14 @@ class OneLogin_Saml2_Utils
     /**
      * Interprets a ISO8601 duration value relative to a given timestamp.
      *
-     * @param string $duration  The duration, as a string.
-     * @param int    $timestamp The unix timestamp we should apply the
-     *                          duration to. Optional, default to the
-     *                          current time.
+     * @param string   $duration  The duration, as a string.
+     * @param int|null $timestamp The unix timestamp we should apply the
+     *                            duration to. Optional, default to the
+     *                            current time.
      *
-     * @return int The new timestamp, after the duration is applied.
+     * @return int|null The new timestamp, after the duration is applied.
+     *
+     * @throws Exception
      */
     public static function parseDuration($duration, $timestamp = null)
     {
@@ -632,7 +640,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $x509cert x509 cert
      *
-     * @return string Formated fingerprint
+     * @return null|string Formated fingerprint
      */
     public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
@@ -692,10 +700,10 @@ class OneLogin_Saml2_Utils
     /**
      * Generates a nameID.
      *
-     * @param string $value  fingerprint
-     * @param string $spnq   SP Name Qualifier
-     * @param string $format SP Format
-     * @param string $cert   IdP Public cert to encrypt the nameID
+     * @param string      $value  fingerprint
+     * @param string      $spnq   SP Name Qualifier
+     * @param string      $format SP Format
+     * @param string|null $cert   IdP Public cert to encrypt the nameID
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
@@ -743,9 +751,11 @@ class OneLogin_Saml2_Utils
     /**
      * Gets Status from a Response.
      *
-     * @param DomElement $dom The Response as XML
+     * @param DOMDocument $dom The Response as XML
      *
      * @return array $status The Status, an array with the code and a message.
+     *
+     * @throws Exception
      */
     public static function getStatus($dom)
     {
@@ -786,6 +796,8 @@ class OneLogin_Saml2_Utils
      * @param XMLSecurityKey $inputKey      The decryption key.
      *
      * @return DOMElement  The decrypted element.
+     *
+     * @throws Exception
      */
     public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey)
     {
@@ -877,14 +889,16 @@ class OneLogin_Saml2_Utils
     }
 
      /**
-    * Converts a XMLSecurityKey to the correct algorithm.
-    *
-    * @param XMLSecurityKey $key The key.
-    * @param string $algorithm The desired algorithm.
-    * @param string $type Public or private key, defaults to public.
-    * @return XMLSecurityKey The new key.
-    * @throws Exception
-    */
+      * Converts a XMLSecurityKey to the correct algorithm.
+      *
+      * @param XMLSecurityKey $key The key.
+      * @param string $algorithm The desired algorithm.
+      * @param string $type Public or private key, defaults to public.
+      *
+      * @return XMLSecurityKey The new key.
+      *
+      * @throws Exception
+      */
     public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
     {
         assert('is_string($algorithm)');
@@ -911,6 +925,10 @@ class OneLogin_Saml2_Utils
      * @param string|DomDocument $xml  The element we should sign
      * @param string             $key  The private key
      * @param string             $cert The public
+     *
+     * @return string
+     *
+     * @throws Exception
      */
     public static function addSign($xml, $key, $cert)
     {
@@ -971,10 +989,14 @@ class OneLogin_Saml2_Utils
     /**
      * Validates a signature (Message or Assertion).
      *
-     * @param string|DomDocument $xml            The element we should validate
-     * @param string|null        $cert           The pubic cert
-     * @param string|null        $fingerprint    The fingerprint of the public cert
-     * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
+     * @param string|DomNode $xml            The element we should validate
+     * @param string|null    $cert           The pubic cert
+     * @param string|null    $fingerprint    The fingerprint of the public cert
+     * @param string|null    $fingerprintalg The algorithm used to get the fingerprint
+     *
+     * @return bool
+     *
+     * @throws Exception
      */
     public static function validateSign ($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
