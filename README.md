@@ -131,7 +131,7 @@ the new features that the new library Saml2 carries.
 Namespaces
 ----------
 
-If you are using the library with a framework like Symphony2 that contains
+If you are using the library with a framework like Symfony2 that contains
 namespaces, remember that calls to the class must be done by adding a \ to the
 start, for example to use the static method getSelfURLNoQuery use:
 \OneLogin_Saml2_Utils::getSelfURLNoQuery()
