@@ -310,10 +310,11 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SLO process.
      *
-     * @param string $returnTo      The target URL the user should be returned to after logout.
-     * @param array  $parameters    Extra parameters to be added to the GET
-     * @param string $nameId        The NameID that will be set in the LogoutRequest.
-     * @param string $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param string  $returnTo      The target URL the user should be returned to after logout.
+     * @param array   $parameters    Extra parameters to be added to the GET
+     * @param string  $nameId        The NameID that will be set in the LogoutRequest.
+     * @param string  $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param boolean $addEntityId  Defines if the SPNameQualifier should be added to the logout request
      */
     public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $addEntityId = true)
     {

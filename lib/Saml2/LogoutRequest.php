@@ -37,6 +37,7 @@ class OneLogin_Saml2_LogoutRequest
      * @param string                  $response A UUEncoded Logout Request.
      * @param string                  $nameId   The NameID that will be set in the LogoutRequest.
      * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param boolean                 $addEntityId  Defines if the SPNameQualifier should be added to the logout request
      *
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null, $addEntityId = true)
