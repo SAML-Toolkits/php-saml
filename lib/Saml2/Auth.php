@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -37,7 +37,7 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored the
      * from the AuthnStatement of the SAML Response
      */
     private $_sessionIndex;
@@ -281,7 +281,7 @@ class OneLogin_Saml2_Auth
      * @param array  $parameters Extra parameters to be added to the GET
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
-     *  
+     *
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
@@ -315,7 +315,7 @@ class OneLogin_Saml2_Auth
      * @param string $nameId        The NameID that will be set in the LogoutRequest.
      * @param string $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
      */
-    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null)
+    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $addEntityId = true)
     {
         assert('is_array($parameters)');
 
@@ -331,7 +331,7 @@ class OneLogin_Saml2_Auth
             $nameId = $this->_nameid;
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $addEntityId);
 
         $samlRequest = $logoutRequest->getRequest();
 
@@ -411,9 +411,9 @@ class OneLogin_Saml2_Auth
      * Generates the Signature for a SAML Response
      *
      * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $relayState   The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState)
     {

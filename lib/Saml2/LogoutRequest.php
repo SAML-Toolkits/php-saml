@@ -12,7 +12,6 @@ class OneLogin_Saml2_LogoutRequest
     * @var string
     */
     public $id;
-
     /**
      * Object that represents the setting info
      * @var OneLogin_Saml2_Settings
@@ -40,7 +39,7 @@ class OneLogin_Saml2_LogoutRequest
      * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
      *
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null, $addEntityId = true)
     {
 
         $this->_settings = $settings;
@@ -53,10 +52,9 @@ class OneLogin_Saml2_LogoutRequest
 
             $id = OneLogin_Saml2_Utils::generateUniqueID();
             $this->id = $id;
-
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
-            
+
             $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
                 $cert = $idpData['x509cert'];
@@ -71,7 +69,7 @@ class OneLogin_Saml2_LogoutRequest
 
             $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
                 $nameId,
-                $spData['entityId'],
+                $addEntityId === true ? $spData['entityId'] : "",
                 $nameIdFormat,
                 $cert
             );
@@ -142,7 +140,7 @@ LOGOUTREQUEST;
      *
      * @param string|DOMDocument $request Logout Request Message
      * @param string             $key     The SP key
-     *     
+     *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      */
     public static function getNameIdData($request, $key = null)
@@ -195,7 +193,7 @@ LOGOUTREQUEST;
      * Gets the NameID of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string             $key     The SP key     
+     * @param string             $key     The SP key
      *
      * @return string Name ID Value
      */
@@ -232,11 +230,11 @@ LOGOUTREQUEST;
     /**
      * Gets the SessionIndexes from the Logout Request.
      * Notice: Our Constructor only support 1 SessionIndex but this parser
-     *         extracts an array of all the  SessionIndex found on a  
+     *         extracts an array of all the  SessionIndex found on a
      *         Logout Request, that could be many.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * 
+     *
      * @return array The SessionIndex value
      */
     public static function getSessionIndexes($request)
@@ -280,7 +278,7 @@ LOGOUTREQUEST;
                         throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
                     }
                 }
-                
+
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter
@@ -372,7 +370,7 @@ LOGOUTREQUEST;
 
     /* After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {
