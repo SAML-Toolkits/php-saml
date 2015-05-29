@@ -281,9 +281,10 @@ class OneLogin_Saml2_Auth
      * @param array  $parameters Extra parameters to be added to the GET
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool   $redirect   Define if the user should be redirected to the url of that should be returned as string
      *
      */
-    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
+    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $redirect = true)
     {
         assert('is_array($parameters)');
 
@@ -304,7 +305,11 @@ class OneLogin_Saml2_Auth
             $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
             $parameters['Signature'] = $signature;
         }
-        $this->redirectTo($this->getSSOurl(), $parameters);
+        if ($redirect === true) {
+            $this->redirectTo($this->getSSOurl(), $parameters);
+        } else {
+            return OneLogin_Saml2_Utils::redirect($this->getSSOurl(), $parameters, true);
+        }
     }
 
     /**
