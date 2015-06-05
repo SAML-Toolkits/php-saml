@@ -48,18 +48,22 @@ class OneLogin_Saml2_Response
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
-     * @param string                  $response A UUEncoded SAML response from the IdP.
+     * @param string|DOMDocument                  $response A UUEncoded SAML response from the IdP.
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response)
     {
         $this->_settings = $settings;
 
-        $this->response = base64_decode($response);
+        if ($response instanceof DOMDocument) {
+            $this->document = $response;
+        } else {
+            $this->response = base64_decode($response);
 
-        $this->document = new DOMDocument();
-        $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->response);
-        if (!$this->document) {
-            throw new Exception('SAML Response could not be processed');
+            $this->document = new DOMDocument();
+            $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->response);
+            if (!$this->document) {
+                throw new Exception('SAML Response could not be processed');
+            }
         }
 
         // Quick check for the presence of EncryptedAssertion
@@ -92,8 +96,7 @@ class OneLogin_Saml2_Response
                 throw new Exception('Missing ID attribute on SAML Response');
             }
 
-            $status = $this->checkStatus();
-
+            $this->checkStatus();
             $singleAssertion = $this->validateNumAssertions();
             if (!$singleAssertion) {
                 throw new Exception('SAML Response must contain 1 assertion');
@@ -132,7 +135,7 @@ class OneLogin_Saml2_Response
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
-                
+
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
@@ -248,7 +251,7 @@ class OneLogin_Saml2_Response
                 if ($security['wantAssertionsSigned'] && !in_array('Assertion', $signedElements)) {
                     throw new Exception("The Assertion of the Response is not signed and the SP requires it");
                 }
-                
+
                 if ($security['wantMessagesSigned'] && !in_array('Response', $signedElements)) {
                     throw new Exception("The Message of the Response is not signed and the SP requires it");
                 }
@@ -291,7 +294,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Checks if the Status is success
-     * 
+     *
      * @throws $statusExceptionMsg If status is not success
      */
     public function checkStatus()
@@ -313,7 +316,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the audiences.
-     * 
+     *
      * @return array @audience The valid audiences of the response
      */
     public function getAudiences()
@@ -333,7 +336,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the Issuers (from Response and Assertion).
-     * 
+     *
      * @return array @issuers The issuers of the assertion/response
      */
     public function getIssuers()
@@ -407,7 +410,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
-     * 
+     *
      * @return DateTime|null The SessionNotOnOrAfter value
      */
     public function getSessionNotOnOrAfter()
@@ -425,7 +428,7 @@ class OneLogin_Saml2_Response
      * Could be used to be stored in the local session in order
      * to be used in a future Logout Request that the SP could
      * send to the SP, to set what specific session must be deleted
-     * 
+     *
      * @return string|null The SessionIndex value
      */
 
@@ -441,7 +444,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the Attributes from the AttributeStatement element.
-     * 
+     *
      * @return array The attributes of the SAML Assertion
      */
     public function getAttributes()
@@ -610,13 +613,13 @@ class OneLogin_Saml2_Response
         if (empty($pem)) {
             throw new Exception("No private key available, check settings");
         }
-        
+
         $objenc = new XMLSecEnc();
         $encData = $objenc->locateEncryptedData($dom);
         if (!$encData) {
             throw new Exception("Cannot locate encrypted assertion");
         }
-        
+
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
@@ -631,7 +634,7 @@ class OneLogin_Saml2_Response
                 $key = $objencKey->decryptKey($objKeyInfo);
             }
         }
-                
+
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }
@@ -645,7 +648,7 @@ class OneLogin_Saml2_Response
 
     /* After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {

@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Configuration of the OneLogin PHP Toolkit
  *
@@ -15,7 +15,7 @@ class OneLogin_Saml2_Settings
     private $_paths = array();
 
     /**
-     * Strict. If active, PHP Toolkit will reject unsigned or unencrypted messages 
+     * Strict. If active, PHP Toolkit will reject unsigned or unencrypted messages
      * if it expects them signed or encrypted. If not, the messages will be accepted
      * and some security issues will be also relaxed.
      *
@@ -78,7 +78,7 @@ class OneLogin_Saml2_Settings
      * - Loads settings info from settings file or array/object provided
      *
      * @param array|object $settings SAML Toolkit Settings
-     * 
+     *
      * @exceptions Throws error exception if any settings parameter is invalid
      */
     public function __construct($settings = null)
@@ -201,7 +201,7 @@ class OneLogin_Saml2_Settings
      * Loads settings info from a settings Array
      *
      * @param array $settings SAML Toolkit Settings
-     * 
+     *
      * @return boolean  True if the settings info is valid
      */
     private function _loadSettingsFromArray($settings)
@@ -394,6 +394,14 @@ class OneLogin_Saml2_Settings
                 && !filter_var($idp['singleLogoutService']['url'], FILTER_VALIDATE_URL)
             ) {
                 $errors[] = 'idp_slo_url_invalid';
+            }
+
+            if (isset($idp['artifactResolutionService'])
+                && isset($idp['artifactResolutionService']['url'])
+                && !empty($idp['artifactResolutionService']['url'])
+                && !filter_var($idp['artifactResolutionService']['url'], FILTER_VALIDATE_URL)
+            ) {
+                $errors[] = 'idp_ars_url_invalid';
             }
         }
 
@@ -624,7 +632,7 @@ class OneLogin_Saml2_Settings
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
                     );
                 }
-                
+
                 if (!$certMetadata) {
                     throw new OneLogin_Saml2_Error(
                         'Public cert file not found.',
@@ -645,7 +653,7 @@ class OneLogin_Saml2_Settings
 
                 $keyMetadataFile = $this->_paths['cert'].$keyFileName;
                 $certMetadataFile = $this->_paths['cert'].$certFileName;
-            
+
 
                 if (!file_exists($keyMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
@@ -654,7 +662,7 @@ class OneLogin_Saml2_Settings
                         array($keyMetadataFile)
                     );
                 }
-                
+
                 if (!file_exists($certMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
                         'Public cert file not found: %s',

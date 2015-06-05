@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -37,7 +37,7 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored the
      * from the AuthnStatement of the SAML Response
      */
     private $_sessionIndex;
@@ -93,14 +93,21 @@ class OneLogin_Saml2_Auth
      * Process the SAML Response sent by the IdP.
      *
      * @param string $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     * @throws OneLogin_Saml2_Error
      */
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
-        if (isset($_POST) && isset($_POST['SAMLResponse'])) {
-            // AuthnResponse -- HTTP_POST Binding
+        $response = null;
+        if (!empty($_POST['SAMLResponse'])) {
+            // HTTP_POST Binding
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
+        } elseif (!empty($_REQUEST['SAMLart'])) {
+            // HTTP Artifact Binding
+            $response = $this->_resolveArtifact($_REQUEST['SAMLart']);
+        }
 
+        if ($response) {
             if ($response->isValid($requestId)) {
                 $this->_attributes = $response->getAttributes();
                 $this->_nameid = $response->getNameId();
@@ -113,10 +120,77 @@ class OneLogin_Saml2_Auth
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(
-                'SAML Response not found, Only supported HTTP_POST Binding',
+                'SAML Response not found, Only supporting HTTP-POST and HTTP-Artifact Bindings',
                 OneLogin_Saml2_Error::SAML_RESPONSE_NOT_FOUND
             );
         }
+    }
+
+    /**
+     * Performs artifact resolution
+     * @param string $encodedArtifact
+     * @return OneLogin_Saml2_Response
+     * @throws OneLogin_Saml2_Error
+     */
+    protected function _resolveArtifact($encodedArtifact) {
+        if (!($destination = $this->getARSurl())) {
+            throw new OneLogin_Saml2_Error(
+                'Missing artifact resolution service URL.',
+                OneLogin_Saml2_Error::SETTINGS_INVALID
+            );
+        }
+
+        $idpData = $this->_settings->getIdPData();
+        $artifact = base64_decode($encodedArtifact);
+        $sourceId = bin2hex(substr($artifact, 4, 20));
+
+        if ($sourceId !== sha1($idpData['entityId'])) {
+            throw new OneLogin_Saml2_Error(
+                'Invalid IdP Source',
+                OneLogin_Saml2_Error::SAML_ARS_SOURCE_INVALID
+            );
+        }
+
+        $request = new OneLogin_Saml2_ArtifactResolve($this->_settings, $destination, $encodedArtifact);
+        $rootXml = $request->getXML(true);
+
+        $xml = <<<ARS
+<?xml version="1.0"?>
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Header/>
+    <soap-env:Body>$rootXml</soap-env:Body>
+</soap-env:Envelope>
+ARS;
+
+        // POST the data using cURL
+        // TODO support basic auth
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $destination);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+
+        // Using text/xml here rather than application/soap+xml
+        // because it breaks on some servers.
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $out = curl_exec($ch);
+        curl_close($ch);
+
+        if ($out === false) {
+            throw new OneLogin_Saml2_Error(
+                'Could not retrieve ARS response.',
+                OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
+            );
+        }
+
+        $response = new OneLogin_Saml2_ArtifactResponse($this->_settings, $out);
+        if (!$response->isSuccessful()) {
+            throw new OneLogin_Saml2_Error(
+                'Invalid ARS response. Error message: '.$response->getStatusCode(),
+                OneLogin_Saml2_Error::SAML_ARS_RESPONSE_INVALID
+            );
+        }
+
+        return $response->getAssertionResponse();
     }
 
     /**
@@ -281,7 +355,7 @@ class OneLogin_Saml2_Auth
      * @param array  $parameters Extra parameters to be added to the GET
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
-     *  
+     *
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
@@ -364,6 +438,19 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Gets the ARS url.
+     *
+     * @return string|false The url of the Artifact Resolution Service,
+     *                      or false if it is not set.
+     */
+    public function getARSurl()
+    {
+        $idpData = $this->_settings->getIdPData();
+        return isset($idpData['artifactResolutionService']['url']) ?
+            $idpData['artifactResolutionService']['url'] : false;
+    }
+
+    /**
      * Gets the SLO url.
      *
      * @return string The url of the Single Logout Service
@@ -411,9 +498,9 @@ class OneLogin_Saml2_Auth
      * Generates the Signature for a SAML Response
      *
      * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $relayState   The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState)
     {
