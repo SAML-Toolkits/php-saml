@@ -620,7 +620,7 @@ $nameId = $_SESSION['samlNameId'];
 echo '<h1>Identified user: '. htmlentities($nameId) .'</h1>';
 
 if (!empty($attributes)) {
-    echo '<h2>'._('User attributes:').'</h1>';
+    echo '<h2>'._('User attributes:').'</h2>';
     echo '<table><thead><th>'._('Name').'</th><th>'._('Values').'</th></thead><tbody>';
     foreach ($attributes as $attributeName => $attributeValues) {
         echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
