@@ -609,14 +609,18 @@ if (!$auth->isAuthenticated()) {
 }
 
 $_SESSION['samlUserdata'] = $auth->getAttributes();
+$_SESSION['samlNameId'] = $auth->getNameId();
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
     $auth->redirectTo($_POST['RelayState']);
 }
 
 $attributes = $_SESSION['samlUserdata'];
+$nameId = $_SESSION['samlNameId'];
+
+echo '<h1>Identified user: '. htmlentities($nameId) .'</h1>';
 
 if (!empty($attributes)) {
-    echo '<h1>'._('User attributes:').'</h1>';
+    echo '<h2>'._('User attributes:').'</h1>';
     echo '<table><thead><th>'._('Name').'</th><th>'._('Values').'</th></thead><tbody>';
     foreach ($attributes as $attributeName => $attributeValues) {
         echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
@@ -627,7 +631,7 @@ if (!empty($attributes)) {
     }
     echo '</tbody></table>';
 } else {
-    echo _('Attributes not found');
+    echo _('No attributes found.');
 }
 ```
 
@@ -698,10 +702,11 @@ print_r($auth->getAttribute('cn'));
 
 
 Before trying to get an attribute, check that the user is
-authenticated. If the user isn't authenticated, an empty
-array will be returned. For example, if we call to getAttributes
-before a $auth->processResponse, the getAttributes() will return
-an empty array.
+authenticated. If the user isn't authenticated or if there were
+no attributes in the SAML assertion, an empty array will be
+returned. For example, if we call to getAttributes before a
+$auth->processResponse, the getAttributes() will return an
+empty array.
 
 
 ##### Single Logout Service (SLS) endpoints/sls.php #####
@@ -837,7 +842,7 @@ $auth->logout($newTargetUrl);
 #### Example of a view that initiates the SSO request and handles the response (is the acs target) ####
 
 We can code a unique file that initiates the SSO process, handle the response, get the attributes, initiate 
-the slo and processes the logout response.
+the SLO and processes the logout response.
 
 Note: Review the demo1 folder that contains that use case; in a later section we
 explain the demo1 use case further in detail.
@@ -1269,7 +1274,7 @@ demo1, only changes the targets.
     user is logged and redirects to index.php, so we will be in the
     index.php at the end.
 
- 3. We are logged into the app and the user attributes are shown. 
+ 3. We are logged into the app and the user attributes (if any) are shown. 
     At this point, we can test the single log out functionality.
 
  4. The single log out funcionality could be tested by 2 ways.
