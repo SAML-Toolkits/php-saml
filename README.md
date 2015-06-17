@@ -92,9 +92,14 @@ To install the latest stable release of this package simply type:
 
     composer require onelogin/php-saml
 
-After this package is installed make sure you are including the autoloader provided by composer. It can be found at `vendor/autoload.php`.
+If you instead wish to install the latest (and possibly unstable) version:
+
+    composer require onelogin/php-saml dev-master
+
+After installation has completed make sure you are including the autoloader provided by composer. It can be found at `vendor/autoload.php`.
 
 **Important**
+
 When installing this package with composer it is **highly** recommended that you pass the options as
 an array to the constructor (explained later in this document). If you do not use this approach your settings are at risk
 of being deleted when updating packages using `composer update` or similiar commands.
