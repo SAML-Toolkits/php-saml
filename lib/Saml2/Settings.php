@@ -290,7 +290,7 @@ class OneLogin_Saml2_Settings
 
         // Related to nameID
         if (!isset($this->_sp['NameIDFormat'])) {
-            $this->_sp['NameIDFormat'] = OneLogin_Saml2_Constants::NAMEID_PERSISTENT;
+            $this->_sp['NameIDFormat'] = OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED;
         }
         if (!isset($this->_security['nameIdEncrypted'])) {
             $this->_security['nameIdEncrypted'] = false;
@@ -335,7 +335,6 @@ class OneLogin_Saml2_Settings
         }
 
         // Certificates / Private key /Fingerprint
-
         if (!isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = '';
         }
