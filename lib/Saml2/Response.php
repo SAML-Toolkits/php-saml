@@ -548,7 +548,7 @@ class OneLogin_Saml2_Response
      * @throws Exception
      * @return DOMNodeList The queried node
      */
-    private function _queryAssertion($assertionXpath)
+    protected function _queryAssertion($assertionXpath)
     {
         if ($this->encrypted) {
             $xpath = new DOMXPath($this->decryptedDocument);

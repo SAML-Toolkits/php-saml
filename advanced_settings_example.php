@@ -55,6 +55,14 @@ $advancedSettings = array (
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
+
+        // Algorithm that the toolkit will use on signing process. Options:
+        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
+        'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
     ),
 
     // Contact information template, it is recommended to suply a technical and support contacts

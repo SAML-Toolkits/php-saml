@@ -17,7 +17,7 @@ class OneLogin_Saml2_LogoutResponse
      * The decoded, unprocessed XML response provided to the constructor.
      * @var string
      */
-    private $_logoutResponse;
+    protected $_logoutResponse;
 
     /**
      * A DOMDocument class loaded from the SAML LogoutResponse.

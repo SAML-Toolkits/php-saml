@@ -161,8 +161,8 @@ class OneLogin_Saml2_Auth
 
                 $security = $this->_settings->getSecurityData();
                 if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-                    $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState']);
-                    $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+                    $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState'], $security['signatureAlgorithm']);
+                    $parameters['SigAlg'] = $security['signatureAlgorithm'];
                     $parameters['Signature'] = $signature;
                 }
 
@@ -300,8 +300,8 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['authnRequestsSigned']) && $security['authnRequestsSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
-            $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
+            $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
         $this->redirectTo($this->getSSOurl(), $parameters);
@@ -344,8 +344,8 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['logoutRequestSigned']) && $security['logoutRequestSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
-            $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
+            $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
 
@@ -381,12 +381,13 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Request
      *
-     * @param string $samlRequest The SAML Request
-     * @param string $relayState  The RelayState
+     * @param string $samlRequest    The SAML Request
+     * @param string $relayState     The RelayState
+     * @param string $sign_algorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
      */
-    public function buildRequestSignature($samlRequest, $relayState)
+    public function buildRequestSignature($samlRequest, $relayState, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -397,12 +398,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($sign_algorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLRequest='.urlencode($samlRequest);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA1);
+        $msg .= '&SigAlg=' . urlencode($sign_algorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
@@ -410,12 +411,13 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Response
      *
-     * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $samlResponse   The SAML Response
+     * @param string $relayState     The RelayState
+     * @param string $sign_algorithm Signature algorithm method
      *
      * @return string A base64 encoded signature 
      */
-    public function buildResponseSignature($samlResponse, $relayState)
+    public function buildResponseSignature($samlResponse, $relayState, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -426,12 +428,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($sign_algorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLResponse='.urlencode($samlResponse);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA1);
+        $msg .= '&SigAlg=' . urlencode($sign_algorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }

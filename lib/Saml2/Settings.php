@@ -334,6 +334,11 @@ class OneLogin_Saml2_Settings
             $this->_security['wantXMLValidation'] = true;
         }
 
+        // Algorithm
+        if (!isset($this->_security['signatureAlgorithm'])) {
+            $this->_security['signatureAlgorithm'] = XMLSecurityKey::RSA_SHA1;
+        }
+
         // Certificates / Private key /Fingerprint
         if (!isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = '';

@@ -113,9 +113,9 @@ METADATA_TEMPLATE;
      *
      * @return string Signed Metadata
      */
-    public static function signMetadata($metadata, $key, $cert)
+    public static function signMetadata($metadata, $key, $cert, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
     {
-        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $sign_algorithm);
     }
 
     /**

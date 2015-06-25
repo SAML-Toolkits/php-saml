@@ -23,7 +23,7 @@ class OneLogin_Saml2_LogoutRequest
      * SAML Logout Request
      * @var string
      */
-    private $_logoutRequest;
+    protected $_logoutRequest;
 
     /**
     * After execute a validation process, this var contains the cause

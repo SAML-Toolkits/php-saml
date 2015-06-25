@@ -411,6 +411,14 @@ $advancedSettings = array (
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
+
+        // Algorithm that the toolkit will use on signing process. Options:
+        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
+        'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
     ),
 
     // Contact information template, it is recommended to suply a
@@ -778,8 +786,8 @@ if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
 
     $security = $this->_settings->getSecurityData();
     if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-        $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState']);
-        $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+        $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState'], $security['signatureAlgorithm']);
+        $parameters['SigAlg'] = $security['signatureAlgorithm'];
         $parameters['Signature'] = $signature;
     }
 
