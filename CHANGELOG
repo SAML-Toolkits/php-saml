@@ -1,6 +1,13 @@
 CHANGELOG
 =========
- 
+
+v.2.5.0
+-------
+* Do accesible the ID of the object Logout Request (id attribute)
+* Add note about the fact that PHP 5.3 is unssuported
+* Add fingerprint algorithm support.
+* Add dependences to composer.
+
 v.2.4.0
 -------
 * Fix wrong element order in generated metadata

@@ -911,9 +911,9 @@ class OneLogin_Saml2_Utils
      * @param string|DomDocument $xml            The element we should sign
      * @param string             $key            The private key
      * @param string             $cert           The public
-     * @param string             $sign_algorithm Signature algorithm method
+     * @param string             $signAlgorithm Signature algorithm method
      */
-    public static function addSign($xml, $key, $cert, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
+    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
@@ -926,7 +926,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Load the private key. */
-        $objKey = new XMLSecurityKey($sign_algorithm, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         /* Get the EntityDescriptor node we should sign. */

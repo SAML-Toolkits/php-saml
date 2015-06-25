@@ -383,11 +383,11 @@ class OneLogin_Saml2_Auth
      *
      * @param string $samlRequest    The SAML Request
      * @param string $relayState     The RelayState
-     * @param string $sign_algorithm Signature algorithm method
+     * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
      */
-    public function buildRequestSignature($samlRequest, $relayState, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
+    public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -398,12 +398,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey($sign_algorithm, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLRequest='.urlencode($samlRequest);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode($sign_algorithm);
+        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
@@ -413,11 +413,11 @@ class OneLogin_Saml2_Auth
      *
      * @param string $samlResponse   The SAML Response
      * @param string $relayState     The RelayState
-     * @param string $sign_algorithm Signature algorithm method
+     * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature 
      */
-    public function buildResponseSignature($samlResponse, $relayState, $sign_algorithm = XMLSecurityKey::RSA_SHA1)
+    public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -428,12 +428,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey($sign_algorithm, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLResponse='.urlencode($samlResponse);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode($sign_algorithm);
+        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
