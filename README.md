@@ -86,27 +86,19 @@ See the "Guide to add SAML support to my app" to know how.
 
 #### Option 2. Composer ####
 
-The toolkit supports [composer][1]. You can find the onelogin/php-saml package at https://packagist.org/packages/onelogin/php-saml
+The toolkit supports [composer](https://getcomposer.org/). You can find the onelogin/php-saml package at https://packagist.org/packages/onelogin/php-saml
 
-In order to import the saml toolkit to your current php project, just add to the composer.json file this require:
-
- "onelogin/php-saml": "master-dev"
-
-Done that, execute:
+In order to import the saml toolkit to your current php project, execute
 ```
- composer install
+composer require onelogin/php-saml
 ```
 
-you will find at the "vendor" folder a new folder named *onelogin* and inside the *php-saml*.
-
-Composer will automatically handle the libraries (with require "vendor/autoload.php" you will load all the vendor libraries).
+After installation has completed you will find at the "vendor" folder a new folder named *onelogin* and inside the *php-saml*. Make sure you are including the autoloader provided by composer. It can be found at `vendor/autoload.php`.
 
 **Important** In this option, the x509 certs must be stored at *vendor/onelogin/php-saml/certs*
-and settings file should be stored at *vendor/onelogin/php-saml*.
-But could be easier to use the "array method" to provide settings info (explained later)
+and settings file stored at *vendor/onelogin/php-saml*. 
 
-  [1]: https://getcomposer.org/
-
+Your settings are at risk of being deleted when updating packages using `composer update` or similiar commands. So is **highly** recommended that instead of use settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similiar commands.
 
 Compatibility
 -------------
