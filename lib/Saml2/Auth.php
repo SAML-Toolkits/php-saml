@@ -166,7 +166,7 @@ class OneLogin_Saml2_Auth
                     $parameters['Signature'] = $signature;
                 }
 
-                $this->redirectTo($this->getSLOurl(), $parameters);
+                return $this->redirectTo($this->getSLOurl(), $parameters);
             }
         } else {
             $this->_errors[] = 'invalid_binding';
@@ -193,7 +193,7 @@ class OneLogin_Saml2_Auth
             $url = $_REQUEST['RelayState'];
         }
 
-        OneLogin_Saml2_Utils::redirect($url, $parameters);
+        return OneLogin_Saml2_Utils::redirect($url, $parameters);
     }
 
     /**
@@ -304,7 +304,7 @@ class OneLogin_Saml2_Auth
             $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
-        $this->redirectTo($this->getSSOurl(), $parameters);
+        return $this->redirectTo($this->getSSOurl(), $parameters);
     }
 
     /**
@@ -349,7 +349,7 @@ class OneLogin_Saml2_Auth
             $parameters['Signature'] = $signature;
         }
 
-        $this->redirectTo($sloUrl, $parameters);
+        return $this->redirectTo($sloUrl, $parameters);
     }
 
     /**
