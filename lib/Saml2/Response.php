@@ -603,7 +603,7 @@ class OneLogin_Saml2_Response
      * @throws Exception
      * @return DOMDocument Decrypted Assertion
      */
-    private function _decryptAssertion($dom)
+    protected function _decryptAssertion($dom)
     {
         $pem = $this->_settings->getSPkey();
 
