@@ -1,10 +1,36 @@
 xmlseclibs.php
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+??, ??? ????, 2.0.0
+Features:
+- Support for locating specific signature when multiple exist in 
+  document. (griga3k)
+
+23, Jun 2015, 1.4.0
+Features:
+- Support for PSR-0 standard.
+- Support for X509SubjectName. (Milos Tomic)
+- Add HMAC-SHA1 support.
+
+Improvements:
+- Add how to install to README. (Bernardo Vieira da Silva)
+- Code cleanup. (Jaime PÃ©rez)
+- Normalilze tests. (Hidde Wieringa)
+- Add basic usage to README. (Hidde Wieringa)
+
+21, May 2015, 1.3.2
+Bug Fixes:
+- Fix Undefined variable notice. (dpieper85)
+- Fix typo when setting MimeType attribute. (Eugene OZ)
+- Fix validateReference() with enveloping signatures
+
+Features:
+- canonicalizeData performance optimization. (Jaime PÃ©rez)
+- Add composer support (Maks3w)
+
 19, Jun 2013, 1.3.1
 Features:
 - return encrypted node from XMLSecEnc::encryptNode() when replace is set to 
   false. (Olav)
-- Add support for RSA SHA384 and RSA_SHA512 and SHA384 digest. (Jaime PŽrez)
+- Add support for RSA SHA384 and RSA_SHA512 and SHA384 digest. (Jaime PÂŽrez)
 - Add options parameter to the add cert methods.
 - Add optional issuerSerial creation with cert
 
@@ -99,7 +125,6 @@ Features:
 - Add InclusiveNamespaces prefix list support within exclusive transformations.
 
 Bug Fixes:
-- Initialize random number generator for mcrypt_create_iv. (Joan Cornadó).
+- Initialize random number generator for mcrypt_create_iv. (Joan CornadÃ³).
 - Fix an interoperability issue with .NET when encrypting data in CBC mode.
-  (Joan Cornadó).
-
+  (Joan CornadÃ³).
