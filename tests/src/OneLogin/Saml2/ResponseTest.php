@@ -1166,4 +1166,18 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($response6->isValid());
         $this->assertEquals('Reference validation failed', $response6->getError());
     }
+
+    public function testIsValidSignWithEmptyReferenceURI()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri.xml.base64');
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['idp']['certFingerprint'] = "194d97e4d8c9c8cfa4b721e5ee497fd9660e5213";
+        $settingsInfo['idp']['x509cert'] = null;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+    }
 }

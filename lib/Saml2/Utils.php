@@ -988,6 +988,22 @@ class OneLogin_Saml2_Utils
             $dom = self::loadXML($dom, $xml);
         }
 
+        # Check if Reference URI is empty
+        try {
+            $signatureElems = $dom->getElementsByTagName('Signature');
+            foreach ($signatureElems as $signatureElem) {
+                $referenceElems = $dom->getElementsByTagName('Reference');
+                if (count($referenceElems) > 0) {
+                    $referenceElem = $referenceElems->item(0);
+                    if ($referenceElem->getAttribute('URI') == '') {
+                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
+                    }
+                 }
+            }
+        } catch (Exception $e) {
+            continue;
+        }
+
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');
 
