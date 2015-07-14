@@ -1185,35 +1185,13 @@ class XMLSecurityDSig {
         if (! $parentRef instanceof DOMElement) {
             throw new Exception('Invalid parent Node parameter');
         }
-        $baseDoc = $parentRef->ownerDocument;
         
-        if (empty($xpath)) {
-            $xpath = new DOMXPath($parentRef->ownerDocument);
-            $xpath->registerNamespace('secdsig', XMLSecurityDSig::XMLDSIGNS);
-        }
-        
-        $query = "./secdsig:KeyInfo";
-        $nodeset = $xpath->query($query, $parentRef);
-        $keyInfo = $nodeset->item(0);
-        if (! $keyInfo) {
-            $inserted = FALSE;
-            $keyInfo = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'ds:KeyInfo');
-        
-            $query = "./secdsig:Object";
-            $nodeset = $xpath->query($query, $parentRef);
-            if ($sObject = $nodeset->item(0)) {
-                $sObject->parentNode->insertBefore($keyInfo, $sObject);
-                $inserted = TRUE;
-            }
-        
-            if (! $inserted) {
-                $parentRef->appendChild($keyInfo);
-            }
-        }
+        list($parentRef, $keyInfo) = self::auxKeyInfo($parentRef, $xpath);
         
         // Add all certs if there are more than one
         $certs = XMLSecurityDSig::staticGet509XCerts($cert, $isPEMFormat);
 
+        $baseDoc = $parentRef->ownerDocument;
         // Attach X509 data node
         $x509DataNode = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'ds:X509Data');
         $keyInfo->appendChild($x509DataNode);
@@ -1290,9 +1268,19 @@ class XMLSecurityDSig {
      */
     public function appendToKeyInfo($node) {
         $parentRef = $this->sigNode;
-        $baseDoc = $parentRef->ownerDocument;
-        
+
         $xpath = $this->getXPathObj();
+
+        list($parentRef, $keyInfo) = self::auxKeyInfo($parentRef, $xpath);
+                
+        $keyInfo->appendChild($node);
+        
+        return $keyInfo;
+    }
+    
+    static function auxKeyInfo($parentRef, $xpath=null)
+    {
+        $baseDoc = $parentRef->ownerDocument;
         if (empty($xpath)) {
             $xpath = new DOMXPath($parentRef->ownerDocument);
             $xpath->registerNamespace('secdsig', XMLSecurityDSig::XMLDSIGNS);
@@ -1304,24 +1292,21 @@ class XMLSecurityDSig {
         if (! $keyInfo) {
             $inserted = FALSE;
             $keyInfo = $baseDoc->createElementNS(XMLSecurityDSig::XMLDSIGNS, 'ds:KeyInfo');
-        
+
             $query = "./secdsig:Object";
             $nodeset = $xpath->query($query, $parentRef);
             if ($sObject = $nodeset->item(0)) {
                 $sObject->parentNode->insertBefore($keyInfo, $sObject);
                 $inserted = TRUE;
             }
-        
+
             if (! $inserted) {
                 $parentRef->appendChild($keyInfo);
             }
         }
-        
-        $keyInfo->appendChild($node);
-        
-        return $keyInfo;
+        return array($parentRef, $keyInfo);
     }
-    
+
     /* This function retrieves an associative array of the validated nodes.
      *
      * The array will contain the id of the referenced node as the key and the node itself
