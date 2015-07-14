@@ -998,7 +998,7 @@ class OneLogin_Saml2_Utils
                     if ($referenceElem->getAttribute('URI') == '') {
                         $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
                     }
-                 }
+                }
             }
         } catch (Exception $e) {
             continue;

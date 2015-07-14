@@ -369,11 +369,33 @@ class OneLogin_Saml2_Settings
     {
         assert('is_array($settings)');
 
-        $errors = array ();
         if (!is_array($settings) || empty($settings)) {
-            $errors[] = 'invalid_syntax';
-            return $errors;
+            $errors = array('invalid_syntax');
+        } else {
+            $idpErrors = $this->checkIdPSettings($settings);
+            $spErrors = $this->checkSPSettings($settings);
+            $errors = array_merge($idpErrors, $spErrors);
         }
+
+        return $errors;
+    }
+
+    /**
+     * Checks the IdP settings info.
+     *
+     * @param array $settings Array with settings data
+     *
+     * @return array $errors  Errors found on the IdP settings data
+     */
+    public function checkIdPSettings($settings)
+    {
+        assert('is_array($settings)');
+
+        if (!is_array($settings) || empty($settings)) {
+            return array('invalid_syntax');
+        }
+
+        $errors = array();
 
         if (!isset($settings['idp']) || empty($settings['idp'])) {
             $errors[] = 'idp_not_found';
@@ -400,6 +422,44 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'idp_slo_url_invalid';
             }
         }
+
+        if (isset($settings['security'])) {
+            $security = $settings['security'];
+        }
+
+        $existsX509 = isset($settings['idp']) && isset($settings['idp']['x509cert']) && !empty($settings['idp']['x509cert']);
+        $existsFingerprint = isset($settings['idp']) && isset($settings['idp']['certFingerprint']) && !empty($settings['idp']['certFingerprint']);
+        if (((isset($security['wantAssertionsSigned']) && $security['wantAssertionsSigned'] == true)
+            || (isset($security['wantMessagesSigned']) && $security['wantMessagesSigned'] == true))
+            && !($existsX509 || $existsFingerprint)
+        ) {
+            $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
+        }
+        if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
+            && !($existsX509)
+        ) {
+            $errors[] = 'idp_cert_not_found_and_required';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Checks the SP settings info.
+     *
+     * @param array $settings Array with settings data
+     *
+     * @return array $errors  Errors found on the SP settings data
+     */
+    public function checkSPSettings($settings)
+    {
+        assert('is_array($settings)');
+
+        if (!is_array($settings) || empty($settings)) {
+            return array('invalid_syntax');
+        }
+
+        $errors = array();
 
         if (!isset($settings['sp']) || empty($settings['sp'])) {
             $errors[] = 'sp_not_found';
@@ -446,20 +506,6 @@ class OneLogin_Saml2_Settings
                 && !$this->checkSPCerts()
             ) {
                 $errors[] = 'sp_certs_not_found_and_required';
-            }
-
-            $existsX509 = isset($settings['idp']) && isset($settings['idp']['x509cert']) && !empty($settings['idp']['x509cert']);
-            $existsFingerprint = isset($settings['idp']) && isset($settings['idp']['certFingerprint']) && !empty($settings['idp']['certFingerprint']);
-            if (((isset($security['wantAssertionsSigned']) && $security['wantAssertionsSigned'] == true)
-                || (isset($security['wantMessagesSigned']) && $security['wantMessagesSigned'] == true))
-                && !($existsX509 || $existsFingerprint)
-            ) {
-                $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
-            }
-            if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
-                && !($existsX509)
-            ) {
-                $errors[] = 'idp_cert_not_found_and_required';
             }
         }
 
