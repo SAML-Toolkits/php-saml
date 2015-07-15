@@ -578,6 +578,12 @@ on the security info of the advanced_settings.php ('signMetadata').
 Before the XML metadata is exposed, a check takes place to ensure
 that the info to be provided is valid.
 
+Instead of use the Auth object, you can directly use
+```
+$settings = new OneLogin_Saml2_Settings($settingsInfo, true);
+```
+to get the settings object and with the true parameter we will avoid the IdP Settings validation.
+
 
 ##### Attribute Consumer Service(ACS) endpoints/acs.php #####
 

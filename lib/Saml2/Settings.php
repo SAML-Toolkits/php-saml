@@ -73,6 +73,13 @@ class OneLogin_Saml2_Settings
     private $_errors = array();
 
     /**
+     * Setting errors.
+     *
+     * @var array
+     */
+    private $_spValidationOnly = false;
+
+    /**
      * Initializes the settings:
      * - Sets the paths of the different folders
      * - Loads settings info from settings file or array/object provided
@@ -81,8 +88,9 @@ class OneLogin_Saml2_Settings
      * 
      * @exceptions Throws error exception if any settings parameter is invalid
      */
-    public function __construct($settings = null)
+    public function __construct($settings = null, $spValidationOnly = false)
     {
+        $this->_spValidationOnly = $spValidationOnly;
         $this->_loadPaths();
 
         if (!isset($settings)) {
@@ -372,9 +380,13 @@ class OneLogin_Saml2_Settings
         if (!is_array($settings) || empty($settings)) {
             $errors = array('invalid_syntax');
         } else {
-            $idpErrors = $this->checkIdPSettings($settings);
+            $errors = array();
+            if (!$this->_spValidationOnly) {
+                $idpErrors = $this->checkIdPSettings($settings);
+                $errors = array_merge($idpErrors, $errors);
+            }
             $spErrors = $this->checkSPSettings($settings);
-            $errors = array_merge($idpErrors, $spErrors);
+            $errors = array_merge($spErrors, $errors);
         }
 
         return $errors;
