@@ -433,24 +433,24 @@ class OneLogin_Saml2_Settings
             ) {
                 $errors[] = 'idp_slo_url_invalid';
             }
-        }
 
-        if (isset($settings['security'])) {
-            $security = $settings['security'];
-        }
+            if (isset($settings['security'])) {
+                $security = $settings['security'];
 
-        $existsX509 = isset($settings['idp']) && isset($settings['idp']['x509cert']) && !empty($settings['idp']['x509cert']);
-        $existsFingerprint = isset($settings['idp']) && isset($settings['idp']['certFingerprint']) && !empty($settings['idp']['certFingerprint']);
-        if (((isset($security['wantAssertionsSigned']) && $security['wantAssertionsSigned'] == true)
-            || (isset($security['wantMessagesSigned']) && $security['wantMessagesSigned'] == true))
-            && !($existsX509 || $existsFingerprint)
-        ) {
-            $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
-        }
-        if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
-            && !($existsX509)
-        ) {
-            $errors[] = 'idp_cert_not_found_and_required';
+                $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
+                $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
+                if (((isset($security['wantAssertionsSigned']) && $security['wantAssertionsSigned'] == true)
+                    || (isset($security['wantMessagesSigned']) && $security['wantMessagesSigned'] == true))
+                    && !($existsX509 || $existsFingerprint)
+                ) {
+                    $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
+                }
+                if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
+                    && !($existsX509)
+                ) {
+                    $errors[] = 'idp_cert_not_found_and_required';
+                }
+            }
         }
 
         return $errors;
