@@ -977,7 +977,7 @@ class OneLogin_Saml2_Utils
      * @param string|null        $fingerprint    The fingerprint of the public cert
      * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
      */
-    public static function validateSign ($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
+    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;

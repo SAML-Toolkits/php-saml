@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+v.2.6.0
+-------
+* Set NAMEID_UNSPECIFIED as default NameIDFormat to prevent conflicts with IdPs that don't support NAMEID_PERSISTENT.
+* Now the SP is able to select the algorithm to be used on signatures (DSA_SHA1, RSA_SHA1, RSA_SHA256, RSA_SHA384, RSA_SHA512).
+* Change visibility of _decryptAssertion to protected.
+* Update xmlseclibs library.
+* Handle valid but uncommon dsig block with no URI in the reference.
+* login, logout and processSLO now return ->redirectTo instead of just call it.
+* Split the setting check methods. Now 1 method for IdP settings and other for SP settings.
+* Let the setting object to avoid the IdP setting check. required if we want to publish SP SAML Metadata when the IdP data is still not provided.
+
 v.2.5.0
 -------
 * Do accesible the ID of the object Logout Request (id attribute)
