@@ -32,7 +32,7 @@ class OneLogin_Saml2_Metadata
         $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
 
         if (!isset($cacheDuration)) {
-            $cacheDuration = time() + self::TIME_CACHED;
+            $cacheDuration = self::TIME_CACHED;
         }
 
         $sls = '';
