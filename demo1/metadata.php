@@ -13,6 +13,7 @@ try {
     #$settings = $auth->getSettings();
     // Now we only validate SP settings
     $settings = new OneLogin_Saml2_Settings($settingsInfo, true);
+    $metadata = $settings->getSPMetadata();
     $errors = $settings->validateMetadata($metadata);
     if (empty($errors)) {
         header('Content-Type: text/xml');
