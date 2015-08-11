@@ -64,14 +64,16 @@ class OneLogin_Saml2_LogoutRequest
 
             if (!empty($nameId)) {
                 $nameIdFormat = $spData['NameIDFormat'];
+                $spNameQualifier = null;
             } else {
                 $nameId = $idpData['entityId'];
                 $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
+                $spNameQualifier = $spData['entityId'];
             }
 
             $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
                 $nameId,
-                $spData['entityId'],
+                $spNameQualifier,
                 $nameIdFormat,
                 $cert
             );

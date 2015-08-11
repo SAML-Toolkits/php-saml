@@ -699,13 +699,15 @@ class OneLogin_Saml2_Utils
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $cert = null)
+    public static function generateNameId($value, $spnq = null, $format, $cert = null)
     {
 
         $doc = new DOMDocument();
 
         $nameId = $doc->createElement('saml:NameID');
-        $nameId->setAttribute('SPNameQualifier', $spnq);
+        if (isset($spnq)) {
+            $nameId->setAttribute('SPNameQualifier', $spnq);
+        }
         $nameId->setAttribute('Format', $format);
         $nameId->appendChild($doc->createTextNode($value));
 
