@@ -699,7 +699,7 @@ class OneLogin_Saml2_Utils
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq = null, $format, $cert = null)
+    public static function generateNameId($value, $spnq, $format, $cert = null)
     {
 
         $doc = new DOMDocument();
