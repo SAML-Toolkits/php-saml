@@ -48,9 +48,13 @@ $advancedSettings = array (
 
         // Authentication context.
         // Set to false and no AuthContext will be sent in the AuthNRequest,
-        // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+        // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
         // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
         'requestedAuthnContext' => true,
+
+        // Allows the authn comparison parameter to be set, defaults to 'exact' if
+        // the setting is not present.
+        'requestedAuthnContextComparison' => 'exact',
 
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
