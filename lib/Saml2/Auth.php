@@ -37,10 +37,20 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored it 
      * from the AuthnStatement of the SAML Response
+     * 
+     * @var string
      */
     private $_sessionIndex;
+
+    /**
+     * SessionNotOnOrAfter. When the user is logged, this stored it 
+     * from the AuthnStatement of the SAML Response
+     *
+     * @var DateTime
+     */
+    private $_sessionExpiration;
 
     /**
      * If any error.
@@ -106,6 +116,7 @@ class OneLogin_Saml2_Auth
                 $this->_nameid = $response->getNameId();
                 $this->_authenticated = true;
                 $this->_sessionIndex = $response->getSessionIndex();
+                $this->_sessionExpiration = $response->getSessionNotOnOrAfter();
             } else {
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
@@ -234,6 +245,16 @@ class OneLogin_Saml2_Auth
     public function getSessionIndex()
     {
         return $this->_sessionIndex;
+    }
+
+    /**
+     * Returns the SessionNotOnOrAfter
+     *
+     * @return DateTime|null  The SessionNotOnOrAfter of the assertion
+     */
+    public function getSessionExpiration()
+    {
+        return $this->_sessionExpiration;
     }
 
     /**

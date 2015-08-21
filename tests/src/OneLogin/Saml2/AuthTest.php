@@ -92,6 +92,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getNameId
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
+    * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getLastErrorReason    
     */
     public function testProcessResponseInvalid()
@@ -105,6 +106,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($this->_auth->getAttributes());
         $this->assertNull($this->_auth->getNameId());
         $this->assertNull($this->_auth->getSessionIndex());
+        $this->assertNull($this->_auth->getSessionExpiration());
         $this->assertNull($this->_auth->getAttribute('uid'));
         $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
         $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
@@ -152,6 +154,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
     * @covers OneLogin_Saml2_Auth::getSessionIndex
+    * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getErrors
     */
     public function testProcessResponseValid()
@@ -168,6 +171,9 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $sessionIndex = $this->_auth->getSessionIndex();
         $this->assertNotNull($sessionIndex);
         $this->assertEquals('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', $sessionIndex);
+        $sessionExpiration = $this->_auth->getSessionExpiration();
+        $this->assertNotNull($sessionExpiration);
+        $this->assertEquals('1392802621', $sessionExpiration);
     }
 
     /**
