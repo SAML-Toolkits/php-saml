@@ -124,7 +124,7 @@ Namespaces
 ----------
 
 If you are using the library with a framework like Symfony2 that contains
-namespaces, remember that calls to the class must be done by adding a backslah (`\`) to the
+namespaces, remember that calls to the class must be done by adding a backslash (`\`) to the
 start, for example to use the static method getSelfURLNoQuery use:
 
     \OneLogin_Saml2_Utils::getSelfURLNoQuery()
