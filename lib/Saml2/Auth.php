@@ -10,7 +10,7 @@ class OneLogin_Saml2_Auth
     /**
      * Settings data.
      *
-     * @var array
+     * @var OneLogin_Saml2_Settings
      */
     private $_settings;
 
@@ -69,7 +69,7 @@ class OneLogin_Saml2_Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array $oldSettings Setting data
+     * @param array|OneLogin_Saml_Settings $oldSettings Setting data. (OneLogin_Saml_Settings is the settings object of the old implementation)
      */
     public function __construct($oldSettings = null)
     {
@@ -79,7 +79,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the settings info
      *
-     * @return array  The settings data.
+     * @return OneLogin_Saml2_Settings  The settings data.
      */
     public function getSettings()
     {
