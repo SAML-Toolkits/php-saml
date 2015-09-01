@@ -396,7 +396,7 @@ class OneLogin_Saml2_Auth
         if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['url'])) {
             $url = $idpData['singleLogoutService']['url'];
         }
-        return trim($url);
+        return $url;
     }
 
     /**
