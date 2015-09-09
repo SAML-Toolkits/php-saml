@@ -802,6 +802,20 @@ if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
 }
 ```
 
+If you aren't using the default PHP session, or otherwise need a manual 
+way to destroy the session, you can pass a callback method to the
+`processSLO` method as the fourth parameter
+
+```php
+$keepLocalSession = False;
+$callback = function () {
+    // Destroy user session
+};
+
+$auth->processSLO($keepLocalSession, null, false, $callback);
+```
+
+
 If we don't want that `processSLO` to destroy the session, pass a true
 parameter to the `processSLO` method
 

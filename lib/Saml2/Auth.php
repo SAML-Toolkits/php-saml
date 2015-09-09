@@ -134,9 +134,13 @@ class OneLogin_Saml2_Auth
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
      * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
-     * @param string  $requestId        The ID of the LogoutRequest sent by this SP to the IdP
+     * @param string $requestId The ID of the LogoutRequest sent by this SP to the IdP
+     * @param bool $retrieveParametersFromServer
+     * @param callable $cbDeleteSession
+     * @return string|void
+     * @throws \OneLogin_Saml2_Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null)
     {
         $this->_errors = array();
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
@@ -148,7 +152,11 @@ class OneLogin_Saml2_Auth
                 $this->_errors[] = 'logout_not_success';
             } else {
                 if (!$keepLocalSession) {
-                    OneLogin_Saml2_Utils::deleteLocalSession();
+                    if ($cbDeleteSession === null) {
+                        OneLogin_Saml2_Utils::deleteLocalSession();
+                    } else {
+                        call_user_func($cbDeleteSession);
+                    }
                 }
             }
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
@@ -158,7 +166,11 @@ class OneLogin_Saml2_Auth
                 $this->_errorReason = $logoutRequest->getError();
             } else {
                 if (!$keepLocalSession) {
-                    OneLogin_Saml2_Utils::deleteLocalSession();
+                    if ($cbDeleteSession === null) {
+                        OneLogin_Saml2_Utils::deleteLocalSession();
+                    } else {
+                        call_user_func($cbDeleteSession);
+                    }
                 }
                 $inResponseTo = $logoutRequest->id;
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
