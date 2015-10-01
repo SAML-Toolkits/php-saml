@@ -169,10 +169,11 @@ class OneLogin_Saml2_Response
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = $this->document->documentElement->getAttribute('Destination');
+                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) !== 0) {
                             $currentURLrouted = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+
                             if (strpos($destination, $currentURLrouted) !== 0) {
                                 throw new Exception("The response was received at $currentURL instead of $destination");
                             }
@@ -189,7 +190,9 @@ class OneLogin_Saml2_Response
                 // Check the issuers
                 $issuers = $this->getIssuers();
                 foreach ($issuers as $issuer) {
-                    if (empty($issuer) || $issuer != $idPEntityId) {
+                    $trimmedIssuer = trim($issuer);
+
+                    if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
                         throw new Exception("Invalid issuer in the Assertion/Response");
                     }
                 }
