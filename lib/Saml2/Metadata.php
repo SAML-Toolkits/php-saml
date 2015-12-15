@@ -59,21 +59,21 @@ SLS_TEMPLATE;
 
         $strOrganization = '';
         if (!empty($organization)) {
-            $organizationInfo_names = array();
-            $organizationInfo_displaynames = array();
-            $organizationInfo_urls = array();
+            $organizationInfoNames = array();
+            $organizationInfoDisplaynames = array();
+            $organizationInfoUrls = array();
             foreach ($organization as $lang => $info) {
-                $organizationInfo_names[] = <<<ORGANIZATION_NAME
+                $organizationInfoNames[] = <<<ORGANIZATION_NAME
        <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
 ORGANIZATION_NAME;
-                $organizationInfo_displaynames[] = <<<ORGANIZATION_DISPLAY
+                $organizationInfoDisplaynames[] = <<<ORGANIZATION_DISPLAY
        <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
 ORGANIZATION_DISPLAY;
-                $organizationInfo_urls[] = <<<ORGANIZATION_URL
+                $organizationInfoUrls[] = <<<ORGANIZATION_URL
        <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
 ORGANIZATION_URL;
             }
-            $orgData = implode("\n", $organizationInfo_names)."\n".implode("\n", $organizationInfo_displaynames)."\n".implode("\n", $organizationInfo_urls);
+            $orgData = implode("\n", $organizationInfoNames)."\n".implode("\n", $organizationInfoDisplaynames)."\n".implode("\n", $organizationInfoUrls);
             $strOrganization = <<<ORGANIZATIONSTR
 
     <md:Organization>
