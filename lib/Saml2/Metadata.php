@@ -59,18 +59,27 @@ SLS_TEMPLATE;
 
         $strOrganization = '';
         if (!empty($organization)) {
-            $organizationInfo = array();
+            $organizationInfo_names = array();
+            $organizationInfo_displaynames = array();
+            $organizationInfo_urls = array();
             foreach ($organization as $lang => $info) {
-                $organizationInfo[] = <<<ORGANIZATION
+                $organizationInfo_names[] = <<<ORGANIZATION_NAME
+       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
+ORGANIZATION_NAME;
+                $organizationInfo_displaynames[] = <<<ORGANIZATION_DISPLAY
+       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
+ORGANIZATION_DISPLAY;
+                $organizationInfo_urls[] = <<<ORGANIZATION_URL
+       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+ORGANIZATION_URL;
+            }
+            $orgData = implode("\n", $organizationInfo_names)."\n".implode("\n", $organizationInfo_displaynames)."\n".implode("\n", $organizationInfo_urls);
+            $strOrganization = <<<ORGANIZATIONSTR
 
     <md:Organization>
-       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
-       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
-       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+{$orgData}
     </md:Organization>
-ORGANIZATION;
-            }
-            $strOrganization = implode("\n", $organizationInfo);
+ORGANIZATIONSTR;
         }
 
         $strContacts = '';
