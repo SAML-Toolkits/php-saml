@@ -21,6 +21,7 @@ class OneLogin_Saml2_Error extends Exception
     const SAML_LOGOUTREQUEST_INVALID = 10;
     const SAML_LOGOUTRESPONSE_INVALID  = 11;
     const SAML_SINGLE_LOGOUT_NOT_SUPPORTED = 12;
+    const SAML_RESPONSE_INVALID = 13;
     
     /**
      * Constructor
