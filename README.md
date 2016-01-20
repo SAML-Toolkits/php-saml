@@ -677,7 +677,7 @@ Array
 (
     [cn] => Array
         (
-            [0] => Jhon
+            [0] => John
         )
     [sn] => Array
         (
@@ -685,7 +685,7 @@ Array
         )
     [mail] => Array
         (
-            [0] => jhon.doe@example.com
+            [0] => john.doe@example.com
         )
     [groups] => Array
         (
