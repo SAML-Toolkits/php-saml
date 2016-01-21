@@ -540,8 +540,8 @@ $auth->login($newTargetUrl);
 The login method can recieve three more optional parameters:
 
 * `$parameters` - An array of parameters that will be added to the `GET` in the HTTP-Redirect.
-* `$forceAuthn` - When true the `AuthNReuqest` will set the `ForceAuthn='true'`
-* `$isPassive` - When true the `AuthNReuqest` will set the `Ispassive='true'`
+* `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
+* `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
 
 #### The SP Endpoints ####
 
