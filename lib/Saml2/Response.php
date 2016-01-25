@@ -629,6 +629,8 @@ class OneLogin_Saml2_Response
                 $objencKey = $objKeyInfo->encryptedCtx;
                 $objKeyInfo->loadKey($pem, false, false);
                 $key = $objencKey->decryptKey($objKeyInfo);
+            } else {
+                $objKeyInfo->loadKey($pem, false, false);
             }
         }
                 

@@ -800,7 +800,7 @@ class OneLogin_Saml2_Settings
      */
     public function formatSPKey()
     {
-        if (isset($this->_sp['privateKey'])) {
+        if (isset($this->_sp['x509cert']) && !empty($this->_sp['x509cert']) && isset($this->_sp['privateKey'])) {
             $this->_sp['privateKey'] = OneLogin_Saml2_Utils::formatPrivateKey($this->_sp['privateKey']);
         }
     }
