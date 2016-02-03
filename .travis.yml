@@ -6,6 +6,9 @@ php:
   - 5.4
   - 5.3
 
+env:
+ - TRAVIS=true
+
 before_install:
  - curl -s https://getcomposer.org/installer | php
  - php composer.phar install --prefer-source --no-interaction
