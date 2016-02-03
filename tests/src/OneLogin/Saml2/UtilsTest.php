@@ -693,10 +693,10 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     */
     public function testDeleteLocalSession()
     {
-       if (getenv("TRAVIS")) {
+        if (getenv("TRAVIS")) {
             // Can't test that on TRAVIS
             $this->markTestSkipped("Can't test that on TRAVIS");
-       } else {
+        } else {
 
             if (!isset($_SESSION)) {
                 $_SESSION = array();

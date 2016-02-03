@@ -545,7 +545,7 @@ The login method can recieve other four optional parameters:
 * `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
 * `$strict` - True if we want to stay (returns the url string) False to redirect
 
-If a match on the SAMLResponse ID and the AuthNRequest ID that was sent is required, that AuthNRequest ID must to be extracted and saved.
+If a match on the future SAMLResponse ID and the AuthNRequest ID to be sent is required, that AuthNRequest ID must to be extracted and saved.
 
 ```php
 $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
@@ -889,7 +889,7 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
 ```
 
-If a match on the LogoutRequest ID and the LogoutResponse ID that was sent is required, that LogoutRequest ID must to be extracted and stored.
+If a match on the future LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored.
 
 ```php
 $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
