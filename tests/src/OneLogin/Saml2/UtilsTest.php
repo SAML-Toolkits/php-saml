@@ -693,22 +693,24 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     */
     public function testDeleteLocalSession()
     {
-        if (!isset($_SESSION)) {
-            $_SESSION = array();
-        }
-        $_SESSION['samltest'] = true;
-
-        $this->assertTrue(isset($_SESSION['samltest']));
-        $this->assertTrue($_SESSION['samltest']);
-
-        OneLogin_Saml2_Utils::deleteLocalSession();
-        $this->assertFalse(isset($_SESSION));
-        $this->assertFalse(isset($_SESSION['samltest']));
-
-	if (getenv("TRAVIS")) {
+       if (getenv("TRAVIS")) {
             // Can't test that on TRAVIS
             $this->markTestSkipped("Can't test that on TRAVIS");
-        } else {
+       } else {
+
+            if (!isset($_SESSION)) {
+                $_SESSION = array();
+            }
+            $_SESSION['samltest'] = true;
+
+            $this->assertTrue(isset($_SESSION['samltest']));
+            $this->assertTrue($_SESSION['samltest']);
+
+
+            OneLogin_Saml2_Utils::deleteLocalSession();
+            $this->assertFalse(isset($_SESSION));
+            $this->assertFalse(isset($_SESSION['samltest']));
+
             session_start();
             $_SESSION['samltest'] = true;
             OneLogin_Saml2_Utils::deleteLocalSession();
