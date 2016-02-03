@@ -57,6 +57,7 @@ Key features:
  * **Tested** - Thoroughly tested.
  * **Popular** - OneLogin's customers use it. Many PHP SAML plugins uses it.
 
+Integrate your PHP toolkit at OneLogin using this guide: [https://developers.onelogin.com/page/saml-toolkit-for-php](https://developers.onelogin.com/page/saml-toolkit-for-php)
 
 Installation
 ------------
@@ -537,11 +538,23 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->login($newTargetUrl);
 ```
 
-The login method can recieve three more optional parameters:
+The login method can recieve other four optional parameters:
 
 * `$parameters` - An array of parameters that will be added to the `GET` in the HTTP-Redirect.
 * `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
 * `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
+* `$strict` - True if we want to stay (returns the url string) False to redirect
+
+If a match on the SAMLResponse ID and the AuthNRequest ID that was sent is required, that AuthNRequest ID must to be extracted and saved.
+
+```php
+$ssoBuiltUrl = $auth->login(null, array(), false, false, true);
+$_SESSION['AuthNRequestID'] = $auth->getLastRequestID();
+header('Pragma: no-cache');
+header('Cache-Control: no-cache, must-revalidate');
+header('Location: ' . $ssoBuiltUrl);
+exit();
+```
 
 #### The SP Endpoints ####
 
@@ -604,7 +617,13 @@ require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
 $auth = new OneLogin_Saml2_Auth();
 
-$auth->processResponse();
+if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
+    $requestID = $_SESSION['AuthNRequestID'];
+} else {
+    $requestID = null;
+}
+
+$auth->processResponse($requestID);
 
 $errors = $auth->getErrors();
 
@@ -734,7 +753,13 @@ require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
 $auth = new OneLogin_Saml2_Auth();
 
-$auth->processSLO();
+if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
+    $requestID = $_SESSION['LogoutRequestID'];
+} else {
+    $requestID = null;
+}
+
+$auth->processSLO(false, $requestID);
 
 $errors = $auth->getErrors();
 
@@ -839,11 +864,12 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->logout();   // Method that sent the Logout Request.
 ```
 
-Also there are two optional parameters that can be set:
+Also there are three optional parameters that can be set:
 
-* `name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a 
+* `$name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a 
 SAML Response with a `NameId`, then this `NameId` will be used.
-* `session_index` - SessionIndex that identifies the session of the user.
+* `$session_index` - SessionIndex that identifies the session of the user.
+* `$strict` - True if we want to stay (returns the url string) False to redirect.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the `advanced_settings.php` (`'logoutRequestSigned'`).
@@ -861,6 +887,17 @@ to other php file.
 $newTargetUrl = 'http://example.com/loggedOut.php';
 $auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
+```
+
+If a match on the LogoutRequest ID and the LogoutResponse ID that was sent is required, that LogoutRequest ID must to be extracted and stored.
+
+```php
+$sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
+$_SESSION['LogoutRequestID'] = $auth->getLastRequestID();
+header('Pragma: no-cache');
+header('Cache-Control: no-cache, must-revalidate');
+header('Location: ' . $sloBuiltUrl);
+exit();
 ```
 
 #### Example of a view that initiates the SSO request and handles the response (is the acs target) ####
