@@ -991,56 +991,68 @@ class OneLogin_Saml2_Utils
         }
 
         # Check if Reference URI is empty
+        $emptyUri = false;
         try {
             $signatureElems = $dom->getElementsByTagName('Signature');
             foreach ($signatureElems as $signatureElem) {
                 $referenceElems = $dom->getElementsByTagName('Reference');
                 if (count($referenceElems) > 0) {
                     $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '') {
-                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
-                    }
+                    $emptyUri = ($referenceElem->getAttribute('URI') == '');
                 }
             }
         } catch (Exception $e) {
             //It's ok, let's continue;
         }
 
-        $objXMLSecDSig = new XMLSecurityDSig();
-        $objXMLSecDSig->idKeys = array('ID');
+        while (true) {
+            $objXMLSecDSig = new XMLSecurityDSig();
+            $objXMLSecDSig->idKeys = array('ID');
 
-        $objDSig = $objXMLSecDSig->locateSignature($dom);
-        if (!$objDSig) {
-            throw new Exception('Cannot locate Signature Node');
-        }
-
-        $objKey = $objXMLSecDSig->locateKey();
-        if (!$objKey) {
-            throw new Exception('We have no idea about the key');
-        }
-
-        $objXMLSecDSig->canonicalizeSignedInfo();
-
-        try {
-            $retVal = $objXMLSecDSig->validateReference();
-        } catch (Exception $e) {
-            throw $e;
-        }
-
-        XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
-
-        if (!empty($cert)) {
-            $objKey->loadKey($cert, false, true);
-            return ($objXMLSecDSig->verify($objKey) === 1);
-        } else {
-            $domCert = $objKey->getX509Certificate();
-            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
-            if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
-                return false;
-            } else {
-                $objKey->loadKey($domCert, false, true);
-                return ($objXMLSecDSig->verify($objKey) === 1);
+            $objDSig = $objXMLSecDSig->locateSignature($dom);
+            if (!$objDSig) {
+                throw new Exception('Cannot locate Signature Node');
             }
+
+            $objKey = $objXMLSecDSig->locateKey();
+            if (!$objKey) {
+                throw new Exception('We have no idea about the key');
+            }
+
+            $objXMLSecDSig->canonicalizeSignedInfo();
+
+            try {
+                $retVal = $objXMLSecDSig->validateReference();
+            } catch (Exception $e) {
+                throw $e;
+            }
+
+            XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
+
+            if (!empty($cert)) {
+                $objKey->loadKey($cert, false, true);
+                if ($objXMLSecDSig->verify($objKey) === 1) {
+                    return true;
+                } else if (!$emptyUri) {
+                    return false;
+                }
+            } else {
+                $domCert = $objKey->getX509Certificate();
+                $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
+                if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
+                    return false;
+                } else {
+                    $objKey->loadKey($domCert, false, true);
+                    if ($objXMLSecDSig->verify($objKey) === 1) {
+                        return true;
+                    } else if (!$emptyUri) {
+                        return false;
+                    }
+                }
+            }
+
+            $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
+            $emptyUri = false;
         }
     }
 }
