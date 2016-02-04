@@ -8,7 +8,7 @@
 class OneLogin_Saml2_Constants
 {
     // Value added to the current time in time condition validations
-    const ALOWED_CLOCK_DRIFT = 180;  // 3 min in seconds
+    const ALLOWED_CLOCK_DRIFT = 180;  // 3 min in seconds
 
     // NameID Formats
     const NAMEID_EMAIL_ADDRESS = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress';

@@ -57,6 +57,7 @@ Key features:
  * **Tested** - Thoroughly tested.
  * **Popular** - OneLogin's customers use it. Many PHP SAML plugins uses it.
 
+Integrate your PHP toolkit at OneLogin using this guide: [https://developers.onelogin.com/page/saml-toolkit-for-php](https://developers.onelogin.com/page/saml-toolkit-for-php)
 
 Installation
 ------------
@@ -325,13 +326,17 @@ $settings = array (
         // Public x509 certificate of the IdP
         'x509cert' => '',
         /*
-         *  Instead of use the whole x509cert you can use a fingerprint
+         *  Instead of use the whole x509cert you can use a fingerprint in order to 
+         *  validate a SAMLResponse.
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *   or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
          *  If a fingerprint is provided, then the certFingerprintAlgorithm is required in order to
          *  let the toolkit know which algorithm was used. Possible values: sha1, sha256, sha384 or sha512
          *  'sha1' is the default value.
+         * 
+         *  Notice that if you want to validate any SAML Message sent by the HTTP-Redirect binding, you
+         *  will need to provide the whole x509cert.
          */
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
@@ -533,11 +538,23 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->login($newTargetUrl);
 ```
 
-The login method can recieve three more optional parameters:
+The login method can recieve other four optional parameters:
 
 * `$parameters` - An array of parameters that will be added to the `GET` in the HTTP-Redirect.
-* `$forceAuthn` - When true the `AuthNReuqest` will set the `ForceAuthn='true'`
-* `$isPassive` - When true the `AuthNReuqest` will set the `Ispassive='true'`
+* `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
+* `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
+* `$strict` - True if we want to stay (returns the url string) False to redirect
+
+If a match on the future SAMLResponse ID and the AuthNRequest ID to be sent is required, that AuthNRequest ID must to be extracted and saved.
+
+```php
+$ssoBuiltUrl = $auth->login(null, array(), false, false, true);
+$_SESSION['AuthNRequestID'] = $auth->getLastRequestID();
+header('Pragma: no-cache');
+header('Cache-Control: no-cache, must-revalidate');
+header('Location: ' . $ssoBuiltUrl);
+exit();
+```
 
 #### The SP Endpoints ####
 
@@ -600,7 +617,13 @@ require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
 $auth = new OneLogin_Saml2_Auth();
 
-$auth->processResponse();
+if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
+    $requestID = $_SESSION['AuthNRequestID'];
+} else {
+    $requestID = null;
+}
+
+$auth->processResponse($requestID);
 
 $errors = $auth->getErrors();
 
@@ -673,7 +696,7 @@ Array
 (
     [cn] => Array
         (
-            [0] => Jhon
+            [0] => John
         )
     [sn] => Array
         (
@@ -681,7 +704,7 @@ Array
         )
     [mail] => Array
         (
-            [0] => jhon.doe@example.com
+            [0] => john.doe@example.com
         )
     [groups] => Array
         (
@@ -730,7 +753,13 @@ require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
 $auth = new OneLogin_Saml2_Auth();
 
-$auth->processSLO();
+if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
+    $requestID = $_SESSION['LogoutRequestID'];
+} else {
+    $requestID = null;
+}
+
+$auth->processSLO(false, $requestID);
 
 $errors = $auth->getErrors();
 
@@ -798,6 +827,20 @@ if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
 }
 ```
 
+If you aren't using the default PHP session, or otherwise need a manual 
+way to destroy the session, you can pass a callback method to the
+`processSLO` method as the fourth parameter
+
+```php
+$keepLocalSession = False;
+$callback = function () {
+    // Destroy user session
+};
+
+$auth->processSLO($keepLocalSession, null, false, $callback);
+```
+
+
 If we don't want that `processSLO` to destroy the session, pass a true
 parameter to the `processSLO` method
 
@@ -821,11 +864,12 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->logout();   // Method that sent the Logout Request.
 ```
 
-Also there are two optional parameters that can be set:
+Also there are three optional parameters that can be set:
 
-* `name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a 
+* `$name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a 
 SAML Response with a `NameId`, then this `NameId` will be used.
-* `session_index` - SessionIndex that identifies the session of the user.
+* `$session_index` - SessionIndex that identifies the session of the user.
+* `$strict` - True if we want to stay (returns the url string) False to redirect.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the `advanced_settings.php` (`'logoutRequestSigned'`).
@@ -843,6 +887,17 @@ to other php file.
 $newTargetUrl = 'http://example.com/loggedOut.php';
 $auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
+```
+
+If a match on the future LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored.
+
+```php
+$sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
+$_SESSION['LogoutRequestID'] = $auth->getLastRequestID();
+header('Pragma: no-cache');
+header('Cache-Control: no-cache, must-revalidate');
+header('Location: ' . $sloBuiltUrl);
+exit();
 ```
 
 #### Example of a view that initiates the SSO request and handles the response (is the acs target) ####
@@ -998,6 +1053,7 @@ Main class of OneLogin PHP Toolkit
  * `getErrors` - Returns if there were any error 
  * `getSSOurl` - Gets the SSO url.
  * `getSLOurl` - Gets the SLO url.
+ * `getLastRequestID` - The ID of the last Request SAML message generated.
  * `buildRequestSignature` - Generates the Signature for a SAML Request
  * `buildResponseSignature` - Generates the Signature for a SAML Response
  * `getSettings` - Returns the settings info

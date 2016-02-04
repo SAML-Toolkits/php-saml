@@ -14,6 +14,15 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 if (isset($_GET['sso'])) {
     $auth->login();
+
+    # If AuthNRequest ID need to be saved in order to later validate it, do instead
+    # $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
+    # $_SESSION['AuthNRequestID'] = $auth->getLastRequestID();
+    # header('Pragma: no-cache');
+    # header('Cache-Control: no-cache, must-revalidate');
+    # header('Location: ' . $ssoBuiltUrl);
+    # exit();
+
 } else if (isset($_GET['sso2'])) {
     $returnTo = $spBaseUrl.'/demo1/attrs.php';
     $auth->login($returnTo);
@@ -30,8 +39,23 @@ if (isset($_GET['sso'])) {
     }
 
     $auth->logout($returnTo, $paramters, $nameId, $sessionIndex);
+
+    # If LogoutRequest ID need to be saved in order to later validate it, do instead
+    # $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
+    # $_SESSION['LogoutRequestID'] = $auth->getLastRequestID();
+    # header('Pragma: no-cache');
+    # header('Cache-Control: no-cache, must-revalidate');
+    # header('Location: ' . $sloBuiltUrl);
+    # exit();
+
 } else if (isset($_GET['acs'])) {
-    $auth->processResponse();
+    if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
+        $requestID = $_SESSION['AuthNRequestID'];
+    } else {
+        $requestID = null;
+    }
+
+    $auth->processResponse($requestID);
 
     $errors = $auth->getErrors();
 
@@ -46,12 +70,19 @@ if (isset($_GET['sso'])) {
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
     $_SESSION['samlNameId'] = $auth->getNameId();
-    $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();        
+    $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
+    unset($_SESSION['AuthNRequestID']);
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);
     }
 } else if (isset($_GET['sls'])) {
-    $auth->processSLO();
+    if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
+        $requestID = $_SESSION['LogoutRequestID'];
+    } else {
+        $requestID = null;
+    }
+
+    $auth->processSLO(false, $requestID);
     $errors = $auth->getErrors();
     if (empty($errors)) {
         print_r('<p>Sucessfully logged out</p>');

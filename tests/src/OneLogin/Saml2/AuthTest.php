@@ -388,6 +388,42 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the processSLO method of the OneLogin_Saml2_Auth class
+     * Case Valid Logout Response, validating deleting the local session
+     *
+     * @covers OneLogin_Saml2_Auth::processSLO
+     */
+    public function testProcessSLOResponseValidDeletingSessionCallback()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
+
+        if (!isset($_SESSION)) {
+            $_SESSION = array();
+        }
+        $_SESSION['samltest'] = true;
+
+        $callback = function() {
+            $_SESSION['samltest'] = false;
+        };
+
+        // In order to avoid the destination problem
+        $plainMessage = gzinflate(base64_decode($message));
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
+        $message = base64_encode(gzdeflate($plainMessage));
+
+        $_GET['SAMLResponse'] = $message;
+
+        $this->_auth->setStrict(true);
+        $this->_auth->processSLO(false, null, false, $callback);
+
+        $this->assertEmpty($this->_auth->getErrors());
+
+        $this->assertTrue(isset($_SESSION['samltest']));
+        $this->assertFalse($_SESSION['samltest']);
+    }
+
+    /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
     * Case Invalid Logout Request
     *
@@ -528,6 +564,61 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             // Session is alive
             $this->assertTrue(isset($_SESSION['samltest']));
             $this->assertTrue($_SESSION['samltest']);
+        }
+    }
+
+    /**
+     * Tests the processSLO method of the OneLogin_Saml2_Auth class
+     * Case Valid Logout Request, validating that the local session is deleted with callback,
+     * a LogoutResponse is created and a redirection executed
+     *
+     * @covers OneLogin_Saml2_Auth::processSLO
+     */
+    public function testProcessSLORequestDeletingSessionCallback()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
+
+        // In order to avoid the destination problem
+        $plainMessage = gzinflate(base64_decode($message));
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
+        $message = base64_encode(gzdeflate($plainMessage));
+
+        $_GET['SAMLRequest'] = $message;
+
+        if (!isset($_SESSION)) {
+            $_SESSION = array();
+        }
+        $_SESSION['samltest'] = true;
+
+        $callback = function() {
+            $_SESSION['samltest'] = false;
+        };
+
+        try {
+            $this->_auth->setStrict(true);
+            $this->_auth->processSLO(false, null, false, $callback);
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
+
+            if (getenv("TRAVIS")) {
+                // Can't test that on TRAVIS
+                $this->markTestSkipped("Can't test that on TRAVIS");
+            } else {
+                // Session is alive
+                $this->assertTrue(isset($_SESSION['samltest']));
+                // But has been modified
+                $this->assertFalse(isset($_SESSION['samltest']));
+            }
         }
     }
 

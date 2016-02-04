@@ -1003,7 +1003,7 @@ class OneLogin_Saml2_Utils
                 }
             }
         } catch (Exception $e) {
-            continue;
+            //It's ok, let's continue;
         }
 
         $objXMLSecDSig = new XMLSecurityDSig();

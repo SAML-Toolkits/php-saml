@@ -169,10 +169,11 @@ class OneLogin_Saml2_Response
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = $this->document->documentElement->getAttribute('Destination');
+                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) !== 0) {
                             $currentURLrouted = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+
                             if (strpos($destination, $currentURLrouted) !== 0) {
                                 throw new Exception("The response was received at $currentURL instead of $destination");
                             }
@@ -189,7 +190,9 @@ class OneLogin_Saml2_Response
                 // Check the issuers
                 $issuers = $this->getIssuers();
                 foreach ($issuers as $issuer) {
-                    if (empty($issuer) || $issuer != $idPEntityId) {
+                    $trimmedIssuer = trim($issuer);
+
+                    if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
                         throw new Exception("Invalid issuer in the Assertion/Response");
                     }
                 }
@@ -255,6 +258,9 @@ class OneLogin_Saml2_Response
             }
 
             if (!empty($signedElements)) {
+                if (count($signedElements) > 2) {
+                    throw new Exception("Too many Signatures found. SAML Response rejected");
+                }
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
                 $fingerprintalg = $idpData['certFingerprintAlgorithm'];
@@ -510,10 +516,10 @@ class OneLogin_Saml2_Response
         for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if ($nbAttribute && OneLogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALOWED_CLOCK_DRIFT) {
+            if ($nbAttribute && OneLogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
                 return false;
             }
-            if ($naAttribute && OneLogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALOWED_CLOCK_DRIFT <= time()) {
+            if ($naAttribute && OneLogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
                 return false;
             }
         }
