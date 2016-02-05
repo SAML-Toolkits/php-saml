@@ -991,14 +991,18 @@ class OneLogin_Saml2_Utils
         }
 
         # Check if Reference URI is empty
-        $emptyUri = false;
+        $signatureElem = null;
+        $referenceElem = null;
         try {
             $signatureElems = $dom->getElementsByTagName('Signature');
             foreach ($signatureElems as $signatureElem) {
                 $referenceElems = $dom->getElementsByTagName('Reference');
                 if (count($referenceElems) > 0) {
                     $referenceElem = $referenceElems->item(0);
-                    $emptyUri = ($referenceElem->getAttribute('URI') == '');
+                    if ($referenceElem->getAttribute('URI') == '') {
+                        break;
+                    }
+                    $referenceElem = null;
                 }
             }
         } catch (Exception $e) {
@@ -1033,7 +1037,7 @@ class OneLogin_Saml2_Utils
                 $objKey->loadKey($cert, false, true);
                 if ($objXMLSecDSig->verify($objKey) === 1) {
                     return true;
-                } else if (!$emptyUri) {
+                } else if (!$referenceElem) {
                     return false;
                 }
             } else {
@@ -1045,14 +1049,14 @@ class OneLogin_Saml2_Utils
                     $objKey->loadKey($domCert, false, true);
                     if ($objXMLSecDSig->verify($objKey) === 1) {
                         return true;
-                    } else if (!$emptyUri) {
+                    } else if (!$referenceElem) {
                         return false;
                     }
                 }
             }
 
             $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
-            $emptyUri = false;
+            $referenceElem = null;
         }
     }
 }
