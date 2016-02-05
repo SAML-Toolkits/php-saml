@@ -999,7 +999,7 @@ class OneLogin_Saml2_Utils
                 $referenceElems = $dom->getElementsByTagName('Reference');
                 if (count($referenceElems) > 0) {
                     $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '' && $signatureElem->parentNode) {
+                    if ($referenceElem->getAttribute('URI') == '') {
                         break;
                     }
                     $referenceElem = null;
@@ -1055,7 +1055,9 @@ class OneLogin_Saml2_Utils
                 }
             }
 
-            $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
+            if ($signatureElem->parentNode) {
+                $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
+            }
             $referenceElem = null;
         }
     }
