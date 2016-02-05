@@ -999,7 +999,7 @@ class OneLogin_Saml2_Utils
                 $referenceElems = $dom->getElementsByTagName('Reference');
                 if (count($referenceElems) > 0) {
                     $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '') {
+                    if ($referenceElem->getAttribute('URI') == '' && $signatureElem->parentNode) {
                         break;
                     }
                     $referenceElem = null;
