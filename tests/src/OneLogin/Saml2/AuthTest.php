@@ -573,6 +573,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
      * a LogoutResponse is created and a redirection executed
      *
      * @covers OneLogin_Saml2_Auth::processSLO
+     * @runInSeparateProcess
      */
     public function testProcessSLORequestDeletingSessionCallback()
     {
@@ -617,7 +618,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
                 // Session is alive
                 $this->assertTrue(isset($_SESSION['samltest']));
                 // But has been modified
-                $this->assertFalse(isset($_SESSION['samltest']));
+                $this->assertFalse($_SESSION['samltest']);
             }
         }
     }
