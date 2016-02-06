@@ -140,14 +140,15 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
-     * @param string $requestId The ID of the LogoutRequest sent by this SP to the IdP
+     * @param boolean $keepLocalSession             When false will destroy the local session, otherwise will keep it
+     * @param string $requestId                     The ID of the LogoutRequest sent by this SP to the IdP
      * @param bool $retrieveParametersFromServer
      * @param callable $cbDeleteSession
+     * @param boolean $stay                         True if we want to stay (returns the url string) False to redirect
      * @return string|void
      * @throws \OneLogin_Saml2_Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay=false)
     {
         $this->_errors = array();
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
@@ -196,7 +197,7 @@ class OneLogin_Saml2_Auth
                     $parameters['Signature'] = $signature;
                 }
 
-                return $this->redirectTo($this->getSLOurl(), $parameters);
+                return $this->redirectTo($this->getSLOurl(), $parameters, $stay);
             }
         } else {
             $this->_errors[] = 'invalid_binding';
