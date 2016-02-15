@@ -258,23 +258,24 @@ class OneLogin_Saml2_Response
             }
 
             if (!empty($signedElements)) {
-                if (count($signedElements) > 2) {
-                    throw new Exception("Too many Signatures found. SAML Response rejected");
-                }
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
                 $fingerprintalg = $idpData['certFingerprintAlgorithm'];
 
-                // Only validates the first signed element
+                # If find a Signature on the Response, validates it checking the original response
                 if (in_array('Response', $signedElements)) {
                     $documentToValidate = $this->document;
                 } else {
-                    $documentToValidate = $signNodes->item(0)->parentNode;
+                    # Otherwise validates the assertion (decrypted assertion if was encrypted)
+                    $documentToValidate = $this->decryptedDocument;
                     if ($this->encrypted) {
+                        $documentToValidate = $this->decryptedDocument;
                         $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:EncryptedAssertion/saml:Assertion/saml:Subject/saml:EncryptedID');
                         if ($encryptedIDNodes->length > 0) {
                             throw new Exception('Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.');
                         }
+                    } else {
+                        $documentToValidate = $this->document;
                     }
                 }
 

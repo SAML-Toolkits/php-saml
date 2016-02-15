@@ -1005,5 +1005,13 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             $this->assertContains('We have no idea about the key', $e->getMessage());
         }
+
+        $signatureWrapping = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/signature_wrapping_attack.xml.base64'));
+        try {
+            $this->assertFalse(OneLogin_Saml2_Utils::validateSign($signatureWrapping, $cert));
+            $this->assertTrue(false);
+        } catch (Exception $e) {
+            $this->assertContains('Reference validation failed', $e->getMessage());
+        }
     }
 }
