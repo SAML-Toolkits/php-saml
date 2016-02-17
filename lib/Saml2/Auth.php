@@ -214,6 +214,7 @@ class OneLogin_Saml2_Auth
      *
      * @param string $url        The target URL to redirect the user.
      * @param array  $parameters Extra parameters to be passed as part of the url
+     * @param boolean $stay      True if we want to stay (returns the url string) False to redirect
      */
     public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
