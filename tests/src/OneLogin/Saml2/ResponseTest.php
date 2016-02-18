@@ -388,13 +388,14 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
-
         $this->assertTrue($response->validateNumAssertions());
 
+        $xmlWithAdviceAssertion = file_get_contents(TEST_ROOT . '/data/responses/response_with_advice_assertion.xml.base64');
+        $responseAdvice = new OneLogin_Saml2_Response($this->_settings, $xmlWithAdviceAssertion);
+        $this->assertTrue($responseAdvice->validateNumAssertions());
+
         $xmlMultiAssertion = file_get_contents(TEST_ROOT . '/data/responses/invalids/multiple_assertions.xml.base64');
-
         $response2 = new OneLogin_Saml2_Response($this->_settings, $xmlMultiAssertion);
-
         $this->assertFalse($response2->validateNumAssertions());
     }
 
