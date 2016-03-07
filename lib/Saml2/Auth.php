@@ -435,7 +435,7 @@ class OneLogin_Saml2_Auth
      */
     public function getLastRequestID()
     {
-        return $_lastRequestID;
+        return $this->_lastRequestID;
     }
 
     /**
