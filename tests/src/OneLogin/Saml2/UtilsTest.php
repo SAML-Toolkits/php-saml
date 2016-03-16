@@ -693,23 +693,30 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     */
     public function testDeleteLocalSession()
     {
-        if (!isset($_SESSION)) {
-            $_SESSION = array();
+        if (getenv("TRAVIS")) {
+            // Can't test that on TRAVIS
+            $this->markTestSkipped("Can't test that on TRAVIS");
+        } else {
+
+            if (!isset($_SESSION)) {
+                $_SESSION = array();
+            }
+            $_SESSION['samltest'] = true;
+
+            $this->assertTrue(isset($_SESSION['samltest']));
+            $this->assertTrue($_SESSION['samltest']);
+
+
+            OneLogin_Saml2_Utils::deleteLocalSession();
+            $this->assertFalse(isset($_SESSION));
+            $this->assertFalse(isset($_SESSION['samltest']));
+
+            session_start();
+            $_SESSION['samltest'] = true;
+            OneLogin_Saml2_Utils::deleteLocalSession();
+            $this->assertFalse(isset($_SESSION));
+            $this->assertFalse(isset($_SESSION['samltest']));
         }
-        $_SESSION['samltest'] = true;
-
-        $this->assertTrue(isset($_SESSION['samltest']));
-        $this->assertTrue($_SESSION['samltest']);
-
-        OneLogin_Saml2_Utils::deleteLocalSession();
-        $this->assertFalse(isset($_SESSION));
-        $this->assertFalse(isset($_SESSION['samltest']));
-
-        session_start();
-        $_SESSION['samltest'] = true;
-        OneLogin_Saml2_Utils::deleteLocalSession();
-        $this->assertFalse(isset($_SESSION));
-        $this->assertFalse(isset($_SESSION['samltest']));
     }
 
     /**
@@ -719,11 +726,17 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     */
     public function testisSessionStarted()
     {
-        $this->assertFalse(OneLogin_Saml2_Utils::isSessionStarted());
+        if (getenv("TRAVIS")) {
+            // Can't test that on TRAVIS
+            $this->markTestSkipped("Can't test that on TRAVIS");
+        } else {
 
-        session_start();
+            $this->assertFalse(OneLogin_Saml2_Utils::isSessionStarted());
 
-        $this->assertTrue(OneLogin_Saml2_Utils::isSessionStarted());
+            session_start();
+
+            $this->assertTrue(OneLogin_Saml2_Utils::isSessionStarted());
+        }
     }
 
 
@@ -991,6 +1004,14 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $this->assertTrue(false);
         } catch (Exception $e) {
             $this->assertContains('We have no idea about the key', $e->getMessage());
+        }
+
+        $signatureWrapping = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/signature_wrapping_attack.xml.base64'));
+        try {
+            $this->assertFalse(OneLogin_Saml2_Utils::validateSign($signatureWrapping, $cert));
+            $this->assertTrue(false);
+        } catch (Exception $e) {
+            $this->assertContains('Reference validation failed', $e->getMessage());
         }
     }
 }
