@@ -156,16 +156,20 @@ class OneLogin_Saml2_Utils
         if (!empty($key)) {
 
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
-                $key = str_replace('-----BEGIN PRIVATE KEY-----', "", $key);
-                $key = str_replace('-----END PRIVATE KEY-----', "", $key);
+                $key = OneLogin_Saml2_Utils::get_string_between($key,'-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
                     $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
                 }
+            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false){
+                $key = OneLogin_Saml2_Utils::get_string_between($key,'-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+                }
             } else {
-                $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
-                $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
@@ -174,6 +178,30 @@ class OneLogin_Saml2_Utils
             }
         }
         return $key;
+    }
+
+    /**
+     * Extracts a substring between 2 marks
+     *
+     * @param string  $str      The target string
+     * @param string  $start    The initial mark
+     * @param string  $end      The end mark
+     *
+     * @return string A substring or an empty string if is not able to find the marks
+     *                or if there is no string between the marks
+     */
+    public static function get_string_between($str, $start, $end)
+    {
+        $str = ' ' . $str;
+        $ini = strpos($str, $start);
+
+        if ($ini == 0) {
+            return '';
+        }
+
+        $ini += strlen($start);
+        $len = strpos($str, $end, $ini) - $ini;
+        return substr($str, $ini, $len);
     }
 
     /**
