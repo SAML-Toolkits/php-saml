@@ -728,7 +728,8 @@ class OneLogin_Saml2_Settings
                 $certMetadata = file_get_contents($certMetadataFile);
             }
 
-            $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata);
+            $signatureAlgorithm = $this->_security['signatureAlgorithm'];
+            $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata, $signatureAlgorithm);
         }
         return $metadata;
     }
