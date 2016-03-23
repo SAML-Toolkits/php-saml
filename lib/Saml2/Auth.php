@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -37,15 +37,15 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored it 
+     * SessionIndex. When the user is logged, this stored it
      * from the AuthnStatement of the SAML Response
-     * 
+     *
      * @var string
      */
     private $_sessionIndex;
 
     /**
-     * SessionNotOnOrAfter. When the user is logged, this stored it 
+     * SessionNotOnOrAfter. When the user is logged, this stored it
      * from the AuthnStatement of the SAML Response
      *
      * @var DateTime
@@ -214,8 +214,9 @@ class OneLogin_Saml2_Auth
      *
      * @param string $url        The target URL to redirect the user.
      * @param array  $parameters Extra parameters to be passed as part of the url
+     * @param boolean $stay      True if we want to stay (returns the url string) False to redirect
      */
-    public function redirectTo($url = '', $parameters = array())
+    public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
         assert('is_string($url)');
         assert('is_array($parameters)');
@@ -224,7 +225,7 @@ class OneLogin_Saml2_Auth
             $url = $_REQUEST['RelayState'];
         }
 
-        return OneLogin_Saml2_Utils::redirect($url, $parameters);
+        return OneLogin_Saml2_Utils::redirect($url, $parameters, $stay);
     }
 
     /**
@@ -475,7 +476,7 @@ class OneLogin_Saml2_Auth
      * @param string $relayState     The RelayState
      * @param string $signAlgorithm Signature algorithm method
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
