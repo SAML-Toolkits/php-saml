@@ -671,7 +671,11 @@ class OneLogin_Saml2_Settings
         $cert = $this->getSPcert();
 
         if (!empty($cert)) {
-            $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert);
+            $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
+                $metadata,
+                $cert,
+                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+            );
         }
 
         //Sign Metadata

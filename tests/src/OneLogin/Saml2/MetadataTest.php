@@ -132,6 +132,16 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
         $this->assertContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
 
+        $metadataWithDescriptors = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, false);
+
+        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+
+        $metadataWithDescriptors = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, 'foobar');
+
+        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+
         try {
             $signedMetadata2 = OneLogin_Saml2_Metadata::addX509KeyDescriptors('', $cert);
             $this->assertFalse(true);
