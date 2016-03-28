@@ -133,11 +133,11 @@ METADATA_TEMPLATE;
      *
      * @param string $metadata SAML Metadata XML
      * @param string $cert     x509 cert
-     * @param boolean $wants_encrypted Whether to include the KeyDescriptor for encryption
+     * @param boolean $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
      */
-    public static function addX509KeyDescriptors($metadata, $cert, $wants_encrypted = true)
+    public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
     {
         $xml = new DOMDocument();
         $xml->preserveWhiteSpace = false;
@@ -164,7 +164,7 @@ METADATA_TEMPLATE;
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
         $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
-        if ($wants_encrypted === true) {
+        if ($wantsEncrypted === true) {
             $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
         }
 
@@ -172,7 +172,7 @@ METADATA_TEMPLATE;
         $signing->setAttribute('use', 'signing');
         $signing->appendChild($keyInfo);
 
-        if ($wants_encrypted === true) {
+        if ($wantsEncrypted === true) {
             $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
             $encryption->setAttribute('use', 'encryption');
 
