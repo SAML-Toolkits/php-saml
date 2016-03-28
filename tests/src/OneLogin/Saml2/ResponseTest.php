@@ -1167,13 +1167,41 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Reference validation failed', $response6->getError());
     }
 
-    public function testIsValidSignWithEmptyReferenceURI()
+    public function testIsValidSignWithEmptyReferenceURISignedAssertion()
     {
-        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri.xml.base64');
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri_signed_assertion.xml.base64');
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['idp']['certFingerprint'] = "afe71c28ef740bc87425be13a2263d37971da1f9";
+        $settingsInfo['idp']['x509cert'] = null;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+    }
+
+    public function testIsValidSignWithEmptyReferenceURISignedMessage()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri_signed_mesage.xml.base64');
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
         $settingsInfo['idp']['certFingerprint'] = "194d97e4d8c9c8cfa4b721e5ee497fd9660e5213";
+        $settingsInfo['idp']['x509cert'] = null;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+    }
+
+    public function testIsValidSignWithEmptyReferenceURISignedBoth()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri_signed_both.xml.base64');
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['idp']['certFingerprint'] = "afe71c28ef740bc87425be13a2263d37971da1f9";
         $settingsInfo['idp']['x509cert'] = null;
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);

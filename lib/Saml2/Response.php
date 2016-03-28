@@ -574,13 +574,17 @@ class OneLogin_Saml2_Response
         $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
         if (!$assertionReferenceNode) {
             // is the response signed as a whole?
+            $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
+
             $signatureQuery = '/samlp:Response/ds:Signature/ds:SignedInfo/ds:Reference';
             $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
+
             if ($assertionReferenceNode) {
                 $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
-                $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
-            } else {
-                $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
+                if (!empty($id)) {
+                    // If there is Reference-URI we limit the nameQuery.
+                    $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
+                }
             }
         } else {
             $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
