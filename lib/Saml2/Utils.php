@@ -835,9 +835,9 @@ class OneLogin_Saml2_Utils
             throw new Exception('Could not locate <dsig:KeyInfo> for the encrypted key.');
         }
 
-        $inputKeyAlgo = $inputKey->getAlgorith();
+        $inputKeyAlgo = $inputKey->getAlgorithm();
         if ($symmetricKeyInfo->isEncrypted) {
-            $symKeyInfoAlgo = $symmetricKeyInfo->getAlgorith();
+            $symKeyInfoAlgo = $symmetricKeyInfo->getAlgorithm();
 
             if ($symKeyInfoAlgo === XMLSecurityKey::RSA_OAEP_MGF1P && $inputKeyAlgo === XMLSecurityKey::RSA_1_5) {
                 $inputKeyAlgo = XMLSecurityKey::RSA_OAEP_MGF1P;
@@ -876,7 +876,7 @@ class OneLogin_Saml2_Utils
             }
             $symmetricKey->loadkey($key);
         } else {
-            $symKeyAlgo = $symmetricKey->getAlgorith();
+            $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {
                 throw new Exception(
                     'Algorithm mismatch between input key and key in message. ' .
