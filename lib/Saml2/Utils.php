@@ -156,14 +156,14 @@ class OneLogin_Saml2_Utils
         if (!empty($key)) {
 
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
-                $key = OneLogin_Saml2_Utils::get_string_between($key,'-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
+                $key = OneLogin_Saml2_Utils::get_string_between($key, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
                     $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
                 }
-            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false){
-                $key = OneLogin_Saml2_Utils::get_string_between($key,'-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
+            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
+                $key = OneLogin_Saml2_Utils::get_string_between($key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
