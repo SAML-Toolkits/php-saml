@@ -47,7 +47,7 @@ class XMLSecurityKey {
     const AES256_CBC = 'http://www.w3.org/2001/04/xmlenc#aes256-cbc';
     const RSA_1_5 = 'http://www.w3.org/2001/04/xmlenc#rsa-1_5';
     const RSA_OAEP_MGF1P = 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p';
-    const DSA_SHA1 = 'http://www.w3.org/2000/09/xmld/sig#dsa-sha1';
+    const DSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1';
     const RSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
     const RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
     const RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
