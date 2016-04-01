@@ -490,14 +490,28 @@ class OneLogin_Saml2_Response
 
     /**
      * Verifies that the document only contains a single Assertion (encrypted or not).
+     * Ignoring the assertions inside "Advice" element
      *
      * @return bool TRUE if the document passes.
      */
     public function validateNumAssertions()
     {
-        $encryptedAssertionNodes = $this->document->getElementsByTagName('EncryptedAssertion');
-        $assertionNodes = $this->document->getElementsByTagName('Assertion');
-        return ($assertionNodes->length + $encryptedAssertionNodes->length == 1);
+        $encryptedAssertionNodesLength = 0;
+        $assertionNodesLength = 0;
+
+        foreach ($this->document->getElementsByTagName('EncryptedAssertion') as $node) {
+            if($node->parentNode->localName !== 'Advice') {
+                $encryptedAssertionNodesLength++;
+            }
+        }
+
+        foreach ($this->document->getElementsByTagName('Assertion') as $node) {
+            if($node->parentNode->localName !== 'Advice') {
+                $assertionNodesLength++;
+            }
+        }
+
+        return ($assertionNodesLength + $encryptedAssertionNodesLength == 1);
     }
 
     /**
