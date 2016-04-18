@@ -61,6 +61,14 @@ class OneLogin_Saml2_LogoutRequest
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
                 $cert = $idpData['x509cert'];
             }
+            
+            $namespace = null;
+            $namespaceIssuer = '';
+            if (isset($idpData['singleLogoutService']['namespace'])) {
+                $namespace = $idpData['singleLogoutService']['namespace'];
+                $namespaceIssuer = ' xmlns:saml="' . $namespace . '"';
+            }
+            
 
             if (!empty($nameId)) {
                 $nameIdFormat = $spData['NameIDFormat'];
@@ -75,7 +83,8 @@ class OneLogin_Saml2_LogoutRequest
                 $nameId,
                 $spNameQualifier,
                 $nameIdFormat,
-                $cert
+                $cert,
+                $namespace
             );
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
@@ -88,7 +97,7 @@ class OneLogin_Saml2_LogoutRequest
     Version="2.0"
     IssueInstant="{$issueInstant}"
     Destination="{$idpData['singleLogoutService']['url']}">
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    <saml:Issuer{$namespaceIssuer}>{$spData['entityId']}</saml:Issuer>
     {$nameIdObj}
     {$sessionIndexStr}
 </samlp:LogoutRequest>

@@ -720,14 +720,15 @@ class OneLogin_Saml2_Utils
     /**
      * Generates a nameID.
      *
-     * @param string $value  fingerprint
-     * @param string $spnq   SP Name Qualifier
-     * @param string $format SP Format
-     * @param string $cert   IdP Public cert to encrypt the nameID
+     * @param string $value     fingerprint
+     * @param string $spnq      SP Name Qualifier
+     * @param string $format    SP Format
+     * @param string $cert      IdP Public cert to encrypt the nameID
+     * @param string $namespace Namespace for logout request
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $cert = null)
+    public static function generateNameId($value, $spnq, $format, $cert = null, $namespace = null)
     {
 
         $doc = new DOMDocument();
@@ -736,6 +737,11 @@ class OneLogin_Saml2_Utils
         if (isset($spnq)) {
             $nameId->setAttribute('SPNameQualifier', $spnq);
         }
+        
+        if ($namespace !== null) {
+            $nameId->setAttribute('xmlns:saml', $namespace);
+        }
+        
         $nameId->setAttribute('Format', $format);
         $nameId->appendChild($doc->createTextNode($value));
 
