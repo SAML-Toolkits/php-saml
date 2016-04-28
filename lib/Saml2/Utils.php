@@ -996,9 +996,6 @@ class OneLogin_Saml2_Utils
         return $signedxml;
     }
 
-
-
-
     /**
      * Validates a signature (Message or Assertion).
      *
@@ -1019,20 +1016,7 @@ class OneLogin_Saml2_Utils
         }
 
         # Check if Reference URI is empty
-        try {
-            $signatureElems = $dom->getElementsByTagName('Signature');
-            foreach ($signatureElems as $signatureElem) {
-                $referenceElems = $dom->getElementsByTagName('Reference');
-                if (count($referenceElems) > 0) {
-                    $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '') {
-                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            //It's ok, let's continue;
-        }
+        $uri = self::checkForEmptyUri($dom);
 
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');
@@ -1059,7 +1043,13 @@ class OneLogin_Saml2_Utils
 
         if (!empty($cert)) {
             $objKey->loadKey($cert, false, true);
-            return ($objXMLSecDSig->verify($objKey) === 1);
+            while ($objXMLSecDSig->verify($objKey) !== 1) {
+                if (empty($uri)) {
+                    return false;
+                }
+                self::injectReferenceUri($dom, $objDSig, $objXMLSecDSig, $uri);
+            }
+            return true;
         } else {
             $domCert = $objKey->getX509Certificate();
             $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
@@ -1067,8 +1057,65 @@ class OneLogin_Saml2_Utils
                 return false;
             } else {
                 $objKey->loadKey($domCert, false, true);
-                return ($objXMLSecDSig->verify($objKey) === 1);
+                while ($objXMLSecDSig->verify($objKey) !== 1) {
+                    if (empty($uri)) {
+                        return false;
+                    }
+                    self::injectReferenceUri($dom, $objDSig, $objXMLSecDSig, $uri);
+                }
+                return true;
             }
         }
+    }
+
+    /**
+     * Checks whether or not the Signature's Reference is empty.
+     * If so, returns the ID to be used instead, otherwise empty.
+     *
+     * @param DomDocument $dom The element we should validate
+     * @return string The ID for the root element or empty.
+     */
+    private static function checkForEmptyUri($dom)
+    {
+        try {
+            $signatureElems = $dom->getElementsByTagName('Signature');
+            foreach ($signatureElems as $signatureElem) {
+                $referenceElems = $dom->getElementsByTagName('Reference');
+                if (count($referenceElems) > 0) {
+                    $referenceElem = $referenceElems->item(0);
+                    if ($referenceElem->getAttribute('URI') == '') {
+                        return $signatureElem->parentNode->getAttribute('ID');
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            //It's ok, let's continue;
+        }
+        return '';
+    }
+
+    /**
+     * Injects the URI into the signature reference.
+     *
+     * @param DomDocument     $dom           The element we should validate
+     * @param DomNode         $objDSig       The signature node
+     * @param XMLSecurityDSig $objXMLSecDSig The signature
+     * @param string          $uri           The message's URI
+     */
+    private static function injectReferenceUri($dom, $objDSig, $objXMLSecDSig, &$uri)
+    {
+        // canonicalizeSignedInfo() won't work unless $objDSig is part of the
+        // document. It has been removed when validateReference() was called.
+        $dom->insertBefore($objDSig);
+        $referenceElems = $objDSig->getElementsByTagName('Reference');
+        if (count($referenceElems) > 0) {
+            $referenceElem = $referenceElems->item(0);
+            // Inject the URI and C14N the signedInfo again.
+            $referenceElem->setAttribute('URI', '#'.$uri);
+            $objXMLSecDSig->canonicalizeSignedInfo();
+            $uri = '';
+        }
+        // Restore the document state.
+        $dom->removeChild($objDSig);
     }
 }

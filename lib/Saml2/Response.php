@@ -578,6 +578,10 @@ class OneLogin_Saml2_Response
             $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
             if ($assertionReferenceNode) {
                 $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                if (empty($id)) {
+                    $response = $xpath->query('/samlp:Response')->item(0);
+                    $id = $response->attributes->getNamedItem('ID')->nodeValue;
+                }
                 $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
             } else {
                 $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
