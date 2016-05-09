@@ -1178,8 +1178,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $response = new OneLogin_Saml2_Response($settings, $xml);
         $this->assertTrue($response->isValid());
-        $this->assertTrue(!empty($response->getAttributes()));
         $attributes = $response->getAttributes();
+        $this->assertTrue(!empty($attributes));
         $this->assertEquals('saml@user.com', $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0]);
     }
 }
