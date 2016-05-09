@@ -1169,15 +1169,17 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
     public function testIsValidSignWithEmptyReferenceURI()
     {
-        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri.xml.base64');
-
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['idp']['certFingerprint'] = "194d97e4d8c9c8cfa4b721e5ee497fd9660e5213";
-        $settingsInfo['idp']['x509cert'] = null;
 
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri.xml.base64');
+
+        $settingsInfo['idp']['x509cert'] = 'MIICGzCCAYQCCQCNNcQXom32VDANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzELMAkGA1UECBMCSU4xFTATBgNVBAcTDEluZGlhbmFwb2xpczERMA8GA1UEChMIT25lTG9naW4xDDAKBgNVBAsTA0VuZzAeFw0xNDA0MjMxODQxMDFaFw0xNTA0MjMxODQxMDFaMFIxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJJTjEVMBMGA1UEBxMMSW5kaWFuYXBvbGlzMREwDwYDVQQKEwhPbmVMb2dpbjEMMAoGA1UECxMDRW5nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBALM2vGCiQ/vm+a6v40+VX2zdqHA2Q/1vF1ibQzJ54MJCOVWvs+vQXfZFhdm0OPM2IrDU7oqvKPqP6xOAeJK6H0yP7M4YL3fatSvIYmmfyXC9kt3Svz/NyrHzPhUnJ0ye/sUSXxnzQxwcm/9PwAqrQaA3QpQkH57ybF/OoryPe+2h';
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $response = new OneLogin_Saml2_Response($settings, $xml);
         $this->assertTrue($response->isValid());
+        $this->assertTrue(!empty($response->getAttributes()));
+        $attributes = $response->getAttributes();
+        $this->assertEquals('saml@user.com', $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0]);
     }
 }

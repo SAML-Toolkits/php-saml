@@ -577,13 +577,23 @@ class OneLogin_Saml2_Response
             $signatureQuery = '/samlp:Response/ds:Signature/ds:SignedInfo/ds:Reference';
             $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
             if ($assertionReferenceNode) {
-                $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
+                if (empty($uri)) {
+                    $id = $assertionReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
+                } else {
+                    $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                }
                 $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
             } else {
                 $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
             }
         } else {
-            $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+            $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
+            if (empty($uri)) {
+                $id = $assertionReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
+            } else {
+                $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+            }
             $nameQuery = $assertionNode."[@ID='$id']" . $assertionXpath;
         }
 

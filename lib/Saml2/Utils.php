@@ -996,9 +996,6 @@ class OneLogin_Saml2_Utils
         return $signedxml;
     }
 
-
-
-
     /**
      * Validates a signature (Message or Assertion).
      *
@@ -1016,22 +1013,6 @@ class OneLogin_Saml2_Utils
         } else {
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
-        }
-
-        # Check if Reference URI is empty
-        try {
-            $signatureElems = $dom->getElementsByTagName('Signature');
-            foreach ($signatureElems as $signatureElem) {
-                $referenceElems = $dom->getElementsByTagName('Reference');
-                if (count($referenceElems) > 0) {
-                    $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '') {
-                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            //It's ok, let's continue;
         }
 
         $objXMLSecDSig = new XMLSecurityDSig();
