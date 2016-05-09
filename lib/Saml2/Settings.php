@@ -329,6 +329,11 @@ class OneLogin_Saml2_Settings
             $this->_security['wantAssertionsSigned'] = false;
         }
 
+        // NameID element expected
+        if (!isset($this->_security['wantNameId'])) {
+            $this->_security['wantNameId'] = true;
+        }
+
         // encrypt expected
         if (!isset($this->_security['wantAssertionsEncrypted'])) {
             $this->_security['wantAssertionsEncrypted'] = false;

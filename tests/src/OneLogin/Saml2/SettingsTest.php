@@ -621,6 +621,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('wantNameIdEncrypted', $security);
         $this->assertArrayHasKey('requestedAuthnContext', $security);
         $this->assertArrayHasKey('wantXMLValidation', $security);
+        $this->assertArrayHasKey('wantNameId', $security);
     }
 
     /**
@@ -671,6 +672,9 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('wantXMLValidation', $security);
         $this->assertTrue($security['wantXMLValidation']);
+
+        $this->assertArrayHasKey('wantNameId', $security);
+        $this->assertTrue($security['wantNameId']);
     }
 
     /**

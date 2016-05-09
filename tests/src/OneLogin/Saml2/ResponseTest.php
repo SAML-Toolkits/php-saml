@@ -79,7 +79,38 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
 
         try {
-            $nameIdData4 = $response4->getNameId();
+            $nameId4 = $response4->getNameId();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response5 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameId5 = $response5->getNameId();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response6 = new OneLogin_Saml2_Response($settings, $xml4);
+        $nameId6 = $response6->getNameId();
+        $this->assertNull($nameId6);
+
+        unset($settingsInfo['security']['wantNameId']);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response7 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameId7 = $response7->getNameId();
         } catch (Exception $e) {
             $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
         }
@@ -126,6 +157,37 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData4 = $response4->getNameIdData();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response5 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameIdData5 = $response5->getNameIdData();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response6 = new OneLogin_Saml2_Response($settings, $xml4);
+        $nameIdData6 = $response6->getNameIdData();
+        $this->assertEmpty($nameIdData6);
+
+        unset($settingsInfo['security']['wantNameId']);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response7 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameIdData7 = $response7->getNameIdData();
         } catch (Exception $e) {
             $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
         }

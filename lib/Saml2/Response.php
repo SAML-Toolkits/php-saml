@@ -385,15 +385,19 @@ class OneLogin_Saml2_Response
             }
         }
 
-        if (!isset($nameId)) {
-            throw new Exception("Not NameID found in the assertion of the Response");
-        }
-
         $nameIdData = array();
-        $nameIdData['Value'] = $nameId->nodeValue;
-        foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
-            if ($nameId->hasAttribute($attr)) {
-                $nameIdData[$attr] = $nameId->getAttribute($attr);
+
+        if (!isset($nameId)) {
+            $security = $this->_settings->getSecurityData();
+            if ($security['wantNameId']) {
+                throw new Exception("Not NameID found in the assertion of the Response");
+            }
+        } else {
+            $nameIdData['Value'] = $nameId->nodeValue;
+            foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
+                if ($nameId->hasAttribute($attr)) {
+                    $nameIdData[$attr] = $nameId->getAttribute($attr);
+                }
             }
         }
 
@@ -407,8 +411,12 @@ class OneLogin_Saml2_Response
      */
     public function getNameId()
     {
+        $nameIdvalue = null;
         $nameIdData = $this->getNameIdData();
-        return $nameIdData['Value'];
+        if (!empty($nameIdData) && isset($nameIdData['Value'])) {
+            $nameIdvalue = $nameIdData['Value'];
+        }
+        return $nameIdvalue;
     }
 
     /**
