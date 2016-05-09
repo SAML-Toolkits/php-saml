@@ -31,8 +31,9 @@ class OneLogin_Saml2_AuthnRequest
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool   $nameIdPolicy  When true the AuthNReuqest will set a nameIdPolicy
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false)
+    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false, $nameIdPolicy = true)
     {
         $this->_settings = $settings;
 
@@ -43,10 +44,20 @@ class OneLogin_Saml2_AuthnRequest
         $id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
-        $nameIDPolicyFormat = $spData['NameIDFormat'];
-        if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
-            $nameIDPolicyFormat = OneLogin_Saml2_Constants::NAMEID_ENCRYPTED;
+        $nameIdPolicyStr = '';
+        if ($nameIdPolicy) {
+            $nameIDPolicyFormat = $spData['NameIDFormat'];
+            if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
+                $nameIDPolicyFormat = OneLogin_Saml2_Constants::NAMEID_ENCRYPTED;
+            }
+
+            $nameIdPolicyStr = <<<NAMEIDPOLICY
+    <samlp:NameIDPolicy
+        Format="{$nameIDPolicyFormat}"
+        AllowCreate="true" />
+NAMEIDPOLICY;
         }
+
 
         $providerNameStr = '';
         $organizationData = $settings->getOrganization();
@@ -115,9 +126,7 @@ REQUESTEDAUTHN;
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
-    <samlp:NameIDPolicy
-        Format="{$nameIDPolicyFormat}"
-        AllowCreate="true" />
+{$nameIdPolicyStr}
 {$requestedAuthnStr}
 </samlp:AuthnRequest>
 AUTHNREQUEST;

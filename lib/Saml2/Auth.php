@@ -324,14 +324,15 @@ class OneLogin_Saml2_Auth
      * @param bool    $forceAuthn    When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool    $isPassive     When true the AuthNReuqest will set the Ispassive='true'
      * @param boolean $stay          True if we want to stay (returns the url string) False to redirect
+     * @param bool    $nameIdPolicy  When true the AuthNReuqest will set a nameIdPolicy element
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
-    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay=false)
+    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay=false, $nameIdPolicy = true)
     {
         assert('is_array($parameters)');
 
-        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive, $nameIdPolicy);
 
         $this->_lastRequestID = $authnRequest->getId();
 
