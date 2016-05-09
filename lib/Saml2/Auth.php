@@ -31,7 +31,7 @@ class OneLogin_Saml2_Auth
     /**
      * If user is authenticated.
      *
-     * @var boolean
+     * @var bool
      */
     private $_authenticated = false;
 
@@ -76,7 +76,7 @@ class OneLogin_Saml2_Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array|OneLogin_Saml_Settings $oldSettings Setting data. (OneLogin_Saml_Settings is the settings object of the old implementation)
+     * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
      */
     public function __construct($oldSettings = null)
     {
@@ -86,7 +86,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the settings info
      *
-     * @return OneLogin_Saml2_Settings  The settings data.
+     * @return OneLogin_Saml2_Settings The settings data.
      */
     public function getSettings()
     {
@@ -96,7 +96,7 @@ class OneLogin_Saml2_Auth
     /**
      * Set the strict mode active/disable
      *
-     * @param boolean $value Strict parameter
+     * @param bool $value Strict parameter
      *
      * @return array The settings data.
      */
@@ -109,7 +109,9 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Response sent by the IdP.
      *
-     * @param string $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function processResponse($requestId = null)
     {
@@ -140,13 +142,15 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @param boolean $keepLocalSession             When false will destroy the local session, otherwise will keep it
-     * @param string $requestId                     The ID of the LogoutRequest sent by this SP to the IdP
-     * @param bool $retrieveParametersFromServer
-     * @param callable $cbDeleteSession
-     * @param boolean $stay                         True if we want to stay (returns the url string) False to redirect
+     * @param bool        $keepLocalSession              When false will destroy the local session, otherwise will keep it
+     * @param string|null $requestId                     The ID of the LogoutRequest sent by this SP to the IdP
+     * @param bool        $retrieveParametersFromServer
+     * @param callable    $cbDeleteSession
+     * @param bool        $stay                          True if we want to stay (returns the url string) False to redirect
+     *
      * @return string|void
-     * @throws \OneLogin_Saml2_Error
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay=false)
     {
@@ -214,7 +218,7 @@ class OneLogin_Saml2_Auth
      *
      * @param string $url        The target URL to redirect the user.
      * @param array  $parameters Extra parameters to be passed as part of the url
-     * @param boolean $stay      True if we want to stay (returns the url string) False to redirect
+     * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      */
     public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
@@ -231,7 +235,7 @@ class OneLogin_Saml2_Auth
     /**
      * Checks if the user is authenticated or not.
      *
-     * @return boolean  True if the user is authenticated
+     * @return bool  True if the user is authenticated
      */
     public function isAuthenticated()
     {
@@ -261,7 +265,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the SessionIndex
      *
-     * @return string  The SessionIndex of the assertion
+     * @return string|null  The SessionIndex of the assertion
      */
     public function getSessionIndex()
     {
@@ -303,7 +307,7 @@ class OneLogin_Saml2_Auth
      *
      * @param string $name The requested attribute of the user.
      *
-     * @return NULL || array Requested SAML attribute ($name).
+     * @return array|null Requested SAML attribute ($name).
      */
     public function getAttribute($name)
     {
@@ -319,12 +323,12 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SSO process.
      *
-     * @param string  $returnTo      The target URL the user should be returned to after login.
-     * @param array   $parameters    Extra parameters to be added to the GET
-     * @param bool    $forceAuthn    When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool    $isPassive     When true the AuthNReuqest will set the Ispassive='true'
-     * @param boolean $stay          True if we want to stay (returns the url string) False to redirect
-     * @param bool    $nameIdPolicy  When true the AuthNReuqest will set a nameIdPolicy element
+     * @param string|null $returnTo     The target URL the user should be returned to after login.
+     * @param array       $parameters   Extra parameters to be added to the GET
+     * @param bool        $forceAuthn   When true the AuthNReuqest will set the ForceAuthn='true'
+     * @param bool        $isPassive    When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool        $stay         True if we want to stay (returns the url string) False to redirect
+     * @param bool        $nameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
@@ -357,13 +361,15 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SLO process.
      *
-     * @param string  $returnTo      The target URL the user should be returned to after logout.
-     * @param array   $parameters    Extra parameters to be added to the GET
-     * @param string  $nameId        The NameID that will be set in the LogoutRequest.
-     * @param string  $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
-     * @param boolean $stay          True if we want to stay (returns the url string) False to redirect
+     * @param string|null $returnTo      The target URL the user should be returned to after logout.
+     * @param array       $parameters    Extra parameters to be added to the GET
+     * @param string|null $nameId        The NameID that will be set in the LogoutRequest.
+     * @param string|null $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param bool        $stay          True if we want to stay (returns the url string) False to redirect
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay=false)
     {
@@ -448,6 +454,9 @@ class OneLogin_Saml2_Auth
      * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
+     *
+     * @throws Exception
+     * @throws OneLogin_Saml2_Error
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
@@ -473,11 +482,14 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Response
      *
-     * @param string $samlResponse   The SAML Response
-     * @param string $relayState     The RelayState
+     * @param string $samlResponse  The SAML Response
+     * @param string $relayState    The RelayState
      * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
+     *
+     * @throws Exception
+     * @throws OneLogin_Saml2_Error
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
