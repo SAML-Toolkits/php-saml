@@ -548,7 +548,7 @@ The login method can recieve other five optional parameters:
 * `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
 * `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
 * `$strict` - True if we want to stay (returns the url string) False to redirect
-* `$nameIdPolicy` - When true the AuthNReuqest will set a nameIdPolicy element.
+* `$setNameIdPolicy` - When true the AuthNReuqest will set a nameIdPolicy element.
 
 If a match on the future SAMLResponse ID and the AuthNRequest ID to be sent is required, that AuthNRequest ID must to be extracted and saved.
 

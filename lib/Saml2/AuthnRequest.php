@@ -29,11 +29,11 @@ class OneLogin_Saml2_AuthnRequest
      * Constructs the AuthnRequest object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
-     * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
-     * @param bool   $nameIdPolicy  When true the AuthNReuqest will set a nameIdPolicy
+     * @param bool   $forceAuthn      When true the AuthNReuqest will set the ForceAuthn='true'
+     * @param bool   $isPassive       When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool   $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false, $nameIdPolicy = true)
+    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false, $setNameIdPolicy = true)
     {
         $this->_settings = $settings;
 
@@ -45,7 +45,7 @@ class OneLogin_Saml2_AuthnRequest
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
         $nameIdPolicyStr = '';
-        if ($nameIdPolicy) {
+        if ($setNameIdPolicy) {
             $nameIDPolicyFormat = $spData['NameIDFormat'];
             if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
                 $nameIDPolicyFormat = OneLogin_Saml2_Constants::NAMEID_ENCRYPTED;

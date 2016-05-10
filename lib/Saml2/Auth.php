@@ -323,20 +323,20 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SSO process.
      *
-     * @param string|null $returnTo     The target URL the user should be returned to after login.
-     * @param array       $parameters   Extra parameters to be added to the GET
-     * @param bool        $forceAuthn   When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool        $isPassive    When true the AuthNReuqest will set the Ispassive='true'
-     * @param bool        $stay         True if we want to stay (returns the url string) False to redirect
-     * @param bool        $nameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
+     * @param string|null $returnTo        The target URL the user should be returned to after login.
+     * @param array       $parameters      Extra parameters to be added to the GET
+     * @param bool        $forceAuthn      When true the AuthNReuqest will set the ForceAuthn='true'
+     * @param bool        $isPassive       When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool        $stay            True if we want to stay (returns the url string) False to redirect
+     * @param bool        $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
-    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay=false, $nameIdPolicy = true)
+    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay=false, $setNameIdPolicy = true)
     {
         assert('is_array($parameters)');
 
-        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive, $nameIdPolicy);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy);
 
         $this->_lastRequestID = $authnRequest->getId();
 
