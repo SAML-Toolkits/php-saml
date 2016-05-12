@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+v.2.8.0
+-------
+* Make NameIDPolicy of AuthNRequest optional
+* Make nameID requirement on SAMLResponse optional
+* Fix empty URI support
+* Symmetric encryption key support
+* Add more Auth Context options to the constant class
+* Fix DSA_SHA1 constant on xmlseclibs
+* Set none requestedAuthnContext as default behaviour
+* Update xmlseclibs lib
+* Improve formatPrivateKey method
+* Fix bug when signing metadata, the SignatureMethod was not provided
+* Fix getter for lastRequestID parameter in OneLogin_Saml2_Auth class
+* Add $wantEncrypted parameter on addX509KeyDescriptors method that will allow to set KeyDescriptor[use='encryption'] if wantNameIdEncrypted or wantAssertionsEncrypted enabled
+* Add $stay parameter on redirectTo method. (login/logout supports $stay but I forgot add this on previous 2.7.0 version)
+* Improve code style
+
 v.2.7.0
 -------
 * Trim acs, slo and issuer urls.
