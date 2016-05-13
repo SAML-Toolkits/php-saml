@@ -165,7 +165,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     {
         $expectedNameIdData = array (
             'Value' => 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c',
-            'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified',
+            'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             'SPNameQualifier' => 'http://idp.example.com/'
         );
 

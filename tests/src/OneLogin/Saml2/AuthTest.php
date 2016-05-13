@@ -1349,7 +1349,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
         $relayState = 'http://relaystate.com';
         $signature = $this->_auth->buildRequestSignature($message, $relayState);
-        $validSignature = 'E17GU1STzanOXxBTKjweB1DovP8aMJdj5BEy0fnGoEslKdP6hpPc3enjT/bu7I8D8QzLoir8SxZVWdUDXgIxJIEgfK5snr+jJwfc5U2HujsOa/Xb3c4swoyPcyQhcxLRDhDjPq5cQxJfYoPeElvCuI6HAD1mtdd5PS/xDvbIxuw=';
+        $validSignature = 'Pb1EXAX5TyipSJ1SndEKZstLQTsT+1D00IZAhEepBM+OkAZQSToivu3njgJu47HZiZAqgXZFgloBuuWE/+GdcSsRYEMkEkiSDWTpUr25zKYLJDSg6GNo6iAHsKSuFt46Z54Xe/keYxYP03Hdy97EwuuSjBzzgRc5tmpV+KC7+a0=';
         $this->assertEquals($validSignature, $signature);
     }
 

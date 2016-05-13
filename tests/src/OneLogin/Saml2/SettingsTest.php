@@ -275,7 +275,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('WantAssertionsSigned="false"', $metadata);
         $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', $metadata);
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata);
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', $metadata);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
     }
 
     /**
@@ -305,7 +305,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('WantAssertionsSigned="false"', $metadata);
         $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', $metadata);
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata);
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', $metadata);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata);
         $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $metadata);
@@ -332,7 +332,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('WantAssertionsSigned="false"', $metadata2);
         $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', $metadata2);
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata2);
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', $metadata2);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata2);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata2);
         $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $metadata2);
@@ -593,7 +593,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://stuff.com/endpoints/metadata.php', $spData['entityId']);
         $this->assertEquals('http://stuff.com/endpoints/endpoints/acs.php', $spData['assertionConsumerService']['url']);
         $this->assertEquals('http://stuff.com/endpoints/endpoints/sls.php', $spData['singleLogoutService']['url']);
-        $this->assertEquals('urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified', $spData['NameIDFormat']);
+        $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified', $spData['NameIDFormat']);
     }
 
     /**

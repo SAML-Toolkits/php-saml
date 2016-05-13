@@ -616,7 +616,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $nameIdValue = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde';
         $entityId = 'http://stuff.com/endpoints/metadata.php';
-        $nameIDFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified';
+        $nameIDFormat = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
 
         $nameId = OneLogin_Saml2_Utils::generateNameId(
             $nameIdValue,
@@ -624,7 +624,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $nameIDFormat
         );
 
-        $expectedNameId = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
+        $expectedNameId = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
 
         $this->assertEquals($nameId, $expectedNameId);
 
@@ -657,7 +657,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $nameIdValue = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde';
         $entityId = 'http://stuff.com/endpoints/metadata.php';
-        $nameIDFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified';
+        $nameIDFormat = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
 
         $nameId = OneLogin_Saml2_Utils::generateNameId(
             $nameIdValue,
@@ -665,7 +665,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $nameIDFormat
         );
 
-        $expectedNameId = '<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
+        $expectedNameId = '<saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
 
         $this->assertEquals($nameId, $expectedNameId);
 

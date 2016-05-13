@@ -136,7 +136,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
         $expectedNameIdData2 = array (
             'Value' => '2de11defd199f8d5bb63f9b7deb265ba5c675c10',
-            'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified',
+            'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             'SPNameQualifier' => 'https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php'
         );
         $nameIdData2 = $response2->getNameIdData();
