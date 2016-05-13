@@ -129,6 +129,10 @@ class OneLogin_Saml2_Auth
             } else {
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
+                throw new OneLogin_Saml2_Error(
+                  'SAML Response invalid: ' . $this->_errorReason,
+                  OneLogin_Saml2_Error::SAML_RESPONSE_INVALID
+                );
             }
         } else {
             $this->_errors[] = 'invalid_binding';
