@@ -4,6 +4,7 @@ php:
   - 5.5
   - 5.4
   - 5.3
+  - 7.0
 
 before_install:
  - curl -s https://getcomposer.org/installer | php
