@@ -663,7 +663,10 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($_SESSION));
         $this->assertFalse(isset($_SESSION['samltest']));
 
+        $prev = error_reporting(0);
         session_start();
+        error_reporting($prev);
+
         $_SESSION['samltest'] = true;
         OneLogin_Saml2_Utils::deleteLocalSession();
         $this->assertFalse(isset($_SESSION));
@@ -679,7 +682,9 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertFalse(OneLogin_Saml2_Utils::isSessionStarted());
 
+        $prev = error_reporting(0);
         session_start();
+        error_reporting($prev);
 
         $this->assertTrue(OneLogin_Saml2_Utils::isSessionStarted());
     }
