@@ -7,10 +7,10 @@
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {
         "classmap": [
-		"extlib/xmlseclibs",
-		"lib/Saml",
-		"lib/Saml2"
-	]
+            "extlib/xmlseclibs",
+            "lib/Saml",
+            "lib/Saml2"
+        ]
     },
     "support": {
         "email": "sixto.garcia@onelogin.com",
@@ -24,7 +24,7 @@
         "ext-mcrypt": "*"
     },
     "require-dev": {
-	"phpunit/phpunit": "3.7.31",
+        "phpunit/phpunit": "4.8",
         "satooshi/php-coveralls": "1.0.1",
         "sebastian/phpcpd": "*",
         "phploc/phploc": "*",
@@ -34,6 +34,6 @@
     "suggest": {
         "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
         "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
-	    "ext-gettext": "Install gettext and php5-gettext libs to handle translations" 
+        "ext-gettext": "Install gettext and php5-gettext libs to handle translations"
     }
 }
