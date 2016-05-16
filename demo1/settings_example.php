@@ -11,7 +11,7 @@
             'singleLogoutService' => array (
                 'url' => $spBaseUrl.'/demo1/index.php?sls',
             ),
-            'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified',
+            'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
         ),
         'idp' => array (
             'entityId' => '',

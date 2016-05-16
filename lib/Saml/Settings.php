@@ -52,7 +52,7 @@ class OneLogin_Saml_Settings
     public $requestedNameIdFormat = self::NAMEID_EMAIL_ADDRESS;
 
     /**
-     * Return an Array with the values (compatibility with the new version)
+     * @return array<string,array> Values (compatibility with the new version)
      */
     public function getValues()
     {

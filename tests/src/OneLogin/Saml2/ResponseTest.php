@@ -79,7 +79,38 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
 
         try {
-            $nameIdData4 = $response4->getNameId();
+            $nameId4 = $response4->getNameId();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response5 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameId5 = $response5->getNameId();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response6 = new OneLogin_Saml2_Response($settings, $xml4);
+        $nameId6 = $response6->getNameId();
+        $this->assertNull($nameId6);
+
+        unset($settingsInfo['security']['wantNameId']);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response7 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameId7 = $response7->getNameId();
         } catch (Exception $e) {
             $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
         }
@@ -105,7 +136,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
         $expectedNameIdData2 = array (
             'Value' => '2de11defd199f8d5bb63f9b7deb265ba5c675c10',
-            'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified',
+            'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             'SPNameQualifier' => 'https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php'
         );
         $nameIdData2 = $response2->getNameIdData();
@@ -126,6 +157,37 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData4 = $response4->getNameIdData();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response5 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameIdData5 = $response5->getNameIdData();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response6 = new OneLogin_Saml2_Response($settings, $xml4);
+        $nameIdData6 = $response6->getNameIdData();
+        $this->assertEmpty($nameIdData6);
+
+        unset($settingsInfo['security']['wantNameId']);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response7 = new OneLogin_Saml2_Response($settings, $xml4);
+
+        try {
+            $nameIdData7 = $response7->getNameIdData();
         } catch (Exception $e) {
             $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
         }
@@ -1165,5 +1227,21 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response6 = new OneLogin_Saml2_Response($this->_settings, $xml6);
         $this->assertFalse($response6->isValid());
         $this->assertEquals('Reference validation failed', $response6->getError());
+    }
+
+    public function testIsValidSignWithEmptyReferenceURI()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_without_reference_uri.xml.base64');
+
+        $settingsInfo['idp']['x509cert'] = 'MIICGzCCAYQCCQCNNcQXom32VDANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzELMAkGA1UECBMCSU4xFTATBgNVBAcTDEluZGlhbmFwb2xpczERMA8GA1UEChMIT25lTG9naW4xDDAKBgNVBAsTA0VuZzAeFw0xNDA0MjMxODQxMDFaFw0xNTA0MjMxODQxMDFaMFIxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJJTjEVMBMGA1UEBxMMSW5kaWFuYXBvbGlzMREwDwYDVQQKEwhPbmVMb2dpbjEMMAoGA1UECxMDRW5nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBALM2vGCiQ/vm+a6v40+VX2zdqHA2Q/1vF1ibQzJ54MJCOVWvs+vQXfZFhdm0OPM2IrDU7oqvKPqP6xOAeJK6H0yP7M4YL3fatSvIYmmfyXC9kt3Svz/NyrHzPhUnJ0ye/sUSXxnzQxwcm/9PwAqrQaA3QpQkH57ybF/OoryPe+2h';
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+        $attributes = $response->getAttributes();
+        $this->assertTrue(!empty($attributes));
+        $this->assertEquals('saml@user.com', $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0]);
     }
 }

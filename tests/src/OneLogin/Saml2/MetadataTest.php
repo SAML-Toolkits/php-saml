@@ -36,7 +36,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata);
         $this->assertContains('Location="http://stuff.com/endpoints/endpoints/sls.php"', $metadata);
 
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', $metadata);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
 
         $this->assertContains('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', $metadata);
         $this->assertContains('<md:ContactPerson contactType="technical">', $metadata);
@@ -91,7 +91,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $signedMetadata);
         $this->assertContains(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $signedMetadata);
         
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat>', $signedMetadata);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $signedMetadata);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $signedMetadata);
         $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $signedMetadata);
@@ -131,6 +131,16 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
 
         $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
         $this->assertContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+
+        $metadataWithDescriptors = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, false);
+
+        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+
+        $metadataWithDescriptors = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, 'foobar');
+
+        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
 
         try {
             $signedMetadata2 = OneLogin_Saml2_Metadata::addX509KeyDescriptors('', $cert);

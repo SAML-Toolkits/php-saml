@@ -8,7 +8,7 @@
 class OneLogin_Saml2_Constants
 {
     // Value added to the current time in time condition validations
-    const ALOWED_CLOCK_DRIFT = 180;  // 3 min in seconds
+    const ALLOWED_CLOCK_DRIFT = 180;  // 3 min in seconds
 
     // NameID Formats
     const NAMEID_EMAIL_ADDRESS = 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress';
@@ -46,9 +46,12 @@ class OneLogin_Saml2_Constants
     // Auth Context Class
     const AC_UNSPECIFIED = 'urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified';
     const AC_PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password';
+    const AC_PASSWORD_PROTECTED = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport';
     const AC_X509 = 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509';
     const AC_SMARTCARD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard';
     const AC_KERBEROS = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos';
+    const AC_WINDOWS = 'urn:federation:authentication:windows';
+    const AC_TLS = 'urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient';
 
     // Subject Confirmation
     const CM_BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer';

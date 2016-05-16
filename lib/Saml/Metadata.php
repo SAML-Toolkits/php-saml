@@ -6,17 +6,28 @@ class OneLogin_Saml_Metadata
 
     protected $_settings;
 
-    public function __construct($settings=null)
+    /**
+     * @param array|object|null $settings Setting data
+     */
+    public function __construct($settings = null)
     {
         $auth = new OneLogin_Saml2_Auth($settings);
         $this->_settings = $auth->getSettings();
     }
 
+    /**
+     * @return string
+     *
+     * @throws OneLogin_Saml2_Error
+     */
     public function getXml()
     {
         return $this->_settings->getSPMetadata();
     }
 
+    /**
+     * @return string
+     */
     protected function _getMetadataValidTimestamp()
     {
         $timeZone = date_default_timezone_get();

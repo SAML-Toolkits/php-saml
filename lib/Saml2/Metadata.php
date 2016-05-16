@@ -13,14 +13,14 @@ class OneLogin_Saml2_Metadata
     /**
      * Generates the metadata of the SP based on the settings
      *
-     * @param string    $sp            The SP data
-     * @param string    $authnsign     authnRequestsSigned attribute
-     * @param string    $wsign         wantAssertionsSigned attribute 
-     * @param DateTime  $validUntil    Metadata's valid time
-     * @param Timestamp $cacheDuration Duration of the cache in seconds
-     * @param array     $contacts      Contacts info
-     * @param array     $organization  Organization ingo
-     *
+     * @param array         $sp            The SP data
+     * @param bool|string   $authnsign     authnRequestsSigned attribute
+     * @param bool|string   $wsign         wantAssertionsSigned attribute
+     * @param DateTime|null $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
+     * @param array         $contacts      Contacts info
+     * @param array         $organization  Organization ingo
+     * @param array         $attributes
      * @return string SAML Metadata XML
      */
     public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
@@ -32,7 +32,7 @@ class OneLogin_Saml2_Metadata
         $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
 
         if (!isset($cacheDuration)) {
-            $cacheDuration = time() + self::TIME_CACHED;
+            $cacheDuration = self::TIME_CACHED;
         }
 
         $sls = '';
@@ -59,18 +59,27 @@ SLS_TEMPLATE;
 
         $strOrganization = '';
         if (!empty($organization)) {
-            $organizationInfo = array();
+            $organizationInfoNames = array();
+            $organizationInfoDisplaynames = array();
+            $organizationInfoUrls = array();
             foreach ($organization as $lang => $info) {
-                $organizationInfo[] = <<<ORGANIZATION
+                $organizationInfoNames[] = <<<ORGANIZATION_NAME
+       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
+ORGANIZATION_NAME;
+                $organizationInfoDisplaynames[] = <<<ORGANIZATION_DISPLAY
+       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
+ORGANIZATION_DISPLAY;
+                $organizationInfoUrls[] = <<<ORGANIZATION_URL
+       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+ORGANIZATION_URL;
+            }
+            $orgData = implode("\n", $organizationInfoNames)."\n".implode("\n", $organizationInfoDisplaynames)."\n".implode("\n", $organizationInfoUrls);
+            $strOrganization = <<<ORGANIZATIONSTR
 
     <md:Organization>
-       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
-       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
-       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+{$orgData}
     </md:Organization>
-ORGANIZATION;
-            }
-            $strOrganization = implode("\n", $organizationInfo);
+ORGANIZATIONSTR;
         }
 
         $strContacts = '';
@@ -113,21 +122,22 @@ METADATA_TEMPLATE;
      *
      * @return string Signed Metadata
      */
-    public static function signMetadata($metadata, $key, $cert)
+    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm);
     }
 
     /**
      * Adds the x509 descriptors (sign/encriptation) to the metadata
      * The same cert will be used for sign/encrypt
      *
-     * @param string $metadata SAML Metadata XML
-     * @param string $cert     x509 cert
+     * @param string $metadata       SAML Metadata XML
+     * @param string $cert           x509 cert
+     * @param bool   $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
      */
-    public static function addX509KeyDescriptors($metadata, $cert)
+    public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
     {
         $xml = new DOMDocument();
         $xml->preserveWhiteSpace = false;
@@ -154,16 +164,20 @@ METADATA_TEMPLATE;
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
         $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
-        $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+        if ($wantsEncrypted === true) {
+            $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+        }
 
         $signing = $xml->getElementsByTagName('KeyDescriptor')->item(0);
         $signing->setAttribute('use', 'signing');
-
-        $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
-        $encryption->setAttribute('use', 'encryption');
-
         $signing->appendChild($keyInfo);
-        $encryption->appendChild($keyInfo->cloneNode(true));
+
+        if ($wantsEncrypted === true) {
+            $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
+            $encryption->setAttribute('use', 'encryption');
+
+            $encryption->appendChild($keyInfo->cloneNode(true));
+        }
 
         return $xml->saveXML();
     }

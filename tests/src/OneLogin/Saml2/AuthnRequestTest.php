@@ -20,7 +20,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request
     *
     * @covers OneLogin_Saml2_AuthnRequest
@@ -40,7 +40,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request with AuthNContext
     *
     * @covers OneLogin_Saml2_AuthnRequest
@@ -86,10 +86,18 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>', $request4);
         $this->assertContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef>', $request4);
         $this->assertContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:X509</saml:AuthnContextClassRef>', $request4);
+
+        $settingsInfo['security']['requestedAuthnContextComparison'] = 'minimum';
+        $settings5 = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest5 = new OneLogin_Saml2_AuthnRequest($settings5);
+        $encodedRequest5 = $authnRequest5->getRequest();
+        $decoded5 = base64_decode($encodedRequest5);
+        $request5 = gzinflate($decoded5);
+        $this->assertContains('<samlp:RequestedAuthnContext Comparison="minimum">', $request5);
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request with ForceAuthn
     *
     * @covers OneLogin_Saml2_AuthnRequest
@@ -120,7 +128,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request with isPassive
     *
     * @covers OneLogin_Saml2_AuthnRequest
@@ -151,7 +159,38 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor. 
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+    * The creation of a deflated SAML Request with and without NameIDPolicy
+    *
+    * @covers OneLogin_Saml2_AuthnRequest
+    */
+    public function testNameIDPolicy()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings, false, false, false);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('<samlp:NameIDPolicy', $request);
+
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings, false, false, true);
+        $encodedRequest2 = $authnRequest2->getRequest();
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertContains('<samlp:NameIDPolicy', $request2);
+
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings);
+        $encodedRequest3 = $authnRequest3->getRequest();
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('<samlp:NameIDPolicy', $request3);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request
     *
     * @covers OneLogin_Saml2_AuthnRequest

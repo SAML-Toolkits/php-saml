@@ -53,7 +53,7 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
         $nameIdNodes = $entityDescriptor->getElementsByTagName('NameIDFormat');
         $this->assertEquals(1, $nameIdNodes->length);
         $nameID = $nameIdNodes->item(0);
-        $this->assertEquals("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified", $nameID->nodeValue);
+        $this->assertEquals("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", $nameID->nodeValue);
 
         $assertionConsumerServiceNodes = $entityDescriptor->getElementsByTagName('AssertionConsumerService');
         $this->assertEquals(1, $assertionConsumerServiceNodes->length);

@@ -23,7 +23,7 @@ class OneLogin_Saml2_LogoutRequest
      * SAML Logout Request
      * @var string
      */
-    private $_logoutRequest;
+    protected $_logoutRequest;
 
     /**
     * After execute a validation process, this var contains the cause
@@ -35,12 +35,11 @@ class OneLogin_Saml2_LogoutRequest
      * Constructs the Logout Request object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
-     * @param string                  $response A UUEncoded Logout Request.
-     * @param string                  $nameId   The NameID that will be set in the LogoutRequest.
-     * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
-     *
+     * @param string|null             $request A UUEncoded Logout Request.
+     * @param string|null             $nameId   The NameID that will be set in the LogoutRequest.
+     * @param string|null             $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null)
     {
 
         $this->_settings = $settings;
@@ -64,14 +63,16 @@ class OneLogin_Saml2_LogoutRequest
 
             if (!empty($nameId)) {
                 $nameIdFormat = $spData['NameIDFormat'];
+                $spNameQualifier = null;
             } else {
                 $nameId = $idpData['entityId'];
                 $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
+                $spNameQualifier = $spData['entityId'];
             }
 
             $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
                 $nameId,
-                $spData['entityId'],
+                $spNameQualifier,
                 $nameIdFormat,
                 $cert
             );
@@ -141,9 +142,11 @@ LOGOUTREQUEST;
      * Gets the NameID Data of the the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string             $key     The SP key
+     * @param string|null        $key     The SP key
      *     
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
+     *
+     * @throws Exception
      */
     public static function getNameIdData($request, $key = null)
     {
@@ -195,7 +198,7 @@ LOGOUTREQUEST;
      * Gets the NameID of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string             $key     The SP key     
+     * @param string|null        $key     The SP key
      *
      * @return string Name ID Value
      */
@@ -259,7 +262,7 @@ LOGOUTREQUEST;
     /**
      * Checks if the Logout Request recieved is valid.
      *
-     * @return boolean If the Logout Request is or not valid
+     * @return bool If the Logout Request is or not valid
      */
     public function isValid($retrieveParametersFromServer=false)
     {

@@ -25,9 +25,9 @@ class OneLogin_Saml2_Error extends Exception
     /**
      * Constructor
      *
-        * @param string  $msg  Describes the error.
-        * @param integer $code The code error (defined in the error class).
-        * @param array   $args Arguments used in the message that describes the error.
+     * @param string     $msg  Describes the error.
+     * @param int        $code The code error (defined in the error class).
+     * @param array|null $args Arguments used in the message that describes the error.
      */
     public function __construct($msg, $code = 0, $args = null)
     {
