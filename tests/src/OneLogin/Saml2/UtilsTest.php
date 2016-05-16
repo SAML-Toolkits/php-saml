@@ -530,7 +530,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             OneLogin_Saml2_Utils::parseTime2SAML('invalidtime');
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('strftime() expects parameter 2 to be long', $e->getMessage());
+            $this->assertContains('strftime() expects parameter 2 to be', $e->getMessage());
         }
     }
 
