@@ -58,7 +58,3 @@ if (!function_exists('getParamsFromUrl')) {
         return $parsedQuery;
     }
 }
-
-if (PHP_VERSION_ID < 70000) {
-    class Error extends \Exception {}
-}
