@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+v.2.9.0
+-------
+* Change the decrypt assertion process.
+* Add 2 extra validations to prevent Signature wrapping attacks.
+* Remove reference to wrong NameIDFormat: urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified should be urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+* [128](https://github.com/onelogin/php-saml/pull/128) Test php7 and upgrade phpunit
+* Update Readme with more descriptive requestedAuthnContext description and Security Guidelines
+
 v.2.8.0
 -------
 * Make NameIDPolicy of AuthNRequest optional
