@@ -107,31 +107,27 @@ class OneLogin_Saml2_Response
             $spData = $this->_settings->getSPData();
             $spEntityId = $spData['entityId'];
 
-            $signedElements = array();
-            if ($this->encrypted) {
-                $signNodes = $this->decryptedDocument->getElementsByTagName('Signature');
-            } else {
-                $signNodes = $this->document->getElementsByTagName('Signature');
-            }
-            foreach ($signNodes as $signNode) {
-                $signedElements[] = $signNode->parentNode->localName;
-            }
-
-            if (!empty($signedElements)) {
-                // Check SignedElements
-                if (!$this->validateSignedElements($signedElements)) {
-                    throw new Exception('Found an unexpected Signature Element. SAML Response rejected');
-                }
-            }
+            $signedElements = $this->processSignedElements();
 
             if ($this->_settings->isStrict()) {
                 $security = $this->_settings->getSecurityData();
 
                 if ($security['wantXMLValidation']) {
+                    $errorXmlMsg = "Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd";
                     $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                     if (!$res instanceof DOMDocument) {
-                        throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
+                        throw new Exception($errorXmlMsg);
                     }
+
+                    # If encrypted, check also the decrypted document
+
+                    if ($this->encrypted) {
+                        $res = OneLogin_Saml2_Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                        if (!$res instanceof DOMDocument) {
+                            throw new Exception($errorXmlMsg);
+                        }
+                    }
+
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
@@ -273,7 +269,7 @@ class OneLogin_Saml2_Response
                     $documentToValidate = $this->decryptedDocument;
                     if ($this->encrypted) {
                         $documentToValidate = $this->decryptedDocument;
-                        $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:EncryptedAssertion/saml:Assertion/saml:Subject/saml:EncryptedID');
+                        $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
                         if ($encryptedIDNodes->length > 0) {
                             throw new Exception('Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.');
                         }
@@ -512,6 +508,71 @@ class OneLogin_Saml2_Response
     }
 
     /**
+     * Verifies the signature nodes:
+     *   - Checks that are Response or Assertion
+     *   - Check that IDs and reference URI are unique and consistent.
+     *
+     * @return array Signed element tags
+     */
+    public function processSignedElements()
+    {
+        $signedElements = array();
+        $verifiedSeis = array();
+        $verifiedIds = array();
+
+        if ($this->encrypted) {
+            $signNodes = $this->decryptedDocument->getElementsByTagName('Signature');
+        } else {
+            $signNodes = $this->document->getElementsByTagName('Signature');
+        }
+        foreach ($signNodes as $signNode) {
+            $signedElement = $signNode->parentNode->localName;
+
+            if ($signedElement != 'Response' && $signedElement != 'Assertion') {
+                throw new Exception('Invalid Signature Element '.$signedElement.' SAML Response rejected');
+            }
+
+            # Check that reference URI matches the parent ID and no duplicate References or IDs
+            $idValue = $signNode->parentNode->getAttribute('ID');
+            if (empty($idValue)) {
+                throw new Exception('Signed Element must contain an ID. SAML Response rejected');
+            }
+
+            if (in_array($idValue, $verifiedIds)) {
+                throw new Exception('Duplicated ID. SAML Response rejected');
+            }
+            $verifiedIds[] = $idValue;
+
+            $ref = $signNode->getElementsByTagName('Reference');
+            if (!empty($ref)) {
+                $ref = $ref->item(0);
+                $sei = $ref->getAttribute('URI');
+                if (!empty($sei)) {
+                    $sei = substr($sei, 1);
+
+                    if ($sei != $idValue) {
+                        throw new Exception('Found an invalid Signed Element. SAML Response rejected');
+                    }
+
+                    if (in_array($sei, $verifiedSeis)) {
+                        throw new Exception('Duplicated Reference URI. SAML Response rejected');
+                    }
+                    $verifiedSeis[] = $sei;
+                }
+            }
+            $signedElements[] = $signedElement;
+        }
+
+        if (!empty($signedElements)) {
+            // Check SignedElements
+            if (!$this->validateSignedElements($signedElements)) {
+                throw new Exception('Found an unexpected Signature Element. SAML Response rejected');
+            }
+        }
+        return $signedElements;
+    }
+
+    /**
      * Verifies that the document is still valid according Conditions Element.
      *
      * @return bool
@@ -580,8 +641,7 @@ class OneLogin_Saml2_Response
         $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
         $xpath->registerNamespace('xenc', OneLogin_Saml2_Constants::NS_XENC);
 
-        $assertionNode = $this->encrypted ? '/samlp:Response/saml:EncryptedAssertion/saml:Assertion'
-                : '/samlp:Response/saml:Assertion';
+        $assertionNode = '/samlp:Response/saml:Assertion';
         $signatureQuery = $assertionNode . '/ds:Signature/ds:SignedInfo/ds:Reference';
         $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
         if (!$assertionReferenceNode) {
@@ -595,9 +655,9 @@ class OneLogin_Saml2_Response
                 } else {
                     $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
                 }
-                $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
+                $nameQuery = "/samlp:Response[@ID='$id']/saml:Assertion" . $assertionXpath;
             } else {
-                $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
+                $nameQuery = "/samlp:Response/saml:Assertion" . $assertionXpath;
             }
         } else {
             $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
@@ -668,11 +728,18 @@ class OneLogin_Saml2_Response
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }
-        $decrypt = $objenc->decryptNode($objKey, true);
-        if ($decrypt instanceof DOMDocument) {
-            return $decrypt;
+
+        $decrypted = $objenc->decryptNode($objKey, true);
+
+        if ($decrypted instanceof DOMDocument) {
+            return $decrypted;
         } else {
-            return $decrypt->ownerDocument;
+            $encryptedAssertion = $decrypted->parentNode;
+            $container = $encryptedAssertion->parentNode;
+
+            $container->replaceChild($decrypted, $encryptedAssertion);
+
+            return $decrypted->ownerDocument;
         }
     }
 
