@@ -39,6 +39,10 @@ $advancedSettings = array (
         'wantMessagesSigned' => false,
 
         // Indicates a requirement for the <saml:Assertion> elements received by
+        // this SP to be encrypted. [Metadata of the SP will offer this info]
+        'wantAssertionsEncrypted' => false,
+
+        // Indicates a requirement for the <saml:Assertion> elements received by
         // this SP to be signed.        [The Metadata of the SP will offer this info]
         'wantAssertionsSigned' => false,
 
