@@ -102,7 +102,10 @@ class OneLogin_Saml2_Auth
      */
     public function setStrict($value)
     {
-        assert('is_bool($value)');
+        if (! (is_bool($value))) {
+            throw new Exception('Invalid value passed to setStrict()');
+        }
+
         $this->_settings->setStrict($value);
     }
 

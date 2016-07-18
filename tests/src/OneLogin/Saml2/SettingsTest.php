@@ -7,7 +7,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-    * Tests the OneLogin_Saml2_Settings Constructor. 
+    * Tests the OneLogin_Saml2_Settings Constructor.
     * Case load setting from array
     *
     * @covers OneLogin_Saml2_Settings
@@ -43,7 +43,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_Settings Constructor. 
+    * Tests the OneLogin_Saml2_Settings Constructor.
     * Case load setting from OneLogin_Saml_Settings's object
     *
     * @covers OneLogin_Saml2_Settings
@@ -60,7 +60,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_Settings Constructor. 
+    * Tests the OneLogin_Saml2_Settings Constructor.
     * Case load setting from file
     *
     * @covers OneLogin_Saml2_Settings
@@ -740,7 +740,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
             $settings->setStrict('a');
             $this->assertTrue(false);
         } catch (Exception $e) {
-            $this->assertContains('Assertion "is_bool($value)" failed', $e->getMessage());
+            $this->assertContains('Invalid value passed to setStrict()', $e->getMessage());
         }
     }
 
