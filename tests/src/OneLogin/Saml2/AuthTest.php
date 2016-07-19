@@ -23,7 +23,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     /**
     * Tests the getSettings method of the OneLogin_Saml2_Auth class
     * Build a OneLogin_Saml2_Settings object with a setting array
-    * and compare the value returned from the method of the 
+    * and compare the value returned from the method of the
     * $auth object
     *
     * @covers OneLogin_Saml2_Auth::getSettings
@@ -93,7 +93,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
-    * @covers OneLogin_Saml2_Auth::getLastErrorReason    
+    * @covers OneLogin_Saml2_Auth::getLastErrorReason
     */
     public function testProcessResponseInvalid()
     {
@@ -150,7 +150,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_Auth::processResponse
     * @covers OneLogin_Saml2_Auth::isAuthenticated
-    * @covers OneLogin_Saml2_Auth::getAttributes    
+    * @covers OneLogin_Saml2_Auth::getAttributes
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
     * @covers OneLogin_Saml2_Auth::getSessionIndex
@@ -178,7 +178,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
-    * (phpunit raises an exception when a redirect is executed, the 
+    * (phpunit raises an exception when a redirect is executed, the
     * exception is catched and we check that the targetURL is correct)
     * Case redirect without url parameter
     *
@@ -205,7 +205,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
-    * (phpunit raises an exception when a redirect is executed, the 
+    * (phpunit raises an exception when a redirect is executed, the
     * exception is catched and we check that the targetURL is correct)
     * Case redirect with url parameter
     *
@@ -358,7 +358,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
-    * Case Valid Logout Response, validating deleting the local session  
+    * Case Valid Logout Response, validating deleting the local session
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     */
@@ -482,7 +482,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     */
-    
+
     public function testProcessSLORequestNotOnOrAfterFailed()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/invalids/not_after_failed.xml.base64');
@@ -741,7 +741,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the login method of the OneLogin_Saml2_Auth class
-    * Case Login with relayState. An AuthnRequest is built. GET with SAMLRequest, 
+    * Case Login with relayState. An AuthnRequest is built. GET with SAMLRequest,
     * and RelayState. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::login
@@ -880,7 +880,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $request = gzinflate($decoded);
             $this->assertNotContains('ForceAuthn="true"', $request);
         }
-        
+
         try {
             // The Header of the redirect produces an Exception
             $returnTo = 'http://example.com/returnto';
@@ -962,7 +962,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $request = gzinflate($decoded);
             $this->assertNotContains('IsPassive="true"', $request);
         }
-        
+
         try {
             // The Header of the redirect produces an Exception
             $returnTo = 'http://example.com/returnto';
@@ -1040,7 +1040,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $request = gzinflate($decoded);
             $this->assertNotContains('<samlp:NameIDPolicy', $request);
         }
-        
+
         try {
             // The Header of the redirect produces an Exception
             $returnTo = 'http://example.com/returnto';
@@ -1285,7 +1285,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the logout method of the OneLogin_Saml2_Auth class
-    * Case IdP no SLO endpoint. 
+    * Case IdP no SLO endpoint.
     *
     * @covers OneLogin_Saml2_Auth::logout
     */
@@ -1335,7 +1335,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $auth->setStrict('a');
             $this->assertTrue(false);
         } catch (Exception $e) {
-            $this->assertContains('Assertion "is_bool($value)" failed', $e->getMessage());
+            $this->assertContains('Invalid value passed to setStrict()', $e->getMessage());
         }
     }
 
