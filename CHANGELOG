@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v.2.9.1
+.......
+* [134](https://github.com/onelogin/php-saml/pull/134) PHP7 production settings compiles out assert(), throw an exception explicitly
+* [132](https://github.com/onelogin/php-saml/pull/132) Add note for "wantAssertionsEncrypted"
+* Update copyright on LICENSE
+
 v.2.9.0
 -------
 * Change the decrypt assertion process.
