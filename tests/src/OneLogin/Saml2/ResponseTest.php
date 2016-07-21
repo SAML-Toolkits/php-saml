@@ -1202,7 +1202,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertContains('No Signature found. SAML Response rejected', $response4->getError());
     }
 
-    public function testIsValidEncWithNSProblem() {
+    public function testIsValidEncWithNSProblem()
+    {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
