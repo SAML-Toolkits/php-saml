@@ -69,7 +69,7 @@ class OneLogin_Saml2_Response
         if ($encryptedAssertionNodes->length !== 0) {
             $this->decryptedDocument = clone $this->document;
             $this->encrypted = true;
-            $this->_decryptAssertion($this->decryptedDocument);
+            $this->decryptedDocument = $this->_decryptAssertion($this->decryptedDocument);
         }
     }
 
@@ -738,7 +738,14 @@ class OneLogin_Saml2_Response
 
             $container->replaceChild($decrypted, $encryptedAssertion);
 
-            return $decrypted->ownerDocument;
+            // Fix NameSpace && LocalName if required
+            if (!isset($decrypted->namespaceURI) || $decrypted->localName != 'Assertion') {
+                $original = $decrypted->ownerDocument->saveXML();
+                $dom = new DOMDocument();
+                return OneLogin_Saml2_Utils::loadXML($dom, $original);
+            } else {
+                return $decrypted->ownerDocument;
+            }
         }
     }
 

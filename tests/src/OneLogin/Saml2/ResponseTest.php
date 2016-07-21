@@ -419,6 +419,27 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('SAML Response must contain 1 assertion', $response->getError());
     }
 
+    public function testDoesNotAllowSignatureWrappingAttack2()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        unset($settingsInfo['idp']['x509cert']);
+        $settingsInfo['strict'] = false;
+        $settingsInfo['idp']['certFingerprint'] = "385b1eec71143f00db6af936e2ea12a28771d72c";
+        $settingsInfo['sp']['privateKey'] = 'MIICXAIBAAKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABAoGBALGR6bRBit+yV5TUU3MZSrf8WQSLWDLgs/33FQSAEYSib4+DJke2lKbI6jkGUoSJgFUXFbaQLtMY2+3VDsMKPBdAge9gIdvbkC4yoKjLGm/FBDOxxZcfLpR+9OPqU3qM9D0CNuliBWI7Je+p/zs09HIYucpDXy9E18KA1KNF6rfhAkEA9KoNam6wAKnmvMzz31ws3RuIOUeo2rx6aaVY95+P9tTxd6U+pNkwxy1aCGP+InVSwlYNA1aQ4Axi/GdMIWMkxwJBAPO1CP7cQNZQmu7yusY+GUObDII5YK9WLaY4RAicn5378crPBFxvUkqf9G6FHo7u88iTCIp+vwa3Hn9Tumg3iP0CQQDgUXWBasCVqzCxU5wY4tMDWjXYhpoLCpmVeRML3dDJt004rFm2HKe7Rhpw7PTZNQZOxUSjFeA4e0LaNf838UWLAkB8QfbHM3ffjhOg96PhhjINdVWoZCb230LBOHj/xxPfUmFTHcBEfQIBSJMxcrBFAnLL9qPpMXymqOFk3ETz9DTlAj8E0qGbp78aVbTOtuwEwNJII+RPw+Zkc+lKR+yaWkAzfIXw527NPHH3+rnBG72wyZr9ud4LAum9jh+5No1LQpk=';
+        $settingsInfo['sp']['x509cert'] = 'MIICGzCCAYQCCQCNNcQXom32VDANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzELMAkGA1UECBMCSU4xFTATBgNVBAcTDEluZGlhbmFwb2xpczERMA8GA1UEChMIT25lTG9naW4xDDAKBgNVBAsTA0VuZzAeFw0xNDA0MjMxODQxMDFaFw0xNTA0MjMxODQxMDFaMFIxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJJTjEVMBMGA1UEBxMMSW5kaWFuYXBvbGlzMREwDwYDVQQKEwhPbmVMb2dpbjEMMAoGA1UECxMDRW5nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBALM2vGCiQ/vm+a6v40+VX2zdqHA2Q/1vF1ibQzJ54MJCOVWvs+vQXfZFhdm0OPM2IrDU7oqvKPqP6xOAeJK6H0yP7M4YL3fatSvIYmmfyXC9kt3Svz/NyrHzPhUnJ0ye/sUSXxnzQxwcm/9PwAqrQaA3QpQkH57ybF/OoryPe+2h';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_3.xml.base64');
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+
+        $valid = $response->isValid();
+
+        $this->assertFalse($valid);
+    }
+
     /**
     * Tests the getSessionNotOnOrAfter method of the OneLogin_Saml2_Response
     *
@@ -1179,6 +1200,20 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $response4->isValid();
         $this->assertContains('No Signature found. SAML Response rejected', $response4->getError());
+    }
+
+    public function testIsValidEncWithNSProblem() {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['idp']['x509cert'] = 'MIICajCCAdOgAwIBAgIBADANBgkqhkiG9w0BAQ0FADBSMQswCQYDVQQGEwJ1czETMBEGA1UECAwKQ2FsaWZvcm5pYTEVMBMGA1UECgwMT25lbG9naW4gSW5jMRcwFQYDVQQDDA5zcC5leGFtcGxlLmNvbTAeFw0xNDA3MTcxNDEyNTZaFw0xNTA3MTcxNDEyNTZaMFIxCzAJBgNVBAYTAnVzMRMwEQYDVQQIDApDYWxpZm9ybmlhMRUwEwYDVQQKDAxPbmVsb2dpbiBJbmMxFzAVBgNVBAMMDnNwLmV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZx+ON4IUoIWxgukTb1tOiX3bMYzYQiwWPUNMp+Fq82xoNogso2bykZG0yiJm5o8zv/sd6pGouayMgkx/2FSOdc36T0jGbCHuRSbtia0PEzNIRtmViMrt3AeoWBidRXmZsxCNLwgIV6dn2WpuE5Az0bHgpZnQxTKFek0BMKU/d8wIDAQABo1AwTjAdBgNVHQ4EFgQUGHxYqZYyX7cTxKVODVgZwSTdCnwwHwYDVR0jBBgwFoAUGHxYqZYyX7cTxKVODVgZwSTdCnwwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQ0FAAOBgQByFOl+hMFICbd3DJfnp2Rgd/dqttsZG/tyhILWvErbio/DEe98mXpowhTkC04ENprOyXi7ZbUqiicF89uAGyt1oqgTUCD1VsLahqIcmrzgumNyTwLGWo17WDAa1/usDhetWAMhgzF/Cnf5ek0nK00m0YZGyc4LzgD0CROMASTWNg==';
+        $settingsInfo['sp']['x509cert'] = 'MIICPDCCAaWgAwIBAgIBADANBgkqhkiG9w0BAQ0FADA7MQswCQYDVQQGEwJ1czEMMAoGA1UECAwDeHh4MQwwCgYDVQQKDAN4eHgxEDAOBgNVBAMMB3h4eC5jb20wHhcNMTYwNzIwMTQ1MzE5WhcNMTcwNzIwMTQ1MzE5WjA7MQswCQYDVQQGEwJ1czEMMAoGA1UECAwDeHh4MQwwCgYDVQQKDAN4eHgxEDAOBgNVBAMMB3h4eC5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL/CBtDyuvSbbS3ngUtQ+vBNiGSainIhxZDd8QFFInoRAUuST2WDRLNe0InkaMrE9yJXnQb0EUDfN+9gQgoNIzhrcUK8OzttKRTSecdxaab9KdRqd2T8fsr4A91clOCh8uoUi3yyQkHA6pHArKFuxFc5FkfkvOS5mLo967VTn/qBAgMBAAGjUDBOMB0GA1UdDgQWBBRNQKAK0I1y2ztvJ3aZvo+/s13aoDAfBgNVHSMEGDAWgBRNQKAK0I1y2ztvJ3aZvo+/s13aoDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBDQUAA4GBAF/BiDLQWm6GoXLi/xgih59kCeqjWhggeDEQt2nD4b4MNIR/d+xBZ/NE0IGBEu1BG6lmUMn3mVhdNalNAvaKOhBRywXX6tdoIxwdg7d6GGI9eI7EHNCOFbPwM133eAs9ars1WO5TxPqWcp1Pgwtl7SQH18NEH8xXbcg3VM5tXhO4';
+        $settingsInfo['sp']['privateKey'] = 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAL/CBtDyuvSbbS3ngUtQ+vBNiGSainIhxZDd8QFFInoRAUuST2WDRLNe0InkaMrE9yJXnQb0EUDfN+9gQgoNIzhrcUK8OzttKRTSecdxaab9KdRqd2T8fsr4A91clOCh8uoUi3yyQkHA6pHArKFuxFc5FkfkvOS5mLo967VTn/qBAgMBAAECgYEAghH0WassEVuUNT0BQLtPW8zbpZIGMuChiGBjZ78jYbVDMaWu4WanJRw9TCt4wYHVOKBBTUQkp+JBqMecRAEhT6ZLdZP3olA0JMLg7/XeJ9f3WmVxG5y3mm3xc1qYMaZrflPI8d+ehkrWt0CPgRisvtS6gjTMrAT9tpOSnvUKyCECQQD/NDuik4UFcbdwPeR0Rmm14pQeTfanHq03tSp/nZAGAnCWUJqkatGAdzvdBVMf1akw3Yj4/tmb6YQVzSvomJldAkEAwFsioWHVhsPPRk5AlkwJPdatQp3d+U8TP/TyWPRvIIXCqwaeU+lw3aivJIn2ElEH4iMTcMDQfmMYP/QjQnQ/dQJBAKQsRfDgVcKa1RcvubfTVE3d5MtZ/EKmSWh880oFYpF7IFKSp+j9jqjGC4yz0DW6jY0R9vu3duYF4yLjSkvnX0ECQBFAm0yKL9KUgWS25AgW7cVEGeodqqkPtJRJ7eqYkdcC6EDaqRyxlVPsKzlFvnJKHkDkEHxObuTHEoe55+ev8XkCQF3DSI43jzsEHvt6DGz77vqA6lMcPnnzDYRI1qfTHv8TG6i7nBNqUGsvpFvAHH2EIClDNUa4xlfPP3jEAk18rYw=';
+        $xml = base64_encode(file_get_contents(TEST_ROOT . '/data/responses/signed_encrypted_assertion_with_ns_problems.xml'));
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
     }
 
     /**
