@@ -266,7 +266,6 @@ class OneLogin_Saml2_Response
                     $documentToValidate = $this->document;
                 } else {
                     # Otherwise validates the assertion (decrypted assertion if was encrypted)
-                    $documentToValidate = $this->decryptedDocument;
                     if ($this->encrypted) {
                         $documentToValidate = $this->decryptedDocument;
                         $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
