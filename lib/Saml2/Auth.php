@@ -509,7 +509,7 @@ class OneLogin_Saml2_Auth
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLResponse='.urlencode($samlResponse);
-        if (isset($relayState) && !empty($relayState)) {
+        if (isset($relayState)) {
             $msg .= '&RelayState='.urlencode($relayState);
         }
         $msg .= '&SigAlg=' . urlencode($signAlgorithm);
