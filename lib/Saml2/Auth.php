@@ -199,7 +199,7 @@ class OneLogin_Saml2_Auth
 
                 $security = $this->_settings->getSecurityData();
                 if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-                    $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState'], $security['signatureAlgorithm']);
+                    $signature = $this->buildResponseSignature($logoutResponse, isset($parameters['RelayState'])? $parameters['RelayState']: null, $security['signatureAlgorithm']);
                     $parameters['SigAlg'] = $security['signatureAlgorithm'];
                     $parameters['Signature'] = $signature;
                 }
@@ -509,7 +509,9 @@ class OneLogin_Saml2_Auth
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLResponse='.urlencode($samlResponse);
-        $msg .= '&RelayState='.urlencode($relayState);
+        if (isset($relayState) && !empty($relayState)) {
+            $msg .= '&RelayState='.urlencode($relayState);
+        }
         $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
