@@ -117,7 +117,7 @@ REQUESTEDAUTHN;
         if (isset($idpData['idpList']) && is_array($idpData['idpList'])) {
             $idpListProxyCount = isset($idpData['idpListProxyCount']) ? $idpData['idpListProxyCount'] : 1;
             $idpListStr = '';
-            foreach($idpData['idpList'] as $idpProviderId) {
+            foreach ($idpData['idpList'] as $idpProviderId) {
                 $idpListStr .= '<samlp:IDPEntry ProviderID="' . $idpProviderId . '" />';
             }
             $scopingStr = <<<SCOPING
