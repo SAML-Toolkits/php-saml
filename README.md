@@ -70,7 +70,7 @@ Installation
    encrypted data (`nameID`, `assertions`).
  * `gettext`. Install that library and its php driver. It handles translations.
 
-Since [PHP 5.3 is officially unssuported](http://php.net/eol.php) we recommend you to use a newer PHP version.
+Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
 
 ### Code ###
 
@@ -99,7 +99,7 @@ After installation has completed you will find at the `vendor/` folder a new fol
 **Important** In this option, the x509 certs must be stored at `vendor/onelogin/php-saml/certs`
 and settings file stored at `vendor/onelogin/php-saml`.
 
-Your settings are at risk of being deleted when updating packages using `composer update` or similiar commands. So is **highly** recommended that instead of use settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similiar commands.
+Your settings are at risk of being deleted when updating packages using `composer update` or similiar commands. So it is **highly** recommended that instead of using settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similiar commands.
 
 Compatibility
 -------------
@@ -114,7 +114,7 @@ The old-demo folder contains code from an old app that uses the old version of
 the toolkit (v.1). Take a look.
 
 Sometimes the names of the classes of the old code could be a bit different
-and if is your case you must change them for `OneLogin_Saml_Settings`,
+and if that is your case you must change them for `OneLogin_Saml_Settings`,
 `OneLogin_Saml_Response`, `OneLogin_Saml_AuthRequest` or `OneLogin_Saml_Metadata`.
 
 We recommend that you migrate the old code to the new one to be able to use
@@ -432,7 +432,7 @@ $advancedSettings = array (
         'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
     ),
 
-    // Contact information template, it is recommended to suply a
+    // Contact information template, it is recommended to supply a
     // technical and support contacts.
     'contactPerson' => array (
         'technical' => array (
@@ -552,7 +552,7 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->login($newTargetUrl);
 ```
 
-The login method can recieve other five optional parameters:
+The login method can receive other five optional parameters:
 
 * `$parameters` - An array of parameters that will be added to the `GET` in the HTTP-Redirect.
 * `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
@@ -1038,7 +1038,7 @@ A simple class used to build the Setting object used in the v1.0 of the toolkit.
 
 ##### OneLogin_Saml_XmlSec - `XmlSec.php` #####
 
-Auxiliary class that contains methos to validate the SAML Response:
+Auxiliary class that contains methods to validate the SAML Response:
 `validateNumAssertions`, `validateTimestamps`, `isValid` (which
 uses the other two previous methods and also validate the signature of
 SAML Response).
@@ -1102,7 +1102,7 @@ SAML 2 Authentication Response class
    Assertion (encrypted or not).
  * `validateTimestamps` - Verifies that the document is still valid according
    Conditions Element.
- * `getError` - After execute a validation process, if fails this method returns the cause
+ * `getError` - After executing a validation process, if it fails, this method returns the cause
 
 ##### OneLogin_Saml2_LogoutRequest - `LogoutRequest.php` #####
 
@@ -1115,8 +1115,8 @@ SAML 2 Logout Request class
  * `getNameId` - Gets the NameID of the Logout Request.
  * `getIssuer` - Gets the Issuer of the Logout Request.
  * `getSessionIndexes` - Gets the SessionIndexes from the Logout Request.
- * `isValid` - Checks if the Logout Request recieved is valid.
- * `getError` - After execute a validation process, if fails this method returns the cause
+ * `isValid` - Checks if the Logout Request received is valid.
+ * `getError` - After executing a validation process, if it fails, this method returns the cause
 
 ##### OneLogin_Saml2_LogoutResponse - `LogoutResponse.php` #####
 
@@ -1129,7 +1129,7 @@ SAML 2 Logout Response class
  * `isValid` - Determines if the SAML LogoutResponse is valid
  * `build` - Generates a Logout Response object.
  * `getResponse` - Returns a Logout Response object.
- * `getError` - After execute a validation process, if fails this method returns the cause
+ * `getError` - After executing a validation process, if it fails, this method returns the cause
 
 ##### OneLogin_Saml2_Settings - `Settings.php` #####
 
@@ -1189,7 +1189,7 @@ Auxiliary class that contains several methods
    (if different than common ports).
  * `getSelfURLNoQuery` - Returns the URL of the current host + current view.
  * `getSelfURL` - Returns the URL of the current host + current view + query.
- * `generateUniqueID` - Generates an unique string (used for example as ID
+ * `generateUniqueID` - Generates a unique string (used for example as ID
    for assertions).
  * `parseTime2SAML` - Converts a UNIX timestamp to SAML2 timestamp on the
    form `yyyy-mm-ddThh:mm:ss(\.s+)?Z`.
@@ -1203,7 +1203,7 @@ Auxiliary class that contains several methods
  * `isSessionStarted` - Checks if the session is started or not.
  * `deleteLocalSession` - Deletes the local session.
  * `calculateX509Fingerprint` - Calculates the fingerprint of a x509cert.
- * `formatFingerPrint` - Formates a fingerprint.
+ * `formatFingerPrint` - Formats a fingerprint.
  * `generateNameId` - Generates a `nameID`.
  * `getStatus` - Gets Status from a Response.
  * `decryptElement` - Decrypts an encrypted element.
@@ -1213,7 +1213,7 @@ Auxiliary class that contains several methods
  * `validateSign` - Validates a signature (Message or Assertion).
 
 For more info, look at the source code; each method is documented and details
-about what does and how to use it are provided. Make sure to also check the doc folder where
+about what it does and how to use it are provided. Make sure to also check the doc folder where
 HTML documentation about the classes and methods is provided for SAML and
 SAML2.
 
@@ -1278,7 +1278,7 @@ Once the SP is configured, the metadata of the SP is published at the
  4. We are logged in the app and the user attributes are showed. 
     At this point, we can test the single log out functionality.
 
- 5. The single log out funcionality could be tested by two ways.
+ 5. The single log out functionality could be tested by two ways.
 
     5.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that a
     Logout Request is sent to the IdP, the session at the IdP is closed and 
@@ -1295,7 +1295,7 @@ Once the SP is configured, the metadata of the SP is published at the
     of the IdP). The IdP receives the Logout Response, process it and close the
     session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
     
-Notice that all the SAML Requests and Responses are handled at a unique file,
+Notice that all the SAML Requests and Responses are handled by a unique file,
 the `index.php` file and how `GET` paramters are used to know the action that
 must be done.
 
@@ -1354,7 +1354,7 @@ demo1, only changes the targets.
  3. We are logged into the app and the user attributes (if any) are shown. 
     At this point, we can test the single log out functionality.
 
- 4. The single log out funcionality could be tested by two ways.
+ 4. The single log out functionality could be tested by two ways.
 
     4.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that
     we are redirected to the `slo.php` view and there a Logout Request is sent
@@ -1383,7 +1383,7 @@ An object of the class `OneLogin_Saml_Settings` must be provided to the
 constructor of the `AuthRequest`.
 
 You will find an `example_settings.php` file at the demo-old's folder that
-could be used as a template for you `settings.php` file.
+could be used as a template for your `settings.php` file.
 
 In that template, SAML settings are divided into two parts, the application
 specific (`const_assertion_consumer_service_url`, `const_issuer`,
