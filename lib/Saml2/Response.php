@@ -646,13 +646,13 @@ class OneLogin_Saml2_Response
         if (!$assertionReferenceNode) {
             // is the response signed as a whole?
             $signatureQuery = '/samlp:Response/ds:Signature/ds:SignedInfo/ds:Reference';
-            $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
-            if ($assertionReferenceNode) {
-                $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
+            $responseReferenceNode = $xpath->query($signatureQuery)->item(0);
+            if ($responseReferenceNode) {
+                $uri = $responseReferenceNode->attributes->getNamedItem('URI')->nodeValue;
                 if (empty($uri)) {
-                    $id = $assertionReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
+                    $id = $responseReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
                 } else {
-                    $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                    $id = substr($responseReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
                 }
                 $nameQuery = "/samlp:Response[@ID='$id']/saml:Assertion" . $assertionXpath;
             } else {
