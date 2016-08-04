@@ -476,7 +476,9 @@ class OneLogin_Saml2_Auth
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLRequest='.urlencode($samlRequest);
-        $msg .= '&RelayState='.urlencode($relayState);
+        if (isset($relayState)) {
+            $msg .= '&RelayState='.urlencode($relayState);
+        }
         $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
