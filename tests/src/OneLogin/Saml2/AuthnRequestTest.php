@@ -203,7 +203,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $authnRequest = new OneLogin_Saml2_AuthnRequest($settings, false, false, false);
         $encodedRequest = $authnRequest->getRequest();
         $decoded = base64_decode($encodedRequest);
-        $this->assertContains('<samlp:NameIDPolicy', $decoded);
+        $this->assertContains('<samlp:AuthnRequest', $decoded);
     }
 
     /**
