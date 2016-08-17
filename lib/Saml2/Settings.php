@@ -676,6 +676,11 @@ class OneLogin_Saml2_Settings
         return $this->_organization;
     }
 
+    /**
+     * Should we compress the body of a saml request?
+     *
+     * @return bool Yes/No as True/False
+     */
     public function shouldWeCompressRequests()
     {
         return $this->_compressRequest;
