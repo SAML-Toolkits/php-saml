@@ -126,6 +126,29 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests shouldWeCompressRequests method of the OneLogin_Saml2_Settings
+    *
+    * @covers OneLogin_Saml2_Settings::shouldWeCompressRequests
+    */
+    public function testGetCompressionSettings()
+    {
+        $settings = new OneLogin_Saml2_Settings();
+        $this->assertTrue($settings->shouldWeCompressRequests());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertTrue($settings->shouldWeCompressRequests());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertFalse($settings->shouldWeCompressRequests());
+    }
+
+    /**
     * Tests the checkSPCerts method of the OneLogin_Saml2_Settings
     *
     * @covers OneLogin_Saml2_Settings::checkSPCerts
