@@ -126,9 +126,9 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests getCompressionSettings method of the OneLogin_Saml2_Settings
+    * Tests shouldWeCompressRequests method of the OneLogin_Saml2_Settings
     *
-    * @covers OneLogin_Saml2_Settings::getCompressionSettings
+    * @covers OneLogin_Saml2_Settings::shouldWeCompressRequests
     */
     public function testGetCompressionSettings()
     {
