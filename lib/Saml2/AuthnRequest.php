@@ -141,8 +141,13 @@ AUTHNREQUEST;
      */
     public function getRequest()
     {
-        $deflatedRequest = gzdeflate($this->_authnRequest);
-        $base64Request = base64_encode($deflatedRequest);
+        if ($this->_settings->shouldWeCompressRequests()) {
+            $deflatedRequest = gzdeflate($this->_authnRequest);
+            $base64Request = base64_encode($deflatedRequest);
+        } else {
+            $base64Request = base64_encode($this->_authnRequest);
+        }
+
         return $base64Request;
     }
 

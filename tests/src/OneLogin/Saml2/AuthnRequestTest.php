@@ -190,6 +190,23 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test the getRequest method.
+     * A developer should be able to opt out of gzip encoding so that they can communicate
+     * with idp's that don't/can't support it.
+     */
+    public function testSkipGzipCompression()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings, false, false, false);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $this->assertContains('<samlp:NameIDPolicy', $decoded);
+    }
+
+    /**
     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request
     *

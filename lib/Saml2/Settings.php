@@ -73,6 +73,13 @@ class OneLogin_Saml2_Settings
     private $_errors = array();
 
     /**
+     * Setting compression
+     *
+     * @var bool
+     */
+     private $_compressRequest = true;
+
+    /**
      * Setting errors.
      *
      * @var array
@@ -242,6 +249,10 @@ class OneLogin_Saml2_Settings
 
             if (isset($settings['organization'])) {
                 $this->_organization = $settings['organization'];
+            }
+
+            if (isset($settings['compress_request'])) {
+                $this->_compressRequest = (boolean) $settings['compress_request'];
             }
 
             $this->_addDefaultValues();
@@ -663,6 +674,11 @@ class OneLogin_Saml2_Settings
     public function getOrganization()
     {
         return $this->_organization;
+    }
+
+    public function shouldWeCompressRequests()
+    {
+        return $this->_compressRequest;
     }
 
     /**
