@@ -71,7 +71,7 @@ class OneLogin_Saml2_LogoutResponse
 
     /**
      * Gets the Status of the Logout Response.
-     * 
+     *
      * @return string The Status
      */
     public function getStatus()
@@ -213,7 +213,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Generates a Logout Response object.
      *
-     * @param string $inResponseTo InResponseTo value for the Logout Response. 
+     * @param string $inResponseTo InResponseTo value for the Logout Response.
      */
     public function build($inResponseTo)
     {
@@ -249,13 +249,16 @@ LOGOUTRESPONSE;
      */
     public function getResponse()
     {
-        $deflatedResponse = gzdeflate($this->_logoutResponse);
-        return base64_encode($deflatedResponse);
+        $subject = $this->_logoutResponse;
+        if ($this->_settings->shouldCompressResponses()) {
+            $subject = gzdeflate($this->_logoutResponse);
+        }
+        return base64_encode($subject);
     }
 
     /* After execute a validation process, if fails this method returns the cause.
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {

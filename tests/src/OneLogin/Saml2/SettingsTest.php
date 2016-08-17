@@ -126,6 +126,131 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests shouldCompressRequests method of OneLogin_Saml2_Settings.
+    *
+    * @covers OneLogin_Saml2_settings::shouldCompressRequests
+    */
+    public function testShouldCompressRequests()
+    {
+        //The default value should be true.
+        $settings = new OneLogin_Saml2_Settings();
+        $this->assertTrue($settings->shouldCompressRequests());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        //settings1.php contains a true value for compress => requests.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertTrue($settings->shouldCompressRequests());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        //settings2 contains a false value for compress => requests.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertFalse($settings->shouldCompressRequests());
+    }
+
+    /**
+    * Tests shouldCompressResponses method of OneLogin_Saml2_Settings.
+    *
+    * @covers OneLogin_Saml2_settings::shouldCompressResponses
+    */
+    public function testShouldCompressResponses()
+    {
+        //The default value should be true.
+        $settings = new OneLogin_Saml2_Settings();
+        $this->assertTrue($settings->shouldCompressResponses());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        //settings1.php contains a true value for compress => responses.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertTrue($settings->shouldCompressResponses());
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        //settings2 contains a false value for compress => responses.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $this->assertFalse($settings->shouldCompressResponses());
+    }
+
+    /**
+     * Tests the checkCompressionSettings method of OneLogin_Saml2_settings.
+     * @dataProvider invalidCompressSettingsProvider
+     * @covers OneLogin_Saml2_settings::checkCompressionSettings
+     */
+    public function testNonArrayCompressionSettingsCauseSyntaxError($invalidValue)
+    {
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['compress'] = $invalidValue;
+
+        try {
+           $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        } catch(OneLogin_Saml2_error $error) {
+           $expectedMessage = "Invalid array settings: invalid_syntax";
+           $this->assertEquals($expectedMessage, $error->getMessage());
+           return;
+        }
+
+        $this->fail("An OneLogin_Saml2_error should have been caught.");
+    }
+
+    /**
+     * Tests the checkCompressionSettings method of OneLogin_Saml2_settings.
+     * @dataProvider invalidCompressSettingsProvider
+     * @covers OneLogin_Saml2_settings::checkCompressionSettings
+     */
+    public function testThatOnlyBooleansCanBeUsedForCompressionSettings($invalidValue)
+    {
+
+        $requestsIsInvalid = false;
+        $responsesIsInvalid = false;
+
+        try {
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+
+            $settingsInfo['compress']['requests'] = $invalidValue;
+            $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        } catch(OneLogin_Saml2_error $error) {
+             $expectedMessage = "Invalid array settings: 'compress'=>'requests' values must be true or false.";
+             $this->assertEquals($expectedMessage, $error->getMessage());
+             $requestsIsInvalid = true;
+        }
+
+        try {
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+
+            $settingsInfo['compress']['responses'] = $invalidValue;
+            $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        } catch(OneLogin_Saml2_error $error) {
+             $expectedMessage = "Invalid array settings: 'compress'=>'responses' values must be true or false.";
+             $this->assertEquals($expectedMessage, $error->getMessage());
+             $responsesIsInvalid = true;
+        }
+
+        $this->assertTrue($requestsIsInvalid);
+        $this->assertTrue($responsesIsInvalid);
+    }
+
+    public function invalidCompressSettingsProvider()
+    {
+        return array(
+            array(1),
+            array(0.1),
+            array(new \stdClass),
+            array("A random string.")
+        );
+    }
+
+    /**
     * Tests the checkSPCerts method of the OneLogin_Saml2_Settings
     *
     * @covers OneLogin_Saml2_Settings::checkSPCerts

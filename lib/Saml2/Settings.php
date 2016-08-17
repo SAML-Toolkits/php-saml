@@ -45,6 +45,14 @@ class OneLogin_Saml2_Settings
     private $_idp = array();
 
     /**
+     * Compression settings that determine
+     * whether gzip compression should be used.
+     *
+     * @var array
+     */
+    private $_compress = array();
+
+    /**
      * Security Info related to the SP.
      *
      * @var array
@@ -232,6 +240,10 @@ class OneLogin_Saml2_Settings
                 $this->_debug = $settings['debug'];
             }
 
+            if (isset($settings['compress'])) {
+                $this->_compress = $settings['compress'];
+            }
+
             if (isset($settings['security'])) {
                 $this->_security = $settings['security'];
             }
@@ -295,6 +307,14 @@ class OneLogin_Saml2_Settings
         }
         if (isset($this->_sp['singleLogoutService']) && !isset($this->_sp['singleLogoutService']['binding'])) {
             $this->_sp['singleLogoutService']['binding'] = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT;
+        }
+
+        if (!isset($this->_compress['requests'])) {
+            $this->_compress['requests'] = true;
+        }
+
+        if (!isset($this->_compress['responses'])) {
+            $this->_compress['responses'] = true;
         }
 
         // Related to nameID
@@ -393,8 +413,42 @@ class OneLogin_Saml2_Settings
             }
             $spErrors = $this->checkSPSettings($settings);
             $errors = array_merge($spErrors, $errors);
+
+            $compressErrors = $this->checkCompressionSettings($settings);
+            $errors = array_merge($compressErrors, $errors);
         }
 
+        return $errors;
+    }
+
+    /**
+     * Checks the compression settings info.
+     *
+     * @param array $settings Array with settings data
+     *
+     * @return array $errors  Errors found on the settings data
+     */
+    public function checkCompressionSettings($settings)
+    {
+        $errors = array();
+
+        if (isset($settings['compress'])) {
+            if (!is_array($settings['compress'])) {
+                $errors[] = "invalid_syntax";
+            } else if (
+                isset($settings['compress']['requests'])
+                && $settings['compress']['requests'] !== true
+                && $settings['compress']['requests'] !== false
+            ) {
+                $errors[] = "'compress'=>'requests' values must be true or false.";
+            } else if (
+                isset($settings['compress']['responses'])
+                && $settings['compress']['responses'] !== true
+                && $settings['compress']['responses'] !== false
+            ) {
+                $errors[] = "'compress'=>'responses' values must be true or false.";
+            }
+        }
         return $errors;
     }
 
@@ -663,6 +717,26 @@ class OneLogin_Saml2_Settings
     public function getOrganization()
     {
         return $this->_organization;
+    }
+
+    /**
+    * Should SAML requests be compressed?
+    *
+    * @return bool Yes/No as True/False
+    */
+    public function shouldCompressRequests()
+    {
+        return $this->_compress['requests'];
+    }
+
+    /**
+    * Should SAML responses be compressed?
+    *
+    * @return bool Yes/No as True/False
+    */
+    public function shouldCompressResponses()
+    {
+        return $this->_compress['responses'];
     }
 
     /**

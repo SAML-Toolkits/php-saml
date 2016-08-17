@@ -226,4 +226,43 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $this->assertRegExp('#Format="urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"#', $message);
         $this->assertRegExp('#ProviderName="SP prueba"#', $message);
     }
+
+    /**
+    * Tests that a 'true' value for compress => requests gets honored when we
+    * try to obtain the request payload from getRequest()
+    *
+    * @covers OneLogin_Saml2_AuthnRequest::getRequest()
+    */
+    public function testWeCanChooseToCompressARequest()
+    {
+        //Test that we can compress.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $payload = $authnRequest->getRequest();
+        $decoded = base64_decode($payload);
+        $decompressed = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:AuthnRequest#', $decompressed);
+    }
+
+    /**
+    * Tests that a 'false' value for compress => requests gets honored when we
+    * try to obtain the request payload from getRequest()
+    *
+    * @covers OneLogin_Saml2_AuthnRequest::getRequest()
+    */
+    public function testWeCanChooseNotToCompressARequest()
+    {
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $payload = $authnRequest->getRequest();
+        $decoded = base64_decode($payload);
+        $this->assertRegExp('#^<samlp:AuthnRequest#', $decoded);
+    }
 }
