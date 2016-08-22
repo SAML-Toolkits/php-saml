@@ -256,7 +256,13 @@ class OneLogin_Saml2_Response
                 }
             }
 
-            if (!empty($signedElements)) {
+            $security = $this->_settings->getSecurityData();
+
+            $wantMessagesSigned = $this->_settings->isStrict() || $security['wantMessagesSigned'];
+
+            if ($wantMessagesSigned && empty($signedElements)) {
+                throw new Exception('No Signature found. SAML Response rejected');
+            } else if ($wantMessagesSigned) {
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
                 $fingerprintalg = $idpData['certFingerprintAlgorithm'];
@@ -280,8 +286,6 @@ class OneLogin_Saml2_Response
                 if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint, $fingerprintalg)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
-            } else {
-                throw new Exception('No Signature found. SAML Response rejected');
             }
             return true;
         } catch (Exception $e) {

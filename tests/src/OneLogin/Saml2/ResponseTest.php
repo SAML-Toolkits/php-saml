@@ -974,7 +974,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $settingsInfo['security']['wantAssertionsSigned'] = false;
         $settingsInfo['strict'] = false;
 
-        $settingsInfo['security']['wantMessagesSigned'] = false;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
         $settings5 = new OneLogin_Saml2_Settings($settingsInfo);
         $response5 = new OneLogin_Saml2_Response($settings5, $message);
         $response5->isValid();
