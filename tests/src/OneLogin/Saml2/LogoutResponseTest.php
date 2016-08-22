@@ -396,4 +396,35 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $decoded = base64_decode($payload);
         $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
     }
+
+    public function testWeCanChooseToDeflateAResponseBody()
+    {
+
+        $message = file_get_contents(
+            TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64'
+        );
+
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        
+        //Compression is currently turned on in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $payload = $logoutResponse->getResponse(false);
+        $decoded = base64_decode($payload);
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
+
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        
+        //Compression is currently turned on in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $payload = $logoutResponse->getResponse(true);
+        $decoded = base64_decode($payload);
+        $decompressed = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $decompressed);
+    }
 }

@@ -265,4 +265,37 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $decoded = base64_decode($payload);
         $this->assertRegExp('#^<samlp:AuthnRequest#', $decoded);
     }
+
+    /**
+     * Tests that we can pass a boolean value to the getRequest()
+     * method to choose whether it should 'gzdeflate' the body
+     * of the request.
+     *
+     * @covers OneLogin_Saml2_AuthnRequest::getRequest()
+     */
+    public function testWeCanChooseToDeflateARequestBody()
+    {
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        //Compression is currently turned on in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $payload = $authnRequest->getRequest(false);
+        $decoded = base64_decode($payload);
+        $this->assertRegExp('#^<samlp:AuthnRequest#', $decoded);
+
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        //Compression is currently turned off in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $payload = $authnRequest->getRequest(true);
+        $decoded = base64_decode($payload);
+        $decompressed = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:AuthnRequest#', $decompressed);
+    }
 }

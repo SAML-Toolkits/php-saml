@@ -483,6 +483,39 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests that we can pass a boolean value to the getRequest()
+     * method to choose whether it should 'gzdeflate' the body
+     * of the request.
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getRequest()
+     */
+    public function testWeCanChooseToDeflateARequestBody()
+    {
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        //Compression is currently turned on in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+        $payload = $logoutRequest->getRequest(false);
+        $decoded = base64_decode($payload);
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $decoded);
+
+        //Test that we can choose not to compress the request payload.
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+
+        //Compression is currently turned off in settings.
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+        $payload = $logoutRequest->getRequest(true);
+        $decoded = base64_decode($payload);
+        $decompressed = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $decompressed);
+    }
+
+    /**
     * Tests the isValid method of the OneLogin_Saml2_LogoutRequest
     *
     * @covers OneLogin_Saml2_LogoutRequest::isValid

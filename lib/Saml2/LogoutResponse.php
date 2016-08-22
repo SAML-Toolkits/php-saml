@@ -244,13 +244,20 @@ LOGOUTRESPONSE;
 
     /**
      * Returns a Logout Response object.
-     *
+     * 
+     * @param bool|null $deflate Whether or not we should 'gzdeflate' the response body before we return it.
+     *                           
      * @return string Logout Response deflated and base64 encoded
      */
-    public function getResponse()
+    public function getResponse($deflate = null)
     {
         $subject = $this->_logoutResponse;
-        if ($this->_settings->shouldCompressResponses()) {
+
+        if (is_null($deflate)) {
+            $deflate = $this->_settings->shouldCompressResponses();
+        }
+
+        if ($deflate) {
             $subject = gzdeflate($this->_logoutResponse);
         }
         return base64_encode($subject);

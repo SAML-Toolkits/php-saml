@@ -110,12 +110,19 @@ LOGOUTREQUEST;
     /**
      * Returns the Logout Request defated, base64encoded, unsigned
      *
+     * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
+     *
      * @return string Deflated base64 encoded Logout Request
      */
-    public function getRequest()
+    public function getRequest($deflate = null)
     {
         $subject = $this->_logoutRequest;
-        if ($this->_settings->shouldCompressRequests()) {
+
+        if (is_null($deflate)) {
+            $deflate = $this->_settings->shouldCompressRequests();
+        }
+
+        if ($deflate) {
             $subject = gzdeflate($this->_logoutRequest);
         }
 
