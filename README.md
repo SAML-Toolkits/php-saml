@@ -219,7 +219,7 @@ and support multiple languages.
 
 #### Other important files ####
 
-* `settings_example_example.php` - A template to be used in order to create a
+* `settings_example.php` - A template to be used in order to create a
   settings.php file which contains the basic configuration info of the toolkit.
 * `advanced_settings_example.php` - A template to be used in order to create a 
   advanced_settings.php file which contains extra configuration info related to
