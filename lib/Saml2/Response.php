@@ -543,7 +543,7 @@ class OneLogin_Saml2_Response
             $verifiedIds[] = $idValue;
 
             $ref = $signNode->getElementsByTagName('Reference');
-            if (!empty($ref)) {
+            if ($ref->length > 0) {
                 $ref = $ref->item(0);
                 $sei = $ref->getAttribute('URI');
                 if (!empty($sei)) {
