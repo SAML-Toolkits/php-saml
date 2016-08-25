@@ -96,6 +96,11 @@ CONTACT;
             $strContacts = "\n".implode("\n", $contactsInfo);
         }
 
+        $supportedNameIdFormat = '';
+        foreach($sp['NameIDFormat'] as $format){
+          $supportedNameIdFormat .= "<md:NameIDFormat>{$format}</md:NameIDFormat>" . "\n";
+        }
+
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -103,7 +108,7 @@ CONTACT;
                      cacheDuration="PT{$cacheDuration}S"
                      entityID="{$sp['entityId']}">
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-{$sls}        <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
+{$sls}       {$supportedNameIdFormat}
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
                                      Location="{$sp['assertionConsumerService']['url']}"
                                      index="1" />
