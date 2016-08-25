@@ -299,6 +299,11 @@ $settings = array (
         // represent the requested subject.
         // Take a look on lib/Saml2/Constants.php to see the NameIdFormat supported.
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        // If you require multiple format support, you can provide all formats in an array.
+        'NameIDFormat' => [
+            'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+        ]
         // Usually x509cert and privateKey of the SP are provided by files placed at
         // the certs folder. But we can also provide them with the following parameters
         'x509cert' => '',

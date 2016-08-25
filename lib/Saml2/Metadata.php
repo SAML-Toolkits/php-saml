@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Metadata lib of OneLogin PHP Toolkit
  *
@@ -97,8 +97,12 @@ CONTACT;
         }
 
         $supportedNameIdFormat = '';
-        foreach($sp['NameIDFormat'] as $format){
-          $supportedNameIdFormat .= "<md:NameIDFormat>{$format}</md:NameIDFormat>" . "\n";
+        if (is_array($sp['NameIDFormat'])) {
+            foreach ($sp['NameIDFormat'] as $format) {
+                $supportedNameIdFormat .= "<md:NameIDFormat>{$format}</md:NameIDFormat>" . "\n";
+            }
+        } else {
+            $supportedNameIdFormat = "<md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>" . "\n";
         }
 
         $metadata = <<<METADATA_TEMPLATE
@@ -164,7 +168,7 @@ METADATA_TEMPLATE;
 
         $keyInfo = $xml->createElementNS(OneLogin_Saml2_Constants::NS_DS, 'ds:KeyInfo');
         $keyInfo->appendChild($keyData);
-        
+
         $keyDescriptor = $xml->createElementNS(OneLogin_Saml2_Constants::NS_MD, "md:KeyDescriptor");
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);

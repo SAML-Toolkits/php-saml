@@ -37,7 +37,6 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertContains('Location="http://stuff.com/endpoints/endpoints/sls.php"', $metadata);
 
         $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>', $metadata);
 
         $this->assertContains('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', $metadata);
         $this->assertContains('<md:ContactPerson contactType="technical">', $metadata);
@@ -58,6 +57,27 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata2);
     }
 
+    /**
+    * Test if Array value of NameIDFormat will generate appropriate metadata file.
+    *
+    * @covers OneLogin_Saml2_Metadata::builder
+    */
+    public function testNameIDFormatArray()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings3.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $spData = $settings->getSPData();
+        $security = $settings->getSecurityData();
+        $organization = $settings->getOrganization();
+        $contacts = $settings->getContacts();
+
+        $metadata = OneLogin_Saml2_Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned'], null, null, $contacts, $organization);
+
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>', $metadata);
+    }
     /**
     * Tests the signMetadata method of the OneLogin_Saml2_Metadata
     *
@@ -91,7 +111,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $this->assertContains('Location="http://stuff.com/endpoints/endpoints/acs.php"', $signedMetadata);
         $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $signedMetadata);
         $this->assertContains(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $signedMetadata);
-        
+
         $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $signedMetadata);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $signedMetadata);
