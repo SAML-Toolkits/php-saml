@@ -10,7 +10,10 @@
             'singleLogoutService' => array (
                 'url' => 'http://stuff.com/endpoints/endpoints/sls.php',
             ),
-            'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+            'NameIDFormat' => array (
+                'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+                'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
+            ),
         ),
         'idp' => array (
             'entityId' => 'http://idp.example.com/',
