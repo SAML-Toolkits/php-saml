@@ -336,6 +336,21 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers OneLogin_Saml2_Utils::getSelfURLhost()
+     */
+    public function testGetselfurlhostdoubleport()
+    {
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $_SERVER['HTTP_HOST'] = 'example.com:8080';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = 82;
+        $this->assertEquals('http://example.com:82', OneLogin_Saml2_Utils::getSelfURLhost());
+
+        $_SERVER['HTTP_HOST'] = 'example.com:ok';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = 82;
+        $this->assertEquals('http://example.com:82', OneLogin_Saml2_Utils::getSelfURLhost());
+    }
+
+    /**
      * @covers OneLogin_Saml2_Utils::getSelfPort()
      */
     public function testGetselfPort()
