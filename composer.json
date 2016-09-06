@@ -31,6 +31,9 @@
         "pdepend/pdepend" : "1.1.0",
         "squizlabs/php_codesniffer": "*"
     },
+    "replace": {
+        "robrichards/xmlseclibs": "*"
+    },
     "suggest": {
         "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
         "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
