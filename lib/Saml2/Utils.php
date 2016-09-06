@@ -312,11 +312,7 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
-        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
-            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
-        } else if (isset($_SERVER["SERVER_PORT"])) {
-            $portnumber = $_SERVER["SERVER_PORT"];
-        }
+        $portnumber = self::getSelfPort();
 
         if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
             $port = ':' . $portnumber;
@@ -326,13 +322,10 @@ class OneLogin_Saml2_Utils
     }
 
     /**
-     * Returns the current host.
-     *
-     * @return string $currentHost The current host
+     * @return string The raw host name
      */
-    public static function getSelfHost()
+    protected static function getRawHost()
     {
-
         if (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
@@ -344,15 +337,48 @@ class OneLogin_Saml2_Utils
                 $currentHost = php_uname("n");
             }
         }
+        return $currentHost;
+    }
 
-        if (strstr($currentHost, ":")) {
-            $currentHostData = explode(":", $currentHost);
-            $possiblePort = array_pop($currentHostData);
-            if (is_numeric($possiblePort)) {
-                $currentHost = implode(':', $currentHostData);
+    /**
+     * Returns the current host.
+     *
+     * @return string $currentHost The current host
+     */
+    public static function getSelfHost()
+    {
+        $currentHost = self::getRawHost();
+
+        // strip the port
+        if (false !== strpos($currentHost, ':')) {
+            list($currentHost, $port) = explode(':', $currentHost, 2);
+        }
+
+        return $currentHost;
+    }
+
+    /**
+     * @return null|string The port number used for the request
+     */
+    public static function getSelfPort()
+    {
+        $portnumber = null;
+        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+        } else if (isset($_SERVER["SERVER_PORT"])) {
+            $portnumber = $_SERVER["SERVER_PORT"];
+        } else {
+            $currentHost = self::getRawHost();
+
+            // strip the port
+            if (false !== strpos($currentHost, ':')) {
+                list($currentHost, $port) = explode(':', $currentHost, 2);
+                if (is_numeric($port)) {
+                    $portnumber = $port;
+                }
             }
         }
-        return $currentHost;
+        return $portnumber;
     }
 
     /**
@@ -363,7 +389,7 @@ class OneLogin_Saml2_Utils
     public static function isHTTPS()
     {
         $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+                    || (self::getSelfPort() == 443)
                     || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
         return $isHttps;
     }

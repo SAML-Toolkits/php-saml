@@ -2,6 +2,8 @@
 
 /**
  * Unit tests for Utils class
+ *
+ * @backupStaticAttributes enabled
  */
 class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 {
@@ -14,7 +16,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 /*
     public function testT()
     {
-	setlocale(LC_MESSAGES, 'en_US');
+    setlocale(LC_MESSAGES, 'en_US');
 
         $msg = 'test';
         $translatedMsg = OneLogin_Saml2_Utils::t($msg);
@@ -300,7 +302,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
 
         $_SERVER['HTTP_HOST'] = 'example.org:ok';
-        $this->assertEquals('example.org:ok', OneLogin_Saml2_Utils::getSelfHost());
+        $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
     }
 
     /**
@@ -311,6 +313,29 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     public function testisHTTPS()
     {
         $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+    }
+
+    /**
+     * @covers OneLogin_Saml2_Utils::getSelfPort()
+     */
+    public function testGetselfPort()
+    {
+        $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+
+        $_SERVER['HTTP_HOST'] = 'example.org:ok';
+        $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+
+        $_SERVER['HTTP_HOST'] = 'example.org:8080';
+        $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
+
+        $_SERVER["SERVER_PORT"] = 80;
+        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+
+        $_SERVER["HTTP_X_FORWARDED_PORT"] = 443;
+        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $this->assertEquals(443, OneLogin_Saml2_Utils::getSelfPort());
     }
 
 
