@@ -11,8 +11,8 @@ env:
  - TRAVIS=true
 
 before_install:
- - curl -s https://getcomposer.org/installer | php
- - php composer.phar install --prefer-source --no-interaction
+ - composer self-update || true
+ - composer install --prefer-source --no-interaction
 
 before_script:
   - phpenv config-rm xdebug.ini
