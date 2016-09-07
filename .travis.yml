@@ -10,15 +10,18 @@ php:
 env:
  - TRAVIS=true
 
+matrix:
+  fast_finish: true
+
 before_install:
- - curl -s https://getcomposer.org/installer | php
- - php composer.phar install --prefer-source --no-interaction
+ - composer self-update || true
+ - composer install --prefer-source --no-interaction
 
 before_script:
   - phpenv config-rm xdebug.ini
 
 script:
-  - phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+  - vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
   - php vendor/bin/phpcpd --exclude tests --exclude vendor .
   - php vendor/bin/phploc . --exclude vendor
   - php vendor/bin/phploc lib/.
