@@ -10,6 +10,9 @@ php:
 env:
  - TRAVIS=true
 
+matrix:
+  fast_finish: true
+
 before_install:
  - composer self-update || true
  - composer install --prefer-source --no-interaction
