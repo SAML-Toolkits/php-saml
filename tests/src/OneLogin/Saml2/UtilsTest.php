@@ -2,6 +2,8 @@
 
 /**
  * Unit tests for Utils class
+ *
+ * @backupStaticAttributes enabled
  */
 class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 {
@@ -14,7 +16,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 /*
     public function testT()
     {
-	setlocale(LC_MESSAGES, 'en_US');
+    setlocale(LC_MESSAGES, 'en_US');
 
         $msg = 'test';
         $translatedMsg = OneLogin_Saml2_Utils::t($msg);
@@ -273,6 +275,26 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $targetUrl8 = OneLogin_Saml2_Utils::redirect($url, $parameters3, true);
         $this->assertEquals("http://$hostname/example?alphavalue=a&numvaluelist[]=", $targetUrl8);
+    }
+
+    /**
+     * @covers OneLogin_Saml2_Utils::setProxyVars()
+     * @covers OneLogin_Saml2_Utils::getProxyVars()
+     */
+    public function testProxyvars()
+    {
+        $this->assertFalse(OneLogin_Saml2_Utils::getProxyVars());
+
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $this->assertTrue(OneLogin_Saml2_Utils::getProxyVars());
+
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+        $_SERVER['SERVER_PORT'] = '80';
+
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+
+        OneLogin_Saml2_Utils::setProxyVars(false);
+        $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
     }
 
     /**
