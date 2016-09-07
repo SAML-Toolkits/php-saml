@@ -8,14 +8,20 @@
 
 class OneLogin_Saml2_Utils
 {
+
     /**
-    * Translates any string. Accepts args  
-    *
-    * @param string $msg  Message to be translated
-    * @param array|null $args Arguments
-    * 
-    * @return string $translatedMsg  Translated text
-    */
+     * @var bool Control if the `Forwarded-For-*` headers are used
+     */
+    private static $_proxyVars = false;
+
+    /**
+     * Translates any string. Accepts args
+     *
+     * @param string $msg Message to be translated
+     * @param array|null $args Arguments
+     *
+     * @return string $translatedMsg  Translated text
+     */
     public static function t($msg, $args = array())
     {
         assert('is_string($msg)');
@@ -273,6 +279,22 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $proxyVars bool Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     */
+    public static function setProxyVars($proxyVars)
+    {
+        self::$_proxyVars = (bool)$proxyVars;
+    }
+
+    /**
+     * return bool
+     */
+    public static function getProxyVars()
+    {
+        return self::$_proxyVars;
+    }
+
+    /**
      * Returns the protocol + the current host + the port (if different than
      * common ports).
      *
@@ -290,7 +312,7 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
-        if (isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
@@ -342,7 +364,7 @@ class OneLogin_Saml2_Utils
     {
         $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
                     || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
+                    || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
         return $isHttps;
     }
 
