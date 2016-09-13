@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Metadata lib of OneLogin PHP Toolkit
  *
@@ -58,6 +58,7 @@ SLS_TEMPLATE;
         }
 
         $strOrganization = '';
+
         if (!empty($organization)) {
             $organizationInfoNames = array();
             $organizationInfoDisplaynames = array();
@@ -96,6 +97,42 @@ CONTACT;
             $strContacts = "\n".implode("\n", $contactsInfo);
         }
 
+        $strAttributeConsumingService = '';
+        if (isset($sp['attributeConsumingService'])) {
+            $attrCsDesc = '';
+            if (isset($sp['attributeConsumingService']['serviceDescription'])) {
+                $attrCsDesc = sprintf(
+                    '            <md:ServiceDescription xml:lang="en">%s</md:ServiceDescription>' . PHP_EOL,
+                    $sp['attributeConsumingService']['serviceDescription']
+                );
+            }
+            if (!isset($sp['attributeConsumingService']['serviceName'])) {
+                $sp['attributeConsumingService']['serviceName'] = 'Service';
+            }
+            $requestedAttributeData = array();
+            foreach ($sp['attributeConsumingService']['requestedAttributes'] as $attribute) {
+                $requestedAttributeStr = sprintf('            <md:RequestedAttribute Name="%s"', $attribute['name']);
+                if (isset($attribute['nameFormat'])) {
+                    $requestedAttributeStr .= sprintf(' NameFormat="%s"', $attribute['nameFormat']);
+                }
+                if (isset($attribute['friendlyName'])) {
+                    $requestedAttributeStr .= sprintf(' FriendlyName="%s"', $attribute['friendlyName']);
+                }
+                if (isset($attribute['isRequired'])) {
+                    $requestedAttributeStr .= sprintf(' isRequired="%s"', $attribute['isRequired'] === true ? 'true' : 'false');
+                }
+                $requestedAttributeData[] = $requestedAttributeStr . '/>';
+            }
+
+            $requestedAttributeStr = implode(PHP_EOL, $requestedAttributeData);
+            $strAttributeConsumingService = <<<METADATA_TEMPLATE
+<md:AttributeConsumingService index="1">
+            <md:ServiceName xml:lang="en">{$sp['attributeConsumingService']['serviceName']}</md:ServiceName>
+{$attrCsDesc}{$requestedAttributeStr}
+        </md:AttributeConsumingService>
+METADATA_TEMPLATE;
+        }
+
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -107,6 +144,7 @@ CONTACT;
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
                                      Location="{$sp['assertionConsumerService']['url']}"
                                      index="1" />
+        {$strAttributeConsumingService}
     </md:SPSSODescriptor>{$strOrganization}{$strContacts}
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
@@ -159,7 +197,7 @@ METADATA_TEMPLATE;
 
         $keyInfo = $xml->createElementNS(OneLogin_Saml2_Constants::NS_DS, 'ds:KeyInfo');
         $keyInfo->appendChild($keyData);
-        
+
         $keyDescriptor = $xml->createElementNS(OneLogin_Saml2_Constants::NS_MD, "md:KeyDescriptor");
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
