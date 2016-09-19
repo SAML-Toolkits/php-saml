@@ -55,7 +55,7 @@ class OneLogin_Saml2_LogoutRequest
 
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
-            
+
             $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
                 $cert = $idpData['x509cert'];
@@ -110,12 +110,23 @@ LOGOUTREQUEST;
     /**
      * Returns the Logout Request defated, base64encoded, unsigned
      *
+     * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
+     *
      * @return string Deflated base64 encoded Logout Request
      */
-    public function getRequest()
+    public function getRequest($deflate = null)
     {
-        $deflatedRequest = gzdeflate($this->_logoutRequest);
-        return base64_encode($deflatedRequest);
+        $subject = $this->_logoutRequest;
+
+        if (is_null($deflate)) {
+            $deflate = $this->_settings->shouldCompressRequests();
+        }
+
+        if ($deflate) {
+            $subject = gzdeflate($this->_logoutRequest);
+        }
+
+        return base64_encode($subject);
     }
 
     /**
@@ -143,7 +154,7 @@ LOGOUTREQUEST;
      *
      * @param string|DOMDocument $request Logout Request Message
      * @param string|null        $key     The SP key
-     *     
+     *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      *
      * @throws Exception
@@ -235,11 +246,11 @@ LOGOUTREQUEST;
     /**
      * Gets the SessionIndexes from the Logout Request.
      * Notice: Our Constructor only support 1 SessionIndex but this parser
-     *         extracts an array of all the  SessionIndex found on a  
+     *         extracts an array of all the  SessionIndex found on a
      *         Logout Request, that could be many.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * 
+     *
      * @return array The SessionIndex value
      */
     public static function getSessionIndexes($request)
@@ -283,7 +294,7 @@ LOGOUTREQUEST;
                         throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
                     }
                 }
-                
+
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter
@@ -375,7 +386,7 @@ LOGOUTREQUEST;
 
     /* After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {
