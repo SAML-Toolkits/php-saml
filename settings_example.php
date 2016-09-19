@@ -24,6 +24,22 @@ $settings = array (
             // HTTP-Redirect binding only
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         ),
+        // If you need to specify requested attributes, set a
+        // attributeConsumingService. nameFormat, attributeValue and
+        // friendlyName can be omitted. Otherwise remove this section. 
+        "attributeConsumingService"=> array(
+                "ServiceName" => "SP test",
+                "serviceDescription" => "Test Service",
+                "requestedAttributes" => array(
+                    array(
+                        "name" => "",
+                        "isRequired" => false,
+                        "nameFormat" => "",
+                        "friendlyName" => "",
+                        "attributeValue" => ""
+                    )
+                )
+        ),
         // Specifies info about where and how the <Logout Response> message MUST be
         // returned to the requester, in this case our SP.
         'singleLogoutService' => array (
