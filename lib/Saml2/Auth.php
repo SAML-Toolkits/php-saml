@@ -475,7 +475,8 @@ class OneLogin_Saml2_Auth
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
-        if ($this->_security['lowercaseUrlencoding']) {
+        $security = $this->_settings->getSecurityData();
+        if ($security['lowercaseUrlencoding']) {
             $msg = 'SAMLRequest='.rawurlencode($samlRequest);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.rawurlencode($relayState);
@@ -518,7 +519,8 @@ class OneLogin_Saml2_Auth
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
-        if ($this->_security['lowercaseUrlencoding']) {
+        $security = $this->_settings->getSecurityData();
+        if ($security['lowercaseUrlencoding']) {
             $msg = 'SAMLResponse='.rawurlencode($samlResponse);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.rawurlencode($relayState);
