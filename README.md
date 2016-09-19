@@ -463,9 +463,8 @@ $advancedSettings = array (
 ```
 
 The compression settings allow you to instruct whether or not the IdP can accept
-data that has been compressed using [gzip](gzip) ('requests'). We can also determine
-whether or not the SP should expect to receive responses that have been compressed
-with [gzip](gzip) ('responses').
+data that has been compressed using [gzip](gzip) ('requests' and 'responses').
+But if we provide a $deflate boolean parameter to the getRequest or getResponse method it will have priority over the compression settings.
 
 In the security section, you can set the way that the SP will handle the messages
 and assertions. Contact the admin of the IdP and ask him what the IdP expects,

@@ -2,6 +2,15 @@
 
 $advancedSettings = array (
 
+    // Compression settings 
+    // Handle if the getRequest/getResponse methods will return the Request/Response deflated.
+    // But if we provide a $deflate boolean parameter to the getRequest or getResponse
+    // method it will have priority over the compression settings.
+    'compress' => array (
+        'requests' => true,
+        'responses' => true
+    ),
+
     // Security settings
     'security' => array (
 
