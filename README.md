@@ -451,6 +451,10 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
         'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+
+        // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
+        // uppercase. Turn it True for ADFS compatibility on signature verification
+        'lowercaseUrlencoding' => false,
     ),
 
     // Contact information template, it is recommended to supply a

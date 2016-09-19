@@ -373,6 +373,10 @@ class OneLogin_Saml2_Settings
             $this->_security['signatureAlgorithm'] = XMLSecurityKey::RSA_SHA1;
         }
 
+        if (!isset($this->_security['lowercaseUrlencoding'])) {
+            $this->_security['lowercaseUrlencoding'] = false;
+        }
+
         // Certificates / Private key /Fingerprint
         if (!isset($this->_idp['x509cert'])) {
             $this->_idp['x509cert'] = '';

@@ -475,11 +475,19 @@ class OneLogin_Saml2_Auth
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
-        $msg = 'SAMLRequest='.urlencode($samlRequest);
-        if (isset($relayState)) {
-            $msg .= '&RelayState='.urlencode($relayState);
+        if ($this->_security['lowercaseUrlencoding']) {
+            $msg = 'SAMLRequest='.rawurlencode($samlRequest);
+            if (isset($relayState)) {
+                $msg .= '&RelayState='.rawurlencode($relayState);
+            }
+            $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
+        } else {
+            $msg = 'SAMLRequest='.urlencode($samlRequest);
+            if (isset($relayState)) {
+                $msg .= '&RelayState='.urlencode($relayState);
+            }
+            $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         }
-        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
@@ -510,11 +518,19 @@ class OneLogin_Saml2_Auth
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
-        $msg = 'SAMLResponse='.urlencode($samlResponse);
-        if (isset($relayState)) {
-            $msg .= '&RelayState='.urlencode($relayState);
+        if ($this->_security['lowercaseUrlencoding']) {
+            $msg = 'SAMLResponse='.rawurlencode($samlResponse);
+            if (isset($relayState)) {
+                $msg .= '&RelayState='.rawurlencode($relayState);
+            }
+            $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
+        } else {
+            $msg = 'SAMLResponse='.urlencode($samlResponse);
+            if (isset($relayState)) {
+                $msg .= '&RelayState='.urlencode($relayState);
+            }
+            $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         }
-        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
