@@ -297,7 +297,7 @@ $settings = array (
                         "isRequired" => false,
                         "nameFormat" => "",
                         "friendlyName" => "",
-                        "attributeValue" => ""
+                        "attributeValue" => array()
                     )
                 )
         ),

@@ -76,8 +76,35 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
 
         $this->assertContains('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
         $this->assertContains('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
-        $this->assertContains('<md:RequestedAttribute Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>', $metadata);
-        $this->assertContains('<md:RequestedAttribute Name="LastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>', $metadata);
+        $this->assertContains('<md:RequestedAttribute Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
+        $this->assertContains('<md:RequestedAttribute Name="LastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
+
+        $result = \OneLogin_Saml2_Utils::validateXML($metadata, 'saml-schema-metadata-2.0.xsd');
+        $this->assertInstanceOf('DOMDocument', $result);
+    }
+
+    /**
+    * Tests the builder method of the OneLogin_Saml2_Metadata
+    *
+    * @covers OneLogin_Saml2_Metadata::builder
+    */
+    public function testBuilderWithAttributeConsumingServiceWithMultipleAttributeValue()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings4.php';
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $spData = $settings->getSPData();
+        $security = $settings->getSecurityData();
+        $organization = $settings->getOrganization();
+        $contacts = $settings->getContacts();
+
+        $metadata = OneLogin_Saml2_Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned'], null, null, $contacts, $organization);
+
+        $this->assertContains('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
+        $this->assertContains('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
+        $this->assertContains('<md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="uid" isRequired="true" />', $metadata);
+        $this->assertContains('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">userType</saml:AttributeValue>', $metadata);
+        $this->assertContains('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">admin</saml:AttributeValue>', $metadata);
 
         $result = \OneLogin_Saml2_Utils::validateXML($metadata, 'saml-schema-metadata-2.0.xsd');
         $this->assertInstanceOf('DOMDocument', $result);

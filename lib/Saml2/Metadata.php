@@ -121,7 +121,23 @@ CONTACT;
                 if (isset($attribute['isRequired'])) {
                     $requestedAttributeStr .= sprintf(' isRequired="%s"', $attribute['isRequired'] === true ? 'true' : 'false');
                 }
-                $requestedAttributeData[] = $requestedAttributeStr . '/>';
+                $reqAttrAuxStr = " />";
+
+                if (isset($attribute['attributeValue']) && !empty($attribute['attributeValue'])) {
+                    $reqAttrAuxStr = '>';
+                    if (is_string($attribute['attributeValue'])) {
+                        $attribute['attributeValue'] = array($attribute['attributeValue']);
+                    }                    
+                    foreach($attribute['attributeValue'] as $attrValue) {
+                        $reqAttrAuxStr .=<<<ATTRIBUTEVALUE
+
+                <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">{$attrValue}</saml:AttributeValue>
+ATTRIBUTEVALUE;
+                    }
+                    $reqAttrAuxStr .= "\n            </md:RequestedAttribute>";
+                }
+
+                $requestedAttributeData[] = $requestedAttributeStr . $reqAttrAuxStr;
             }
 
             $requestedAttributeStr = implode(PHP_EOL, $requestedAttributeData);
