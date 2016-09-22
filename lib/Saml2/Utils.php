@@ -840,26 +840,25 @@ class OneLogin_Saml2_Utils
         $status = array();
 
         $statusEntry = self::query($dom, '/samlp:Response/samlp:Status');
-        if ($statusEntry->length == 0) {
-            throw new Exception('Missing Status on response');
+        if ($statusEntry->length != 1) {
+            throw new Exception('Missing valid Status on response');
         }
 
         $codeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode', $statusEntry->item(0));
-        if ($codeEntry->length == 0) {
-            throw new Exception('Missing Status Code on response');
+        if ($codeEntry->length != 1) {
+            throw new Exception('Missing valid Status Code on response');
         }
         $code = $codeEntry->item(0)->getAttribute('Value');
         $status['code'] = $code;
 
+        $status['msg'] = '';
         $messageEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', $statusEntry->item(0));
         if ($messageEntry->length == 0) {
             $subCodeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', $statusEntry->item(0));
-            if ($subCodeEntry->length > 0) {
+            if ($subCodeEntry->length == 1) {
                 $status['msg'] = $subCodeEntry->item(0)->getAttribute('Value');
-            } else {
-                $status['msg'] = '';
             }
-        } else {
+        } else if ($messageEntry->length == 1) {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
         }

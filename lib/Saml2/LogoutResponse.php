@@ -77,7 +77,7 @@ class OneLogin_Saml2_LogoutResponse
     public function getStatus()
     {
         $entries = $this->_query('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode');
-        if ($entries->length == 0) {
+        if ($entries->length != 1) {
             return null;
         }
         $status = $entries->item(0)->getAttribute('Value');
