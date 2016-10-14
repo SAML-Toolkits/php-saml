@@ -1,5 +1,25 @@
 CHANGELOG
 =========
+v.2.10.0
+* Several security improvements:
+  * Conditions element required and unique.
+  * AuthnStatement element required and unique.
+  * SPNameQualifier must math the SP EntityID
+  * Reject saml:Attribute element with same “Name” attribute
+  * Reject empty nameID
+  * Require Issuer element. (Must match IdP EntityID).
+  * Destination value can't be blank (if present must match ACS URL).
+  * Check that the EncryptedAssertion element only contains 1 Assertion element.
+* Improve Signature validation process
+* AttributeConsumingService support
+* Support lowercase Urlencoding (ADFS compatibility).
+* [#154](https://github.com/onelogin/php-saml/pull/154) getSelfHost no longer returns a port number
+* [#156](https://github.com/onelogin/php-saml/pull/156) Use correct host on response destination fallback check
+* [#158](https://github.com/onelogin/php-saml/pull/158) NEW Control usage of X-Forwarded-* headers
+* Fix issue with buildRequestSignature. Added RelayState to the SignQuery only if is not null.
+* Add Signature Wrapping prevention Test
+* Improve _decryptAssertion in order to take care of Assertions with problems with namespaces
+* Improve documentation
 
 v.2.9.1
 .......

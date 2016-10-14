@@ -7,6 +7,20 @@ Forget those complicated libraries and use that open source library provided
 and supported by OneLogin Inc.
 
 
+Warning
+-------
+
+Update php-saml to 2.10.0, this version includes a security patch that contains extra validations that will prevent signature wrapping attacks.
+
+php-saml < v2.10.0 is vulnerable and allows signature wrapping!
+
+
+Security Guidelines
+-------------------
+
+If you believe you have discovered a security vulnerability in this toolkit, please report it at https://www.onelogin.com/security with a description. We follow responsible disclosure guidelines, and will work with you to quickly find a resolution.
+
+
 Why add SAML support to my software?
 ------------------------------------
 
@@ -136,12 +150,6 @@ Security warning
 
 In production, the `strict` parameter **MUST** be set as `"true"`. Otherwise
 your environment is not secure and will be exposed to attacks.
-
-
-Security Guidelines
--------------------
-
-If you believe you have discovered a security vulnerability in this toolkit, please report it at https://www.onelogin.com/security with a description. We follow responsible disclosure guidelines, and will work with you to quickly find a resolution.
 
 
 Getting started
