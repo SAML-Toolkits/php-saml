@@ -234,7 +234,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
      *
      * @covers OneLogin_Saml2_Response::checkOneCondition
      */
-    public function testCheckOneCondition() {
+    public function testCheckOneCondition()
+    {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_conditions.xml.base64');
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
         $this->assertFalse($response->checkOneCondition());
@@ -249,7 +250,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
      *
      * @covers OneLogin_Saml2_Response::checkOneAuthnStatement
      */
-    public function testCheckOneAuthNStatement() {
+    public function testCheckOneAuthNStatement()
+    {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_authnstatement.xml.base64');
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
         $this->assertFalse($response->checkOneAuthnStatement());

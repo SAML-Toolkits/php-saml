@@ -338,7 +338,8 @@ class OneLogin_Saml2_Response
     *
     * @return boolean true if the Conditions element exists and is unique
     */
-    public function checkOneCondition() {
+    public function checkOneCondition()
+    {
         $entries = $this->_queryAssertion("/saml:Conditions");
         if ($entries->length == 1) {
             return true;
@@ -352,7 +353,8 @@ class OneLogin_Saml2_Response
     *
     * @return boolean true if the AuthnStatement element exists and is unique
     */
-    public function checkOneAuthnStatement() {
+    public function checkOneAuthnStatement()
+    {
         $entries = $this->_queryAssertion("/saml:AuthnStatement");
         if ($entries->length == 1) {
             return true;
