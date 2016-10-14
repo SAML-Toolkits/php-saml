@@ -8,6 +8,8 @@
 
 class OneLogin_Saml2_Utils
 {
+    const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
+    const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
@@ -1068,12 +1070,13 @@ class OneLogin_Saml2_Utils
      * @param string|null    $cert           The pubic cert
      * @param string|null    $fingerprint    The fingerprint of the public cert
      * @param string|null    $fingerprintalg The algorithm used to get the fingerprint
+     * @param string|null    $xpath          The xpath of the signed element
      *
      * @return bool
      *
      * @throws Exception
      */
-    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
+    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1', $xpath=null)
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
@@ -1087,7 +1090,14 @@ class OneLogin_Saml2_Utils
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');
 
-        $objDSig = $objXMLSecDSig->locateSignature($dom);
+        if ($xpath) {
+            $nodeset = OneLogin_Saml2_Utils::query($dom, $xpath);
+            $objDSig = $nodeset->item(0);
+            $objXMLSecDSig->sigNode = $objDSig;
+        } else {
+            $objDSig = $objXMLSecDSig->locateSignature($dom);
+        }
+
         if (!$objDSig) {
             throw new Exception('Cannot locate Signature Node');
         }

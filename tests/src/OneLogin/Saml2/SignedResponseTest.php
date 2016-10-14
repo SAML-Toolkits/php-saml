@@ -46,7 +46,7 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['idp']['entityId'] = "https://federate.example.net/saml/saml2/idp/metadata.php";
         $settingsInfo['sp']['entityId'] = "hello.com";
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);   
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
         // Both the Response and the Asseretion are signed
         $message = file_get_contents(TEST_ROOT . '/data/responses/simple_saml_php.xml');
