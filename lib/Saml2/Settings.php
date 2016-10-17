@@ -772,14 +772,14 @@ class OneLogin_Saml2_Settings
 
                 if (!$keyMetadata) {
                     throw new OneLogin_Saml2_Error(
-                        'Private key not found.',
+                        'SP Private key not found.',
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
                     );
                 }
 
                 if (!$certMetadata) {
                     throw new OneLogin_Saml2_Error(
-                        'Public cert file not found.',
+                        'SP Public cert not found.',
                         OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND
                     );
                 }
@@ -801,7 +801,7 @@ class OneLogin_Saml2_Settings
 
                 if (!file_exists($keyMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
-                        'Private key file not found: %s',
+                        'SP Private key file not found: %s',
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
                         array($keyMetadataFile)
                     );
@@ -809,7 +809,7 @@ class OneLogin_Saml2_Settings
 
                 if (!file_exists($certMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
-                        'Public cert file not found: %s',
+                        'SP Public cert file not found: %s',
                         OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
                         array($certMetadataFile)
                     );
