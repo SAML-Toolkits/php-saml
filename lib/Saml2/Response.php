@@ -838,19 +838,20 @@ class OneLogin_Saml2_Response
         if ($decrypted instanceof DOMDocument) {
             return $decrypted;
         } else {
+
             $encryptedAssertion = $decrypted->parentNode;
             $container = $encryptedAssertion->parentNode;
 
+            # Fix possible issue with saml namespace
+            if (!$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
+              !$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns') &&
+              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml')) {
+                $decrypted->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', OneLogin_Saml2_Constants::NS_SAML);
+            }
+
             $container->replaceChild($decrypted, $encryptedAssertion);
 
-            // Fix NameSpace && LocalName if required
-            if (!isset($decrypted->namespaceURI) || $decrypted->localName != 'Assertion') {
-                $original = $decrypted->ownerDocument->saveXML();
-                $dom = new DOMDocument();
-                return OneLogin_Saml2_Utils::loadXML($dom, $original);
-            } else {
-                return $decrypted->ownerDocument;
-            }
+            return $decrypted->ownerDocument;
         }
     }
 
