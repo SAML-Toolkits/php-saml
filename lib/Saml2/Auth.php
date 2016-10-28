@@ -29,6 +29,13 @@ class OneLogin_Saml2_Auth
     private $_nameid;
 
     /**
+     * NameID Format
+     *
+     * @var string
+     */
+    private $_nameidFormat;
+
+    /**
      * If user is authenticated.
      *
      * @var bool
@@ -126,6 +133,7 @@ class OneLogin_Saml2_Auth
             if ($response->isValid($requestId)) {
                 $this->_attributes = $response->getAttributes();
                 $this->_nameid = $response->getNameId();
+                $this->_nameidFormat = $response->getNameIdFormat();
                 $this->_authenticated = true;
                 $this->_sessionIndex = $response->getSessionIndex();
                 $this->_sessionExpiration = $response->getSessionNotOnOrAfter();
@@ -266,6 +274,16 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Returns the nameID Format
+     *
+     * @return string  The nameID Format of the assertion
+     */
+    public function getNameIdFormat()
+    {
+        return $this->_nameidFormat;
+    }
+
+    /**
      * Returns the SessionIndex
      *
      * @return string|null  The SessionIndex of the assertion
@@ -369,12 +387,13 @@ class OneLogin_Saml2_Auth
      * @param string|null $nameId        The NameID that will be set in the LogoutRequest.
      * @param string|null $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
      * @param bool        $stay          True if we want to stay (returns the url string) False to redirect
+     * @param string|null $nameIdFormat  The NameID Format will be set in the LogoutRequest.
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      *
      * @throws OneLogin_Saml2_Error
      */
-    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay=false)
+    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay=false, $nameIdFormat = null)
     {
         assert('is_array($parameters)');
 
@@ -390,7 +409,7 @@ class OneLogin_Saml2_Auth
             $nameId = $this->_nameid;
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat);
 
         $this->_lastRequestID = $logoutRequest->id;
 

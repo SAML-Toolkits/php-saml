@@ -31,14 +31,19 @@ if (isset($_GET['sso'])) {
     $paramters = array();
     $nameId = null;
     $sessionIndex = null;
+    $nameIdFormat = null;
+
     if (isset($_SESSION['samlNameId'])) {
         $nameId = $_SESSION['samlNameId'];
     }
     if (isset($_SESSION['samlSessionIndex'])) {
         $sessionIndex = $_SESSION['samlSessionIndex'];
     }
+    if (isset($_SESSION['samlNameIdFormat'])) {
+        $nameIdFormat = $_SESSION['samlNameIdFormat'];
+    }
 
-    $auth->logout($returnTo, $paramters, $nameId, $sessionIndex);
+    $auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat);
 
     # If LogoutRequest ID need to be saved in order to later validate it, do instead
     # $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
@@ -70,6 +75,7 @@ if (isset($_GET['sso'])) {
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
     $_SESSION['samlNameId'] = $auth->getNameId();
+    $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {

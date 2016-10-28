@@ -1131,6 +1131,7 @@ SAML 2 Authentication Response class
  * `getNameIdData` - Gets the NameID Data provided by the SAML response from the
    IdP.
  * `getNameId` - Gets the NameID provided by the SAML response from the IdP.
+ * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getSessionNotOnOrAfter` - Gets the SessionNotOnOrAfter from the
    AuthnStatement
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.

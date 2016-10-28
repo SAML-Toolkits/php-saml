@@ -480,6 +480,21 @@ class OneLogin_Saml2_Response
     }
 
     /**
+     * Gets the NameID Format provided by the SAML response from the IdP.
+     *
+     * @return string Name ID Format
+     */
+    public function getNameIdFormat()
+    {
+        $nameIdFormat = null;
+        $nameIdData = $this->getNameIdData();
+        if (!empty($nameIdData) && isset($nameIdData['Format'])) {
+            $nameIdFormat = $nameIdData['Format'];
+        }
+        return $nameIdFormat;
+    }
+
+    /**
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
      * 

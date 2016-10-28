@@ -90,6 +90,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttributes
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
+    * @covers OneLogin_Saml2_Auth::getNameIdFormat
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
@@ -105,6 +106,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->_auth->isAuthenticated());
         $this->assertEmpty($this->_auth->getAttributes());
         $this->assertNull($this->_auth->getNameId());
+        $this->assertNull($this->_auth->getNameIdFormat());
         $this->assertNull($this->_auth->getSessionIndex());
         $this->assertNull($this->_auth->getSessionExpiration());
         $this->assertNull($this->_auth->getAttribute('uid'));
@@ -153,6 +155,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttributes
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
+    * @covers OneLogin_Saml2_Auth::getNameIdFormat
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getErrors
@@ -165,6 +168,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processResponse();
         $this->assertTrue($this->_auth->isAuthenticated());
         $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $this->_auth->getNameId());
+        $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', $this->_auth->getNameIdFormat());
         $attributes = $this->_auth->getAttributes();
         $this->assertNotEmpty($attributes);
         $this->assertEquals($this->_auth->getAttribute('mail'), $attributes['mail']);
