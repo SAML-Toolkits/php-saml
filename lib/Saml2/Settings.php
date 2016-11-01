@@ -119,7 +119,17 @@ class OneLogin_Saml2_Settings
                 );
             }
         } else {
-            if (!$this->_loadSettingsFromArray($settings->getValues())) {
+
+            // JV: If this was an object, we want convert it to an array as expected.
+            if (is_object($settings)) {
+                $tmp = [];
+                foreach ( get_object_vars($settings) as $k => $v ) {
+                    $tmp[trim($k,'_')] = $v;
+                }
+                $settings = $tmp;
+            }
+
+            if (!$this->_loadSettingsFromArray($settings)) {
                 throw new OneLogin_Saml2_Error(
                     'Invalid array settings: %s',
                     OneLogin_Saml2_Error::SETTINGS_INVALID,
@@ -772,14 +782,14 @@ class OneLogin_Saml2_Settings
 
                 if (!$keyMetadata) {
                     throw new OneLogin_Saml2_Error(
-                        'SP Private key not found.',
+                        'Private key not found.',
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
                     );
                 }
 
                 if (!$certMetadata) {
                     throw new OneLogin_Saml2_Error(
-                        'SP Public cert not found.',
+                        'Public cert file not found.',
                         OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND
                     );
                 }
@@ -801,7 +811,7 @@ class OneLogin_Saml2_Settings
 
                 if (!file_exists($keyMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
-                        'SP Private key file not found: %s',
+                        'Private key file not found: %s',
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND,
                         array($keyMetadataFile)
                     );
@@ -809,7 +819,7 @@ class OneLogin_Saml2_Settings
 
                 if (!file_exists($certMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
-                        'SP Public cert file not found: %s',
+                        'Public cert file not found: %s',
                         OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND,
                         array($certMetadataFile)
                     );
