@@ -844,9 +844,21 @@ class OneLogin_Saml2_Response
 
             # Fix possible issue with saml namespace
             if (!$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
+              !$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2') &&
               !$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns') &&
-              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml')) {
-                $decrypted->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', OneLogin_Saml2_Constants::NS_SAML);
+              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
+              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2')
+              ) {
+
+                if (strpos($encryptedAssertion->tagName, 'saml2:') !== false) {
+                    $ns = 'xmlns:saml2';
+                } else if (strpos($encryptedAssertion->tagName, 'saml:') != false) {
+                    $ns = 'xmlns:saml';
+                } else {
+                    $ns = 'xmlns';
+                }
+
+                $decrypted->setAttributeNS('http://www.w3.org/2000/xmlns/', $ns, OneLogin_Saml2_Constants::NS_SAML);
             }
 
             $container->replaceChild($decrypted, $encryptedAssertion);
