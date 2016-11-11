@@ -16,6 +16,22 @@ class OneLogin_Saml2_Utils
      */
     private static $_proxyVars = false;
 
+
+    /**
+     * @var string
+     */
+    private static $_host;
+
+    /**
+     * @var string
+     */
+    private static $_protocol;
+
+    /**
+     * @var int
+     */
+    private static $_port;
+
     /**
      * Translates any string. Accepts args
      *
@@ -324,11 +340,23 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $host string The host to use when constructing URLs
+     */
+    public static function setSelfHost($host)
+    {
+        self::$_host = $host;
+    }
+
+    /**
      * @return string The raw host name
      */
     protected static function getRawHost()
     {
-        if (array_key_exists('HTTP_HOST', $_SERVER)) {
+        if (self::$_host) {
+            $currentHost = self::$_host;
+        } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
+            $currentHost = $_SERVER['HTTP_X_FORWARDED_HOST'];
+        } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
             $currentHost = $_SERVER['SERVER_NAME'];
@@ -340,6 +368,40 @@ class OneLogin_Saml2_Utils
             }
         }
         return $currentHost;
+    }
+
+    /**
+     * @param $port int The port number to use when constructing URLs
+     */
+    public static function setSelfPort($port)
+    {
+        self::$_port = $port;
+    }
+
+    /**
+     * @param $protocol string The protocol to identify as using, usually http or https
+     */
+    public static function setSelfProtocol($protocol)
+    {
+        self::$_protocol = $protocol;
+    }
+
+    /**
+     * @return string http|https
+     */
+    public static function getSelfProtocol()
+    {
+        $protocol = 'http';
+        if (self::$_protocol) {
+            $protocol = self::$_protocol;
+        } elseif (self::getSelfPort() == 443) {
+            $protocol = 'https';
+        } elseif (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+        } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            $protocol = 'https';
+        }
+        return $protocol;
     }
 
     /**
@@ -365,7 +427,9 @@ class OneLogin_Saml2_Utils
     public static function getSelfPort()
     {
         $portnumber = null;
-        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        if (self::$_port) {
+            $portnumber = self::$_port;
+        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
@@ -390,10 +454,7 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                    || (self::getSelfPort() == 443)
-                    || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
-        return $isHttps;
+        return self::getSelfProtocol() == 'https';
     }
 
     /**
