@@ -16,7 +16,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 /*
     public function testT()
     {
-    setlocale(LC_MESSAGES, 'en_US');
+	setlocale(LC_MESSAGES, 'en_US');
 
         $msg = 'test';
         $translatedMsg = OneLogin_Saml2_Utils::t($msg);
@@ -278,6 +278,18 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers OneLogin_Saml2_Utils::setSelfHost
+     */
+    public function testSetselfhost()
+    {
+        $_SERVER['HTTP_HOST'] = 'example.org';
+        $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
+
+        OneLogin_Saml2_Utils::setSelfHost('example.com');
+        $this->assertEquals('example.com', OneLogin_Saml2_Utils::getSelfHost());
+    }
+
+    /**
      * @covers OneLogin_Saml2_Utils::setProxyVars()
      * @covers OneLogin_Saml2_Utils::getProxyVars()
      */
@@ -323,6 +335,12 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $_SERVER['HTTP_HOST'] = 'example.org:ok';
         $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
+
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'example.net';
+        $this->assertNotEquals('example.net', OneLogin_Saml2_Utils::getSelfHost());
+
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $this->assertEquals('example.net', OneLogin_Saml2_Utils::getSelfHost());
     }
 
     /**
@@ -371,8 +389,21 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         OneLogin_Saml2_Utils::setProxyVars(true);
         $this->assertEquals(443, OneLogin_Saml2_Utils::getSelfPort());
+
+        OneLogin_Saml2_Utils::setSelfPort(8080);
+        $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
     }
 
+    /**
+     * @covers OneLogin_Saml2_Utils::setSelfProtocol()
+     */
+    public function testSetselfprotocol()
+    {
+        $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+    }
 
     /**
     * Tests the getSelfURLhost method of the OneLogin_Saml2_Utils
