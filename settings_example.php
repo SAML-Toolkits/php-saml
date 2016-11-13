@@ -10,6 +10,12 @@ $settings = array (
     // Enable debug mode (to print errors)
     'debug' => false,
 
+    // Set a BaseURL to be used instead of try to guess 
+    // the BaseURL of the view that process the SAML Message.
+    // Ex. http://sp.example.com/
+    //     http://example.com/sp/ 
+    'baseurl' => null,
+
     // Service Provider Data that we are deploying
     'sp' => array (
         // Identifier of the SP entity  (must be a URI)

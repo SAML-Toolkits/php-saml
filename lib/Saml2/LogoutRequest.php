@@ -41,8 +41,12 @@ class OneLogin_Saml2_LogoutRequest
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null)
     {
-
         $this->_settings = $settings;
+
+        if (!empty($this->_settings->getBaseURL())) {
+            $baseURL = $this->_settings->getBaseURL();
+            OneLogin_Saml2_Utils::setBaseURL($baseURL);
+        }
 
         if (!isset($request) || empty($request)) {
 

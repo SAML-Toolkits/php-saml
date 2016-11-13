@@ -279,6 +279,12 @@ $settings = array (
     // Enable debug mode (to print errors).
     'debug' => false,
 
+    // Set a BaseURL to be used instead of try to guess
+    // the BaseURL of the view that process the SAML Message.
+    // Ex http://sp.example.com/
+    //    http://example.com/sp/ 
+    'baseurl' => null,
+
     // Service Provider Data that we are deploying.
     'sp' => array (
         // Identifier of the SP entity  (must be a URI)
@@ -1035,6 +1041,26 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 }
 ```
 
+#### URL-guessing methods ####
+ 
+php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
+
+* `getSelfHost` Returns the current host.
+* `getSelfPort` Return the port number used for the request
+* `isHTTPS` Checks if the protocol is https or http.
+* `getSelfURLhost` Returns the protocol + the current host + the port (if different than common ports).
+* `getSelfURL` Returns the URL of the current host + current view + query.
+* `getSelfURLNoQuery` Returns the URL of the current host + current view.
+* `getSelfRoutedURLNoQuery` Returns the routed URL of the current host + current view.
+
+getSelfURLNoQuery and getSelfRoutedURLNoQuery are used to calculate the currentURL in order to valdate SAML elements like Destination or Recipient.
+
+When the PHP application is behind a proxy or a load balancer we can execute setProxyVars(true) and getSelfPort and isHTTPS will take care of the $_SERVER["HTTP_X_FORWARDED_PORT"] and $_SERVER['HTTP_X_FORWARDED_PROTO'] vars (otherwise they are ignored).
+
+Also a developer can use setSelfProtocol, setSelfHost, setSelfPort and getBaseURLPath to define a specific value to be returned by isHTTPS, getSelfHost, getSelfPort and getBaseURLPath. And define a setBasePath to be used on the getSelfURL and getSelfRoutedURLNoQuery to replace the data extracted from $_SERVER["REQUEST_URI"].
+
+At the settings the developer will be able to set a 'baseurl' parameter that automatically will use setBaseURL to set values for setSelfProtocol, setSelfHost, setSelfPort and setBaseURLPath.
+
 ### Main classes and methods ###
 
 Described below are the main classes and methods that can be invoked.
@@ -1196,7 +1222,9 @@ Configuration of the OneLogin PHP Toolkit
  * `formatSPKey` - Formats the SP private key.
  * `getErrors` - Returns an array with the errors, the array is empty when
    the settings is ok.
- * `getLastErrorReason`* Returns the reason of the last error
+ * `getLastErrorReason` - Returns the reason of the last error
+ * `getBaseURL` -  Returns the baseurl set on the settings if any.
+ * `setBaseURL` - Set a baseurl value
  * `setStrict` - Activates or deactivates the strict mode.
  * `isStrict` - Returns if the 'strict' mode is active.
  * `isDebugActive` - Returns if the debug is active.

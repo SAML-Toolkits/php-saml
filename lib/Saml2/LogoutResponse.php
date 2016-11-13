@@ -41,6 +41,12 @@ class OneLogin_Saml2_LogoutResponse
     public function __construct(OneLogin_Saml2_Settings $settings, $response = null)
     {
         $this->_settings = $settings;
+
+        if (!empty($this->_settings->getBaseURL())) {
+            $baseURL = $this->_settings->getBaseURL();
+            OneLogin_Saml2_Utils::setBaseURL($baseURL);
+        }
+
         if ($response) {
             $decoded = base64_decode($response);
             $inflated = @gzinflate($decoded);

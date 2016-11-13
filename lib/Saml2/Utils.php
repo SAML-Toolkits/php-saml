@@ -33,6 +33,12 @@ class OneLogin_Saml2_Utils
     private static $_port;
 
     /**
+     * @var string
+     */
+    private static $_baseurlpath;
+
+
+    /**
      * Translates any string. Accepts args
      *
      * @param string $msg Message to be translated
@@ -249,7 +255,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?://@i', $url)) {
+        if (!preg_match('@^https?:\/\/@i', $url)) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
@@ -294,6 +300,41 @@ class OneLogin_Saml2_Utils
         header('Cache-Control: no-cache, must-revalidate');
         header('Location: ' . $url);
         exit();
+    }
+
+    /**
+     * @param $baseurl string The base url to be used when constructing URLs
+     */
+    public static function setBaseURL($baseurl)
+    {
+        if (!empty($baseurl)) {
+            $baseurlpath = '/';
+            if (preg_match('#^https?:\/\/([^\/]*)\/?(.*)#i', $baseurl, $matches)) {
+                if (strpos($baseurl, 'https://') == False) {
+                    self::setSelfProtocol('http');
+                    $port = '80';
+                } else {
+                    self::setSelfProtocol('https');
+                    $port = '443';
+                }
+
+                $currentHost = $matches[1];
+                if (false !== strpos($currentHost, ':')) {
+                    list($currentHost, $possiblePort) = explode(':', $matches[1], 2);
+                    if (is_numeric($possiblePort)) {
+                        $port = $possiblePort;
+                    }
+                }
+
+                if (isset($matches[2]) && !empty($matches[2])) {
+                    $baseurlpath = $matches[2];
+                }
+
+                self::setSelfHost($currentHost);
+                self::setSelfPort($port);
+                self::setBaseURLPath($baseurlpath);
+            }
+        }
     }
 
     /**
@@ -345,6 +386,26 @@ class OneLogin_Saml2_Utils
     public static function setSelfHost($host)
     {
         self::$_host = $host;
+    }
+
+    /**
+     * @param $baseurlpath string The baseurl path to use when constructing URLs
+     */
+    public static function setBaseURLPath($baseurlpath)
+    {
+        if (!isset($baseurlpath) || empty($baseurlpath)) {
+            $baseurlpath = '/';
+        }
+
+        self::$_baseurlpath = '/'. ltrim(rtrim($baseurlpath, '/') . '/', '/');
+    }
+
+    /**
+     * return string The baseurlpath to be used when constructing URLs
+     */
+    public static function getBaseURLPath()
+    {
+        return self::$_baseurlpath;
     }
 
     /**
@@ -464,9 +525,19 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfURLNoQuery()
     {
-
         $selfURLhost = self::getSelfURLhost();
-        $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
+
+        if (!empty(self::getBaseURLPath())) {
+            $path = explode('/', $_SERVER['SCRIPT_NAME']);
+            $selfURLNoQuery = $selfURLhost . self::getBaseURLPath();
+            $script = array_pop($path);
+            if (!empty($script)) {
+                $selfURLNoQuery .= $script;
+            }
+        } else {
+            $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
+        }
+
         if (isset($_SERVER['PATH_INFO'])) {
             $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
@@ -480,15 +551,26 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfRoutedURLNoQuery()
     {
-
         $selfURLhost = self::getSelfURLhost();
         $route = '';
+
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
                 $route = str_replace($_SERVER['QUERY_STRING'], '', $route);
                 if (substr($route, -1) == '?') {
                     $route = substr($route, 0, -1);
+                }
+            }
+        }
+
+        if (!empty(self::getBaseURLPath())) {
+            if (!empty($route)){
+                $path = explode('/', $route);
+                $route = self::getBaseURLPath();
+                $script = array_pop($path);
+                if (!empty($script)) {
+                    $route .= $script;
                 }
             }
         }
@@ -510,11 +592,23 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
             if ($requestURI[0] !== '/') {
-                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
+                if (preg_match('#^https?:\/\/[^\/]*(\/.*)#i', $requestURI, $matches)) {
                     $requestURI = $matches[1];
                 }
             }
         }
+
+        if (!empty(self::getBaseURLPath())) {
+            if (!empty($requestURI)){
+                $path = explode('/', $requestURI);
+                $requestURI = self::getBaseURLPath();
+                $scriptAndQuery = array_pop($path);
+                if (!empty($scriptAndQuery)) {
+                    $requestURI .= $scriptAndQuery;
+                }
+            } 
+        }
+
         return $selfURLhost . $requestURI;
     }
 
