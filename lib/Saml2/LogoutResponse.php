@@ -42,8 +42,8 @@ class OneLogin_Saml2_LogoutResponse
     {
         $this->_settings = $settings;
 
-        if (!empty($this->_settings->getBaseURL())) {
-            $baseURL = $this->_settings->getBaseURL();
+        $baseURL = $this->_settings->getBaseURL();
+        if (!empty($baseURL)) {
             OneLogin_Saml2_Utils::setBaseURL($baseURL);
         }
 

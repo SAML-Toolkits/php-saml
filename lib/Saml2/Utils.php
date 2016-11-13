@@ -565,7 +565,7 @@ class OneLogin_Saml2_Utils
         }
 
         if (!empty(self::getBaseURLPath())) {
-            if (!empty($route)){
+            if (!empty($route)) {
                 $path = explode('/', $route);
                 $route = self::getBaseURLPath();
                 $script = array_pop($path);
@@ -599,7 +599,7 @@ class OneLogin_Saml2_Utils
         }
 
         if (!empty(self::getBaseURLPath())) {
-            if (!empty($requestURI)){
+            if (!empty($requestURI)) {
                 $path = explode('/', $requestURI);
                 $requestURI = self::getBaseURLPath();
                 $scriptAndQuery = array_pop($path);
