@@ -310,7 +310,7 @@ class OneLogin_Saml2_Utils
         if (!empty($baseurl)) {
             $baseurlpath = '/';
             if (preg_match('#^https?:\/\/([^\/]*)\/?(.*)#i', $baseurl, $matches)) {
-                if (strpos($baseurl, 'https://') == False) {
+                if (strpos($baseurl, 'https://') === false) {
                     self::setSelfProtocol('http');
                     $port = '80';
                 } else {
@@ -393,11 +393,11 @@ class OneLogin_Saml2_Utils
      */
     public static function setBaseURLPath($baseurlpath)
     {
-        if (!isset($baseurlpath) || empty($baseurlpath)) {
+        if (empty($baseurlpath) || $baseurlpath == '/') {
             $baseurlpath = '/';
+        } else {
+            self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
         }
-
-        self::$_baseurlpath = '/'. ltrim(rtrim($baseurlpath, '/') . '/', '/');
     }
 
     /**
@@ -525,22 +525,19 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfURLNoQuery()
     {
-        $selfURLhost = self::getSelfURLhost();
+        $selfURLNoQuery = self::getSelfURLhost();
 
-        if (!empty(self::getBaseURLPath())) {
-            $path = explode('/', $_SERVER['SCRIPT_NAME']);
-            $selfURLNoQuery = $selfURLhost . self::getBaseURLPath();
-            $script = array_pop($path);
-            if (!empty($script)) {
-                $selfURLNoQuery .= $script;
-            }
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($_SERVER['SCRIPT_NAME']);
+        if (!empty($infoWithBaseURLPath)) {
+            $selfURLNoQuery .= $infoWithBaseURLPath;
         } else {
-            $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
+            $selfURLNoQuery .= $_SERVER['SCRIPT_NAME'];
         }
 
         if (isset($_SERVER['PATH_INFO'])) {
             $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
+
         return $selfURLNoQuery;
     }
 
@@ -564,15 +561,9 @@ class OneLogin_Saml2_Utils
             }
         }
 
-        if (!empty(self::getBaseURLPath())) {
-            if (!empty($route)) {
-                $path = explode('/', $route);
-                $route = self::getBaseURLPath();
-                $script = array_pop($path);
-                if (!empty($script)) {
-                    $route .= $script;
-                }
-            }
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($route);
+        if (!empty($infoWithBaseURLPath)) {
+            $route = $infoWithBaseURLPath;
         }
 
         $selfRoutedURLNoQuery = $selfURLhost . $route;
@@ -598,18 +589,34 @@ class OneLogin_Saml2_Utils
             }
         }
 
-        if (!empty(self::getBaseURLPath())) {
-            if (!empty($requestURI)) {
-                $path = explode('/', $requestURI);
-                $requestURI = self::getBaseURLPath();
-                $scriptAndQuery = array_pop($path);
-                if (!empty($scriptAndQuery)) {
-                    $requestURI .= $scriptAndQuery;
-                }
-            } 
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($requestURI);
+        if (!empty($infoWithBaseURLPath)) {
+            $requestURI = $infoWithBaseURLPath;
         }
 
         return $selfURLhost . $requestURI;
+    }
+
+    /**
+     * Returns the part of the URL with the BaseURLPath.
+     *
+     * @return string
+     */
+    protected static function buildWithBaseURLPath($info)
+    {
+        $result = '';
+        $baseURLPath = self::getBaseURLPath();
+        if (!empty($baseURLPath)) {
+            $result = $baseURLPath;
+            if (!empty($info)) {
+                $path = explode('/', $info);
+                $extractedInfo = array_pop($path);
+                if (!empty($extractedInfo)) {
+                    $result .= $extractedInfo;
+                }
+            } 
+        }
+        return $result;
     }
 
     /**
