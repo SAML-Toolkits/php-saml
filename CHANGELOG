@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v.2.10.2
+* [#175](https://github.com/onelogin/php-saml/pull/175) Allow overriding of host, port, protocol and url path for URL building
+* [#173](https://github.com/onelogin/php-saml/pull/173) Provide better support to NameIdFormat
+* Fix another issue on Assertion Signature validation when the assertion contains no namespace, container has saml2 namespace and it was encrypted
+
 v.2.10.1
 * Fix error message on SignMetadata process
 * Fix issue on Assertion Signature validation when the assertion contains no namespace and it was encrypted
