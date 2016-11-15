@@ -135,6 +135,35 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the getNameIdFormat method of the OneLogin_Saml2_Response
+    *
+    * @covers OneLogin_Saml2_Response::getNameIdFormat
+    */
+    public function testGetNameIdFormat()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', $response->getNameIdFormat());
+
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
+        $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified', $response2->getNameIdFormat());
+    
+        $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
+        $this->assertEquals('urn:oasis:names:tc:SAML:2.0:nameid-format:transient', $response3->getNameIdFormat());
+
+        $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_nameid.xml.base64');
+        $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
+
+        try {
+            $nameId4 = $response4->getNameIdFormat();
+        } catch (Exception $e) {
+            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+        }
+    }
+
+    /**
     * Tests the getNameIdData method of the OneLogin_Saml2_Response
     *
     * @covers OneLogin_Saml2_Response::getNameIdData
