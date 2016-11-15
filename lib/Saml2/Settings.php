@@ -100,6 +100,7 @@ class OneLogin_Saml2_Settings
      * @param array|object|null $settings SAML Toolkit Settings
      *
      * @throws OneLogin_Saml2_Error If any settings parameter is invalid
+     * @throws Exception If OneLogin_Saml2_Settings is incorrectly supplied
      */
     public function __construct($settings = null, $spValidationOnly = false)
     {
@@ -123,6 +124,8 @@ class OneLogin_Saml2_Settings
                     array(implode(', ', $this->_errors))
                 );
             }
+        } else if ($settings instanceof OneLogin_Saml2_Settings) {
+            throw new Exception('Only instances of OneLogin_Saml_Settings are supported.');
         } else {
             if (!$this->_loadSettingsFromArray($settings->getValues())) {
                 throw new OneLogin_Saml2_Error(
