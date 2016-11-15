@@ -56,6 +56,11 @@ class OneLogin_Saml2_Response
     {
         $this->_settings = $settings;
 
+        $baseURL = $this->_settings->getBaseURL();
+        if (!empty($baseURL)) {
+            OneLogin_Saml2_Utils::setBaseURL($baseURL);
+        }
+
         $this->response = base64_decode($response);
 
         $this->document = new DOMDocument();

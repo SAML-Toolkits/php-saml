@@ -16,6 +16,28 @@ class OneLogin_Saml2_Utils
      */
     private static $_proxyVars = false;
 
+
+    /**
+     * @var string
+     */
+    private static $_host;
+
+    /**
+     * @var string
+     */
+    private static $_protocol;
+
+    /**
+     * @var int
+     */
+    private static $_port;
+
+    /**
+     * @var string
+     */
+    private static $_baseurlpath;
+
+
     /**
      * Translates any string. Accepts args
      *
@@ -233,7 +255,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?://@i', $url)) {
+        if (!preg_match('@^https?:\/\/@i', $url)) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
@@ -281,6 +303,41 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $baseurl string The base url to be used when constructing URLs
+     */
+    public static function setBaseURL($baseurl)
+    {
+        if (!empty($baseurl)) {
+            $baseurlpath = '/';
+            if (preg_match('#^https?:\/\/([^\/]*)\/?(.*)#i', $baseurl, $matches)) {
+                if (strpos($baseurl, 'https://') === false) {
+                    self::setSelfProtocol('http');
+                    $port = '80';
+                } else {
+                    self::setSelfProtocol('https');
+                    $port = '443';
+                }
+
+                $currentHost = $matches[1];
+                if (false !== strpos($currentHost, ':')) {
+                    list($currentHost, $possiblePort) = explode(':', $matches[1], 2);
+                    if (is_numeric($possiblePort)) {
+                        $port = $possiblePort;
+                    }
+                }
+
+                if (isset($matches[2]) && !empty($matches[2])) {
+                    $baseurlpath = $matches[2];
+                }
+
+                self::setSelfHost($currentHost);
+                self::setSelfPort($port);
+                self::setBaseURLPath($baseurlpath);
+            }
+        }
+    }
+
+    /**
      * @param $proxyVars bool Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
      */
     public static function setProxyVars($proxyVars)
@@ -324,11 +381,43 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $host string The host to use when constructing URLs
+     */
+    public static function setSelfHost($host)
+    {
+        self::$_host = $host;
+    }
+
+    /**
+     * @param $baseurlpath string The baseurl path to use when constructing URLs
+     */
+    public static function setBaseURLPath($baseurlpath)
+    {
+        if (empty($baseurlpath) || $baseurlpath == '/') {
+            $baseurlpath = '/';
+        } else {
+            self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
+        }
+    }
+
+    /**
+     * return string The baseurlpath to be used when constructing URLs
+     */
+    public static function getBaseURLPath()
+    {
+        return self::$_baseurlpath;
+    }
+
+    /**
      * @return string The raw host name
      */
     protected static function getRawHost()
     {
-        if (array_key_exists('HTTP_HOST', $_SERVER)) {
+        if (self::$_host) {
+            $currentHost = self::$_host;
+        } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
+            $currentHost = $_SERVER['HTTP_X_FORWARDED_HOST'];
+        } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
             $currentHost = $_SERVER['SERVER_NAME'];
@@ -340,6 +429,40 @@ class OneLogin_Saml2_Utils
             }
         }
         return $currentHost;
+    }
+
+    /**
+     * @param $port int The port number to use when constructing URLs
+     */
+    public static function setSelfPort($port)
+    {
+        self::$_port = $port;
+    }
+
+    /**
+     * @param $protocol string The protocol to identify as using, usually http or https
+     */
+    public static function setSelfProtocol($protocol)
+    {
+        self::$_protocol = $protocol;
+    }
+
+    /**
+     * @return string http|https
+     */
+    public static function getSelfProtocol()
+    {
+        $protocol = 'http';
+        if (self::$_protocol) {
+            $protocol = self::$_protocol;
+        } elseif (self::getSelfPort() == 443) {
+            $protocol = 'https';
+        } elseif (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+        } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            $protocol = 'https';
+        }
+        return $protocol;
     }
 
     /**
@@ -365,7 +488,9 @@ class OneLogin_Saml2_Utils
     public static function getSelfPort()
     {
         $portnumber = null;
-        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        if (self::$_port) {
+            $portnumber = self::$_port;
+        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
@@ -390,10 +515,7 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                    || (self::getSelfPort() == 443)
-                    || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
-        return $isHttps;
+        return self::getSelfProtocol() == 'https';
     }
 
     /**
@@ -403,12 +525,19 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfURLNoQuery()
     {
+        $selfURLNoQuery = self::getSelfURLhost();
 
-        $selfURLhost = self::getSelfURLhost();
-        $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($_SERVER['SCRIPT_NAME']);
+        if (!empty($infoWithBaseURLPath)) {
+            $selfURLNoQuery .= $infoWithBaseURLPath;
+        } else {
+            $selfURLNoQuery .= $_SERVER['SCRIPT_NAME'];
+        }
+
         if (isset($_SERVER['PATH_INFO'])) {
             $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
+
         return $selfURLNoQuery;
     }
 
@@ -419,9 +548,9 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfRoutedURLNoQuery()
     {
-
         $selfURLhost = self::getSelfURLhost();
         $route = '';
+
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
@@ -430,6 +559,11 @@ class OneLogin_Saml2_Utils
                     $route = substr($route, 0, -1);
                 }
             }
+        }
+
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($route);
+        if (!empty($infoWithBaseURLPath)) {
+            $route = $infoWithBaseURLPath;
         }
 
         $selfRoutedURLNoQuery = $selfURLhost . $route;
@@ -449,12 +583,40 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
             if ($requestURI[0] !== '/') {
-                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
+                if (preg_match('#^https?:\/\/[^\/]*(\/.*)#i', $requestURI, $matches)) {
                     $requestURI = $matches[1];
                 }
             }
         }
+
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($requestURI);
+        if (!empty($infoWithBaseURLPath)) {
+            $requestURI = $infoWithBaseURLPath;
+        }
+
         return $selfURLhost . $requestURI;
+    }
+
+    /**
+     * Returns the part of the URL with the BaseURLPath.
+     *
+     * @return string
+     */
+    protected static function buildWithBaseURLPath($info)
+    {
+        $result = '';
+        $baseURLPath = self::getBaseURLPath();
+        if (!empty($baseURLPath)) {
+            $result = $baseURLPath;
+            if (!empty($info)) {
+                $path = explode('/', $info);
+                $extractedInfo = array_pop($path);
+                if (!empty($extractedInfo)) {
+                    $result .= $extractedInfo;
+                }
+            } 
+        }
+        return $result;
     }
 
     /**

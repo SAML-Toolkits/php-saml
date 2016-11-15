@@ -15,6 +15,11 @@ class OneLogin_Saml2_Settings
     private $_paths = array();
 
     /**
+     * @var string
+     */
+    private  $_baseurl;
+
+    /**
      * Strict. If active, PHP Toolkit will reject unsigned or unencrypted messages
      * if it expects them signed or encrypted. If not, the messages will be accepted
      * and some security issues will be also relaxed.
@@ -238,6 +243,10 @@ class OneLogin_Saml2_Settings
             }
             if (isset($settings['debug'])) {
                 $this->_debug = $settings['debug'];
+            }
+
+            if (isset($settings['baseurl'])) {
+                $this->_baseurl = $settings['baseurl'];
             }
 
             if (isset($settings['compress'])) {
@@ -938,6 +947,24 @@ class OneLogin_Saml2_Settings
     public function isDebugActive()
     {
         return $this->_debug;
+    }
+
+    /**
+     * Set a baseurl value.
+     */
+    public function setBaseURL($baseurl)
+    {
+        $this->_baseurl = $baseurl;
+    }
+
+    /**
+     * Returns the baseurl set on the settings if any.
+     *
+     * @return null|string The baseurl
+     */
+    public function getBaseURL()
+    {
+        return $this->_baseurl;
     }
 
     /**

@@ -16,7 +16,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 /*
     public function testT()
     {
-    setlocale(LC_MESSAGES, 'en_US');
+	setlocale(LC_MESSAGES, 'en_US');
 
         $msg = 'test';
         $translatedMsg = OneLogin_Saml2_Utils::t($msg);
@@ -278,6 +278,18 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers OneLogin_Saml2_Utils::setSelfHost
+     */
+    public function testSetselfhost()
+    {
+        $_SERVER['HTTP_HOST'] = 'example.org';
+        $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
+
+        OneLogin_Saml2_Utils::setSelfHost('example.com');
+        $this->assertEquals('example.com', OneLogin_Saml2_Utils::getSelfHost());
+    }
+
+    /**
      * @covers OneLogin_Saml2_Utils::setProxyVars()
      * @covers OneLogin_Saml2_Utils::getProxyVars()
      */
@@ -323,6 +335,12 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $_SERVER['HTTP_HOST'] = 'example.org:ok';
         $this->assertEquals('example.org', OneLogin_Saml2_Utils::getSelfHost());
+
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'example.net';
+        $this->assertNotEquals('example.net', OneLogin_Saml2_Utils::getSelfHost());
+
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $this->assertEquals('example.net', OneLogin_Saml2_Utils::getSelfHost());
     }
 
     /**
@@ -333,10 +351,18 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     public function testisHTTPS()
     {
         $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+        
+        $_SERVER['HTTPS'] = 'on';
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+    
+        unset($_SERVER['HTTPS']);
+        $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+        $_SERVER['HTTP_HOST'] = 'example.com:443';
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
     }
 
     /**
-     * @covers OneLogin_Saml2_Utils::getSelfURLhost()
+     * @covers OneLogin_Saml2_Utils::getSelfURLhost
      */
     public function testGetselfurlhostdoubleport()
     {
@@ -351,7 +377,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OneLogin_Saml2_Utils::getSelfPort()
+     * @covers OneLogin_Saml2_Utils::getSelfPort
      */
     public function testGetselfPort()
     {
@@ -371,8 +397,89 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         OneLogin_Saml2_Utils::setProxyVars(true);
         $this->assertEquals(443, OneLogin_Saml2_Utils::getSelfPort());
+
+        OneLogin_Saml2_Utils::setSelfPort(8080);
+        $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
     }
 
+    /**
+     * @covers OneLogin_Saml2_Utils::setSelfProtocol
+     */
+    public function testSetselfprotocol()
+    {
+        $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+    }
+
+    /**
+     * @covers OneLogin_Saml2_Utils::setBaseURLPath
+     */
+    public function testSetBaseURLPath()
+    {
+        $this->assertNull(OneLogin_Saml2_Utils::getBaseURLPath());
+
+        OneLogin_Saml2_Utils::setBaseURLPath('sp');
+        $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        OneLogin_Saml2_Utils::setBaseURLPath('sp/');
+        $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        OneLogin_Saml2_Utils::setBaseURLPath('/sp');
+        $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        OneLogin_Saml2_Utils::setBaseURLPath('/sp/');
+        $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
+    }
+
+    /**
+     * @covers OneLogin_Saml2_Utils::setBaseURL
+     */
+    public function testSetBaseURL()
+    {
+        $_SERVER['HTTP_HOST'] = 'sp.example.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/example1/route.php?x=test';
+        $_SERVER['QUERY_STRING'] = '?x=test';
+        $_SERVER['SCRIPT_NAME'] = '/example1/route.php';
+        unset($_SERVER['PATH_INFO']);
+
+        $expectedUrlNQ = 'https://sp.example.com/example1/route.php';
+        $expectedRoutedUrlNQ = 'https://sp.example.com/example1/route.php';
+        $expectedUrl = 'https://sp.example.com/example1/route.php?x=test';
+
+        OneLogin_Saml2_Utils::setBaseURL("no-valid-url");
+        $this->assertEquals('https', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertEquals('sp.example.com', OneLogin_Saml2_Utils::getSelfHost());
+        $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertNull(OneLogin_Saml2_Utils::getBaseURLPath());
+
+        $this->assertEquals($expectedUrlNQ, OneLogin_Saml2_Utils::getSelfURLNoQuery());       
+        $this->assertEquals($expectedRoutedUrlNQ, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals($expectedUrl, OneLogin_Saml2_Utils::getSelfURL());
+
+        OneLogin_Saml2_Utils::setBaseURL("http://anothersp.example.com:81/example2/");
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
+        $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
+        $expectedUrl2 = 'http://anothersp.example.com:81/example2/route.php?x=test';
+        
+        $this->assertEquals('http', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertEquals('anothersp.example.com', OneLogin_Saml2_Utils::getSelfHost());
+        $this->assertEquals('81', OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertEquals('/example2/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        $this->assertEquals($expectedUrlNQ2, OneLogin_Saml2_Utils::getSelfURLNoQuery());       
+        $this->assertEquals($expectedRoutedUrlNQ2, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
+
+        $_SERVER['PATH_INFO'] = '/test';
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php/test';
+
+        $this->assertEquals($expectedUrlNQ2, OneLogin_Saml2_Utils::getSelfURLNoQuery());       
+        $this->assertEquals($expectedRoutedUrlNQ2, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
+    }
 
     /**
     * Tests the getSelfURLhost method of the OneLogin_Saml2_Utils
