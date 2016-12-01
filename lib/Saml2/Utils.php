@@ -152,7 +152,7 @@ class OneLogin_Saml2_Utils
      * @param string  $cert  A x509 unformated cert
      * @param bool    $heads True if we want to include head and footer
      *
-     * @return string $x509 Formated cert
+     * @return string $x509 Formatted cert
      */
 
     public static function formatCert($cert, $heads = true)
@@ -177,7 +177,7 @@ class OneLogin_Saml2_Utils
      * @param string  $key   A private key
      * @param bool    $heads True if we want to include head and footer
      *
-     * @return string $rsaKey Formated private key
+     * @return string $rsaKey Formatted private key
      */
 
     public static function formatPrivateKey($key, $heads = true)
@@ -880,7 +880,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $x509cert x509 cert
      *
-     * @return null|string Formated fingerprint
+     * @return null|string Formatted fingerprint
      */
     public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
@@ -928,7 +928,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $fingerprint fingerprint
      *
-     * @return string Formated fingerprint
+     * @return string Formatted fingerprint
      */
     public static function formatFingerPrint($fingerprint)
     {
