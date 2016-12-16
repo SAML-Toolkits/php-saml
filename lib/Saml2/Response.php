@@ -33,6 +33,13 @@ class OneLogin_Saml2_Response
     public $decryptedDocument;
 
     /**
+     * A DOMDocument class loaded from the original decrypted assertion.
+     * used in order to avoid signature validation conflicts due namespace issues
+     * @var DomDocument
+     */
+    public $originalDecryptedAssertion;
+
+    /**
      * The response contains an encrypted assertion.
      * @var bool
      */
@@ -300,9 +307,18 @@ class OneLogin_Saml2_Response
                 }
 
                 # If find a Signature on the Assertion (decrypted assertion if was encrypted)
-                $documentToCheckAssertion = $this->encrypted ? $this->decryptedDocument : $this->document;
-                if ($hasSignedAssertion && !OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH)) {
-                    throw new Exception("Signature validation failed. SAML Response rejected");
+                if ($hasSignedAssertion) {
+                    if ($this->encrypted) {
+                        $documentToCheckAssertion = $this->originalDecryptedAssertion;
+                        $xPathSignature = OneLogin_Saml2_Utils::DIRECT_ASSERTION_SIGNATURE_XPATH;
+                    } else {
+                        $documentToCheckAssertion = $this->document;
+                        $xPathSignature = OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH;
+                    }
+
+                    if (!OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, $xPathSignature)) {
+                        throw new Exception("Signature validation failed. SAML Response rejected");
+                    }
                 }
             }
             return true;
@@ -825,12 +841,13 @@ class OneLogin_Saml2_Response
             throw new Exception("No private key available, check settings");
         }
         
-        $objenc = new XMLSecEnc();
-        $encData = $objenc->locateEncryptedData($dom);
-        if (!$encData) {
+        $encryptedDataNodes = OneLogin_Saml2_Utils::query($dom, "/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData");
+        if ($encryptedDataNodes->length != 1) {
             throw new Exception("Cannot locate encrypted assertion");
         }
-        
+        $encData = $encryptedDataNodes->item(0);
+
+        $objenc = new XMLSecEnc();
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
@@ -853,38 +870,38 @@ class OneLogin_Saml2_Response
             $objKey->loadKey($key);
         }
 
-        $decrypted = $objenc->decryptNode($objKey, true);
+        $decrypted = $objenc->decryptNode($objKey, false);
+        $newdoc = new DOMDocument();
+        $newdoc = OneLogin_Saml2_Utils::loadXML($newdoc, $decrypted);
 
-        if ($decrypted instanceof DOMDocument) {
-            return $decrypted;
-        } else {
+        $this->originalDecryptedAssertion = clone $newdoc;
 
-            $encryptedAssertion = $decrypted->parentNode;
-            $container = $encryptedAssertion->parentNode;
+        $encryptedAssertion = $encData->parentNode;
+        $container = $encryptedAssertion->parentNode;
 
-            # Fix possible issue with saml namespace
-            if (!$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
-              !$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2') &&
-              !$decrypted->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns') &&
-              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
-              !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2')
-              ) {
+        # Fix possible issue with saml namespace
+        if (!$newdoc->firstChild->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
+          !$newdoc->firstChild->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2') &&
+          !$newdoc->firstChild->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns') &&
+          !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
+          !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2')
+          ) {
 
-                if (strpos($encryptedAssertion->tagName, 'saml2:') !== false) {
-                    $ns = 'xmlns:saml2';
-                } else if (strpos($encryptedAssertion->tagName, 'saml:') != false) {
-                    $ns = 'xmlns:saml';
-                } else {
-                    $ns = 'xmlns';
-                }
-
-                $decrypted->setAttributeNS('http://www.w3.org/2000/xmlns/', $ns, OneLogin_Saml2_Constants::NS_SAML);
+            if (strpos($encryptedAssertion->tagName, 'saml2:') !== false) {
+                $ns = 'xmlns:saml2';
+            } else if (strpos($encryptedAssertion->tagName, 'saml:') != false) {
+                $ns = 'xmlns:saml';
+            } else {
+                $ns = 'xmlns';
             }
 
-            $container->replaceChild($decrypted, $encryptedAssertion);
-
-            return $decrypted->ownerDocument;
+            $newdoc->firstChild->setAttributeNS('http://www.w3.org/2000/xmlns/', $ns, OneLogin_Saml2_Constants::NS_SAML);
         }
+
+        $importEnc = $encData->ownerDocument->importNode($newdoc->documentElement, true);
+        $container->replaceChild($importEnc, $encryptedAssertion);
+
+        return $container->ownerDocument;
     }
 
     /* After execute a validation process, if fails this method returns the cause
