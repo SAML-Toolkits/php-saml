@@ -170,15 +170,17 @@ METADATA_TEMPLATE;
     /**
      * Signs the metadata with the key/cert provided
      *
-     * @param string $metadata SAML Metadata XML
-     * @param string $key      x509 key
-     * @param string $cert     x509 cert
+     * @param string $metadata          SAML Metadata XML
+     * @param string $key               x509 key
+     * @param string $cert              x509 cert
+     * @param string $signAlgorithm     Signature algorithm method
+     * @param string $digestAlgorithm   Digest algorithm method
      *
      * @return string Signed Metadata
      */
-    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
+    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
-        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm, $digestAlgorithm);
     }
 
     /**

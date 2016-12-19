@@ -1167,12 +1167,13 @@ class OneLogin_Saml2_Utils
      * @param string             $key           The private key
      * @param string             $cert          The public
      * @param string             $signAlgorithm Signature algorithm method
+     * @param string             $digestAlgorithm Digest algorithm method
      *
      * @return string
      *
      * @throws Exception
      */
-    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
+    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
@@ -1197,7 +1198,7 @@ class OneLogin_Saml2_Utils
 
         $objXMLSecDSig->addReferenceList(
             array($rootNode),
-            XMLSecurityDSig::SHA1,
+            $digestAlgorithm,
             array('http://www.w3.org/2000/09/xmldsig#enveloped-signature', XMLSecurityDSig::EXC_C14N),
             array('id_name' => 'ID')
         );
