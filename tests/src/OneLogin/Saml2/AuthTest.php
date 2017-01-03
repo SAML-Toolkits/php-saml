@@ -1370,4 +1370,95 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $validSignature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM=';
         $this->assertEquals($validSignature, $signature);
     }
+
+    /**
+     * Tests that we can get most recently constructed
+     * SAML AuthNRequest
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastAuthNRequest()
+    {
+       $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false);
+       $parsedQuery = getParamsFromUrl($targetSSOURL);
+       $decodedSamlRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+       $this->assertEquals($decodedSamlRequest, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently constructed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastLogoutRequestSent()
+    {
+       $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null);
+       $parsedQuery = getParamsFromUrl($targetSLOURL);
+       $decodedLogoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+       $this->assertEquals($decodedLogoutRequest, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastLogoutRequestReceived()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals($xml, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * SAML Response
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastSAMLResponse()
+    {
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
+        $this->_auth->processResponse();
+        file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
+        $this->assertEquals($response, $this->_auth->getLastResponseXML());
+
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $decryptedResponse = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
+        $this->_auth->processResponse();
+        $this->assertEquals($decryptedResponse, $this->_auth->getLastResponseXML());
+    }
+
+    /**
+     * Tests that we can get most recently constructed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastLogoutResponseSent()
+    {
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64');
+        $targetSLOURL = $this->_auth->processSLO(false, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetSLOURL);
+        $decodedLogoutResponse = gzinflate(base64_decode($parsedQuery['SAMLResponse']));
+        $this->assertEquals($decodedLogoutResponse, $this->_auth->getLastResponseXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastLogoutResponseReceived()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml');
+        $_GET['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals($xml, $this->_auth->getLastResponseXML());
+    }
 }

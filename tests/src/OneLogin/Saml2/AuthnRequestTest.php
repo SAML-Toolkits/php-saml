@@ -298,4 +298,22 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $decompressed = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:AuthnRequest#', $decompressed);
     }
+
+    /**
+     * Tests that we can get the request XML directly without
+     * going through intermediate steps
+     *
+     * @covers OneLogin_Saml2_AuthnRequest::getXML()
+     */
+    public function testGetXML()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+
+        $xml = $authnRequest->getXML();
+        $this->assertRegExp('#^<samlp:AuthnRequest#', $xml);
+    }
 }

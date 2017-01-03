@@ -40,6 +40,30 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($responseEnc instanceof OneLogin_Saml2_Response);
     }
 
+    /**
+     * Tests that we can retrieve the raw text of an XML SAML Response
+     * without going through intermediate steps
+     *
+     * @covers OneLogin_Saml2_Response::getXMLDocument()
+     */
+    public function testGetXMLDocument()
+    {
+        $encodedResponse = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $encodedResponse);
+        $responseDoc = new DOMDocument();
+        $responseDoc = OneLogin_Saml2_Utils::loadXML($responseDoc, base64_decode($encodedResponse));
+        $responseParsedDoc = $response->getXMLDocument();
+        $this->assertEquals($responseDoc, $responseParsedDoc);
+
+        $encodedResponse2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $decryptedResponse2 = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $encodedResponse2);
+        $responseDoc2 = new DOMDocument();
+        $responseDoc2 = OneLogin_Saml2_Utils::loadXML($responseDoc2, $decryptedResponse2);
+        $responseParsedDoc2 = $response2->getXMLDocument();
+        $this->assertEquals($responseDoc2, $responseParsedDoc2);
+    }
+
     public function testNamespaces()
     {
         $xml = base64_encode(file_get_contents(TEST_ROOT . '/data/responses/open_saml_response.xml'));

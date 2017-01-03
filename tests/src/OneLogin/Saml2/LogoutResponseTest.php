@@ -427,4 +427,26 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $decompressed = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:LogoutResponse#', $decompressed);
     }
+
+    /**
+     * Tests that we can get the request XML directly without
+     * going through intermediate steps
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::getXML()
+     */
+    public function testGetXML()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings);
+        $logoutResponse->build('jhgvsadja');
+        $xml = $logoutResponse->getXML();
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml);
+
+        $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
+        $xml2 = $processedLogoutResponse->getXML();
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml2);
+    }
 }

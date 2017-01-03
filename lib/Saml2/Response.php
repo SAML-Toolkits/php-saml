@@ -895,4 +895,18 @@ class OneLogin_Saml2_Response
     {
         return $this->_error;
     }
+
+    /* 
+     * Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
+     *
+     * @return DomDocument SAML Response
+     */
+    public function getXMLDocument()
+    {
+        if ($this->encrypted) {
+            return $this->decryptedDocument;
+        } else {
+            return $this->document;
+        }
+    }
 }

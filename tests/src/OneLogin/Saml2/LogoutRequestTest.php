@@ -648,4 +648,25 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($logoutRequest7->isValid());
         $this->assertContains('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', $logoutRequest7->getError());
     }
+
+    /**
+     * Tests that we can get the request XML directly without
+     * going through intermediate steps
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getXML()
+     */
+    public function testGetXML()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+        $xml = $logoutRequest->getXML();
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $xml);
+    
+        $logoutRequestProcessed = new OneLogin_Saml2_LogoutRequest($settings, base64_encode($xml));
+        $xml2 = $logoutRequestProcessed->getXML();
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $xml2);
+    }
 }

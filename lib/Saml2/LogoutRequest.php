@@ -399,4 +399,15 @@ LOGOUTREQUEST;
     {
         return $this->_error;
     }
+
+    /**
+     * Returns the XML that will be sent as part of the request
+     * or that was received at the SP
+     *
+     * @return string
+     */
+    public function getXML()
+    {
+        return $this->_logoutRequest;
+    }
 }

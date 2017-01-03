@@ -165,4 +165,14 @@ AUTHNREQUEST;
     {
         return $this->_id;
     }
+
+    /**
+     * Returns the XML that will be sent as part of the request
+     *
+     * @return string
+     */
+    public function getXML()
+    {
+        return $this->_authnRequest;
+    }
 }
