@@ -285,7 +285,7 @@ class OneLogin_Saml2_Response
                         $scnData = $subjectConfirmationDataNodes->item(0);
                         if ($scnData->hasAttribute('InResponseTo')) {
                             $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if ($responseInResponseTo != $inResponseTo) {
+                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
                                 continue;
                             }
                         }
