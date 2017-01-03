@@ -509,7 +509,7 @@ class OneLogin_Saml2_Auth
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
                 "Trying to sign the SAML Request but can't load the SP certs",
-                OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error::CERT_NOT_FOUND
             );
         }
 
@@ -553,7 +553,7 @@ class OneLogin_Saml2_Auth
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
                 "Trying to sign the SAML Response but can't load the SP certs",
-                OneLogin_Saml2_Error::SP_CERTS_NOT_FOUND
+                OneLogin_Saml2_Error::CERT_NOT_FOUND
             );
         }
 

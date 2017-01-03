@@ -13,6 +13,8 @@ class OneLogin_Saml2_Error extends Exception
     const SETTINGS_INVALID = 2;
     const METADATA_SP_INVALID = 3;
     const SP_CERTS_NOT_FOUND = 4;
+    // SP_CERTS_NOT_FOUND is deprecated, use CERT_NOT_FOUND instead
+    const CERT_NOT_FOUND = 4;
     const REDIRECT_INVALID_URL = 5;
     const PUBLIC_CERT_FILE_NOT_FOUND = 6;
     const PRIVATE_KEY_FILE_NOT_FOUND = 7;
@@ -21,8 +23,8 @@ class OneLogin_Saml2_Error extends Exception
     const SAML_LOGOUTREQUEST_INVALID = 10;
     const SAML_LOGOUTRESPONSE_INVALID  = 11;
     const SAML_SINGLE_LOGOUT_NOT_SUPPORTED = 12;
-    const PUBLIC_CERT_NOT_FOUND = 13;
-    const PRIVATE_KEY_NOT_FOUND = 14;
+    const PRIVATE_KEY_NOT_FOUND = 13;
+    const UNSUPPORTED_SETTINGS_OBJECT = 14;
 
     /**
      * Constructor

@@ -171,10 +171,7 @@ class OneLogin_Saml2_Response
                 }
 
                 // Validate Asserion timestamps
-                $validTimestamps = $this->validateTimestamps();
-                if (!$validTimestamps) {
-                    throw new Exception('Timing issues (please check your clock settings)');
-                }
+                $this->validateTimestamps();                
 
                 // Validate AuthnStatement element exists and is unique
                 if (!$this->checkOneAuthnStatement()) {
@@ -689,10 +686,10 @@ class OneLogin_Saml2_Response
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
             if ($nbAttribute && OneLogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
-                return false;
+                throw new Exception('Could not validate timestamp: not yet valid. Check system clock.');
             }
             if ($naAttribute && OneLogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
-                return false;
+                throw new Exception('Could not validate timestamp: expired. Check system clock.');
             }
         }
         return true;

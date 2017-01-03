@@ -125,7 +125,11 @@ class OneLogin_Saml2_Settings
                 );
             }
         } else if ($settings instanceof OneLogin_Saml2_Settings) {
-            throw new Exception('Only instances of OneLogin_Saml_Settings are supported.');
+            throw new OneLogin_Saml2_Error(
+                'Only instances of OneLogin_Saml_Settings are supported.',
+                OneLogin_Saml2_Error::UNSUPPORTED_SETTINGS_OBJECT,
+                array(implode(', ', $this->_errors))
+            );
         } else {
             if (!$this->_loadSettingsFromArray($settings->getValues())) {
                 throw new OneLogin_Saml2_Error(

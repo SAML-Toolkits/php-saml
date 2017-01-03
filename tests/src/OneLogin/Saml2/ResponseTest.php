@@ -644,15 +644,27 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/expired_response.xml.base64');
         $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
-        $this->assertFalse($response3->validateTimestamps());
+        try {
+            $response3->validateTimestamps();
+        } catch (Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not validate timestamp: expired. Check system clock.');
+        }
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/not_after_failed.xml.base64');
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
-        $this->assertFalse($response4->validateTimestamps());
+        try {
+            $response4->validateTimestamps();
+        } catch (Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not validate timestamp: expired. Check system clock.');
+        }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/not_before_failed.xml.base64');
         $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);
-        $this->assertFalse($response5->validateTimestamps());
+        try {
+            $response5->validateTimestamps();
+        } catch (Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not validate timestamp: not yet valid. Check system clock.');
+        }
     }
 
     /**
@@ -717,7 +729,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response2 = new OneLogin_Saml2_Response($this->_settings, $xml);
 
         $this->assertFalse($response2->isValid());
-        $this->assertEquals('Timing issues (please check your clock settings)', $response2->getError());
+        $this->assertEquals('Could not validate timestamp: expired. Check system clock.', $response2->getError());
     }
 
     /**
