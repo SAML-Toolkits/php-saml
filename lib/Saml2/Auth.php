@@ -127,7 +127,10 @@ class OneLogin_Saml2_Auth
     public function setStrict($value)
     {
         if (! (is_bool($value))) {
-            throw new Exception('Invalid value passed to setStrict()');
+            throw new OneLogin_Saml2_Error(
+                'Invalid value passed to setStrict()',
+                OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
+            );
         }
 
         $this->_settings->setStrict($value);
@@ -506,10 +509,11 @@ class OneLogin_Saml2_Auth
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        if (!$this->_settings->checkSPCerts()) {
+        $key = $this->_settings->getSPkey();
+        if (empty($key)) {
             throw new OneLogin_Saml2_Error(
-                "Trying to sign the SAML Request but can't load the SP certs",
-                OneLogin_Saml2_Error::CERT_NOT_FOUND
+                "Trying to sign the SAML Request but can't load the SP private key",
+                OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
             );
         }
 
@@ -550,14 +554,13 @@ class OneLogin_Saml2_Auth
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        if (!$this->_settings->checkSPCerts()) {
+        $key = $this->_settings->getSPkey();
+        if (empty($key)) {
             throw new OneLogin_Saml2_Error(
-                "Trying to sign the SAML Response but can't load the SP certs",
-                OneLogin_Saml2_Error::CERT_NOT_FOUND
+                "Trying to sign the SAML Response but can't load the SP private key",
+                OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
             );
         }
-
-        $key = $this->_settings->getSPkey();
 
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);

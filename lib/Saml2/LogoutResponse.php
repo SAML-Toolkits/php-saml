@@ -114,7 +114,10 @@ class OneLogin_Saml2_LogoutResponse
                 if ($security['wantXMLValidation']) {
                     $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                     if (!$res instanceof DOMDocument) {
-                        throw new Exception("Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd");
+                        throw new OneLogin_Saml2_ValidationError(
+                            "Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd",
+                            OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
+                        );
                     }
                 }
 
@@ -122,14 +125,20 @@ class OneLogin_Saml2_LogoutResponse
                 if (isset($requestId) && $this->document->documentElement->hasAttribute('InResponseTo')) {
                     $inResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                     if ($requestId != $inResponseTo) {
-                        throw new Exception("The InResponseTo of the Logout Response: $inResponseTo, does not match the ID of the Logout request sent by the SP: $requestId");
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The InResponseTo of the Logout Response: $inResponseTo, does not match the ID of the Logout request sent by the SP: $requestId",
+                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
                     }
                 }
 
                 // Check issuer
                 $issuer = $this->getIssuer();
                 if (!empty($issuer) && $issuer != $idPEntityId) {
-                    throw new Exception("Invalid issuer in the Logout Response");
+                    throw new OneLogin_Saml2_ValidationError(
+                        "Invalid issuer in the Logout Response",
+                        OneLogin_Saml2_ValidationError::WRONG_ISSUER
+                    );
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
@@ -139,14 +148,20 @@ class OneLogin_Saml2_LogoutResponse
                     $destination = $this->document->documentElement->getAttribute('Destination');
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) === false) {
-                            throw new Exception("The LogoutResponse was received at $currentURL instead of $destination");
+                            throw new OneLogin_Saml2_ValidationError(
+                                "The LogoutResponse was received at $currentURL instead of $destination",
+                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                            );
                         }
                     }
                 }
 
                 if ($security['wantMessagesSigned']) {
                     if (!isset($_GET['Signature'])) {
-                        throw new Exception("The Message of the Logout Response is not signed and the SP requires it");
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The Message of the Logout Response is not signed and the SP requires it",
+                            OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                        );
                     }
                 }
             }
@@ -173,7 +188,10 @@ class OneLogin_Saml2_LogoutResponse
                 }
 
                 if (!isset($idpData['x509cert']) || empty($idpData['x509cert'])) {
-                    throw new Exception('In order to validate the sign on the Logout Response, the x509cert of the IdP is required');
+                    throw new OneLogin_Saml2_Error(
+                        "In order to validate the sign on the Logout Response, the x509cert of the IdP is required",
+                        OneLogin_Saml2_Error::CERT_NOT_FOUND
+                    );
                 }
                 $cert = $idpData['x509cert'];
 
@@ -184,12 +202,18 @@ class OneLogin_Saml2_LogoutResponse
                     try {
                         $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
                     } catch (Exception $e) {
-                        throw new Exception('Invalid signAlg in the recieved Logout Response');
+                        throw new OneLogin_Saml2_ValidationError(
+                            "Invalid signAlg in the recieved Logout Response",
+                            OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                        );
                     }
                 }
 
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
-                    throw new Exception('Signature validation failed. Logout Response rejected');
+                    throw new OneLogin_Saml2_ValidationError(
+                        "Signature validation failed. Logout Response rejected",
+                        OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                    );
                 }
             }
             return true;

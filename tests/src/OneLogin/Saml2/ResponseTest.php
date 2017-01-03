@@ -105,7 +105,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameId4 = $response4->getNameId();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -119,7 +119,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameId5 = $response5->getNameId();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsInfo['security']['wantNameId'] = false;
@@ -136,7 +136,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameId7 = $response7->getNameId();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');
@@ -183,7 +183,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameId4 = $response4->getNameIdFormat();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
     }
 
@@ -229,7 +229,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameIdData4 = $response4->getNameIdData();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -243,7 +243,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameIdData5 = $response5->getNameIdData();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsInfo['security']['wantNameId'] = false;
@@ -260,7 +260,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         try {
             $nameIdData7 = $response7->getNameIdData();
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the assertion of the Response', $e->getMessage());
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');

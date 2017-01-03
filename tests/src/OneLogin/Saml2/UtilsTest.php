@@ -610,7 +610,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $statusInv = OneLogin_Saml2_Utils::getStatus($domInv);
             $this->assertTrue(false);
         } catch (Exception $e) {
-            $this->assertEquals('Missing valid Status on response', $e->getMessage());
+            $this->assertEquals('Missing Status on response', $e->getMessage());
         }
 
         $xmlInv2 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/no_status_code.xml.base64'));
@@ -621,7 +621,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $statusInv2 = OneLogin_Saml2_Utils::getStatus($domInv2);
             $this->assertTrue(false);
         } catch (Exception $e) {
-            $this->assertEquals('Missing valid Status Code on response', $e->getMessage());
+            $this->assertEquals('Missing Status Code on response', $e->getMessage());
         }
     }
 

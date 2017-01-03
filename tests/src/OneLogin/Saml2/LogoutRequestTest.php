@@ -237,7 +237,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
             $nameIdData3 = OneLogin_Saml2_LogoutRequest::getNameIdData($invRequest);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Not NameID found in the Logout Request', $e->getMessage());
+            $this->assertContains('NameID not found in the Logout Request', $e->getMessage());
         }
 
     }
@@ -440,7 +440,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $logoutRequest2 = new OneLogin_Saml2_LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest2->isValid());
-        $this->assertEquals('Timing issues (please check your clock settings)', $logoutRequest2->getError());
+        $this->assertEquals("Could not validate timestamp: expired. Check system clock.", $logoutRequest2->getError());
     }
 
     /**
