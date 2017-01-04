@@ -216,8 +216,8 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData3 = OneLogin_Saml2_LogoutRequest::getNameIdData($request2);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('Key is required in order to decrypt the NameID', $e->getMessage());
         }
 
@@ -235,8 +235,8 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $invRequest = file_get_contents(TEST_ROOT . '/data/logout_requests/invalids/no_nameId.xml');
         try {
             $nameIdData3 = OneLogin_Saml2_LogoutRequest::getNameIdData($invRequest);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the Logout Request', $e->getMessage());
         }
 
@@ -257,8 +257,8 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $request2 = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid.xml');
         try {
             $nameId2 = OneLogin_Saml2_LogoutRequest::getNameId($request2);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('Key is required in order to decrypt the NameID', $e->getMessage());
         }
         $key = $this->_settings->getSPkey();

@@ -201,7 +201,7 @@ LOGOUTREQUEST;
         }
 
         if (!isset($nameId)) {
-            throw new OneLogin_Saml2_Error(
+            throw new OneLogin_Saml2_ValidationError(
                 "NameID not found in the Logout Request",
                 OneLogin_Saml2_ValidationError::NO_NAMEID
             );
@@ -395,7 +395,7 @@ LOGOUTREQUEST;
                     try {
                         $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
                     } catch (Exception $e) {
-                        throw new OneLogin_Saml2_Error(
+                        throw new OneLogin_Saml2_ValidationError(
                             "Invalid signAlg in the recieved Logout Request",
                             OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                         );
@@ -403,7 +403,7 @@ LOGOUTREQUEST;
                 }
 
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
-                    throw new OneLogin_Saml2_Error(
+                    throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. Logout Request rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                     );

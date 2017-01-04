@@ -71,8 +71,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->_auth->processResponse();
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('SAML Response not found', $e->getMessage());
         }
 
@@ -245,7 +245,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->_auth->processSLO(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('SAML LogoutRequest/LogoutResponse not found', $e->getMessage());
         }
 
@@ -1305,8 +1306,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         try {
             $returnTo = 'http://example.com/returnto';
             $auth->logout($returnTo);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('The IdP does not support Single Log Out', $e->getMessage());
         }
     }
@@ -1337,7 +1338,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         try {
             $auth->setStrict('a');
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Invalid value passed to setStrict()', $e->getMessage());
         }

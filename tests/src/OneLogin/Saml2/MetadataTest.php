@@ -153,7 +153,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
 
         try {
             $signedMetadata2 = OneLogin_Saml2_Metadata::signMetadata('', $key, $cert);
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Empty string supplied as input', $e->getMessage());
         }
@@ -197,7 +197,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
 
         try {
             $signedMetadata2 = OneLogin_Saml2_Metadata::addX509KeyDescriptors('', $cert);
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Error parsing metadata', $e->getMessage());
         }
@@ -206,7 +206,7 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
         $unparsedMetadata = file_get_contents(TEST_ROOT . '/data/metadata/unparsed_metadata.xml');
         try {
             $metadataWithDescriptors = OneLogin_Saml2_Metadata::addX509KeyDescriptors($unparsedMetadata, $cert);
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Error parsing metadata', $e->getMessage());
         }

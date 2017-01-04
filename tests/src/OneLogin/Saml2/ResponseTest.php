@@ -104,7 +104,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameId4 = $response4->getNameId();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
@@ -118,7 +119,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameId5 = $response5->getNameId();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
@@ -135,25 +137,38 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameId7 = $response7->getNameId();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');
         $response8 = new OneLogin_Saml2_Response($settings, $xml5);
 
-        try {
-            $nameIdData8 = $response8->getNameId();
-        } catch (Exception $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
-        }
+        $nameId8 = $response8->getNameId();
+        $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $nameId8);
 
         $xml6 = file_get_contents(TEST_ROOT . '/data/responses/invalids/empty_nameid.xml.base64');
         $response9 = new OneLogin_Saml2_Response($settings, $xml6);
+        $nameId9 = $response9->getNameId();
+        $this->assertEmpty($nameId9);
+
+        $settingsInfo['strict'] = true;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response10 = new OneLogin_Saml2_Response($settings, $xml5);
+        try {
+            $nameId10 = $response10->getNameId();
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+        }
+
+        $response11 = new OneLogin_Saml2_Response($settings, $xml6);
 
         try {
-            $nameIdData9 = $response9->getNameId();
-        } catch (Exception $e) {
+            $nameId11 = $response11->getNameId();
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('An empty NameID value found', $e->getMessage());
         }
     }
@@ -182,7 +197,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameId4 = $response4->getNameIdFormat();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
     }
@@ -228,7 +244,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData4 = $response4->getNameIdData();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
@@ -242,7 +259,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData5 = $response5->getNameIdData();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
@@ -259,25 +277,47 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         try {
             $nameIdData7 = $response7->getNameIdData();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');
         $response8 = new OneLogin_Saml2_Response($settings, $xml5);
-
-        try {
-            $nameIdData8 = $response8->getNameIdData();
-        } catch (Exception $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
-        }
+        $nameIdData8 = $response8->getNameIdData();
+        $expectedNameIdData8 = array(
+            'Value' => "492882615acf31c8096b627245d76ae53036c090",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+            'SPNameQualifier' => "https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php"
+        );
+        $this->assertEquals($expectedNameIdData8, $nameIdData8);
 
         $xml6 = file_get_contents(TEST_ROOT . '/data/responses/invalids/empty_nameid.xml.base64');
         $response9 = new OneLogin_Saml2_Response($settings, $xml6);
+        $nameIdData9 = $response9->getNameIdData();
+        $expectedNameIdData9 = array(
+            'Value' => "",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+            'SPNameQualifier' => "http://stuff.com/endpoints/metadata.php"
+        );
+        $this->assertEquals($expectedNameIdData9, $nameIdData9);
 
+        $settingsInfo['strict'] = true;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $response10 = new OneLogin_Saml2_Response($settings, $xml5);
         try {
-            $nameIdData9 = $response9->getNameIdData();
-        } catch (Exception $e) {
+            $nameIdData10 = $response10->getNameIdData();
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+        }
+
+        $response11 = new OneLogin_Saml2_Response($settings, $xml6);
+        try {
+            $nameIdData11 = $response11->getNameIdData();
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('An empty NameID value found', $e->getMessage());
         }
     }
@@ -333,11 +373,11 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/invalids/status_code_responder.xml.base64');
         $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
-      
+
         try {
             $response2->checkStatus();
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('The status code of the Response was not Success, was Responder', $e->getMessage());
         }
 
@@ -345,8 +385,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
         try {
             $response3->checkStatus();
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('The status code of the Response was not Success, was Responder -> something_is_wrong', $e->getMessage());
         }
     }
@@ -428,7 +468,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
         try {
             $issuers = $response4->getIssuers();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Issuer of the Response not found or multiple.', $e->getMessage());
         }
 
@@ -436,7 +477,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);
         try {
             $issuers = $response5->getIssuers();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Issuer of the Assertion not found or multiple.', $e->getMessage());
         }
     }
@@ -499,7 +541,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
         try {
             $attrs = $response4->getAttributes();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
         }
     }
@@ -507,7 +550,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     /**
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
-    * The Assertion is unsigned so the method fails
+    * The Assertion is unsigned, the response is invalid but is able to retrieve the NameID
     * 
     * @covers OneLogin_Saml2_Response::getNameId
     */
@@ -515,13 +558,10 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_2.xml.base64');
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
-        try {
-            $nameId = $response->getNameId();
-            $this->assertFalse($response->isValid());
-            $this->assertNotEquals('root@example.com', $nameId);
-        } catch (Exception $e) {
-            $this->assertNotEmpty($e->getMessage(), 'Trying to get NameId on an unsigned assertion fails');
-        }
+
+        $nameId = $response->getNameId();
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('root@example.com', $nameId);
     }
 
     /**
@@ -646,7 +686,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
         try {
             $response3->validateTimestamps();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertEquals($e->getMessage(), 'Could not validate timestamp: expired. Check system clock.');
         }
 
@@ -654,7 +695,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
         try {
             $response4->validateTimestamps();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertEquals($e->getMessage(), 'Could not validate timestamp: expired. Check system clock.');
         }
 
@@ -662,7 +704,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);
         try {
             $response5->validateTimestamps();
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertEquals($e->getMessage(), 'Could not validate timestamp: not yet valid. Check system clock.');
         }
     }

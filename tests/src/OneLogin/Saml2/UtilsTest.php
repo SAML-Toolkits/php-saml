@@ -70,7 +70,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                       <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
         try {
             $res = OneLogin_Saml2_Utils::loadXML($dom, $attackXXE);
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
         }
@@ -93,7 +93,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                       </results>';
         try {
             $res3 = OneLogin_Saml2_Utils::loadXML($dom, $attackXEE);
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
         }
@@ -243,7 +243,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             $targetUrl4 = OneLogin_Saml2_Utils::redirect($url4, array(), true);
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Redirect to invalid URL', $e->getMessage());
         }
@@ -608,8 +608,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             $statusInv = OneLogin_Saml2_Utils::getStatus($domInv);
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertEquals('Missing Status on response', $e->getMessage());
         }
 
@@ -619,8 +619,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             $statusInv2 = OneLogin_Saml2_Utils::getStatus($domInv2);
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertEquals('Missing Status Code on response', $e->getMessage());
         }
     }
@@ -645,7 +645,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $invalidDuration = 'PT1Y';
         try {
             $parsedDuration3 = OneLogin_Saml2_Utils::parseDuration($invalidDuration);
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Invalid ISO 8601 duration', $e->getMessage());
         }
@@ -672,7 +672,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             OneLogin_Saml2_Utils::parseSAML2Time('invalidSAMLTime');
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Invalid SAML2 timestamp passed', $e->getMessage());
         }
@@ -695,7 +695,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             OneLogin_Saml2_Utils::parseTime2SAML('invalidtime');
-            $this->assertFalse(true);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('strftime() expects parameter 2 to be', $e->getMessage());
         }
@@ -992,8 +992,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         try {
             $res = OneLogin_Saml2_Utils::decryptElement($encryptedNameIDNodes->item(0), $seckey);
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Algorithm mismatch between input key and key in message', $e->getMessage());
         }
 
@@ -1009,8 +1009,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $seckey3->loadKey($key3);
         try {
             $res = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey3);
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Algorithm mismatch between input key and key used to encrypt  the symmetric key for the message', $e->getMessage());
         }
 
@@ -1021,7 +1021,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $encryptedData2 = $encryptedNameIDNodes2->item(0)->firstChild;
         try {
             $res = OneLogin_Saml2_Utils::decryptElement($encryptedData2, $seckey);
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Unable to locate algorithm for this Encrypted Key', $e->getMessage());
         }
@@ -1033,8 +1033,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $encryptedData3 = $encryptedNameIDNodes3->item(0)->firstChild;
         try {
             $res = OneLogin_Saml2_Utils::decryptElement($encryptedData3, $seckey);
-            $this->assertTrue(false);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Algorithm mismatch between input key and key in message', $e->getMessage());
         }
     }
@@ -1137,7 +1137,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $dom->firstChild->firstChild->nodeValue = 'https://example.com/other-idp';
         try {
             $this->assertFalse(OneLogin_Saml2_Utils::validateSign($dom, $cert));
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Reference validation failed', $e->getMessage());
         }
@@ -1153,7 +1153,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $assertElem2 = $dom3->firstChild->firstChild->nextSibling->nextSibling;
         try {
             $this->assertTrue(OneLogin_Saml2_Utils::validateSign($assertElem2, $cert));
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Reference validation failed', $e->getMessage());
         }
@@ -1164,7 +1164,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $noSigned = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/no_signature.xml.base64'));
         try {
             $this->assertFalse(OneLogin_Saml2_Utils::validateSign($noSigned, $cert));
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Cannot locate Signature Node', $e->getMessage());
         }
@@ -1172,7 +1172,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $noKey = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/no_key.xml.base64'));
         try {
             $this->assertFalse(OneLogin_Saml2_Utils::validateSign($noKey, $cert));
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('We have no idea about the key', $e->getMessage());
         }
@@ -1180,7 +1180,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $signatureWrapping = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/signature_wrapping_attack.xml.base64'));
         try {
             $this->assertFalse(OneLogin_Saml2_Utils::validateSign($signatureWrapping, $cert));
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Reference validation failed', $e->getMessage());
         }
