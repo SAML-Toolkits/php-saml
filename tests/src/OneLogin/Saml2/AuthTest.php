@@ -1402,7 +1402,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests that we can get most recently processed
-     * LogoutResponse.
+     * LogoutRequest.
      *
      * @covers OneLogin_Saml2_Auth::getLastRequestXML()
      */
