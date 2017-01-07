@@ -315,7 +315,7 @@ class OneLogin_Saml2_Response
                 if (!$anySubjectConfirmation) {
                     throw new OneLogin_Saml2_ValidationError(
                         "A valid SubjectConfirmation was not found on this Response",
-                        OneLogin_Saml2_ValidationError::SESSION_EXPIRED
+                        OneLogin_Saml2_ValidationError::WRONG_SUBJECTCONFIRMATION
                     );
                 }
 
