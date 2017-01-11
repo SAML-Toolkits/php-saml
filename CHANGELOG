@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v.2.10.3
+* Implement a more specific exception class for handling some validation errors
+* Minor changes on time validation/exceptions
+* Add hooks to retrieve last-sent and last-received requests and responses
+* Improve/Fix tests
+* Add DigestAlgorithm support on addSign
+* [#177](https://github.com/onelogin/php-saml/pull/177) Add error message for bad OneLogin_Saml2_Settings argument
+
 v.2.10.2
 * [#175](https://github.com/onelogin/php-saml/pull/175) Allow overriding of host, port, protocol and url path for URL building
 * [#173](https://github.com/onelogin/php-saml/pull/173) Provide better support to NameIdFormat
