@@ -1001,7 +1001,7 @@ class OneLogin_Saml2_Response
 
                 if (strpos($encryptedAssertion->tagName, 'saml2:') !== false) {
                     $ns = 'xmlns:saml2';
-                } else if (strpos($encryptedAssertion->tagName, 'saml:') != false) {
+                } else if (strpos($encryptedAssertion->tagName, 'saml:') !== false) {
                     $ns = 'xmlns:saml';
                 } else {
                     $ns = 'xmlns';
