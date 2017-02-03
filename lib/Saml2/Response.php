@@ -256,7 +256,7 @@ class OneLogin_Saml2_Response
                     $trimmedIssuer = trim($issuer);
                     if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
                         throw new OneLogin_Saml2_ValidationError(
-                            "Invalid issuer in the Assertion/Response",
+                            "Invalid issuer in the Assertion/Response (expected '$idPEntityId', got '$trimmedIssuer')",
                             OneLogin_Saml2_ValidationError::WRONG_ISSUER
                         );
                     }

@@ -952,12 +952,12 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response3 = new OneLogin_Saml2_Response($this->_settings, $message);
 
         $this->assertFalse($response3->isValid());
-        $this->assertEquals('Invalid issuer in the Assertion/Response', $response3->getError());
+        $this->assertEquals('Invalid issuer in the Assertion/Response (expected \'http://idp.example.com/\', got \'http://invalid.issuer.example.com/\')', $response3->getError());
 
         $response4 = new OneLogin_Saml2_Response($this->_settings, $message2);
 
         $this->assertFalse($response4->isValid());
-        $this->assertEquals('Invalid issuer in the Assertion/Response', $response4->getError());
+        $this->assertEquals('Invalid issuer in the Assertion/Response (expected \'http://idp.example.com/\', got \'http://invalid.isser.example.com/\')', $response4->getError());
     }
 
     /**
