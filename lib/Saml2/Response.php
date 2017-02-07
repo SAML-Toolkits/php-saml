@@ -772,7 +772,7 @@ class OneLogin_Saml2_Response
             if (!$this->validateSignedElements($signedElements)) {
                 throw new OneLogin_Saml2_ValidationError(
                     'Found an unexpected Signature Element. SAML Response rejected',
-                    OneLogin_Saml2_ValidationError::UNEXPECTED_SIGNED_ELEMENT
+                    OneLogin_Saml2_ValidationError::UNEXPECTED_SIGNED_ELEMENTS
                 );
             }
         }
