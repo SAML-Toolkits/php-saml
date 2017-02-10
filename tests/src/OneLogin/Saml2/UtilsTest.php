@@ -1056,6 +1056,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $xmlAuthn = base64_decode(file_get_contents(TEST_ROOT . '/data/requests/authn_request.xml.base64'));
         $xmlAuthnSigned = OneLogin_Saml2_Utils::addSign($xmlAuthn, $key, $cert);
         $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $xmlAuthnSigned);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>', $xmlAuthnSigned);
         $res = new DOMDocument();
         $res->loadXML($xmlAuthnSigned);
         $dsSignature = $res->firstChild->firstChild->nextSibling->nextSibling;
@@ -1063,32 +1065,40 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $dom = new DOMDocument();
         $dom->loadXML($xmlAuthn);
-        $xmlAuthnSigned2 = OneLogin_Saml2_Utils::addSign($dom, $key, $cert);
+        $xmlAuthnSigned2 = OneLogin_Saml2_Utils::addSign($dom, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
         $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned2);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlAuthnSigned2);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlAuthnSigned2);
         $res2 = new DOMDocument();
         $res2->loadXML($xmlAuthnSigned2);
         $dsSignature2 = $res2->firstChild->firstChild->nextSibling->nextSibling;
         $this->assertContains('ds:Signature', $dsSignature2->tagName);
 
         $xmlLogoutReq = base64_decode(file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64'));
-        $xmlLogoutReqSigned = OneLogin_Saml2_Utils::addSign($xmlLogoutReq, $key, $cert);
+        $xmlLogoutReqSigned = OneLogin_Saml2_Utils::addSign($xmlLogoutReq, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
         $this->assertContains('<ds:SignatureValue>', $xmlLogoutReqSigned);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutReqSigned);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutReqSigned);
         $res3 = new DOMDocument();
         $res3->loadXML($xmlLogoutReqSigned);
         $dsSignature3 = $res3->firstChild->firstChild->nextSibling->nextSibling;
         $this->assertContains('ds:Signature', $dsSignature3->tagName);
 
         $xmlLogoutRes = base64_decode(file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64'));
-        $xmlLogoutResSigned = OneLogin_Saml2_Utils::addSign($xmlLogoutRes, $key, $cert);
+        $xmlLogoutResSigned = OneLogin_Saml2_Utils::addSign($xmlLogoutRes, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
         $this->assertContains('<ds:SignatureValue>', $xmlLogoutResSigned);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutResSigned);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutResSigned);
         $res4 = new DOMDocument();
         $res4->loadXML($xmlLogoutResSigned);
         $dsSignature4 = $res4->firstChild->firstChild->nextSibling->nextSibling;
         $this->assertContains('ds:Signature', $dsSignature4->tagName);
 
         $xmlMetadata = file_get_contents(TEST_ROOT . '/data/metadata/metadata_settings1.xml');
-        $xmlMetadataSigned = OneLogin_Saml2_Utils::addSign($xmlMetadata, $key, $cert);
+        $xmlMetadataSigned = OneLogin_Saml2_Utils::addSign($xmlMetadata, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
         $this->assertContains('<ds:SignatureValue>', $xmlMetadataSigned);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlMetadataSigned);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlMetadataSigned);
         $res5 = new DOMDocument();
         $res5->loadXML($xmlMetadataSigned);
         $dsSignature5 = $res5->firstChild->firstChild;
