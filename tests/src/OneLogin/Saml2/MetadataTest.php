@@ -160,6 +160,58 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the signMetadata method of the OneLogin_Saml2_Metadata
+    *
+    * @covers OneLogin_Saml2_Metadata::signMetadata
+    */
+    public function testSignMetadataDefaultAlgorithms()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $spData = $settings->getSPData();
+        $security = $settings->getSecurityData();
+
+        $metadata = OneLogin_Saml2_Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned']);
+
+        $certPath = $settings->getCertPath();
+        $key = file_get_contents($certPath.'sp.key');
+        $cert = file_get_contents($certPath.'sp.crt');
+
+        $signedMetadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $key, $cert);
+
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $signedMetadata);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>', $signedMetadata);
+    }
+
+    /**
+    * Tests the signMetadata method of the OneLogin_Saml2_Metadata
+    *
+    * @covers OneLogin_Saml2_Metadata::signMetadata
+    */
+    public function testSignMetadataCustomAlgorithms()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $spData = $settings->getSPData();
+        $security = $settings->getSecurityData();
+
+        $metadata = OneLogin_Saml2_Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned']);
+
+        $certPath = $settings->getCertPath();
+        $key = file_get_contents($certPath.'sp.key');
+        $cert = file_get_contents($certPath.'sp.crt');
+
+        $signedMetadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
+
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $signedMetadata);
+    }
+
+    /**
     * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
     *
     * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
