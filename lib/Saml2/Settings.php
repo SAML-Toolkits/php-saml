@@ -384,9 +384,14 @@ class OneLogin_Saml2_Settings
             $this->_security['wantXMLValidation'] = true;
         }
 
-        // Algorithm
+        // SignatureAlgorithm
         if (!isset($this->_security['signatureAlgorithm'])) {
             $this->_security['signatureAlgorithm'] = XMLSecurityKey::RSA_SHA1;
+        }
+
+        // DigestAlgorithm
+        if (!isset($this->_security['digestAlgorithm'])) {
+            $this->_security['digestAlgorithm'] = XMLSecurityDSig::SHA1;
         }
 
         if (!isset($this->_security['lowercaseUrlencoding'])) {
