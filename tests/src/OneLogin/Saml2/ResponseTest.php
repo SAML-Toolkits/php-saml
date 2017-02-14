@@ -915,7 +915,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response2 = new OneLogin_Saml2_Response($this->_settings, $message);
 
         $this->assertFalse($response2->isValid());
-        $this->assertContains('is not a valid audience for this Response', $response2->getError());
+        $this->assertSame('Invalid audience for this Response (expected \'http://stuff.com/endpoints/metadata.php\', got \'http://invalid.audience.com\')', $response2->getError());
     }
 
     /**
