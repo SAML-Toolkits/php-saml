@@ -243,9 +243,13 @@ class OneLogin_Saml2_Response
 
                 // Check audience
                 $validAudiences = $this->getAudiences();
-                if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences)) {
+                if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences, true)) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "$spEntityId is not a valid audience for this Response",
+                        sprintf(
+                            "Invalid audience for this Response (expected '%s', got '%s')",
+                            $spEntityId,
+                            implode(',', $validAudiences)
+                        ),
                         OneLogin_Saml2_ValidationError::WRONG_AUDIENCE
                     );
                 }
