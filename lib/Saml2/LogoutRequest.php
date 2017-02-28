@@ -402,7 +402,7 @@ LOGOUTREQUEST;
                     }
                 }
 
-                if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
+                if ($objKey->verifySignature($signedQuery, base64_decode($_GET['Signature'])) !== 1) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. Logout Request rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
