@@ -270,7 +270,7 @@ class OneLogin_Saml2_Response
 
                 // Check the session Expiration
                 $sessionExpiration = $this->getSessionNotOnOrAfter();
-                if (!empty($sessionExpiration) &&  $sessionExpiration <= time()) {
+                if (!empty($sessionExpiration) && $sessionExpiration + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
                     throw new OneLogin_Saml2_ValidationError(
                         "The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response",
                         OneLogin_Saml2_ValidationError::SESSION_EXPIRED
@@ -303,13 +303,13 @@ class OneLogin_Saml2_Response
                         }
                         if ($scnData->hasAttribute('NotOnOrAfter')) {
                             $noa = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotOnOrAfter'));
-                            if ($noa <= time()) {
+                            if ($noa + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
                                 continue;
                             }
                         }
                         if ($scnData->hasAttribute('NotBefore')) {
                             $nb = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotBefore'));
-                            if ($nb > time()) {
+                            if ($nb > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
                                 continue;
                             }
                         }
