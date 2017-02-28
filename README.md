@@ -10,6 +10,9 @@ and supported by OneLogin Inc.
 Warning
 -------
 
+Update php-saml to 2.10.4, this version includes a security patch related to
+[signature validations on LogoutRequests/LogoutResponses](https://github.com/onelogin/php-saml/commit/949359f5cad5e1d085c4e5447d9aa8f49a6e82a1)
+
 Update php-saml to 2.10.0, this version includes a security patch that contains extra validations that will prevent signature wrapping attacks. [CVE-2016-1000253](https://github.com/distributedweaknessfiling/DWF-Database-Artifacts/blob/ab8ae6e845eb506fbeb10a7e4ccb379f0b4222ca/DWF/2016/1000253/CVE-2016-1000253.json)
 
 php-saml < v2.10.0 is vulnerable and allows signature wrapping!
