@@ -123,7 +123,7 @@ REQUESTEDAUTHN;
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
-    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+    ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
 {$nameIdPolicyStr}
@@ -137,7 +137,7 @@ AUTHNREQUEST;
 
     /**
      * Returns deflated, base64 encoded, unsigned AuthnRequest.
-     * 
+     *
      * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
      */
     public function getRequest($deflate = null)
