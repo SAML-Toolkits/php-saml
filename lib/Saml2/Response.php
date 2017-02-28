@@ -200,7 +200,7 @@ class OneLogin_Saml2_Response
                 }
 
                 // Validate Asserion timestamps
-                $this->validateTimestamps();                
+                $this->validateTimestamps();
 
                 // Validate AuthnStatement element exists and is unique
                 if (!$this->checkOneAuthnStatement()) {
@@ -223,10 +223,12 @@ class OneLogin_Saml2_Response
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = trim($this->document->documentElement->getAttribute('Destination'));
                     if (empty($destination)) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The response has an empty Destination value",
-                            OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
-                        );
+                        if (!$security['relaxDestinationValidation']) {
+                            throw new OneLogin_Saml2_ValidationError(
+                                "The response has an empty Destination value",
+                                OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
+                            );
+                        }
                     } else {
                         if (strpos($destination, $currentURL) !== 0) {
                             $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
@@ -389,7 +391,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Checks if the Status is success
-     * 
+     *
      * @throws $statusExceptionMsg If status is not success
      */
     public function checkStatus()
@@ -443,7 +445,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the audiences.
-     * 
+     *
      * @return array @audience The valid audiences of the response
      */
     public function getAudiences()
@@ -463,7 +465,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the Issuers (from Response and Assertion).
-     * 
+     *
      * @return array @issuers The issuers of the assertion/response
      */
     public function getIssuers()
@@ -590,7 +592,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
-     * 
+     *
      * @return int|null The SessionNotOnOrAfter value
      */
     public function getSessionNotOnOrAfter()
@@ -608,7 +610,7 @@ class OneLogin_Saml2_Response
      * Could be used to be stored in the local session in order
      * to be used in a future Logout Request that the SP could
      * send to the SP, to set what specific session must be deleted
-     * 
+     *
      * @return string|null The SessionIndex value
      */
 
@@ -624,7 +626,7 @@ class OneLogin_Saml2_Response
 
     /**
      * Gets the Attributes from the AttributeStatement element.
-     * 
+     *
      * @return array The attributes of the SAML Assertion
      */
     public function getAttributes()
@@ -710,7 +712,6 @@ class OneLogin_Saml2_Response
             $signNodes = $this->document->getElementsByTagName('Signature');
         }
         foreach ($signNodes as $signNode) {
-            
             $responseTag = '{'.OneLogin_Saml2_Constants::NS_SAMLP.'}Response';
             $assertionTag = '{'.OneLogin_Saml2_Constants::NS_SAML.'}Assertion';
 
@@ -751,7 +752,7 @@ class OneLogin_Saml2_Response
                         throw new OneLogin_Saml2_ValidationError(
                             'Found an invalid Signed Element. SAML Response rejected',
                             OneLogin_Saml2_ValidationError::INVALID_SIGNED_ELEMENT
-                        );                        
+                        );
                     }
 
                     if (in_array($sei, $verifiedSeis)) {
@@ -957,7 +958,7 @@ class OneLogin_Saml2_Response
         if (!$encData) {
             throw new OneLogin_Saml2_ValidationError(
                 "Cannot locate encrypted assertion",
-                OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT                                        
+                OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT
             );
         }
         
@@ -966,7 +967,7 @@ class OneLogin_Saml2_Response
         if (!$objKey = $objenc->locateKey()) {
             throw new OneLogin_Saml2_ValidationError(
                 "Unknown algorithm",
-                OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR                                        
+                OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
             );
         }
 
@@ -991,7 +992,6 @@ class OneLogin_Saml2_Response
         if ($decrypted instanceof DOMDocument) {
             return $decrypted;
         } else {
-
             $encryptedAssertion = $decrypted->parentNode;
             $container = $encryptedAssertion->parentNode;
 
@@ -1002,7 +1002,6 @@ class OneLogin_Saml2_Response
               !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml') &&
               !$container->hasAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:saml2')
               ) {
-
                 if (strpos($encryptedAssertion->tagName, 'saml2:') !== false) {
                     $ns = 'xmlns:saml2';
                 } else if (strpos($encryptedAssertion->tagName, 'saml:') !== false) {
@@ -1029,7 +1028,7 @@ class OneLogin_Saml2_Response
         return $this->_error;
     }
 
-    /* 
+    /*
      * Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
      *
      * @return DomDocument SAML Response

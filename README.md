@@ -458,6 +458,10 @@ $advancedSettings = array (
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
 
+        // If true, SAMLResponses with an empty value at its Destination
+        // attribute will not be rejected for this fact.
+        'relaxDestinationValidation' => false,
+
         // Algorithm that the toolkit will use on signing process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
         //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'

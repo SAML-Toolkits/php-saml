@@ -890,6 +890,12 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($response3->isValid());
         $this->assertEquals('The response has an empty Destination value', $response3->getError());
+
+        include TEST_ROOT .'/settings/settings1.php';
+        $settingsInfo['security']['relaxDestinationValidation'] = true;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response4 = new OneLogin_Saml2_Response($settings, $xml2);
+        $this->assertTrue($response4->isValid());
     }
 
     /**

@@ -371,6 +371,11 @@ class OneLogin_Saml2_Settings
             $this->_security['wantNameId'] = true;
         }
 
+        // Relax Destination validation
+        if (!isset($this->_security['relaxDestinationValidation'])) {
+            $this->_security['relaxDestinationValidation'] = false;
+        }
+
         // encrypt expected
         if (!isset($this->_security['wantAssertionsEncrypted'])) {
             $this->_security['wantAssertionsEncrypted'] = false;
