@@ -6,6 +6,11 @@
  */
 class OneLogin_Saml2_LogoutResponse
 {
+    /**
+    * Contains the ID of the Logout Response
+    * @var string
+    */
+    public $id;
 
     /**
      * Object that represents the setting info
@@ -57,6 +62,10 @@ class OneLogin_Saml2_LogoutResponse
             }
             $this->document = new DOMDocument();
             $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->_logoutResponse);
+
+            if ($this->document->documentElement->hasAttribute('ID')) {
+                $this->id = $this->document->documentElement->getAttribute('ID');
+            }
         }
     }
 
@@ -100,11 +109,10 @@ class OneLogin_Saml2_LogoutResponse
      *
      * @throws Exception
      */
-    public function isValid($requestId = null, $retrieveParametersFromServer=false)
+    public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
         $this->_error = null;
         try {
-
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
 
@@ -251,13 +259,13 @@ class OneLogin_Saml2_LogoutResponse
         $spData = $this->_settings->getSPData();
         $idpData = $this->_settings->getIdPData();
 
-        $id = OneLogin_Saml2_Utils::generateUniqueID();
+        $this->id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                  ID="{$id}"
+                  ID="{$this->id}"
                   Version="2.0"
                   IssueInstant="{$issueInstant}"
                   Destination="{$idpData['singleLogoutService']['url']}"
@@ -274,9 +282,9 @@ LOGOUTRESPONSE;
 
     /**
      * Returns a Logout Response object.
-     * 
+     *
      * @param bool|null $deflate Whether or not we should 'gzdeflate' the response body before we return it.
-     *                           
+     *
      * @return string Logout Response deflated and base64 encoded
      */
     public function getResponse($deflate = null)
@@ -300,6 +308,14 @@ LOGOUTRESPONSE;
     public function getError()
     {
         return $this->_error;
+    }
+
+   /**
+    * @return the ID of the Response
+    */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

@@ -669,4 +669,25 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $xml2 = $logoutRequestProcessed->getXML();
         $this->assertRegExp('#^<samlp:LogoutRequest#', $xml2);
     }
+
+    /**
+     * Tests that we can get the ID of the LogoutRequest
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     */
+    public function testGetID()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+        $xml = $logoutRequest->getXML();
+        $id1 = OneLogin_Saml2_LogoutRequest::getID($xml);
+        $this->assertNotNull($id1);
+    
+        $logoutRequestProcessed = new OneLogin_Saml2_LogoutRequest($settings, base64_encode($xml));
+        $id2 = $logoutRequestProcessed->id;
+        $this->assertEquals($id1, $id2);
+    }
 }

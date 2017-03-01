@@ -6,7 +6,6 @@
  */
 class OneLogin_Saml2_LogoutRequest
 {
-
     /**
     * Contains the ID of the Logout Request
     * @var string
@@ -50,7 +49,6 @@ class OneLogin_Saml2_LogoutRequest
         }
 
         if (!isset($request) || empty($request)) {
-
             $spData = $this->_settings->getSPData();
             $idpData = $this->_settings->getIdPData();
             $security = $this->_settings->getSecurityData();
@@ -288,7 +286,7 @@ LOGOUTREQUEST;
      *
      * @return bool If the Logout Request is or not valid
      */
-    public function isValid($retrieveParametersFromServer=false)
+    public function isValid($retrieveParametersFromServer = false)
     {
         $this->_error = null;
         try {
@@ -359,7 +357,6 @@ LOGOUTREQUEST;
             }
 
             if (isset($_GET['Signature'])) {
-
                 if (!isset($_GET['SigAlg'])) {
                     $signAlg = XMLSecurityKey::RSA_SHA1;
                 } else {

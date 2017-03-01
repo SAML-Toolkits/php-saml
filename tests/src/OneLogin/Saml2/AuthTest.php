@@ -40,6 +40,24 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the getLastRequestID method of the OneLogin_Saml2_Auth class
+    *
+    * @covers OneLogin_Saml2_Auth::getLastRequestID
+    */
+    public function testGetLastRequestID()
+    {
+        $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false);
+        $id1 = $this->_auth->getLastRequestID();
+        $this->assertNotNull($id1);
+
+        $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null);
+        $id2 = $this->_auth->getLastRequestID();
+        $this->assertNotNull($id2);
+
+        $this->assertNotEquals($id1, $id2);
+    }
+
+    /**
     * Tests the getSSOurl method of the OneLogin_Saml2_Auth class
     *
     * @covers OneLogin_Saml2_Auth::getSSOurl
@@ -177,7 +195,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('_6273d77b8cde0c333ec79d22a9fa0003b9fe2d75cb', $sessionIndex);
         $sessionExpiration = $this->_auth->getSessionExpiration();
         $this->assertNotNull($sessionExpiration);
-        $this->assertEquals('1392802621', $sessionExpiration);
+        $this->assertEquals('2655106621', $sessionExpiration);
     }
 
     /**
@@ -1380,10 +1398,10 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLastAuthNRequest()
     {
-       $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false);
-       $parsedQuery = getParamsFromUrl($targetSSOURL);
-       $decodedSamlRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
-       $this->assertEquals($decodedSamlRequest, $this->_auth->getLastRequestXML());
+        $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false);
+        $parsedQuery = getParamsFromUrl($targetSSOURL);
+        $decodedSamlRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+        $this->assertEquals($decodedSamlRequest, $this->_auth->getLastRequestXML());
     }
 
     /**
@@ -1394,10 +1412,10 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLastLogoutRequestSent()
     {
-       $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null);
-       $parsedQuery = getParamsFromUrl($targetSLOURL);
-       $decodedLogoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
-       $this->assertEquals($decodedLogoutRequest, $this->_auth->getLastRequestXML());
+        $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null);
+        $parsedQuery = getParamsFromUrl($targetSLOURL);
+        $decodedLogoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+        $this->assertEquals($decodedLogoutRequest, $this->_auth->getLastRequestXML());
     }
 
     /**
@@ -1461,5 +1479,83 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $_GET['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64');
         $this->_auth->processSLO(false, null, false, null, true);
         $this->assertEquals($xml, $this->_auth->getLastResponseXML());
+    }
+
+    /**
+     * Tests that we can get the Id of the SAMLResponse and
+     * the assertion processed and the NotOnOrAfter value
+     *
+     * @covers OneLogin_Saml2_Auth::getLastMessageId()
+     * @covers OneLogin_Saml2_Auth::getLastAssertionId()
+     * @covers OneLogin_Saml2_Auth::getLastAssertionNotOnOrAfter()
+     *
+     * @runInSeparateProcess
+     */
+    public function testGetInfoFromLastResponseReceived()
+    {
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
+        $this->_auth->processResponse();
+        $this->assertEmpty($this->_auth->getErrors());
+        $this->assertEquals('pfxc3d2b542-0f7e-8767-8e87-5b0dc6913375', $this->_auth->getLastMessageId());
+        $this->assertEquals('_cccd6024116641fe48e0ae2c51220d02755f96c98d', $this->_auth->getLastAssertionId());
+        $this->assertNull($this->_auth->getLastAssertionNotOnOrAfter());
+
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $this->_auth->processResponse();
+        $this->assertEmpty($this->_auth->getErrors());
+        $this->assertEquals('pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e', $this->_auth->getLastMessageId());
+        $this->assertEquals('pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb', $this->_auth->getLastAssertionId());
+        $this->assertNull($this->_auth->getLastAssertionNotOnOrAfter());
+
+        // NotOnOrAfter is calculated with strict = true
+        // If invalid, response id and assertion id are not obtained
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['strict'] = true;
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+        $auth->processResponse();
+        $this->assertNotEmpty($auth->getErrors());
+        $this->assertNull($auth->getLastMessageId());
+        $this->assertNull($auth->getLastMessageId());
+        $this->assertNull($auth->getLastAssertionId());
+        $this->assertNull($auth->getLastAssertionNotOnOrAfter());
+
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        OneLogin_Saml2_Utils::setSelfHost('pitbulk.no-ip.org');
+        $auth->processResponse();
+        $this->assertEmpty($auth->getErrors());
+        $this->assertEquals('pfx42be40bf-39c3-77f0-c6ae-8bf2e23a1a2e', $auth->getLastMessageId());
+        $this->assertEquals('pfx57dfda60-b211-4cda-0f63-6d5deb69e5bb', $auth->getLastAssertionId());
+        $this->assertEquals(2671081021, $auth->getLastAssertionNotOnOrAfter());
+    }
+
+    /**
+     * Tests that we can get the Id of the LogoutRequest processed
+     *
+     * @covers OneLogin_Saml2_Auth::getLastMessageId()
+     */
+    public function testGetIdFromLastLogoutRequest()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', $this->_auth->getLastMessageId());
+    }
+
+    /**
+     * Tests that we can get the Id of the LogoutResponse processed
+     *
+     * @covers OneLogin_Saml2_Auth::getLastMessageId()
+     */
+    public function testGetIdFromLastLogoutResponse()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml');
+        $_GET['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals('_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859', $this->_auth->getLastMessageId());
     }
 }

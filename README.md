@@ -1075,6 +1075,23 @@ Also a developer can use setSelfProtocol, setSelfHost, setSelfPort and getBaseUR
 
 At the settings the developer will be able to set a 'baseurl' parameter that automatically will use setBaseURL to set values for setSelfProtocol, setSelfHost, setSelfPort and setBaseURLPath.
 
+
+### Working behind load balancer ###
+
+Is possible that asserting request URL and Destination attribute of SAML response fails when working behind load balancer with SSL offload.
+
+You should be able to workaround this by configuring your server so that it is aware of the proxy and returns the original url when requested.
+
+Or by using the method described on the previous section.
+
+
+### Reply attacks ###
+
+In order to avoid reply attacks, you can store the ID of the SAML messages already processed, to avoid processing them twice. Since the Messages expires and will be invalidated due that fact, you don't need to store those IDs longer than the time frame that you currently accepting.
+
+Get the ID of the last processed message/assertion with the getLastMessageId/getLastAssertionId method of the Auth object.
+
+
 ### Main classes and methods ###
 
 Described below are the main classes and methods that can be invoked.

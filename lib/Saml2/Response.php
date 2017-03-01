@@ -45,6 +45,13 @@ class OneLogin_Saml2_Response
     private $_error;
 
     /**
+     * NotOnOrAfter value of a valid SubjectConfirmationData node
+     *
+     * @var DateTime
+     */
+    private $_validSCDNotOnOrAfter;
+
+    /**
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
@@ -313,6 +320,11 @@ class OneLogin_Saml2_Response
                                 continue;
                             }
                         }
+
+                        // Save NotOnOrAfter value
+                        if ($scnData->hasAttribute('NotOnOrAfter')) {
+                            $this->_validSCDNotOnOrAfter = $noa;
+                        }
                         $anySubjectConfirmation = true;
                         break;
                     }
@@ -387,6 +399,44 @@ class OneLogin_Saml2_Response
             }
             return false;
         }
+    }
+
+    /**
+     * @return the ID of the Response
+     */
+    public function getId()
+    {
+        $id = null;
+        if ($this->document->documentElement->hasAttribute('ID')) {
+            $id = $this->document->documentElement->getAttribute('ID');
+        }
+        return $id;
+    }
+
+    /**
+     * @return the ID of the assertion in the Response
+     */
+    public function getAssertionId()
+    {
+        if (!$this->validateNumAssertions()) {
+            throw new IllegalArgumentException("SAML Response must contain 1 Assertion.");
+        }
+        $assertionNodes = $this->_queryAssertion("");
+        $id = null;
+        if ($assertionNodes->length == 1) {
+            if ($assertionNodes->item(0)->hasAttribute('ID')) {
+                $id = $assertionNodes->item(0)->getAttribute('ID');
+            }
+        }
+        return $id;
+    }
+
+    /**
+     * @return the NotOnOrAfter value of the valid SubjectConfirmationData *         node if any
+     */
+    public function getAssertionNotOnOrAfter()
+    {
+        return $this->_validSCDNotOnOrAfter;
     }
 
     /**
