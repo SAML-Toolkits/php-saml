@@ -78,7 +78,7 @@ class OneLogin_Saml2_ValidationError extends Exception
     const WRONG_DESTINATION = 24;
     const EMPTY_DESTINATION = 25;
     const WRONG_AUDIENCE = 26;
-    const ISSUER_NOT_FOUND_IN_RESPONSE = 27;
+    const ISSUER_MULTIPLE_IN_RESPONSE = 27;
     const ISSUER_NOT_FOUND_IN_ASSERTION = 28;
     const WRONG_ISSUER = 29;
     const SESSION_EXPIRED = 30;

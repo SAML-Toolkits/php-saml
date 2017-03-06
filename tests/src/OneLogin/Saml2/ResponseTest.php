@@ -490,12 +490,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_issuer_response.xml.base64');
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
-        try {
-            $issuers = $response4->getIssuers();
-            $this->fail('OneLogin_Saml2_ValidationError was not raised');
-        } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertContains('Issuer of the Response not found or multiple.', $e->getMessage());
-        }
+        $issuers = $response4->getIssuers();
+        $this->assertEquals(array('http://idp.example.com/'), $response4->getIssuers());
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_issuer_assertion.xml.base64');
         $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);

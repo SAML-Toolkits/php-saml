@@ -523,13 +523,15 @@ class OneLogin_Saml2_Response
         $issuers = array();
 
         $responseIssuer = OneLogin_Saml2_Utils::query($this->document, '/samlp:Response/saml:Issuer');
-        if ($responseIssuer->length == 1) {
-            $issuers[] = $responseIssuer->item(0)->textContent;
-        } else {
-            throw new OneLogin_Saml2_ValidationError(
-                "Issuer of the Response not found or multiple.",
-                OneLogin_Saml2_ValidationError::ISSUER_NOT_FOUND_IN_RESPONSE
-            );
+        if ($responseIssuer->length > 0) {
+            if ($responseIssuer->length == 1) {
+                $issuers[] = $responseIssuer->item(0)->textContent;
+            } else {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Issuer of the Response is multiple.",
+                    OneLogin_Saml2_ValidationError::ISSUER_MULTIPLE_IN_RESPONSE
+                );
+            }
         }
 
         $assertionIssuer = $this->_queryAssertion('/saml:Issuer');
