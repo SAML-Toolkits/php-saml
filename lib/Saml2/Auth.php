@@ -462,6 +462,9 @@ class OneLogin_Saml2_Auth
         if (empty($nameId) && !empty($this->_nameid)) {
             $nameId = $this->_nameid;
         }
+        if (empty($nameIdFormat) && !empty($this->_nameidFormat)) {
+            $nameIdFormat = $this->_nameidFormat;
+        }
 
         $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat);
 
