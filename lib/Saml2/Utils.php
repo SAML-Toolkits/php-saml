@@ -1302,8 +1302,19 @@ class OneLogin_Saml2_Utils
         }
 
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
-
+		
         if (!empty($cert)) {
+			if(is_array($cert)) {
+				// Find the certificate that matches the request, if there is one
+				$domCert = $objKey->getX509Certificate();
+				$matching_cert = null;
+				
+				foreach($cert as $single_cert) {
+					if($single_cert == $domCert) { $matching_cert = $single_cert; break; }
+				}
+				$cert = $matching_cert;
+				if(null == $cert) { return false; }	// No matching cert
+			}
             $objKey->loadKey($cert, false, true);
             return ($objXMLSecDSig->verify($objKey) === 1);
         } else {

@@ -899,7 +899,13 @@ class OneLogin_Saml2_Settings
     public function formatIdPCert()
     {
         if (isset($this->_idp['x509cert'])) {
-            $this->_idp['x509cert'] = OneLogin_Saml2_Utils::formatCert($this->_idp['x509cert']);
+			if(is_array($this->_idp['x509cert'])) {
+				$certs = $this->_idp['x509cert'];
+				$this->_idp['x509cert'] = array();
+				foreach($certs as $cert) $this->_idp['x509cert'][] = OneLogin_Saml2_Utils::formatCert($cert);
+			} else {
+				$this->_idp['x509cert'] = OneLogin_Saml2_Utils::formatCert($this->_idp['x509cert']);
+			}
         }
     }
 
