@@ -114,6 +114,34 @@ REQUESTEDAUTHN;
             }
         }
 
+        if (isset($idpData['idpList']) && is_array($idpData['idpList'])) {
+            $idpListProxyCount = isset($idpData['idpListProxyCount']) ? $idpData['idpListProxyCount'] : 1;
+            $idpListStr = '';
+            foreach ($idpData['idpList'] as $idpProviderId) {
+                $idpListStr .= '<samlp:IDPEntry ProviderID="' . $idpProviderId . '" />';
+            }
+            $scopingStr = <<<SCOPING
+<samlp:Scoping ProxyCount="{$idpListProxyCount}">
+    <samlp:IDPList>
+        {$idpListStr}
+    </samlp:IDPList>
+</samlp:Scoping>
+SCOPING;
+        } else {
+            $scopingStr = '';
+        }
+
+        if (isset($idpData['subjectNameId'])) {
+            $subjectStr = <<<SUBJECT
+<saml:Subject>
+    <saml:NameID Format="{$nameIDPolicyFormat}">{$idpData['subjectNameId']}</saml:NameID>
+    <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"/>
+</saml:Subject>
+SUBJECT;
+        } else {
+            $subjectStr = '';
+        }
+
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -127,6 +155,8 @@ REQUESTEDAUTHN;
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
 {$nameIdPolicyStr}
+{$scopingStr}
+{$subjectStr}
 {$requestedAuthnStr}
 </samlp:AuthnRequest>
 AUTHNREQUEST;
