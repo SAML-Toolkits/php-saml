@@ -1,8 +1,8 @@
 {
-    "name": "onelogin/php-saml-no-mcrypt",
-    "description": "OneLogin PHP SAML Toolkit with no mcrypt",
+    "name": "onelogin/php-saml",
+    "description": "OneLogin PHP SAML Toolkit (with no mcrypt)",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "3.0.0-dev",
     "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {

@@ -481,48 +481,6 @@ class XMLSecurityKey
     }
 
     /**
-     * Encrypts the given data (string) using the openssl-extension
-     *
-     * @param string $data
-     * @return string
-     * @throws Exception
-     */
-    private function encryptOpenSSL($data)
-    {
-        if ($this->cryptParams['type'] == 'public') {
-            if (! openssl_public_encrypt($data, $encrypted_data, $this->key, $this->cryptParams['padding'])) {
-                throw new Exception('Failure encrypting Data');
-            }
-        } else {
-            if (! openssl_private_encrypt($data, $encrypted_data, $this->key, $this->cryptParams['padding'])) {
-                throw new Exception('Failure encrypting Data');
-            }
-        }
-        return $encrypted_data;
-    }
-
-    /**
-     * Decrypts the given data (string) using the openssl-extension
-     *
-     * @param string $data
-     * @return string
-     * @throws Exception
-     */
-    private function decryptOpenSSL($data)
-    {
-        if ($this->cryptParams['type'] == 'public') {
-            if (! openssl_public_decrypt($data, $decrypted, $this->key, $this->cryptParams['padding'])) {
-                throw new Exception('Failure decrypting Data');
-            }
-        } else {
-            if (! openssl_private_decrypt($data, $decrypted, $this->key, $this->cryptParams['padding'])) {
-                throw new Exception('Failure decrypting Data');
-            }
-        }
-        return $decrypted;
-    }
-
-    /**
      * Signs the given data (string) using the openssl-extension
      *
      * @param string $data
@@ -565,13 +523,15 @@ class XMLSecurityKey
      */
     public function encryptData($data)
     {
-        switch ($this->cryptParams['type']) {
-            case 'symmetric':
-                return $this->encryptSymmetric($data);
-            case 'public':
-                return $this->encryptPublic($data);
-            case 'private':
-                return $this->encryptPrivate($data);
+        if ($this->cryptParams['library'] === 'openssl') {
+            switch ($this->cryptParams['type']) {
+                case 'symmetric':
+                    return $this->encryptSymmetric($data);
+                case 'public':
+                    return $this->encryptPublic($data);
+                case 'private':
+                    return $this->encryptPrivate($data);
+            }
         }
     }
 
@@ -583,13 +543,15 @@ class XMLSecurityKey
      */
     public function decryptData($data)
     {
-        switch ($this->cryptParams['type']) {
-            case 'symmetric':
-                return $this->decryptSymmetric($data);
-            case 'public':
-                return $this->decryptPublic($data);
-            case 'private':
-                return $this->decryptPrivate($data);
+        if ($this->cryptParams['library'] === 'openssl') {
+            switch ($this->cryptParams['type']) {
+                case 'symmetric':
+                    return $this->decryptSymmetric($data);
+                case 'public':
+                    return $this->decryptPublic($data);
+                case 'private':
+                    return $this->decryptPrivate($data);
+            }
         }
     }
 
