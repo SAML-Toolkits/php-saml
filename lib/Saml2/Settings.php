@@ -512,14 +512,14 @@ class OneLogin_Saml2_Settings
                 || empty($idp['singleSignOnService']['url'])
             ) {
                 $errors[] = 'idp_sso_not_found';
-            } else if (!filter_var($idp['singleSignOnService']['url'], FILTER_VALIDATE_URL)) {
+            } else if (!OneLogin_Saml2_Utils::validateUrl($idp['singleSignOnService']['url'])) {
                 $errors[] = 'idp_sso_url_invalid';
             }
 
             if (isset($idp['singleLogoutService'])
                 && isset($idp['singleLogoutService']['url'])
                 && !empty($idp['singleLogoutService']['url'])
-                && !filter_var($idp['singleLogoutService']['url'], FILTER_VALIDATE_URL)
+                && !OneLogin_Saml2_Utils::validateUrl($idp['singleLogoutService']['url'])
             ) {
                 $errors[] = 'idp_slo_url_invalid';
             }
@@ -581,13 +581,13 @@ class OneLogin_Saml2_Settings
                 || empty($sp['assertionConsumerService']['url'])
             ) {
                 $errors[] = 'sp_acs_not_found';
-            } else if (!filter_var($sp['assertionConsumerService']['url'], FILTER_VALIDATE_URL)) {
+            } else if (!OneLogin_Saml2_Utils::validateUrl($sp['assertionConsumerService']['url'])) {
                 $errors[] = 'sp_acs_url_invalid';
             }
 
             if (isset($sp['singleLogoutService'])
                 && isset($sp['singleLogoutService']['url'])
-                && !filter_var($sp['singleLogoutService']['url'], FILTER_VALIDATE_URL)
+                && !OneLogin_Saml2_Utils::validateUrl($sp['singleLogoutService']['url'])
             ) {
                 $errors[] = 'sp_sls_url_invalid';
             }
