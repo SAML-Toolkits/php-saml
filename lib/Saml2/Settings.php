@@ -700,6 +700,28 @@ class OneLogin_Saml2_Settings
     }
 
     /**
+     * Returns the x509 public of the SP that is
+     * planed to be used soon instead the other
+     * public cert
+     * @return string SP public cert New
+     */
+    public function getSPcertNew()
+    {
+        $cert = null;
+
+        if (isset($this->_sp['x509certNew']) && !empty($this->_sp['x509certNew'])) {
+            $cert = $this->_sp['x509certNew'];
+        } else {
+            $certFile = $this->_paths['cert'].'sp_new.crt';
+
+            if (file_exists($certFile)) {
+                $cert = file_get_contents($certFile);
+            }
+        }
+        return $cert;
+    }
+
+    /**
      * Gets the IdP data.
      *
      * @return array  IdP info
@@ -780,8 +802,16 @@ class OneLogin_Saml2_Settings
     {
         $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
 
-        $cert = $this->getSPcert();
+        $certNew = $this->getSPcertNew();
+        if (!empty($certNew)) {
+            $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
+                $metadata,
+                $certNew,
+                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+            );
+        }
 
+        $cert = $this->getSPcert();
         if (!empty($cert)) {
             $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
                 $metadata,
@@ -848,6 +878,7 @@ class OneLogin_Saml2_Settings
             $digestAlgorithm = $this->_security['digestAlgorithm'];
             $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata, $signatureAlgorithm, $digestAlgorithm);
         }
+//        print_r($metadata);
         return $metadata;
     }
 

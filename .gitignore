@@ -6,6 +6,7 @@
 /demo-old/settings.php
 /certs/sp.key
 /certs/sp.crt
+/certs/sp_new.crt
 /certs/metadata.key
 /certs/metadata.crt
 /tests/build

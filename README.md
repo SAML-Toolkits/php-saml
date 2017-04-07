@@ -183,6 +183,8 @@ Sometimes we could need a signature on the metadata published by the SP, in
 this case we could use the x.509 cert previously mentioned or use a new x.509
 cert: `metadata.crt` and `metadata.key`.
 
+Use `sp_new.crt` if you are in a key rollover process and you want to
+publish that x509certificate on Service Provider metadata.
 
 #### `extlib/` ####
 
@@ -337,6 +339,14 @@ $settings = array (
         'x509cert' => '',
         'privateKey' => '',
 
+        /*
+         * Key rollover
+         * If you plan to update the SP x509cert and privateKey
+         * you can define here the new x509cert and it will be 
+         * published on the SP metadata so Identity Providers can
+         * read them and get ready for rollover.
+         */
+        // 'x509certNew' => '',
     ),
 
     // Identity Provider Data that we want connected with our SP.
@@ -1250,6 +1260,7 @@ Configuration of the OneLogin PHP Toolkit
  * `checkSPCerts` - Checks if the x509 certs of the SP exists and are valid.
  * `getSPkey` - Returns the x509 private key of the SP.
  * `getSPcert` - Returns the x509 public cert of the SP.
+ * `getSPcertNew` - Returns the future x509 public cert of the SP.
  * `getIdPData` - Gets the IdP data.
  * `getSPData`Gets the SP data.
  * `getSecurityData` - Gets security data.
