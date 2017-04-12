@@ -373,8 +373,15 @@ class OneLogin_Saml2_Response
                 $fingerprint = $idpData['certFingerprint'];
                 $fingerprintalg = $idpData['certFingerprintAlgorithm'];
 
+                $multiCerts = null;
+                $existsMultiX509Sign = isset($idpData['x509certMulti']) && isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing']);
+
+                if ($existsMultiX509Sign) {
+                    $multiCerts = $idpData['x509certMulti']['signing'];
+                }
+
                 # If find a Signature on the Response, validates it checking the original response
-                if ($hasSignedResponse && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH)) {
+                if ($hasSignedResponse && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. SAML Response rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
@@ -383,7 +390,7 @@ class OneLogin_Saml2_Response
 
                 # If find a Signature on the Assertion (decrypted assertion if was encrypted)
                 $documentToCheckAssertion = $this->encrypted ? $this->decryptedDocument : $this->document;
-                if ($hasSignedAssertion && !OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH)) {
+                if ($hasSignedAssertion && !OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH, $multiCerts)) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. SAML Response rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
@@ -1004,7 +1011,7 @@ class OneLogin_Saml2_Response
                 OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
             );
         }
-        
+
         $objenc = new XMLSecEnc();
         $encData = $objenc->locateEncryptedData($dom);
         if (!$encData) {
@@ -1013,7 +1020,7 @@ class OneLogin_Saml2_Response
                 OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT
             );
         }
-        
+
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {

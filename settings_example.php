@@ -111,5 +111,21 @@ $settings = array (
          */
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and more 
+         * than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti' => array(
+        //      'signing' => array(
+        //          0 => '<cert1-string>',
+        //      ),
+        //      'encryption' => array(
+        //          0 => '<cert2-string>',
+        //      )
+        // ),
     ),
 );

@@ -389,6 +389,22 @@ $settings = array (
          */
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and
+         * more than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti' => array(
+        //      'signing' => array(
+        //          0 => '<cert1-string>',
+        //      ),
+        //      'encryption' => array(
+        //          0 => '<cert2-string>',
+        //      )
+        // ),
     ),
 );
 ```
@@ -1093,6 +1109,26 @@ Is possible that asserting request URL and Destination attribute of SAML respons
 You should be able to workaround this by configuring your server so that it is aware of the proxy and returns the original url when requested.
 
 Or by using the method described on the previous section.
+
+
+### SP Key rollover ###
+
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
+
+### IdP with multiple certificates ###
+
+In some scenarios the IdP uses different certificates for
+signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
+
+In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+
+When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+
+The 'x509certMulti' is an array with 2 keys:
+- 'signing'. An array of certs that will be used to validate IdP signature 
+- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP
 
 
 ### Replay attacks ###
