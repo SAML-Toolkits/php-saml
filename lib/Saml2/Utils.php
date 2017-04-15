@@ -843,6 +843,9 @@ class OneLogin_Saml2_Utils
         $xpath->registerNamespace('saml', OneLogin_Saml2_Constants::NS_SAML);
         $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
         $xpath->registerNamespace('xenc', OneLogin_Saml2_Constants::NS_XENC);
+        $xpath->registerNamespace('xsi', OneLogin_Saml2_Constants::NS_XSI);
+        $xpath->registerNamespace('xs', OneLogin_Saml2_Constants::NS_XS);
+        $xpath->registerNamespace('md', OneLogin_Saml2_Constants::NS_MD);
 
         if (isset($context)) {
             $res = $xpath->query($query, $context);

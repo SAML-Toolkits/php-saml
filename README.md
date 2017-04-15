@@ -86,6 +86,7 @@ Installation
  * `mcrypt`. Install that library and its php driver if you gonna handle
    encrypted data (`nameID`, `assertions`).
  * `gettext`. Install that library and its php driver. It handles translations.
+ * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
 
 Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
 
@@ -1363,6 +1364,16 @@ Auxiliary class that contains several methods
  * `addSign` - Adds signature key and senders certificate to an element
    (Message or Assertion).
  * `validateSign` - Validates a signature (Message or Assertion).
+
+##### OneLogin_Saml2_IdPMetadataParser - `IdPMetadataParser.php` #####
+
+Auxiliary class that contains several methods to retrieve and process IdP metadata
+
+ * `parseRemoteXML` - Get IdP Metadata Info from URL.
+ * `parseFileXML` - Get IdP Metadata Info from File.
+ * `parseXML` - Get IdP Metadata Info from XML.
+ * `injectIntoSettings` - Inject metadata info into php-saml settings array.
+
 
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where
