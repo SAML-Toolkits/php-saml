@@ -879,7 +879,6 @@ class OneLogin_Saml2_Settings
             $digestAlgorithm = $this->_security['digestAlgorithm'];
             $metadata = OneLogin_Saml2_Metadata::signMetadata($metadata, $keyMetadata, $certMetadata, $signatureAlgorithm, $digestAlgorithm);
         }
-//        print_r($metadata);
         return $metadata;
     }
 
