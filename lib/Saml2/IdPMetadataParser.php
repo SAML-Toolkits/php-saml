@@ -138,7 +138,7 @@ class OneLogin_Saml2_IdPMetadataParser
 
                 $keyDescriptorCertSigningNodes = OneLogin_Saml2_Utils::query($dom, './md:KeyDescriptor[not(contains(@use, "encryption"))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate', $idpDescriptor);
 
-                $keyDescriptorCertEncryptionNodes = OneLogin_Saml2_Utils::query($dom, './md:KeyDescriptor[@use="encryption"]/ds:KeyInfo/ds:X509Data/ds:X509Certificate', $idpDescriptor);
+                $keyDescriptorCertEncryptionNodes = OneLogin_Saml2_Utils::query($dom, './md:KeyDescriptor[not(contains(@use, "signing"))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate', $idpDescriptor);
 
                 if (!empty($keyDescriptorCertSigningNodes) || !empty($keyDescriptorCertEncryptionNodes)) {
                     $metadataInfo['idp']['x509certMulti'] = array();
@@ -157,7 +157,11 @@ class OneLogin_Saml2_IdPMetadataParser
 
                     $idpCertdata = $metadataInfo['idp']['x509certMulti'];
                     if (count($idpCertdata) == 1 || ((isset($idpCertdata['signing']) && count($idpCertdata['signing']) == 1) && isset($idpCertdata['encryption']) && count($idpCertdata['encryption']) == 1 && strcmp($idpCertdata['signing'][0], $idpCertdata['encryption'][0]) == 0)) {
-                        $metadataInfo['idp']['x509cert'] = $metadataInfo['idp']['x509certMulti']['signing'][0];
+                        if (isset($metadataInfo['idp']['x509certMulti']['signing'][0])) {
+                            $metadataInfo['idp']['x509cert'] = $metadataInfo['idp']['x509certMulti']['signing'][0];
+                        } else {
+                            $metadataInfo['idp']['x509cert'] = $metadataInfo['idp']['x509certMulti']['encryption'][0];
+                        }
                         unset($metadataInfo['idp']['x509certMulti']);
                     }
                 }
