@@ -1597,8 +1597,10 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         );
         $settings2 = new OneLogin_Saml2_Settings($settingsInfo2);
         $response2 = new OneLogin_Saml2_Response($settings2, $xml);
-        $this->assertTrue(!empty($attributes));
-        $this->assertFalse(array_key_exists('urn:oid:1.3.6.1.7', $attributes));
+        $this->assertTrue($response2->isValid());
+        $attributes2 = $response2->getAttributes();
+        $this->assertTrue(!empty($attributes2));
+        $this->assertFalse(array_key_exists('urn:oid:1.3.6.1.7', $attributes2));
 
     }
 }
