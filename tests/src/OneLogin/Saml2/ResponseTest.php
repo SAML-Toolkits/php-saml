@@ -1549,7 +1549,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
                         array_push($newValues, $value);
                     }
                 }
-                return $new_values;
+                return $newValues;
             },
         );
 
