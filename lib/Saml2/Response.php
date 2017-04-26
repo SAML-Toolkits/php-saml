@@ -1077,6 +1077,14 @@ class OneLogin_Saml2_Response
         }
     }
 
+    /**
+     * Apply attribute name mapping to extracted attributes
+     *
+     * @param array $attributeMap Associative array mapping IdP attribute names to local names
+     * @param array $attributes Associative array of attribute names => values
+     *
+     * @return array Attribute list containing renamed/merged attributes
+     */
     protected function _applyAttributeMapping($attributeMap, $attributes)
     {
         $mappedAttributes = array();
@@ -1103,6 +1111,14 @@ class OneLogin_Saml2_Response
         return $mappedAttributes;
     }
 
+    /**
+     * Filter attribute values
+     *
+     * @param array $attributePolicy Associative array of filter functions per-attribute-name
+     * @param array $attributes Associative array of attribute names => values
+     *
+     * @return array Attribute list containing filtered attribute values
+     */
     protected function _applyAttributePolicy($attributePolicy, $attributes)
     {
         $filteredAttributes = array();
