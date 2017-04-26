@@ -1542,11 +1542,11 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $settingsInfo['sp']['attributePolicy'] = array(
             'eduPersonAffiliation' => function($values)
             {
-                $valid_values = array('user');
-                $new_values = array();
+                $validValues = array('user');
+                $newValues = array();
                 foreach ($values as $value) {
-                    if (in_array($value, $valid_values, true)) {
-                        array_push($new_values, $value);
+                    if (in_array($value, $validValues, true)) {
+                        array_push($newValues, $value);
                     }
                 }
                 return $new_values;

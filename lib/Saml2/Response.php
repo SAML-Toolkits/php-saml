@@ -731,7 +731,8 @@ class OneLogin_Saml2_Response
         return $attributes;
     }
 
-    private function applyAttributeMapping($attributeMap, $attributes) {
+    private function applyAttributeMapping($attributeMap, $attributes)
+    {
         $mappedAttributes = array();
 
         foreach ($attributes as $attributeName => $attributeValues) {
@@ -747,7 +748,7 @@ class OneLogin_Saml2_Response
             # Merge into already-mapped attribute assoc array
             # (allows for multiple source attributes to be merged)
             foreach ($attributeValues as $newAttrValue) {
-                if (!array_key_exists( $newAttrName, $mappedAttributes)) {
+                if (!array_key_exists($newAttrName, $mappedAttributes)) {
                     $mappedAttributes[$newAttrName] = array();
                 }
                 array_push($mappedAttributes[$newAttrName], $newAttrValue);
@@ -756,7 +757,8 @@ class OneLogin_Saml2_Response
         return $mappedAttributes;
     }
 
-    private function applyAttributePolicy($attributePolicy, $attributes) {
+    private function applyAttributePolicy($attributePolicy, $attributes)
+    {
         $filteredAttributes = array();
 
         foreach ($attributes as $attributeName => $attributeValues) {
