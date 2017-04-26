@@ -1132,8 +1132,9 @@ class OneLogin_Saml2_Response
                 # Apply mapping function
                 $newAttrValues = $attributePolicy[$attributeName]($attributeValues);
             }
-
-            $filteredAttributes[$attributeName] = $newAttrValues;
+            if (count($newAttrValues) > 0) {
+                $filteredAttributes[$attributeName] = $newAttrValues;
+            }
         }
         return $filteredAttributes;
     }
