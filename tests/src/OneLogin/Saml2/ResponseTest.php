@@ -1590,7 +1590,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(in_array('user', $attributes['eduPersonAffiliation']));
         $this->assertFalse(in_array('admin', $attributes['eduPersonAffiliation']));
 
-        $settingsInfo2 = $settingsInfo
+        $settingsInfo2 = $settingsInfo;
         $settingsInfo2['sp']['attributePolicy'] = array(
             'eduPersonAffiliation' => $attrHelpers->retrictValuesTo(array('user')),
             'urn:oid:1.3.6.1.7' => $attrHelpers->requireScope('yaco.com'), 
