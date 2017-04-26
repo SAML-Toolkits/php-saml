@@ -1531,8 +1531,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $attributes = $response->getAttributes();
         $this->assertTrue(!empty($attributes));
         $this->assertEquals('smartin@yaco.es', $attributes['urn:oid:1.3.6.1.7'][0]);
-        # Test should fail as-is
-        $this->assertTrue(array_key_exists('mail', $attributes));
+        $this->assertFalse(array_key_exists('mail', $attributes));
     }
 
     public function testAttributePolicy()
@@ -1561,7 +1560,6 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $attributes = $response->getAttributes();
         $this->assertTrue(!empty($attributes));
         $this->assertTrue(in_array('user', $attributes['eduPersonAffiliation']));
-        # Should break tests...
-        $this->assertTrue(in_array('admin', $attributes['eduPersonAffiliation']));
+        $this->assertFalse(in_array('admin', $attributes['eduPersonAffiliation']));
     }
 }
