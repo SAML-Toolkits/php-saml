@@ -420,6 +420,12 @@ class OneLogin_Saml2_Settings
         if (!isset($this->_sp['privateKey'])) {
             $this->_sp['privateKey'] = '';
         }
+        if (!isset($this->_sp['attributeMap'])) {
+            $this->_sp['attributeMap'] = array();
+        }
+        if (!isset($this->_sp['attributePolicy'])) {
+            $this->_sp['attributePolicy'] = array();
+        }
     }
 
     /**
