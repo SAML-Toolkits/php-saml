@@ -722,6 +722,12 @@ class OneLogin_Saml2_Response
 
             $attributes[$attributeName] = $attributeValues;
         }
+
+        $spData = $this->_settings->getSPData();
+        $attributeMap = $spData['attributeMap'];
+        $attributePolicy = $spData['attributePolicy'];
+        $attributes = $this->_applyAttributeMapping($attributeMap, $attributes);
+        $attributes = $this->_applyAttributePolicy($attributePolicy, $attributes);
         return $attributes;
     }
 
@@ -1069,6 +1075,68 @@ class OneLogin_Saml2_Response
 
             return $decrypted->ownerDocument;
         }
+    }
+
+    /**
+     * Apply attribute name mapping to extracted attributes
+     *
+     * @param array $attributeMap Associative array mapping IdP attribute names to local names
+     * @param array $attributes Associative array of attribute names => values
+     *
+     * @return array Attribute list containing renamed/merged attributes
+     */
+    protected function _applyAttributeMapping($attributeMap, $attributes)
+    {
+        $mappedAttributes = array();
+
+        foreach ($attributes as $attributeName => $attributeValues) {
+            # Generate hash of new values
+
+            # Default value: identity function
+            $newAttrName = $attributeName;
+            if (array_key_exists($attributeName, $attributeMap)) {
+                # Apply mapping function
+                $newAttrName = $attributeMap[$attributeName];
+            }
+
+            # Merge into already-mapped attribute assoc array
+            # (allows for multiple source attributes to be merged)
+            foreach ($attributeValues as $newAttrValue) {
+                if (!array_key_exists($newAttrName, $mappedAttributes)) {
+                    $mappedAttributes[$newAttrName] = array();
+                }
+                array_push($mappedAttributes[$newAttrName], $newAttrValue);
+            }
+        }
+        return $mappedAttributes;
+    }
+
+    /**
+     * Filter attribute values
+     *
+     * @param array $attributePolicy Associative array of filter functions per-attribute-name
+     * @param array $attributes Associative array of attribute names => values
+     *
+     * @return array Attribute list containing filtered attribute values
+     */
+    protected function _applyAttributePolicy($attributePolicy, $attributes)
+    {
+        $filteredAttributes = array();
+
+        foreach ($attributes as $attributeName => $attributeValues) {
+            # Generate hash of new values
+
+            # Default value: identity function
+            $newAttrValues = $attributeValues;
+            if (array_key_exists($attributeName, $attributePolicy)) {
+                # Apply mapping function
+                $newAttrValues = $attributePolicy[$attributeName]($attributeValues);
+            }
+            if (count($newAttrValues) > 0) {
+                $filteredAttributes[$attributeName] = $newAttrValues;
+            }
+        }
+        return $filteredAttributes;
     }
 
     /* After execute a validation process, if fails this method returns the cause
