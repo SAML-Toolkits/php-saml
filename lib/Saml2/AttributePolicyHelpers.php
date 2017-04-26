@@ -17,7 +17,7 @@ class OneLogin_Saml2_Settings_AttributePolicyHelpers
             }
             return $newValues;
         };
-    };
+    }
 
     static function requireScope($scope) {
         $scope = str_replace('.', '\.', $scope);
