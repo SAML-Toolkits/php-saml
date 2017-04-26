@@ -726,54 +726,9 @@ class OneLogin_Saml2_Response
         $spData = $this->_settings->getSPData();
         $attributeMap = $spData['attributeMap'];
         $attributePolicy = $spData['attributePolicy'];
-        $attributes = applyAttributeMapping($attributeMap, $attributes);
-        $attributes = applyAttributePolicy($attributePolicy, $attributes);
+        $attributes = $this->_applyAttributeMapping($attributeMap, $attributes);
+        $attributes = $this->_applyAttributePolicy($attributePolicy, $attributes);
         return $attributes;
-    }
-
-    private function applyAttributeMapping($attributeMap, $attributes)
-    {
-        $mappedAttributes = array();
-
-        foreach ($attributes as $attributeName => $attributeValues) {
-            # Generate hash of new values
-
-            # Default value: identity function
-            $newAttrName = $attributeName;
-            if (array_key_exists($attributeName, $attributeMap)) {
-                # Apply mapping function
-                $newAttrName = $attributeMap[$attributeName];
-            }
-
-            # Merge into already-mapped attribute assoc array
-            # (allows for multiple source attributes to be merged)
-            foreach ($attributeValues as $newAttrValue) {
-                if (!array_key_exists($newAttrName, $mappedAttributes)) {
-                    $mappedAttributes[$newAttrName] = array();
-                }
-                array_push($mappedAttributes[$newAttrName], $newAttrValue);
-            }
-        }
-        return $mappedAttributes;
-    }
-
-    private function applyAttributePolicy($attributePolicy, $attributes)
-    {
-        $filteredAttributes = array();
-
-        foreach ($attributes as $attributeName => $attributeValues) {
-            # Generate hash of new values
-
-            # Default value: identity function
-            $newAttrValues = $attributeValues;
-            if (array_key_exists($attributeName, $attributePolicy)) {
-                # Apply mapping function
-                $newAttrValues = $attributePolicy[$attributeName]($attributeValues);
-            }
-
-            $filteredAttributes[$attributeName] = $newAttrValues;
-        }
-        return $filteredAttributes;
     }
 
     /**
@@ -1120,6 +1075,51 @@ class OneLogin_Saml2_Response
 
             return $decrypted->ownerDocument;
         }
+    }
+
+    protected function _applyAttributeMapping($attributeMap, $attributes)
+    {
+        $mappedAttributes = array();
+
+        foreach ($attributes as $attributeName => $attributeValues) {
+            # Generate hash of new values
+
+            # Default value: identity function
+            $newAttrName = $attributeName;
+            if (array_key_exists($attributeName, $attributeMap)) {
+                # Apply mapping function
+                $newAttrName = $attributeMap[$attributeName];
+            }
+
+            # Merge into already-mapped attribute assoc array
+            # (allows for multiple source attributes to be merged)
+            foreach ($attributeValues as $newAttrValue) {
+                if (!array_key_exists($newAttrName, $mappedAttributes)) {
+                    $mappedAttributes[$newAttrName] = array();
+                }
+                array_push($mappedAttributes[$newAttrName], $newAttrValue);
+            }
+        }
+        return $mappedAttributes;
+    }
+
+    protected function _applyAttributePolicy($attributePolicy, $attributes)
+    {
+        $filteredAttributes = array();
+
+        foreach ($attributes as $attributeName => $attributeValues) {
+            # Generate hash of new values
+
+            # Default value: identity function
+            $newAttrValues = $attributeValues;
+            if (array_key_exists($attributeName, $attributePolicy)) {
+                # Apply mapping function
+                $newAttrValues = $attributePolicy[$attributeName]($attributeValues);
+            }
+
+            $filteredAttributes[$attributeName] = $newAttrValues;
+        }
+        return $filteredAttributes;
     }
 
     /* After execute a validation process, if fails this method returns the cause
