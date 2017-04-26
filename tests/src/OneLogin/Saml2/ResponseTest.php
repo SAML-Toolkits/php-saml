@@ -1562,4 +1562,43 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(in_array('user', $attributes['eduPersonAffiliation']));
         $this->assertFalse(in_array('admin', $attributes['eduPersonAffiliation']));
     }
+
+    public function testAttributeMappingAndPolicy()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $attrHelpers = new OneLogin_Saml2_Settings_AttributePolicyHelpers;
+
+        $settingsInfo['sp']['attributeMap'] = array(
+            'mail' => 'urn:oid:1.3.6.1.7',
+        );
+        $settingsInfo['sp']['attributePolicy'] = array(
+            'eduPersonAffiliation' => $attrHelpers->retrictValuesTo(array('user')),
+            'urn:oid:1.3.6.1.7' => $attrHelpers->requireScope('yaco.es'),
+        );
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+        $attributes = $response->getAttributes();
+        $this->assertTrue(!empty($attributes));
+        $this->assertEquals('smartin@yaco.es', $attributes['urn:oid:1.3.6.1.7'][0]);
+        $this->assertFalse(array_key_exists('mail', $attributes));
+        $this->assertTrue(in_array('user', $attributes['eduPersonAffiliation']));
+        $this->assertFalse(in_array('admin', $attributes['eduPersonAffiliation']));
+
+        $settingsInfo2 = $settingsInfo
+        $settingsInfo2['sp']['attributePolicy'] = array(
+            'eduPersonAffiliation' => $attrHelpers->retrictValuesTo(array('user')),
+            'urn:oid:1.3.6.1.7' => $attrHelpers->requireScope('yaco.com'), 
+        );
+        $settings2 = new OneLogin_Saml2_Settings($settingsInfo2);
+        $response2 = new OneLogin_Saml2_Response($settings2, $xml);
+        $this->assertTrue(!empty($attributes));
+        $this->assertFalse(array_key_exists('urn:oid:1.3.6.1.7', $attributes));
+
+    }
 }
