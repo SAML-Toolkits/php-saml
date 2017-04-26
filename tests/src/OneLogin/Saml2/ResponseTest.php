@@ -1514,4 +1514,54 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(!empty($attributes));
         $this->assertEquals('saml@user.com', $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0]);
     }
+
+    public function testAttributeMapping()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['sp']['attributeMap'] = array(
+            'mail' => 'urn:oid:1.3.6.1.7',
+        );
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+        $attributes = $response->getAttributes();
+        $this->assertTrue(!empty($attributes));
+        $this->assertEquals('smartin@yaco.es', $attributes['urn:oid:1.3.6.1.7'][0]);
+        # Test should fail as-is
+        $this->asserTrue(array_key_exists('mail', $attributes));
+    }
+
+    public function testAttributePolicy()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['sp']['attributePolicy'] = array(
+            'eduPersonAffiliation' => function($values)
+            {
+                $valid_values = array('user');
+                $new_values = array();
+                foreach ($values as $value) {
+                    if (in_array($value, $valid_values, true)) {
+                        array_push($new_values, $value);
+                    }
+                }
+                return $new_values;
+            },
+        );
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+        $attributes = $response->getAttributes();
+        $this->assertTrue(!empty($attributes));
+        $this->assertTrue(in_array('user', $attributes['eduPersonAffiliation']);
+        # Should break tests...
+        $this->assertTrue(in_array('admin', $attributes['eduPersonAffiliation']);
+    }
 }
