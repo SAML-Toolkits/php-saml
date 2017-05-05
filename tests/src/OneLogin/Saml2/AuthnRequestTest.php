@@ -97,6 +97,56 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request with ScopingContext
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
+    public function testScopingContext()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('<samlp:Scoping', $request);
+
+        $settingsInfo['idp']['scoping']['proxyCount'] = 2;
+        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings2);
+        $encodedRequest2 = $authnRequest2->getRequest();
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertContains('<samlp:Scoping ProxyCount="2">', $request2);
+        $this->assertNotContains('<samlp:IDPEntry', $request2);
+        $this->assertNotContains('<samlp:RequesterID>', $request2);
+
+        unset($settingsInfo['idp']['scoping']['proxyCount']);
+        $settingsInfo['idp']['scoping']['idpList'] = ['http://idp2.example.com'];
+        $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings3);
+        $encodedRequest3 = $authnRequest3->getRequest();
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertNotContains('<samlp:Scoping ProxyCount=', $request3);
+        $this->assertContains('<samlp:IDPEntry ProviderID="http://idp2.example.com" />', $request3);
+        $this->assertNotContains('<samlp:RequesterID>', $request3);
+
+        unset($settingsInfo['idp']['scoping']['idpList']);
+        $settingsInfo['idp']['scoping']['requesterId'] = 'http://sp.example.com';
+        $settings4 = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest4 = new OneLogin_Saml2_AuthnRequest($settings4);
+        $encodedRequest4 = $authnRequest4->getRequest();
+        $decoded4 = base64_decode($encodedRequest4);
+        $request4 = gzinflate($decoded4);
+        $this->assertNotContains('<samlp:Scoping ProxyCount=', $request4);
+        $this->assertNotContains('<samlp:IDPEntry', $request4);
+        $this->assertContains('<samlp:RequesterID>http://sp.example.com</samlp:RequesterID>', $request4);
+    }
+
+    /**
     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request with ForceAuthn
     *
