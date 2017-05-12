@@ -1307,6 +1307,7 @@ Configuration of the OneLogin PHP Toolkit
  * `validateMetadata` - Validates an XML SP Metadata.
  * `formatIdPCert` - Formats the IdP cert.
  * `formatSPCert` - Formats the SP cert.
+ * `formatSPCertNew` - Formats the SP cert new.
  * `formatSPKey` - Formats the SP private key.
  * `getErrors` - Returns an array with the errors, the array is empty when
    the settings is ok.
