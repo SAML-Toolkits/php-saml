@@ -263,4 +263,54 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
             $this->assertContains('Error parsing metadata', $e->getMessage());
         }
     }
+
+    /**
+    * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
+    * Case: Execute 2 addX509KeyDescriptors calls
+    *
+    * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
+    */
+    public function testAddX509KeyDescriptors2Times()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $spData = $settings->getSPData();
+
+        $metadata = OneLogin_Saml2_Metadata::builder($spData);
+
+        $this->assertNotContains('<md:KeyDescriptor use="signing"', $metadata);
+        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadata);
+
+        $certPath = $settings->getCertPath();
+        $cert = file_get_contents($certPath.'sp.crt');
+
+        $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, false);
+
+        $this->assertEquals(1, substr_count($metadata, "<md:KeyDescriptor"));
+
+        $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata, $cert, false);
+
+        $this->assertEquals(2, substr_count($metadata, "<md:KeyDescriptor"));
+
+
+        $metadata2 = OneLogin_Saml2_Metadata::builder($spData);
+
+        $metadata2 = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata2, $cert);
+
+        $this->assertEquals(2, substr_count($metadata2, "<md:KeyDescriptor"));
+
+        $this->assertEquals(1, substr_count($metadata2, '<md:KeyDescriptor use="signing"'));
+
+        $this->assertEquals(1, substr_count($metadata2, '<md:KeyDescriptor use="encryption"'));
+
+        $metadata2 = OneLogin_Saml2_Metadata::addX509KeyDescriptors($metadata2, $cert);
+
+        $this->assertEquals(4, substr_count($metadata2, "<md:KeyDescriptor"));
+
+        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="signing"'));
+
+        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="encryption"'));
+    }
 }

@@ -86,6 +86,7 @@ Installation
  * `mcrypt`. Install that library and its php driver if you gonna handle
    encrypted data (`nameID`, `assertions`).
  * `gettext`. Install that library and its php driver. It handles translations.
+ * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
 
 Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
 
@@ -183,6 +184,8 @@ Sometimes we could need a signature on the metadata published by the SP, in
 this case we could use the x.509 cert previously mentioned or use a new x.509
 cert: `metadata.crt` and `metadata.key`.
 
+Use `sp_new.crt` if you are in a key rollover process and you want to
+publish that x509certificate on Service Provider metadata.
 
 #### `extlib/` ####
 
@@ -337,6 +340,14 @@ $settings = array (
         'x509cert' => '',
         'privateKey' => '',
 
+        /*
+         * Key rollover
+         * If you plan to update the SP x509cert and privateKey
+         * you can define here the new x509cert and it will be 
+         * published on the SP metadata so Identity Providers can
+         * read them and get ready for rollover.
+         */
+        // 'x509certNew' => '',
     ),
 
     // Identity Provider Data that we want connected with our SP.
@@ -379,6 +390,22 @@ $settings = array (
          */
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and
+         * more than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti' => array(
+        //      'signing' => array(
+        //          0 => '<cert1-string>',
+        //      ),
+        //      'encryption' => array(
+        //          0 => '<cert2-string>',
+        //      )
+        // ),
     ),
 );
 ```
@@ -1085,6 +1112,26 @@ You should be able to workaround this by configuring your server so that it is a
 Or by using the method described on the previous section.
 
 
+### SP Key rollover ###
+
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
+
+### IdP with multiple certificates ###
+
+In some scenarios the IdP uses different certificates for
+signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
+
+In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+
+When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+
+The 'x509certMulti' is an array with 2 keys:
+- 'signing'. An array of certs that will be used to validate IdP signature 
+- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP
+
+
 ### Replay attacks ###
 
 In order to avoid replay attacks, you can store the ID of the SAML messages already processed, to avoid processing them twice. Since the Messages expires and will be invalidated due that fact, you don't need to store those IDs longer than the time frame that you currently accepting.
@@ -1250,6 +1297,7 @@ Configuration of the OneLogin PHP Toolkit
  * `checkSPCerts` - Checks if the x509 certs of the SP exists and are valid.
  * `getSPkey` - Returns the x509 private key of the SP.
  * `getSPcert` - Returns the x509 public cert of the SP.
+ * `getSPcertNew` - Returns the future x509 public cert of the SP.
  * `getIdPData` - Gets the IdP data.
  * `getSPData`Gets the SP data.
  * `getSecurityData` - Gets security data.
@@ -1259,6 +1307,7 @@ Configuration of the OneLogin PHP Toolkit
  * `validateMetadata` - Validates an XML SP Metadata.
  * `formatIdPCert` - Formats the IdP cert.
  * `formatSPCert` - Formats the SP cert.
+ * `formatSPCertNew` - Formats the SP cert new.
  * `formatSPKey` - Formats the SP private key.
  * `getErrors` - Returns an array with the errors, the array is empty when
    the settings is ok.
@@ -1316,6 +1365,16 @@ Auxiliary class that contains several methods
  * `addSign` - Adds signature key and senders certificate to an element
    (Message or Assertion).
  * `validateSign` - Validates a signature (Message or Assertion).
+
+##### OneLogin_Saml2_IdPMetadataParser - `IdPMetadataParser.php` #####
+
+Auxiliary class that contains several methods to retrieve and process IdP metadata
+
+ * `parseRemoteXML` - Get IdP Metadata Info from URL.
+ * `parseFileXML` - Get IdP Metadata Info from File.
+ * `parseXML` - Get IdP Metadata Info from XML.
+ * `injectIntoSettings` - Inject metadata info into php-saml settings array.
+
 
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where

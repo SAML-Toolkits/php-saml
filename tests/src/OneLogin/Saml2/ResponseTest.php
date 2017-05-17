@@ -1514,4 +1514,22 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(!empty($attributes));
         $this->assertEquals('saml@user.com', $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0]);
     }
+
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_Response
+    * Case: Using x509certMulti
+    *
+    * @covers OneLogin_Saml2_Response::isValid
+    */
+    public function testIsValidSignUsingX509certMulti()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings6.php';
+        
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response->isValid());
+    }
 }
