@@ -288,7 +288,7 @@ $settings = array (
     // Set a BaseURL to be used instead of try to guess
     // the BaseURL of the view that process the SAML Message.
     // Ex http://sp.example.com/
-    //    http://example.com/sp/ 
+    //    http://example.com/sp/
     'baseurl' => null,
 
     // Service Provider Data that we are deploying.
@@ -322,7 +322,7 @@ $settings = array (
                 )
         ),
         // Specifies info about where and how the <Logout Response> message MUST be
-        // returned to the requester, in this case our SP.        
+        // returned to the requester, in this case our SP.
         'singleLogoutService' => array (
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
@@ -343,7 +343,7 @@ $settings = array (
         /*
          * Key rollover
          * If you plan to update the SP x509cert and privateKey
-         * you can define here the new x509cert and it will be 
+         * you can define here the new x509cert and it will be
          * published on the SP metadata so Identity Providers can
          * read them and get ready for rollover.
          */
@@ -454,7 +454,6 @@ $advancedSettings = array (
         */
         'signMetadata' => false,
 
-
         /** signatures and encryptions required **/
 
         // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest>
@@ -477,11 +476,10 @@ $advancedSettings = array (
         // this SP to be encrypted.
         'wantNameIdEncrypted' => false,
 
-
         // Authentication context.
-        // Set to false or don't present this parameter and no AuthContext will be sent in the AuthNRequest,
-        // Set true and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
-        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
+        // Set to false and no AuthContext will be sent in the AuthNRequest.
+        // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
+        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
         'requestedAuthnContext' => true,
 
         // Indicates if the SP will validate all received xmls.
@@ -1083,7 +1081,7 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 ```
 
 #### URL-guessing methods ####
- 
+
 php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
 
 * `getSelfHost` Returns the current host.
@@ -1114,7 +1112,7 @@ Or by using the method described on the previous section.
 
 ### SP Key rollover ###
 
-If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be 
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be
 published on the SP metadata so Identity Providers can read them and get ready for rollover.
 
 
@@ -1128,7 +1126,7 @@ In order to handle that the toolkit offers the $settings['idp']['x509certMulti']
 When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
 
 The 'x509certMulti' is an array with 2 keys:
-- 'signing'. An array of certs that will be used to validate IdP signature 
+- 'signing'. An array of certs that will be used to validate IdP signature
 - 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP
 
 
