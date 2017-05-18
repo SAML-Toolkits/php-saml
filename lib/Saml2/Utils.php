@@ -37,6 +37,10 @@ class OneLogin_Saml2_Utils
      */
     private static $_baseurlpath;
 
+    /**
+     * @var string
+     */
+    private static $_lastsignkey;
 
     /**
      * Translates any string. Accepts args
@@ -1324,10 +1328,12 @@ class OneLogin_Saml2_Utils
         }
 
         $valid = false;
+        self::$_lastsignkey = null;
         foreach ($multiCerts as $cert) {
             if (!empty($cert)) {
                 $objKey->loadKey($cert, false, true);
                 if ($objXMLSecDSig->verify($objKey) === 1) {
+                    self::$_lastsignkey = $cert;
                     $valid = true;
                     break;
                 }
@@ -1338,6 +1344,7 @@ class OneLogin_Saml2_Utils
                     if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) == $domCertFingerprint) {
                         $objKey->loadKey($domCert, false, true);
                         if ($objXMLSecDSig->verify($objKey) === 1) {
+                            self::$_lastsignkey = $cert;
                             $valid = true;
                             break;
                         }
@@ -1390,6 +1397,7 @@ class OneLogin_Saml2_Utils
         }
 
         $signatureValid = false;
+        self::$_lastsignkey = null;
         foreach ($multiCerts as $cert) {
             $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
             $objKey->loadKey($cert, false, true);
@@ -1409,10 +1417,16 @@ class OneLogin_Saml2_Utils
             }
 
             if ($objKey->verifySignature($signedQuery, base64_decode($_GET['Signature'])) === 1) {
+                self::$_lastsignkey = $cert;
                 $signatureValid = true;
                 break;
             }
         }
         return $signatureValid;
+    }
+
+    public static function getLastSigningKey()
+    {
+        return self::$_lastsignkey;
     }
 }

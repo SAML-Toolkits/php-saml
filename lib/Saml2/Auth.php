@@ -81,6 +81,13 @@ class OneLogin_Saml2_Auth
     private $_lastAssertionNotOnOrAfter;
 
     /**
+     * The signing certificate of the last assertion processed
+     *
+     * @var string
+     */
+    private $_lastSigningCertificate;
+
+    /**
      * If any error.
      *
      * @var array
@@ -183,6 +190,7 @@ class OneLogin_Saml2_Auth
                 $this->_lastMessageId = $response->getId();
                 $this->_lastAssertionId = $response->getAssertionId();
                 $this->_lastAssertionNotOnOrAfter = $response->getAssertionNotOnOrAfter();
+                $this->_lastSigningCertificate = $response->getSigningCertificate();
             } else {
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
@@ -638,6 +646,14 @@ class OneLogin_Saml2_Auth
     public function getLastAssertionNotOnOrAfter()
     {
         return $this->_lastAssertionNotOnOrAfter;
+    }
+
+    /**
+     * @return The certificate used to sign the response
+     */
+    public function getLastSigningCertificate()
+    {
+        return $this->_lastSigningCertificate;
     }
 
     /**

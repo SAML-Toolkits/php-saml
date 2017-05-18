@@ -52,6 +52,11 @@ class OneLogin_Saml2_Response
     private $_validSCDNotOnOrAfter;
 
     /**
+     * The signing key used to validate the response
+     */
+    private $_signkey;
+
+    /**
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
@@ -100,6 +105,7 @@ class OneLogin_Saml2_Response
     public function isValid($requestId = null)
     {
         $this->_error = null;
+        $this->_signkey = null;
         try {
             // Check SAML version
             if ($this->document->documentElement->getAttribute('Version') != '2.0') {
@@ -396,6 +402,7 @@ class OneLogin_Saml2_Response
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                     );
                 }
+                $this->_signkey = OneLogin_Saml2_Utils::getLastSigningKey();
             }
             return true;
         } catch (Exception $e) {
@@ -1099,5 +1106,10 @@ class OneLogin_Saml2_Response
         } else {
             return $this->document;
         }
+    }
+
+    public function getSigningCertificate()
+    {
+        return $this->_signkey;
     }
 }
