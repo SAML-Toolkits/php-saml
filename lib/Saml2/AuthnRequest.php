@@ -114,6 +114,8 @@ REQUESTEDAUTHN;
             }
         }
 
+        $sp_entity_id = htmlspecialchars($spData['entityId'], ENT_QUOTES);
+        $acs_url = htmlspecialchars($spData['assertionConsumerService']['url'], ENT_QUOTES);
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -124,8 +126,8 @@ REQUESTEDAUTHN;
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
-    AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    AssertionConsumerServiceURL="{$acs_url}">
+    <saml:Issuer>{$sp_entity_id}</saml:Issuer>
 {$nameIdPolicyStr}
 {$requestedAuthnStr}
 </samlp:AuthnRequest>

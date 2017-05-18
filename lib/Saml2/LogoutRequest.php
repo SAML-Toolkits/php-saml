@@ -90,6 +90,7 @@ class OneLogin_Saml2_LogoutRequest
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
 
+            $sp_entity_id = htmlspecialchars($spData['entityId'], ENT_QUOTES);
             $logoutRequest = <<<LOGOUTREQUEST
 <samlp:LogoutRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -98,7 +99,7 @@ class OneLogin_Saml2_LogoutRequest
     Version="2.0"
     IssueInstant="{$issueInstant}"
     Destination="{$idpData['singleLogoutService']['url']}">
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    <saml:Issuer>{$sp_entity_id}</saml:Issuer>
     {$nameIdObj}
     {$sessionIndexStr}
 </samlp:LogoutRequest>
