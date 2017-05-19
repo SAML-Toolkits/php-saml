@@ -125,9 +125,9 @@ class OneLogin_Saml2_IdPMetadataParser
                     );
                 }
 
-                $sloNodes = OneLogin_Saml2_Utils::query($dom, './md:SingleSignOnService[@Binding="'.OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT.'"]', $idpDescriptor);
+                $sloNodes = OneLogin_Saml2_Utils::query($dom, './md:SingleLogoutService[@Binding="'.OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT.'"]', $idpDescriptor);
                 if ($sloNodes->length < 1) {
-                    $sloNodes = OneLogin_Saml2_Utils::query($dom, './md:SingleSignOnService', $idpDescriptor);
+                    $sloNodes = OneLogin_Saml2_Utils::query($dom, './md:SingleLogoutService', $idpDescriptor);
                 }
                 if ($sloNodes->length > 0) {
                     $metadataInfo['idp']['singleLogoutService'] = array(

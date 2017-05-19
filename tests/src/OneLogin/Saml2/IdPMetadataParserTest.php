@@ -20,7 +20,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'singleLogoutService' => array (
-                    'url' => 'https://example.onelogin.com/trust/saml2/http-redirect/sso/645460',
+                    'url' => 'https://example.onelogin.com/trust/saml2/http-redirect/slo/645460',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'x509cert' => 'MIIEZTCCA02gAwIBAgIUPyy/A3bZAZ4m28PzEUUoT7RJhxIwDQYJKoZIhvcNAQEFBQAwcjELMAkGA1UEBhMCVVMxKzApBgNVBAoMIk9uZUxvZ2luIFRlc3QgKHNnYXJjaWEtdXMtcHJlcHJvZCkxFTATBgNVBAsMDE9uZUxvZ2luIElkUDEfMB0GA1UEAwwWT25lTG9naW4gQWNjb3VudCA4OTE0NjAeFw0xNjA4MDQyMjI5MzdaFw0yMTA4MDUyMjI5MzdaMHIxCzAJBgNVBAYTAlVTMSswKQYDVQQKDCJPbmVMb2dpbiBUZXN0IChzZ2FyY2lhLXVzLXByZXByb2QpMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgODkxNDYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDN6iqQGcLOCglNO42I2rkzE05UXSiMXT6c8ALThMMiaDw6qqzo3sd/tKK+NcNKWLIIC8TozWVyh5ykUiVZps+08xil7VsTU7E+wKu3kvmOsvw2wlRwtnoKZJwYhnr+RkBa+h1r3ZYUgXm1ZPeHMKj1g18KaWz9+MxYL6BhKqrOzfW/P2xxVRcFH7/pq+ZsDdgNzD2GD+apzY4MZyZj/N6BpBWJ0GlFsmtBegpbX3LBitJuFkk5L4/U/jjF1AJa3boBdCUVfATqO5G03H4XS1GySjBIRQXmlUF52rLjg6xCgWJ30/+t1X+IHLJeixiQ0vxyh6C4/usCEt94cgD1r8ADAgMBAAGjgfIwge8wDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUPW0DcH0G3IwynWgi74co4wZ6n7gwga8GA1UdIwSBpzCBpIAUPW0DcH0G3IwynWgi74co4wZ6n7ihdqR0MHIxCzAJBgNVBAYTAlVTMSswKQYDVQQKDCJPbmVMb2dpbiBUZXN0IChzZ2FyY2lhLXVzLXByZXByb2QpMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgODkxNDaCFD8svwN22QGeJtvD8xFFKE+0SYcSMA4GA1UdDwEB/wQEAwIHgDANBgkqhkiG9w0BAQUFAAOCAQEAQhB4q9jrycwbHrDSoYR1X4LFFzvJ9Us75wQquRHXpdyS9D6HUBXMGI6ahPicXCQrfLgN8vzMIiqZqfySXXv/8/dxe/X4UsWLYKYJHDJmxXD5EmWTa65chjkeP1oJAc8f3CKCpcP2lOBTthbnk2fEVAeLHR4xNdQO0VvGXWO9BliYPpkYqUIBvlm+Fg9mF7AM/Uagq2503XXIE1Lq//HON68P10vNMwLSKOtYLsoTiCnuIKGJqG37MsZVjQ1ZPRcO+LSLkq0i91gFxrOrVCrgztX4JQi5XkvEsYZGIXXjwHqxTVyt3adZWQO0LPxPqRiUqUzyhDhLo/xXNrHCu4VbMw=='
@@ -51,7 +51,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'singleLogoutService' => array (
-                    'url' => 'https://idp.examle.com/saml/sso',
+                    'url' => 'https://idp.examle.com/saml/slo',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'x509certMulti' => array (
@@ -91,10 +91,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                     'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
-                'singleLogoutService' => array (
-                    'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
-                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
-                ),
                 'x509cert' => 'MIIDJzCCAg+gAwIBAgIUKuW5MuiehKHHdGjp+5rQDbXzx4IwDQYJKoZIhvcNAQEFBQAwGjEYMBYGA1UEAxMPc2ktc2FhaS51YWxnLnB0MB4XDTE2MDIwMTA5MTQwNFoXDTM2MDIwMTA5MTQwNFowGjEYMBYGA1UEAxMPc2ktc2FhaS51YWxnLnB0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApN/x2BG+tpJBXU+bPSReXt1V+kaSoH1zAbA62ckYhHM6VqlzrqCD5ZCErMt5ysc9jpvJZ9umze1hXRaIYbGHCc3ADfBgrXoedBO7P10psRAuZqXOzvBwD7Dkb25KHTo/si3ZFB5VMUAMzHdxNWlOyhkOOS++hY5sq21iTGy5qDxsFBmHxGFv0oZYMgB6ZFWwScX1GyD6YpnbqBrlvdzmCmtBmGxyVV/ReyY5dK03bbDiF5Hf2mQR24ORQ5VrsbwlRyPtjVcWSilEJOB0PVOoixewA07RBzCQTeGeC3trM9ZobVuOavDxGN6rxzWnhe0DE2+sTqARxsKOY5kgMkM4kwIDAQABo2UwYzBCBgNVHREEOzA5gg9zaS1zYWFpLnVhbGcucHSGJmh0dHBzOi8vc2ktc2FhaS51YWxnLnB0L2lkcC9zaGliYm9sZXRoMB0GA1UdDgQWBBTfBNAJjRTcPNuPowmLQ3a0hqaSKTANBgkqhkiG9w0BAQUFAAOCAQEAkP4lZzeVslQLxLFZWCVVcNh9LuGgsGuiVru8GUH63zNrrzwAyhlSXyXU+61Yn1MxFnx+Bn2zf9qG1UMmf6FFFyxYFCHN1iuo6P0DIkJgpvLo+qoRbYJxB552ZFeF/g8AvhUU910LFLQOHJzrfsrF9hJM2gAinZDbmjY7IsP1f9iLm5aP6tCSszjkEbWzsnweQMBlteNa/2m9Ncfb4TpRwvcViCW77uv/13bbYB4F4pTr6fVxqORhM7HSJYn6WkgZczGbCFUMaIfTxKSF9v7/bpHnbXIP8YekuHRId7rJxQiwaGni69uLUvfjTo4cRrDa6daZo2Ff1LlKlfjTN4ANRA=='
             ),
             'sp' => array (
@@ -108,10 +104,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
             'idp' => array (
                 'entityId' => 'https://idp.fccn.pt/idp/shibboleth',
                 'singleSignOnService' => array (
-                    'url' => 'https://idp.fccn.pt/idp/profile/SAML2/Redirect/SSO',
-                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
-                ),
-                'singleLogoutService' => array (
                     'url' => 'https://idp.fccn.pt/idp/profile/SAML2/Redirect/SSO',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
@@ -143,10 +135,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                     'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
-                'singleLogoutService' => array (
-                    'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
-                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
-                ),
                 'x509cert' => 'MIIDJzCCAg+gAwIBAgIUKuW5MuiehKHHdGjp+5rQDbXzx4IwDQYJKoZIhvcNAQEFBQAwGjEYMBYGA1UEAxMPc2ktc2FhaS51YWxnLnB0MB4XDTE2MDIwMTA5MTQwNFoXDTM2MDIwMTA5MTQwNFowGjEYMBYGA1UEAxMPc2ktc2FhaS51YWxnLnB0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApN/x2BG+tpJBXU+bPSReXt1V+kaSoH1zAbA62ckYhHM6VqlzrqCD5ZCErMt5ysc9jpvJZ9umze1hXRaIYbGHCc3ADfBgrXoedBO7P10psRAuZqXOzvBwD7Dkb25KHTo/si3ZFB5VMUAMzHdxNWlOyhkOOS++hY5sq21iTGy5qDxsFBmHxGFv0oZYMgB6ZFWwScX1GyD6YpnbqBrlvdzmCmtBmGxyVV/ReyY5dK03bbDiF5Hf2mQR24ORQ5VrsbwlRyPtjVcWSilEJOB0PVOoixewA07RBzCQTeGeC3trM9ZobVuOavDxGN6rxzWnhe0DE2+sTqARxsKOY5kgMkM4kwIDAQABo2UwYzBCBgNVHREEOzA5gg9zaS1zYWFpLnVhbGcucHSGJmh0dHBzOi8vc2ktc2FhaS51YWxnLnB0L2lkcC9zaGliYm9sZXRoMB0GA1UdDgQWBBTfBNAJjRTcPNuPowmLQ3a0hqaSKTANBgkqhkiG9w0BAQUFAAOCAQEAkP4lZzeVslQLxLFZWCVVcNh9LuGgsGuiVru8GUH63zNrrzwAyhlSXyXU+61Yn1MxFnx+Bn2zf9qG1UMmf6FFFyxYFCHN1iuo6P0DIkJgpvLo+qoRbYJxB552ZFeF/g8AvhUU910LFLQOHJzrfsrF9hJM2gAinZDbmjY7IsP1f9iLm5aP6tCSszjkEbWzsnweQMBlteNa/2m9Ncfb4TpRwvcViCW77uv/13bbYB4F4pTr6fVxqORhM7HSJYn6WkgZczGbCFUMaIfTxKSF9v7/bpHnbXIP8YekuHRId7rJxQiwaGni69uLUvfjTo4cRrDa6daZo2Ff1LlKlfjTN4ANRA=='
             ),
             'sp' => array (
@@ -160,10 +148,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
             'idp' => array (
                 'entityId' => 'https://si-saai.ualg.pt/idp/shibboleth',
                 'singleSignOnService' => array (
-                    'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
-                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
-                ),
-                'singleLogoutService' => array (
                     'url' => 'https://si-saai.ualg.pt/idp/profile/SAML2/Redirect/SSO',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
