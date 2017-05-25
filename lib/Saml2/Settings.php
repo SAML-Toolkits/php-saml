@@ -941,13 +941,13 @@ class OneLogin_Saml2_Settings
     {
         if (isset($this->_idp['x509certMulti'])) {
             if (isset($this->_idp['x509certMulti']['signing'])) {
-                for ($i=0; $i < count($this->_idp['x509certMulti']['signing']); $i++) {
-                    $this->_idp['x509certMulti']['signing'][$i] = OneLogin_Saml2_Utils::formatCert($this->_idp['x509certMulti']['signing'][$i]);
+                foreach($this->_idp['x509certMulti']['signing'] as $i => $cert) {
+                    $this->_idp['x509certMulti']['signing'][$i] = OneLogin_Saml2_Utils::formatCert($cert);
                 }
             }
             if (isset($this->_idp['x509certMulti']['encryption'])) {
-                for ($i=0; $i < count($this->_idp['x509certMulti']['encryption']); $i++) {
-                    $this->_idp['x509certMulti']['encryption'][$i] = OneLogin_Saml2_Utils::formatCert($this->_idp['x509certMulti']['encryption'][$i]);
+                foreach($this->_idp['x509certMulti']['encryption'] as $i => $cert) {
+                    $this->_idp['x509certMulti']['encryption'][$i] = OneLogin_Saml2_Utils::formatCert($cert);
                 }
             }
         }
