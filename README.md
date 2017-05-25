@@ -721,6 +721,7 @@ if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
 }
 
 $auth->processResponse($requestID);
+unset($_SESSION['AuthNRequestID']);
 
 $errors = $auth->getErrors();
 
@@ -736,6 +737,9 @@ if (!$auth->isAuthenticated()) {
 
 $_SESSION['samlUserdata'] = $auth->getAttributes();
 $_SESSION['samlNameId'] = $auth->getNameId();
+$_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
+$_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
+
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
     $auth->redirectTo($_POST['RelayState']);
 }
@@ -961,12 +965,14 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->logout();   // Method that sent the Logout Request.
 ```
 
-Also there are three optional parameters that can be set:
-
+Also there are six optional parameters that can be set:
+* `$returnTo` - The target URL the user should be returned to after logout.
+* `$parameters` - Extra parameters to be added to the GET.
 * `$name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a
 SAML Response with a `NameId`, then this `NameId` will be used.
 * `$session_index` - SessionIndex that identifies the session of the user.
-* `$strict` - True if we want to stay (returns the url string) False to redirect.
+* `$stay` - True if we want to stay (returns the url string) False to redirect.
+* `$nameIdFormat` - The NameID Format will be set in the LogoutRequest.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the `advanced_settings.php` (`'logoutRequestSigned'`).
@@ -985,6 +991,25 @@ $newTargetUrl = 'http://example.com/loggedOut.php';
 $auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
 ```
+A more complex logout with all the parameters:
+```
+$auth = new OneLogin_Saml2_Auth();
+$returnTo = null;
+$paramters = array();
+$nameId = null;
+$sessionIndex = null;
+$nameIdFormat = null;
+if (isset($_SESSION['samlNameId'])) {
+    $nameId = $_SESSION['samlNameId'];
+}
+if (isset($_SESSION['samlSessionIndex'])) {
+    $sessionIndex = $_SESSION['samlSessionIndex'];
+}
+if (isset($_SESSION['samlNameIdFormat'])) {
+    $nameIdFormat = $_SESSION['samlNameIdFormat'];
+}
+$auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat);
+``` 
 
 If a match on the future LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored.
 
