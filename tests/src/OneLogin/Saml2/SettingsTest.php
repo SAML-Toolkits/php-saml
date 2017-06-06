@@ -44,23 +44,6 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the OneLogin_Saml2_Settings Constructor.
-    * Case load setting from OneLogin_Saml_Settings's object
-    *
-    * @covers OneLogin_Saml2_Settings
-    */
-    public function testLoadSettingsFromObject()
-    {
-        $settingsObj = new OneLogin_Saml_Settings;
-        $settingsObj->idpSingleSignOnUrl = 'http://stuff.com';
-        $settingsObj->spReturnUrl = 'http://sp.stuff.com';
-
-        $settings = new OneLogin_Saml2_Settings($settingsObj);
-
-        $this->assertEmpty($settings->getErrors());
-    }
-
-    /**
-    * Tests the OneLogin_Saml2_Settings Constructor.
     * Case load setting from file
     *
     * @covers OneLogin_Saml2_Settings
@@ -96,19 +79,6 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $base = $settings->getBasePath();
 
         $this->assertEquals($base.'lib/', $settings->getLibPath());
-    }
-
-    /**
-    * Tests getExtLibPath method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getExtLibPath
-    */
-    public function testGetExtLibPath()
-    {
-        $settings = new OneLogin_Saml2_Settings();
-        $base = $settings->getBasePath();
-
-        $this->assertEquals($base.'extlib/', $settings->getExtLibPath());
     }
 
     /**

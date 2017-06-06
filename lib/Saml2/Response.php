@@ -1,10 +1,12 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecEnc;
+
 /**
  * SAML 2 Authentication Response
  *
  */
-
 class OneLogin_Saml2_Response
 {
 

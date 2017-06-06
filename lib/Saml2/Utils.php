@@ -1,11 +1,14 @@
 <?php
- 
+
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+use RobRichards\XMLSecLibs\XMLSecEnc;
+
 /**
  * Utils of OneLogin PHP Toolkit
  *
  * Defines several often used methods
  */
-
 class OneLogin_Saml2_Utils
 {
     const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";

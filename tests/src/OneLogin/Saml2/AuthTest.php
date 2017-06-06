@@ -1,5 +1,7 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+
 /**
  * Unit tests for Auth class
  */
