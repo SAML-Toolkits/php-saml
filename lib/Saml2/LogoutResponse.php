@@ -221,7 +221,7 @@ class OneLogin_Saml2_LogoutResponse
         $this->id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
-        $sp_entity_id = htmlspecialchars($spData['entityId'], ENT_QUOTES);
+        $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
@@ -231,7 +231,7 @@ class OneLogin_Saml2_LogoutResponse
                   Destination="{$idpData['singleLogoutService']['url']}"
                   InResponseTo="{$inResponseTo}"
                   >
-    <saml:Issuer>{$sp_entity_id}</saml:Issuer>
+    <saml:Issuer>{$spEntityId}</saml:Issuer>
     <samlp:Status>
         <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
     </samlp:Status>

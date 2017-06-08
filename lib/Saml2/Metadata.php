@@ -38,10 +38,10 @@ class OneLogin_Saml2_Metadata
         $sls = '';
 
         if (isset($sp['singleLogoutService'])) {
-            $sls_url = htmlspecialchars($sp['singleLogoutService']['url'], ENT_QUOTES);
+            $slsUrl = htmlspecialchars($sp['singleLogoutService']['url'], ENT_QUOTES);
             $sls = <<<SLS_TEMPLATE
         <md:SingleLogoutService Binding="{$sp['singleLogoutService']['binding']}"
-                                Location="{$sls_url}" />
+                                Location="{$slsUrl}" />
 
 SLS_TEMPLATE;
         }
@@ -150,18 +150,18 @@ ATTRIBUTEVALUE;
 METADATA_TEMPLATE;
         }
 
-        $sp_entity_id = htmlspecialchars($sp['entityId'], ENT_QUOTES);
-        $acs_url = htmlspecialchars($sp['assertionConsumerService']['url'], ENT_QUOTES);
+        $spEntityId = htmlspecialchars($sp['entityId'], ENT_QUOTES);
+        $acsUrl = htmlspecialchars($sp['assertionConsumerService']['url'], ENT_QUOTES);
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      validUntil="{$validUntilTime}"
                      cacheDuration="PT{$cacheDuration}S"
-                     entityID="{$sp_entity_id}">
+                     entityID="{$spEntityId}">
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
 {$sls}        <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
-                                     Location="{$acs_url}"
+                                     Location="{$acsUrl}"
                                      index="1" />
         {$strAttributeConsumingService}
     </md:SPSSODescriptor>{$strOrganization}{$strContacts}
