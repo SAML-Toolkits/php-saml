@@ -133,11 +133,11 @@ class OneLogin_Saml2_Settings
                 array(implode(', ', $this->_errors))
             );
         } else {
-	        throw new OneLogin_Saml2_Error(
-		        'Invalid array settings: %s',
-		        OneLogin_Saml2_Error::SETTINGS_INVALID,
-		        array(implode(', ', $this->_errors))
-	        );
+            throw new OneLogin_Saml2_Error(
+                'Invalid array settings: %s',
+                OneLogin_Saml2_Error::SETTINGS_INVALID,
+                array(implode(', ', $this->_errors))
+            );
         }
 
         $this->formatIdPCert();
@@ -930,12 +930,12 @@ class OneLogin_Saml2_Settings
     {
         if (isset($this->_idp['x509certMulti'])) {
             if (isset($this->_idp['x509certMulti']['signing'])) {
-                foreach($this->_idp['x509certMulti']['signing'] as $i => $cert) {
+                foreach ($this->_idp['x509certMulti']['signing'] as $i => $cert) {
                     $this->_idp['x509certMulti']['signing'][$i] = OneLogin_Saml2_Utils::formatCert($cert);
                 }
             }
             if (isset($this->_idp['x509certMulti']['encryption'])) {
-                foreach($this->_idp['x509certMulti']['encryption'] as $i => $cert) {
+                foreach ($this->_idp['x509certMulti']['encryption'] as $i => $cert) {
                     $this->_idp['x509certMulti']['encryption'][$i] = OneLogin_Saml2_Utils::formatCert($cert);
                 }
             }
