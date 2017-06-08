@@ -8,16 +8,6 @@ require_once $basePath.'/_toolkit_loader.php';
 
 if (!defined('TEST_ROOT')) define('TEST_ROOT', dirname(__FILE__));
 
-if (!defined('XMLSECLIBS_DIR')) define('XMLSECLIBS_DIR', $basePath.'/extlib/xmlseclibs/');
-require_once XMLSECLIBS_DIR . 'xmlseclibs.php';
-
-if (!defined('ONELOGIN_SAML_DIR')) define('ONELOGIN_SAML_DIR', $basePath.'/lib/Saml/');
-require_once ONELOGIN_SAML_DIR . 'AuthRequest.php';
-require_once ONELOGIN_SAML_DIR . 'Response.php';
-require_once ONELOGIN_SAML_DIR . 'Settings.php';
-require_once ONELOGIN_SAML_DIR . 'Metadata.php';
-require_once ONELOGIN_SAML_DIR . 'XmlSec.php';
-
 if (!defined('ONELOGIN_CUSTOMPATH')) {
     define('ONELOGIN_CUSTOMPATH', dirname(__FILE__).'/data/customPath/');
 }

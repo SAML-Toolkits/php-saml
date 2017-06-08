@@ -1,10 +1,12 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 /**
  * Metadata lib of OneLogin PHP Toolkit
  *
  */
-
 class OneLogin_Saml2_Metadata
 {
     const TIME_VALID = 172800;  // 2 days
