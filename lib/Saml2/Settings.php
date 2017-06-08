@@ -1,10 +1,12 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 /**
  * Configuration of the OneLogin PHP Toolkit
  *
  */
-
 class OneLogin_Saml2_Settings
 {
     /**
@@ -131,13 +133,11 @@ class OneLogin_Saml2_Settings
                 array(implode(', ', $this->_errors))
             );
         } else {
-            if (!$this->_loadSettingsFromArray($settings->getValues())) {
-                throw new OneLogin_Saml2_Error(
-                    'Invalid array settings: %s',
-                    OneLogin_Saml2_Error::SETTINGS_INVALID,
-                    array(implode(', ', $this->_errors))
-                );
-            }
+	        throw new OneLogin_Saml2_Error(
+		        'Invalid array settings: %s',
+		        OneLogin_Saml2_Error::SETTINGS_INVALID,
+		        array(implode(', ', $this->_errors))
+	        );
         }
 
         $this->formatIdPCert();
@@ -157,8 +157,7 @@ class OneLogin_Saml2_Settings
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',
-            'lib' => $basePath.'lib/',
-            'extlib' => $basePath.'extlib/'
+            'lib' => $basePath.'lib/'
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
@@ -205,16 +204,6 @@ class OneLogin_Saml2_Settings
     public function getLibPath()
     {
         return $this->_paths['lib'];
-    }
-
-    /**
-     * Returns external lib path.
-     *
-     * @return string  The external library folder path
-     */
-    public function getExtLibPath()
-    {
-        return $this->_paths['extlib'];
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+
 /**
  * SAML 2 Logout Request
  *

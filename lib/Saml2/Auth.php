@@ -1,5 +1,7 @@
 <?php
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
