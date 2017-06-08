@@ -131,7 +131,17 @@ class OneLogin_Saml2_Settings
                 array(implode(', ', $this->_errors))
             );
         } else {
-            if (!$this->_loadSettingsFromArray($settings->getValues())) {
+
+            // JV: If this was an object, we want convert it to an array as expected.
+            if (is_object($settings)) {
+                $tmp = [];
+                foreach ( get_object_vars($settings) as $k => $v ) {
+                    $tmp[trim($k,'_')] = $v;
+                }
+                $settings = $tmp;
+            }
+
+            if (!$this->_loadSettingsFromArray($settings)) {
                 throw new OneLogin_Saml2_Error(
                     'Invalid array settings: %s',
                     OneLogin_Saml2_Error::SETTINGS_INVALID,
