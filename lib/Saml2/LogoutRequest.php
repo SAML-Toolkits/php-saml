@@ -76,9 +76,9 @@ class OneLogin_Saml2_LogoutRequest
                 }
                 $spNameQualifier = null;
             } else {
-                $nameId = $idpData['entityId'];
-                $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
-                $spNameQualifier = $spData['entityId'];
+                $nameId = null;
+                $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED;
+                $spNameQualifier = null;
             }
 
             $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
