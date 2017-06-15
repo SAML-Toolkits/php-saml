@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+v.2.10.7
+* Fix IdPMetadataParser. The SingleLogoutService retrieved method was wrong
+* [#201](https://github.com/onelogin/php-saml/issues/201) Fix issues with SP entity_id, acs url and sls url that contains &
+
+v.2.10.6
+* [#206](https://github.com/onelogin/php-saml/pull/206)Be able to register future SP x509cert on the settings and publish it on SP metadata
+* [#206](https://github.com/onelogin/php-saml/pull/206) Be able to register more than 1 Identity Provider x509cert, linked with an specific use (signing or encryption)
+* [#206](https://github.com/onelogin/php-saml/pull/206) Support the ability to parse IdP XML metadata (remote url or file) and be able to inject the data obtained on the settings.
+
 v.2.10.5
 * Be able to get at the auth object the last processed ID
 * Improve NameID Format support

@@ -175,49 +175,8 @@ class OneLogin_Saml2_LogoutResponse
             }
 
             if (isset($_GET['Signature'])) {
-                if (!isset($_GET['SigAlg'])) {
-                    $signAlg = XMLSecurityKey::RSA_SHA1;
-                } else {
-                    $signAlg = $_GET['SigAlg'];
-                }
-
-                if ($retrieveParametersFromServer) {
-                    $signedQuery = 'SAMLResponse='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SAMLResponse');
-                    if (isset($_GET['RelayState'])) {
-                        $signedQuery .= '&RelayState='.OneLogin_Saml2_Utils::extractOriginalQueryParam('RelayState');
-                    }
-                    $signedQuery .= '&SigAlg='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SigAlg');
-                } else {
-                    $signedQuery = 'SAMLResponse='.urlencode($_GET['SAMLResponse']);
-                    if (isset($_GET['RelayState'])) {
-                        $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
-                    }
-                    $signedQuery .= '&SigAlg='.urlencode($signAlg);
-                }
-
-                if (!isset($idpData['x509cert']) || empty($idpData['x509cert'])) {
-                    throw new OneLogin_Saml2_Error(
-                        "In order to validate the sign on the Logout Response, the x509cert of the IdP is required",
-                        OneLogin_Saml2_Error::CERT_NOT_FOUND
-                    );
-                }
-                $cert = $idpData['x509cert'];
-
-                $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
-                $objKey->loadKey($cert, false, true);
-
-                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
-                    try {
-                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
-                    } catch (Exception $e) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "Invalid signAlg in the recieved Logout Response",
-                            OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
-                        );
-                    }
-                }
-
-                if ($objKey->verifySignature($signedQuery, base64_decode($_GET['Signature'])) !== 1) {
+                $signatureValid = OneLogin_Saml2_Utils::validateBinarySign("SAMLResponse", $_GET, $idpData, $retrieveParametersFromServer);
+                if (!$signatureValid) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. Logout Response rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
@@ -262,6 +221,7 @@ class OneLogin_Saml2_LogoutResponse
         $this->id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
+        $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
@@ -271,7 +231,7 @@ class OneLogin_Saml2_LogoutResponse
                   Destination="{$idpData['singleLogoutService']['url']}"
                   InResponseTo="{$inResponseTo}"
                   >
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    <saml:Issuer>{$spEntityId}</saml:Issuer>
     <samlp:Status>
         <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
     </samlp:Status>

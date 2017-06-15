@@ -114,7 +114,10 @@ REQUESTEDAUTHN;
             }
         }
 
-        $scoping = '';
+        $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
+        $acsUrl = htmlspecialchars($spData['assertionConsumerService']['url'], ENT_QUOTES);
+
+$scoping = '';
         if (isset($idpData['scoping'])) {
             $proxyCount = (isset($idpData['scoping']['proxyCount']) ? ' ProxyCount="' . $idpData['scoping']['proxyCount'] . '"' : '');
             $requesterId = (isset($idpData['scoping']['requesterId']) ? '<samlp:RequesterID>' . $idpData['scoping']['requesterId'] . '</samlp:RequesterID>' : '');
@@ -143,8 +146,8 @@ SCOPING;
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
-    AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    AssertionConsumerServiceURL="{$acsUrl}">
+    <saml:Issuer>{$spEntityId}</saml:Issuer>
 {$nameIdPolicyStr}
 {$requestedAuthnStr}
 {$scoping}

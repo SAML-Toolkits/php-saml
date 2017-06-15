@@ -86,6 +86,7 @@ Installation
  * `mcrypt`. Install that library and its php driver if you gonna handle
    encrypted data (`nameID`, `assertions`).
  * `gettext`. Install that library and its php driver. It handles translations.
+ * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
 
 Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
 
@@ -183,6 +184,8 @@ Sometimes we could need a signature on the metadata published by the SP, in
 this case we could use the x.509 cert previously mentioned or use a new x.509
 cert: `metadata.crt` and `metadata.key`.
 
+Use `sp_new.crt` if you are in a key rollover process and you want to
+publish that x509certificate on Service Provider metadata.
 
 #### `extlib/` ####
 
@@ -285,7 +288,7 @@ $settings = array (
     // Set a BaseURL to be used instead of try to guess
     // the BaseURL of the view that process the SAML Message.
     // Ex http://sp.example.com/
-    //    http://example.com/sp/ 
+    //    http://example.com/sp/
     'baseurl' => null,
 
     // Service Provider Data that we are deploying.
@@ -319,7 +322,7 @@ $settings = array (
                 )
         ),
         // Specifies info about where and how the <Logout Response> message MUST be
-        // returned to the requester, in this case our SP.        
+        // returned to the requester, in this case our SP.
         'singleLogoutService' => array (
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
@@ -337,6 +340,14 @@ $settings = array (
         'x509cert' => '',
         'privateKey' => '',
 
+        /*
+         * Key rollover
+         * If you plan to update the SP x509cert and privateKey
+         * you can define here the new x509cert and it will be
+         * published on the SP metadata so Identity Providers can
+         * read them and get ready for rollover.
+         */
+        // 'x509certNew' => '',
     ),
 
     // Identity Provider Data that we want connected with our SP.
@@ -379,7 +390,24 @@ $settings = array (
          */
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
-        /*
+
+        /* In some scenarios the IdP uses different certificates for
+         * signing/encryption, or is under key rollover phase and
+         * more than one certificate is published on IdP metadata.
+         * In order to handle that the toolkit offers that parameter.
+         * (when used, 'x509cert' and 'certFingerprint' values are
+         * ignored).
+         */
+        // 'x509certMulti' => array(
+        //      'signing' => array(
+        //          0 => '<cert1-string>',
+        //      ),
+        //      'encryption' => array(
+        //          0 => '<cert2-string>',
+        //      )
+        // ),
+	
+	/*
          * You can optional set a scoping. Scoping allows a service provider to specify a list of identity
          * providers in an authnRequest to a proxying identity provider. This is an indication to the
          * proxying identity provider, that the service will only deal with the identity providers specified.
@@ -440,7 +468,6 @@ $advancedSettings = array (
         */
         'signMetadata' => false,
 
-
         /** signatures and encryptions required **/
 
         // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest>
@@ -463,11 +490,10 @@ $advancedSettings = array (
         // this SP to be encrypted.
         'wantNameIdEncrypted' => false,
 
-
         // Authentication context.
-        // Set to false or don't present this parameter and no AuthContext will be sent in the AuthNRequest,
-        // Set true and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
-        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
+        // Set to false and no AuthContext will be sent in the AuthNRequest.
+        // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
+        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
         'requestedAuthnContext' => true,
 
         // Indicates if the SP will validate all received xmls.
@@ -709,6 +735,7 @@ if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
 }
 
 $auth->processResponse($requestID);
+unset($_SESSION['AuthNRequestID']);
 
 $errors = $auth->getErrors();
 
@@ -724,6 +751,9 @@ if (!$auth->isAuthenticated()) {
 
 $_SESSION['samlUserdata'] = $auth->getAttributes();
 $_SESSION['samlNameId'] = $auth->getNameId();
+$_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
+$_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
+
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
     $auth->redirectTo($_POST['RelayState']);
 }
@@ -949,12 +979,14 @@ $auth = new OneLogin_Saml2_Auth();
 $auth->logout();   // Method that sent the Logout Request.
 ```
 
-Also there are three optional parameters that can be set:
-
+Also there are six optional parameters that can be set:
+* `$returnTo` - The target URL the user should be returned to after logout.
+* `$parameters` - Extra parameters to be added to the GET.
 * `$name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a
 SAML Response with a `NameId`, then this `NameId` will be used.
 * `$session_index` - SessionIndex that identifies the session of the user.
-* `$strict` - True if we want to stay (returns the url string) False to redirect.
+* `$stay` - True if we want to stay (returns the url string) False to redirect.
+* `$nameIdFormat` - The NameID Format will be set in the LogoutRequest.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the `advanced_settings.php` (`'logoutRequestSigned'`).
@@ -973,6 +1005,25 @@ $newTargetUrl = 'http://example.com/loggedOut.php';
 $auth = new OneLogin_Saml2_Auth();
 $auth->logout($newTargetUrl);
 ```
+A more complex logout with all the parameters:
+```
+$auth = new OneLogin_Saml2_Auth();
+$returnTo = null;
+$paramters = array();
+$nameId = null;
+$sessionIndex = null;
+$nameIdFormat = null;
+if (isset($_SESSION['samlNameId'])) {
+    $nameId = $_SESSION['samlNameId'];
+}
+if (isset($_SESSION['samlSessionIndex'])) {
+    $sessionIndex = $_SESSION['samlSessionIndex'];
+}
+if (isset($_SESSION['samlNameIdFormat'])) {
+    $nameIdFormat = $_SESSION['samlNameIdFormat'];
+}
+$auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat);
+``` 
 
 If a match on the future LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored.
 
@@ -1069,7 +1120,7 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 ```
 
 #### URL-guessing methods ####
- 
+
 php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
 
 * `getSelfHost` Returns the current host.
@@ -1096,6 +1147,26 @@ Is possible that asserting request URL and Destination attribute of SAML respons
 You should be able to workaround this by configuring your server so that it is aware of the proxy and returns the original url when requested.
 
 Or by using the method described on the previous section.
+
+
+### SP Key rollover ###
+
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be
+published on the SP metadata so Identity Providers can read them and get ready for rollover.
+
+
+### IdP with multiple certificates ###
+
+In some scenarios the IdP uses different certificates for
+signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
+
+In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+
+When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+
+The 'x509certMulti' is an array with 2 keys:
+- 'signing'. An array of certs that will be used to validate IdP signature
+- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP
 
 
 ### Replay attacks ###
@@ -1263,6 +1334,7 @@ Configuration of the OneLogin PHP Toolkit
  * `checkSPCerts` - Checks if the x509 certs of the SP exists and are valid.
  * `getSPkey` - Returns the x509 private key of the SP.
  * `getSPcert` - Returns the x509 public cert of the SP.
+ * `getSPcertNew` - Returns the future x509 public cert of the SP.
  * `getIdPData` - Gets the IdP data.
  * `getSPData`Gets the SP data.
  * `getSecurityData` - Gets security data.
@@ -1272,6 +1344,7 @@ Configuration of the OneLogin PHP Toolkit
  * `validateMetadata` - Validates an XML SP Metadata.
  * `formatIdPCert` - Formats the IdP cert.
  * `formatSPCert` - Formats the SP cert.
+ * `formatSPCertNew` - Formats the SP cert new.
  * `formatSPKey` - Formats the SP private key.
  * `getErrors` - Returns an array with the errors, the array is empty when
    the settings is ok.
@@ -1329,6 +1402,16 @@ Auxiliary class that contains several methods
  * `addSign` - Adds signature key and senders certificate to an element
    (Message or Assertion).
  * `validateSign` - Validates a signature (Message or Assertion).
+
+##### OneLogin_Saml2_IdPMetadataParser - `IdPMetadataParser.php` #####
+
+Auxiliary class that contains several methods to retrieve and process IdP metadata
+
+ * `parseRemoteXML` - Get IdP Metadata Info from URL.
+ * `parseFileXML` - Get IdP Metadata Info from File.
+ * `parseXML` - Get IdP Metadata Info from XML.
+ * `injectIntoSettings` - Inject metadata info into php-saml settings array.
+
 
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where

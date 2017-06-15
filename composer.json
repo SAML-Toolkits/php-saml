@@ -2,7 +2,7 @@
     "name": "onelogin/php-saml",
     "description": "OneLogin PHP SAML Toolkit",
     "license": "MIT",
-    "version": "2.10.5",
+    "version": "2.10.7",
     "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {

@@ -44,6 +44,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $decoded = base64_decode($payload);
         $inflated = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
+        $this->assertRegExp('#<saml:EncryptedID>#', $inflated);
     }
 
     /**
@@ -155,6 +156,35 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $decoded = base64_decode($payload);
         $inflated = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_LogoutRequest Constructor.
+    * Case: Able to generate encryptedID with MultiCert
+    * 
+    * @covers OneLogin_Saml2_LogoutRequest
+    */
+    public function testConstructorEncryptIdUsingX509certMulti()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings6.php';
+
+        $settingsInfo['security']['nameIdEncrypted'] = true;
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+
+        $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
+        $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
+        parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
+        // parse_url already urldecode de params so is not required.
+        $payload = $exploded['SAMLRequest'];
+        $decoded = base64_decode($payload);
+        $inflated = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
+        $this->assertRegExp('#<saml:EncryptedID>#', $inflated);
     }
 
     /**
@@ -647,6 +677,36 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($logoutRequest7->isValid());
         $this->assertContains('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', $logoutRequest7->getError());
+    }
+
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_LogoutRequest
+    * Case: Using x509certMulti
+    *
+    * @covers OneLogin_Saml2_LogoutRequest::isValid
+    */
+    public function testIsValidSignUsingX509certMulti()
+    {
+        $_GET = array (
+            'SAMLRequest' => 'fZJNa+MwEIb/itHdiTz6sC0SQyEsBPoB27KHXoIsj7cGW3IlGfLzV7G7kN1DL2KYmeedmRcdgp7GWT26326JP/FzwRCz6zTaoNbKkSzeKqfDEJTVEwYVjXp9eHpUsKNq9i4640Zyh3xP6BDQx8FZkp1PR3KpqexAl72QmpUCS8SW01IiZz2TVVGD4X1VQYlAsl/oQyKPJAklPIQFzzZEbWNK0YLnlOVA3wqpQCoB7yQ7pWsGq+NKfcQ4q/0+xKXvd8ZNe7Td7AYbw10UxrCbP2aSPbv4Yl/8Qx/R3+SB5bTOoXiDQvFNvjnc7lXrIr75kh+6eYdXPc0jrkMO+/umjXhOtpxP2Q/nJx2/9+uWGbq8X1tV9NqGAW0kzaVvoe1AAJeCSWqYaUVRM2SilKKuqDTpFSlszdcK29RthVm9YriZebYdXpsLdhVAB7VJzif3haYMqqTVcl0JMBR4y+s2zak3sf/4v8l/vlHzBw==',
+            'RelayState' => '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
+            'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+            'Signature' => 'Ouxo9BV6zmq4yrgamT9EbSKy/UmvSxGS8z26lIMgKOEP4LFR/N23RftdANmo4HafrzSfA0YTXwhKDqbOByS0j+Ql8OdQOes7vGioSjo5qq/Bi+5i6jXwQfphnfcHAQiJL4gYVIifkhhHRWpvYeiysF1Y9J02me0izwazFmoRXr4='
+        );
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings6.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $encodedRequest = $_GET['SAMLRequest'];
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings->setBaseURL("http://stuff.com/endpoints/endpoints/");
+        $_SERVER['REQUEST_URI'] = "/endpoints/endpoints/sls.php";
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, $encodedRequest);
+        $valid = $logoutRequest->isValid();
+        unset($_SERVER['REQUEST_URI']);
+        OneLogin_Saml2_Utils::setBaseURL(null);
+        $this->assertTrue($valid);
     }
 
     /**
