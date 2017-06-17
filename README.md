@@ -83,7 +83,7 @@ Installation
 
  * `php >= 5.3.3` and some core extensions like `php-xml`, `php-date`, `php-zlib`.
  * `openssl`. Install the openssl library. It handles x509 certificates.
- * `mcrypt`. Install that library and its php driver if you gonna handle
+ * `mcrypt`. Install that library and its php driver if you're going to handle
    encrypted data (`nameID`, `assertions`).
  * `gettext`. Install that library and its php driver. It handles translations.
  * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
@@ -124,7 +124,7 @@ Compatibility
 
 This 2.0 version has a new library. The toolkit is still compatible.
 
-The old code that you used in order to add SAML support gonna continue working
+The old code that you used in order to add SAML support will continue working
 with minor changes. You only need to load the files of the `lib/Saml` folder.
 (notice that the `compatibility.php` file do that).
 
@@ -1514,11 +1514,11 @@ Once the SP is configured, the metadata of the SP is published at the
 
 ### How it works ###
 
-At demo1, we saw how all the SAML Request and Responses were handler at an
+In demo1, we saw how all the SAML Request and Responses were handler at an
 unique file, the `index.php` file. This demo1 uses high-level programming.
 
-At demo2, we have several views: `index.php`, `sso.php`, `slo.php`, `consume.php`
-and `metadata.php`. As we said, we gonna use the endpoints that are defined
+In demo2, we have several views: `index.php`, `sso.php`, `slo.php`, `consume.php`
+and `metadata.php`. As we said, we will use the endpoints that are defined
 in the toolkit (`acs.php`, `sls.php` of the endpoints folder). This demo2 uses
 low-level programming.
 
