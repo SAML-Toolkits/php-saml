@@ -29,7 +29,7 @@
         "sebastian/phpcpd": "*",
         "phploc/phploc": "*",
         "pdepend/pdepend" : "1.1.0",
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "2.9.0"
     },
     "suggest": {
         "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
