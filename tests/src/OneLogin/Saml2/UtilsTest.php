@@ -854,6 +854,52 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the generateNameId method of the OneLogin_Saml2_Utils
+    * Adding a NameQualifier
+    *
+    * @covers OneLogin_Saml2_Utils::generateNameId
+    */
+    public function testGenerateNameIdWithNameQualifier()
+    {
+        //$xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
+        //$newDoc = new DOMDocument();
+
+        $nameIdValue = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde';
+        $entityId = 'http://stuff.com/endpoints/metadata.php';
+        $nameIDFormat = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
+        $nameQualifier = 'http://stuff.com/endpoints/acs.php';
+
+        $nameId = OneLogin_Saml2_Utils::generateNameId(
+            $nameIdValue,
+            $entityId,
+            $nameIDFormat,
+            null,
+            $nameQualifier
+        );
+
+        $expectedNameId = '<saml:NameID SPNameQualifier="http://stuff.com/endpoints/metadata.php" NameQualifier="http://stuff.com/endpoints/acs.php" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
+
+        $this->assertEquals($nameId, $expectedNameId);
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $x509cert = $settingsInfo['idp']['x509cert'];
+        $key = OneLogin_Saml2_Utils::formatCert($x509cert);
+
+        $nameIdEnc = OneLogin_Saml2_Utils::generateNameId(
+            $nameIdValue,
+            $entityId,
+            $nameIDFormat,
+            $key,
+            $nameQualifier
+        );
+
+        $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
+        $this->assertContains($nameidExpectedEnc, $nameIdEnc);
+    }
+
+    /**
     * Tests the deleteLocalSession method of the OneLogin_Saml2_Utils
     *
     * @covers OneLogin_Saml2_Utils::deleteLocalSession
