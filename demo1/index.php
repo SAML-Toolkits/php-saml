@@ -1,5 +1,4 @@
 <?php
- 
 /**
  *  SAML Handler
  */
@@ -65,7 +64,7 @@ if (isset($_GET['sso'])) {
     $errors = $auth->getErrors();
 
     if (!empty($errors)) {
-        print_r('<p>'.implode(', ', $errors).'</p>');
+        echo '<p>',implode(', ', $errors),'</p>';
     }
 
     if (!$auth->isAuthenticated()) {
@@ -91,9 +90,9 @@ if (isset($_GET['sso'])) {
     $auth->processSLO(false, $requestID);
     $errors = $auth->getErrors();
     if (empty($errors)) {
-        print_r('<p>Sucessfully logged out</p>');
+        echo '<p>Sucessfully logged out</p>';
     } else {
-        print_r('<p>'.implode(', ', $errors).'</p>');
+        echo '<p>', implode(', ', $errors), '</p>');
     }
 }
 

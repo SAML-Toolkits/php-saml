@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  *  SP Assertion Consumer Service Endpoint
  */
@@ -15,7 +15,7 @@ $auth->processResponse();
 $errors = $auth->getErrors();
 
 if (!empty($errors)) {
-    print_r('<p>'.implode(', ', $errors).'</p>');
+    echo '<p>', implode(', ', $errors), '</p>';
     exit();
 }
 

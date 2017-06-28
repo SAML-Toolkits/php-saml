@@ -726,7 +726,7 @@ unset($_SESSION['AuthNRequestID']);
 $errors = $auth->getErrors();
 
 if (!empty($errors)) {
-    print_r('<p>'.implode(', ', $errors).'</p>');
+    echo '<p>', implode(', ', $errors), '</p>';
     exit();
 }
 
@@ -865,9 +865,9 @@ $auth->processSLO(false, $requestID);
 $errors = $auth->getErrors();
 
 if (empty($errors)) {
-    print_r('Sucessfully logged out');
+    echo 'Sucessfully logged out';
 } else {
-    print_r(implode(', ', $errors));
+    echo implode(', ', $errors);
 }
 ```
 
@@ -1058,7 +1058,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
                                    // that could took place during the process
 
     if (!empty($errors)) {
-        print_r('<p>'.implode(', ', $errors).'</p>');
+        echo '<p>', implode(', ', $errors), '</p>';
     }
                                           // This check if the response was
     if (!$auth->isAuthenticated()) {      // sucessfully validated and the user
@@ -1074,9 +1074,9 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
     $auth->processSLO();            // Process the Logout Request & Logout Response
     $errors = $auth->getErrors(); // Retrieves possible validation errors
     if (empty($errors)) {
-        print_r('<p>Sucessfully logged out</p>');
+        echo '<p>Sucessfully logged out</p>';
     } else {
-        print_r('<p>'.implode(', ', $errors).'</p>');
+        echo '<p>', implode(', ', $errors), '</p>';
     }
 }
 

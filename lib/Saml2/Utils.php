@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Utils of OneLogin PHP Toolkit
  *
@@ -260,7 +260,6 @@ class OneLogin_Saml2_Utils
             );
         }
 
-        
         /* Add encoded parameters */
         if (strpos($url, '?') === false) {
             $paramPrefix = '?';
