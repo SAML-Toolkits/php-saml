@@ -658,10 +658,8 @@ class OneLogin_Saml2_Utils
      */
     public static function parseTime2SAML($time)
     {
-        $defaultTimezone = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-        $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ", $time);
-        date_default_timezone_set($defaultTimezone);
+        $date = new DateTime("@$time", new DateTimeZone('UTC'));
+        $timestamp = $date->format("Y-m-d\Th:i:s\Z");
         return $timestamp;
     }
 
@@ -1151,7 +1149,7 @@ class OneLogin_Saml2_Utils
                 OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
             );
         }
- 
+
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new OneLogin_Saml2_ValidationError(
