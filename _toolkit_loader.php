@@ -8,8 +8,8 @@ $libDir = __DIR__ . '/lib/Saml2/';
 $extlibDir = __DIR__ . '/extlib/';
 
 // Load composer
-if (file_exists('vendor/autoload.php')) {
-    require 'vendor/autoload.php';
+if (file_exists(__DIR__ .'/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
 }
 
 // Load now external libs
