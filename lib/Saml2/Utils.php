@@ -253,7 +253,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?:\/\/@i', $url)) {
+        if (!preg_match('@^https?://@i', $url)) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
@@ -306,7 +306,7 @@ class OneLogin_Saml2_Utils
     {
         if (!empty($baseurl)) {
             $baseurlpath = '/';
-            if (preg_match('#^https?:\/\/([^\/]*)\/?(.*)#i', $baseurl, $matches)) {
+            if (preg_match('#^https?://([^/]*)/?(.*)#i', $baseurl, $matches)) {
                 if (strpos($baseurl, 'https://') === false) {
                     self::setSelfProtocol('http');
                     $port = '80';
@@ -587,7 +587,7 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
             if ($requestURI[0] !== '/') {
-                if (preg_match('#^https?:\/\/[^\/]*(\/.*)#i', $requestURI, $matches)) {
+                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
                     $requestURI = $matches[1];
                 }
             }
