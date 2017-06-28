@@ -1,11 +1,11 @@
 <?php
 
-// Create an __autoload function 
+// Create an __autoload function
 // (can conflicts other autoloaders)
 // http://php.net/manual/en/language.oop5.autoload.php
 
-$libDir = dirname(__FILE__) . '/lib/Saml2/';
-$extlibDir = dirname(__FILE__) . '/extlib/';
+$libDir = __DIR__ . '/lib/Saml2/';
+$extlibDir = __DIR__ . '/extlib/';
 
 // Load composer
 if (file_exists('vendor/autoload.php')) {
