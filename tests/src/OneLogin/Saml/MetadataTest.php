@@ -1,12 +1,25 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Unit tests for Metadata class
  */
 class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
 {
     /**
-    * Tests the OneLogin_Saml_Metadata Constructor and the getXml method. 
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function setUp()
+    {
+        $this->logger = new NullLogger();
+    }
+
+    /**
+    * Tests the OneLogin_Saml_Metadata Constructor and the getXml method.
     * Prepare the object to generate SAML Metadata (initialize settings)
     * and then generate the Metadata with the getXML method.
     *
@@ -18,7 +31,7 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $metadata = new OneLogin_Saml_Metadata($settingsInfo);
+        $metadata = new OneLogin_Saml_Metadata($this->logger, $settingsInfo);
         $xmlMetadata = $metadata->getXML();
 
         $this->assertNotEmpty($xmlMetadata);
@@ -49,7 +62,7 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
         $nameIdNodes = $entityDescriptor->getElementsByTagName('NameIDFormat');
         $this->assertEquals(1, $nameIdNodes->length);
         $nameID = $nameIdNodes->item(0);
-        
+
         $nameIdNodes = $entityDescriptor->getElementsByTagName('NameIDFormat');
         $this->assertEquals(1, $nameIdNodes->length);
         $nameID = $nameIdNodes->item(0);
@@ -91,7 +104,7 @@ class OneLogin_Saml_MetadataTest extends PHPUnit_Framework_TestCase
                 $settingsDir = TEST_ROOT .'/settings/';
                 include $settingsDir.'settings1.php';
 
-                $metadata = new OneLogin_Saml_Metadata($settingsInfo);
+                $metadata = new OneLogin_Saml_Metadata($this->logger, $settingsInfo);
 
                 $time = time()+ OneLogin_Saml_Metadata::VALIDITY_SECONDS;
                 $validTimestamp = $method->invoke($metadata);

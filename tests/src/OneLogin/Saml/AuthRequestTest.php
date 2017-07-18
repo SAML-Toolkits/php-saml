@@ -1,11 +1,19 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Unit tests for AuthN Request
  */
 class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
 {
     private $_settings;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
     * Initializes the Test Suite
@@ -15,6 +23,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml_Settings;
         $settings->idpSingleSignOnUrl = 'http://stuff.com';
         $settings->spReturnUrl = 'http://sp.stuff.com';
+        $this->logger = new NullLogger();
         $this->_settings = $settings;
     }
 
@@ -28,7 +37,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
     */
     public function testCreateDeflatedSAMLRequestURLParameter()
     {
-        $request = new OneLogin_Saml_AuthRequest($this->_settings);
+        $request = new OneLogin_Saml_AuthRequest($this->logger, $this->_settings);
         $authUrl = $request->getRedirectUrl();
         $this->assertRegExp('#^http://stuff\.com\?SAMLRequest=#', $authUrl);
         parse_str(parse_url($authUrl, PHP_URL_QUERY), $exploded);
@@ -38,7 +47,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
         $inflated = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:AuthnRequest#', $inflated);
 
-        $request2 = new OneLogin_Saml_AuthRequest($this->_settings);
+        $request2 = new OneLogin_Saml_AuthRequest($this->logger, $this->_settings);
         $authUrl2 = $request2->getRedirectUrl('http://sp.example.com');
         $this->assertRegExp('#^http://stuff\.com\?SAMLRequest=#', $authUrl2);
         parse_str(parse_url($authUrl2, PHP_URL_QUERY), $exploded2);
@@ -60,14 +69,14 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
         if (class_exists('ReflectionClass')) {
             $reflectionClass = new ReflectionClass("OneLogin_Saml_AuthRequest");
             $method = $reflectionClass->getMethod('_getTimestamp');
- 
+
             if (method_exists($method, 'setAccessible')) {
                 $method->setAccessible(true);
 
                 $settingsDir = TEST_ROOT .'/settings/';
                 include $settingsDir.'settings1.php';
 
-                $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
+                $metadata = new OneLogin_Saml_AuthRequest($this->logger, $settingsInfo);
 
                 $time = time();
                 $timestamp = $method->invoke($metadata);
@@ -93,7 +102,7 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
                 $settingsDir = TEST_ROOT .'/settings/';
                 include $settingsDir.'settings1.php';
 
-                $metadata = new OneLogin_Saml_AuthRequest($settingsInfo);
+                $metadata = new OneLogin_Saml_AuthRequest($this->logger, $settingsInfo);
 
                 $id = $method->invoke($metadata);
                 $id2 = $method->invoke($metadata);

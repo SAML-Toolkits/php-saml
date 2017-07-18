@@ -1,10 +1,18 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Unit tests for AuthN Request
  */
 class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     private $_settings;
 
     /**
@@ -12,6 +20,7 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     */
     public function setUp()
     {
+        $this->logger = new NullLogger();
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 

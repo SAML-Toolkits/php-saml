@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+
 class OneLogin_Saml_Metadata
 {
     const VALIDITY_SECONDS = 604800; // 1 week
@@ -7,11 +9,18 @@ class OneLogin_Saml_Metadata
     protected $_settings;
 
     /**
-     * @param array|object|null $settings Setting data
+     * @var LoggerInterface
      */
-    public function __construct($settings = null)
+    private $logger;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param array|object|null        $settings Setting data
+     */
+    public function __construct(LoggerInterface $logger, $settings = null)
     {
-        $auth = new OneLogin_Saml2_Auth($settings);
+        $this->logger = $logger;
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settings);
         $this->_settings = $auth->getSettings();
     }
 

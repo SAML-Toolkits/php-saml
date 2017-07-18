@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+
 /**
  * SAML 2 Authentication Response
  *
@@ -52,15 +54,25 @@ class OneLogin_Saml2_Response
     private $_validSCDNotOnOrAfter;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
      * @param string                  $response A UUEncoded SAML response from the IdP.
+     * @param LoggerInterface         $logger
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_ValidationError
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $response)
-    {
+    public function __construct(
+        OneLogin_Saml2_Settings $settings,
+        $response,
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
         $this->_settings = $settings;
 
         $baseURL = $this->_settings->getBaseURL();
@@ -70,9 +82,24 @@ class OneLogin_Saml2_Response
 
         $this->response = base64_decode($response);
 
+        $this->logger->debug(
+            'XML response',
+            [
+                'response' => $this->response,
+            ]
+        );
+
         $this->document = new DOMDocument();
         $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->response);
+
         if (!$this->document) {
+            $this->logger->error(
+                'Error processing XML Response',
+                [
+                    'response' => $this->response,
+                ]
+            );
+
             throw new OneLogin_Saml2_ValidationError(
                 "SAML Response could not be processed",
                 OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
@@ -166,7 +193,7 @@ class OneLogin_Saml2_Response
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
-                
+
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
@@ -343,7 +370,7 @@ class OneLogin_Saml2_Response
                         OneLogin_Saml2_ValidationError::NO_SIGNED_ASSERTION
                     );
                 }
-                
+
                 if ($security['wantMessagesSigned'] && !$hasSignedResponse) {
                     throw new OneLogin_Saml2_ValidationError(
                         "The Message of the Response is not signed and the SP requires it",
@@ -1056,7 +1083,7 @@ class OneLogin_Saml2_Response
                 $objKeyInfo->loadKey($pem, false, false);
             }
         }
-                
+
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }
@@ -1095,7 +1122,7 @@ class OneLogin_Saml2_Response
 
     /* After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {

@@ -1,11 +1,20 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     private $_settings;
 
     public function setUp()
     {
+        $this->logger = new NullLogger();
         $this->_settings = new OneLogin_Saml_Settings;
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -33,7 +42,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateNumAssertions()
     {
         $assertion = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion, $this->logger);
 
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $response);
 
@@ -43,7 +52,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateTimestampsInvalid()
     {
         $assertion = file_get_contents(TEST_ROOT . '/data/responses/invalids/not_before_failed.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion, $this->logger);
 
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $response);
 
@@ -51,7 +60,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
 
 
         $assertion2 = file_get_contents(TEST_ROOT . '/data/responses/invalids/not_after_failed.xml.base64');
-        $response2 = new OneLogin_Saml_Response($this->_settings, $assertion2);
+        $response2 = new OneLogin_Saml_Response($this->_settings, $assertion2, $this->logger);
 
         $xmlSec2 = new OneLogin_Saml_XmlSec($this->_settings, $response2);
 
@@ -61,7 +70,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateTimestampsValid()
     {
         $assertion = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion, $this->logger);
 
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $response);
 
@@ -71,7 +80,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionUnsigned()
     {
         $assertionUnsigned = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_signature.xml.base64');
-        $responseUnsigned = new OneLogin_Saml_Response($this->_settings, $assertionUnsigned);
+        $responseUnsigned = new OneLogin_Saml_Response($this->_settings, $assertionUnsigned, $this->logger);
         $xmlSecUnsigned = new OneLogin_Saml_XmlSec($this->_settings, $responseUnsigned);
         try {
             $this->assertFalse($xmlSecUnsigned->isValid());
@@ -84,7 +93,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionBadReference()
     {
         $assertionBadReference = file_get_contents(TEST_ROOT . '/data/responses/invalids/bad_reference.xml.base64');
-        $responseBadReference = new OneLogin_Saml_Response($this->_settings, $assertionBadReference);
+        $responseBadReference = new OneLogin_Saml_Response($this->_settings, $assertionBadReference, $this->logger);
         $xmlSecBadReference = new OneLogin_Saml_XmlSec($this->_settings, $responseBadReference);
         try {
             $this->assertFalse($xmlSecBadReference->isValid());
@@ -97,7 +106,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionMultiple()
     {
         $assertionMulti = file_get_contents(TEST_ROOT . '/data/responses/invalids/multiple_assertions.xml.base64');
-        $responseMulti = new OneLogin_Saml_Response($this->_settings, $assertionMulti);
+        $responseMulti = new OneLogin_Saml_Response($this->_settings, $assertionMulti, $this->logger);
         $xmlSecMulti = new OneLogin_Saml_XmlSec($this->_settings, $responseMulti);
         try {
             $this->assertFalse($xmlSecMulti->isValid());
@@ -110,7 +119,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionExpired()
     {
         $assertionExpired = file_get_contents(TEST_ROOT . '/data/responses/expired_response.xml.base64');
-        $responseExpired = new OneLogin_Saml_Response($this->_settings, $assertionExpired);
+        $responseExpired = new OneLogin_Saml_Response($this->_settings, $assertionExpired, $this->logger);
         $xmlSecExpired = new OneLogin_Saml_XmlSec($this->_settings, $responseExpired);
         try {
             $this->assertFalse($xmlSecExpired->isValid());
@@ -123,7 +132,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionNoKey()
     {
         $assertionNoKey = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_key.xml.base64');
-        $responseNoKey = new OneLogin_Saml_Response($this->_settings, $assertionNoKey);
+        $responseNoKey = new OneLogin_Saml_Response($this->_settings, $assertionNoKey, $this->logger);
         $xmlSecNoKey = new OneLogin_Saml_XmlSec($this->_settings, $responseNoKey);
         try {
             $this->assertFalse($xmlSecNoKey->isValid());
@@ -136,7 +145,7 @@ class OneLogin_Saml_XmlSecTest extends PHPUnit_Framework_TestCase
     public function testValidateAssertionValid()
     {
         $assertion = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion, $this->logger);
 
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $response);
 
