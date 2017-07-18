@@ -1,11 +1,18 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
  */
 class OneLogin_Saml2_Auth
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * Settings data.
      *
@@ -129,10 +136,12 @@ class OneLogin_Saml2_Auth
     /**
      * Initializes the SP SAML instance.
      *
+     * @param LoggerInterface   $logger
      * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
      */
-    public function __construct($oldSettings = null)
+    public function __construct(LoggerInterface $logger, $oldSettings = null)
     {
+        $this->logger = $logger;
         $this->_settings = new OneLogin_Saml2_Settings($oldSettings);
     }
 
@@ -178,7 +187,11 @@ class OneLogin_Saml2_Auth
         $this->_errorReason = null;
         if (isset($_POST) && isset($_POST['SAMLResponse'])) {
             // AuthnResponse -- HTTP_POST Binding
-            $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
+            $response = new OneLogin_Saml2_Response(
+                $this->_settings,
+                $_POST['SAMLResponse'],
+                $this->logger
+            );
             $this->_lastResponse = $response->getXMLDocument();
 
             if ($response->isValid($requestId)) {
@@ -689,7 +702,7 @@ class OneLogin_Saml2_Auth
                 $response = $this->_lastResponse->saveXML();
             }
         }
-        
+
         return $response;
     }
 }

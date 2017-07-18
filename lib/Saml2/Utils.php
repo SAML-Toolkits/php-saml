@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Utils of OneLogin PHP Toolkit
  *
@@ -68,8 +68,8 @@ class OneLogin_Saml2_Utils
      * This function load an XML string in a save way.
      * Prevent XEE/XXE Attacks
      *
-     * @param DOMDocument $dom The document where load the xml.
-     * @param string      $xml The XML string to be loaded.
+     * @param DOMDocument $dom   The document where load the xml.
+     * @param string      $xml   The XML string to be loaded.
      *
      * @throws Exception
      *
@@ -260,7 +260,7 @@ class OneLogin_Saml2_Utils
             );
         }
 
-        
+
         /* Add encoded parameters */
         if (strpos($url, '?') === false) {
             $paramPrefix = '?';
@@ -1151,7 +1151,7 @@ class OneLogin_Saml2_Utils
                 OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
             );
         }
- 
+
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new OneLogin_Saml2_ValidationError(

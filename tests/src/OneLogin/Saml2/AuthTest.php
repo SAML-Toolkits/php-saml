@@ -1,5 +1,8 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Unit tests for Auth class
  */
@@ -7,6 +10,11 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 {
     private $_auth;
     private $_settingsInfo;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
     * Initializes the Test Suite
@@ -17,7 +25,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         include $settingsDir.'settings1.php';
 
         $this->_settingsInfo = $settingsInfo;
-        $this->_auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $this->logger = new NullLogger();
+        $this->_auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
     }
 
     /**
@@ -700,7 +709,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['logoutResponseSigned'] = true;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
 
@@ -842,7 +851,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['authnRequestsSigned'] = true;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -881,7 +890,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['authnRequestsSigned'] = true;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -963,7 +972,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['authnRequestsSigned'] = true;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -1041,7 +1050,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -1281,7 +1290,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $settingsInfo['security']['logoutRequestSigned'] = true;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             // The Header of the redirect produces an Exception
@@ -1319,7 +1328,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         unset($settingsInfo['idp']['singleLogoutService']);
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         try {
             $returnTo = 'http://example.com/returnto';
@@ -1341,7 +1350,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         include $settingsDir.'settings1.php';
         $settingsInfo['strict'] = false;
 
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         $settings = $auth->getSettings();
         $this->assertFalse($settings->isStrict());
@@ -1515,7 +1524,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         include $settingsDir.'settings1.php';
 
         $settingsInfo['strict'] = true;
-        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth = new OneLogin_Saml2_Auth($this->logger, $settingsInfo);
 
         $auth->processResponse();
         $this->assertNotEmpty($auth->getErrors());

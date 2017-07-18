@@ -1,9 +1,18 @@
 <?php
+
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Unit tests for Response messages signed
  */
 class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     private $_settings;
 
     /**
@@ -11,6 +20,7 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
     */
     public function setUp()
     {
+        $this->logger = new NullLogger();
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
@@ -28,7 +38,7 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
     {
         // The Response is signed, the Assertion is not
         $message = file_get_contents(TEST_ROOT . '/data/responses/open_saml_response.xml');
-        $response = new OneLogin_Saml2_Response($this->_settings, base64_encode($message));
+        $response = new OneLogin_Saml2_Response($this->_settings, base64_encode($message), $this->logger);
 
         $this->assertEquals('someone@example.org', $response->getNameId());
     }
@@ -50,7 +60,7 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
 
         // Both the Response and the Asseretion are signed
         $message = file_get_contents(TEST_ROOT . '/data/responses/simple_saml_php.xml');
-        $response = new OneLogin_Saml2_Response($settings, base64_encode($message));
+        $response = new OneLogin_Saml2_Response($settings, base64_encode($message), $this->logger);
 
         $this->assertEquals('someone@example.com', $response->getNameId());
     }

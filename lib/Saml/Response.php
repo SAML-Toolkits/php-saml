@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+
 class OneLogin_Saml_Response extends OneLogin_Saml2_Response
 {
     /**
@@ -7,14 +9,15 @@ class OneLogin_Saml_Response extends OneLogin_Saml2_Response
      * Internally initializes an SP SAML instance
      * and an OneLogin_Saml2_Response.
      *
-     * @param array|object $oldSettings Settings
-     * @param string       $assertion  SAML Response
+     * @param array|object    $oldSettings Settings
+     * @param string          $assertion   SAML Response
+     * @param LoggerInterface $logger
      */
-    public function __construct($oldSettings, $assertion)
+    public function __construct($oldSettings, $assertion, LoggerInterface $logger)
     {
-        $auth = new OneLogin_Saml2_Auth($oldSettings);
+        $auth = new OneLogin_Saml2_Auth($logger, $oldSettings);
         $settings = $auth->getSettings();
-        parent::__construct($settings, $assertion);
+        parent::__construct($settings, $assertion, $logger);
     }
 
     /**

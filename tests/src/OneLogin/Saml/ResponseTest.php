@@ -1,11 +1,20 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     private $_settings;
 
     public function setUp()
     {
+        $this->logger = new NullLogger();
         $this->_settings = new OneLogin_Saml_Settings;
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -23,7 +32,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
             $x509cert = str_replace('-----BEGIN CERTIFICATE-----', "", $x509cert);
             $x509cert = str_replace('-----END CERTIFICATE-----', "", $x509cert);
             $x509cert = str_replace(' ', '', $x509cert);
-            
+
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
         }
 
@@ -33,7 +42,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
     public function testReturnNameId()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
 
         $this->assertEquals('support@onelogin.com', $response->getNameId());
 
@@ -43,7 +52,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
     public function testGetAttributes()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
 
         $expectedAttributes = array(
             'uid' => array(
@@ -59,7 +68,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
 
         // An assertion that has no attributes should return an empty array when asked for the attributes
         $assertion = file_get_contents(TEST_ROOT . '/data/responses/response2.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $assertion);
+        $response = new OneLogin_Saml_Response($this->_settings, $assertion, $this->logger);
 
         $this->assertEmpty($response->getAttributes());
     }
@@ -67,7 +76,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
     public function testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_2.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
         try {
             $nameId = $response->getNameId();
             $this->assertNotEquals('root@example.com', $nameId);
@@ -79,7 +88,7 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
     public function testDoesNotAllowSignatureWrappingAttack()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response4.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
 
         $this->assertEquals('test@onelogin.com', $response->getNameId());
     }
@@ -87,14 +96,14 @@ class OneLogin_Saml_ResponseTest extends PHPUnit_Framework_TestCase
     public function testGetSessionNotOnOrAfter()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
 
         $this->assertEquals(1290203857, $response->getSessionNotOnOrAfter());
-        
+
         // An assertion that do not specified Session timeout should return NULL
-        
+
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response2.xml.base64');
-        $response = new OneLogin_Saml_Response($this->_settings, $xml);
+        $response = new OneLogin_Saml_Response($this->_settings, $xml, $this->logger);
 
         $this->assertNull($response->getSessionNotOnOrAfter());
     }

@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LoggerInterface;
+
 class OneLogin_Saml_AuthRequest
 {
 
@@ -9,14 +11,21 @@ class OneLogin_Saml_AuthRequest
     protected $auth;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Constructs the OneLogin_Saml2_Auth, initializing
      * the SP SAML instance.
      *
-     * @param array|object $settings SAML Toolkit Settings
+     * @param LoggerInterface $logger
+     * @param array|object    $settings SAML Toolkit Settings
      */
-    public function __construct($settings)
+    public function __construct(LoggerInterface $logger, $settings)
     {
-        $this->auth = new OneLogin_Saml2_Auth($settings);
+        $this->logger = $logger;
+        $this->auth = new OneLogin_Saml2_Auth($this->logger, $settings);
     }
 
     /**
