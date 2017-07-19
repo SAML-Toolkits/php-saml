@@ -1,0 +1,4 @@
+/.gitattributes export-ignore
+/.coveralls.yml export-ignore
+/.travis.yml export-ignore
+/tests export-ignore
