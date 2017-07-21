@@ -5,5 +5,9 @@
 /demo-old export-ignore
 /demo1 export-ignore
 /demo2 export-ignore
-/phpdoc.xml export-ignore
+/endpoints export-ignore
+/locale export-ignore
 /tests export-ignore
+/phpdoc.xml export-ignore
+/_toolkit_loader.php
+/compatibility.php
