@@ -540,7 +540,7 @@ class OneLogin_Saml2_Auth
      * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
-    public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
+    public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256)
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
@@ -585,7 +585,7 @@ class OneLogin_Saml2_Auth
      * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
-    public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
+    public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256)
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
