@@ -451,7 +451,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $metadata);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $metadata);
         $this->assertContains('<ds:Reference', $metadata);
         $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata);
 
@@ -478,7 +478,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata2);
 
         $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata2);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $metadata2);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $metadata2);
         $this->assertContains('<ds:Reference', $metadata2);
         $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata2);
 

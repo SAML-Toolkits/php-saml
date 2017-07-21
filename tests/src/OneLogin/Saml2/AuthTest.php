@@ -1374,7 +1374,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
         $relayState = 'http://relaystate.com';
         $signature = $this->_auth->buildRequestSignature($message, $relayState);
-        $validSignature = 'Pb1EXAX5TyipSJ1SndEKZstLQTsT+1D00IZAhEepBM+OkAZQSToivu3njgJu47HZiZAqgXZFgloBuuWE/+GdcSsRYEMkEkiSDWTpUr25zKYLJDSg6GNo6iAHsKSuFt46Z54Xe/keYxYP03Hdy97EwuuSjBzzgRc5tmpV+KC7+a0=';
+        $validSignature = 'CqdIlbO6GieeJFV+PYqyqz1QVJunQXdZZl+ZyIby9O3/eMJM0XHi+TWReRrpgNxKkbmmvx5fp/t7mphbLiVYNMgGINEaaa/OfoaGwU9GM5YCVULA2t7qZBel1yrIXGMxijJizB7UPR2ZMo4G+Wdhx1zbmbB0GYM0A27w6YCe/+k=';
         $this->assertEquals($validSignature, $signature);
     }
 
@@ -1388,7 +1388,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
         $relayState = 'http://relaystate.com';
         $signature = $this->_auth->buildResponseSignature($message, $relayState);
-        $validSignature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM=';
+        $validSignature = 'fFGaOuO/2+ch/xlwU5o7iS6R+v2quWchLAtiDyQTxStFQZKY1NsBs/eYIin2Meq7oTl1Ks6tpT6JshH5OwhPh/08K7M2oa6FIKb99cjg+jIJ/WwpuJ5h9SH0XXP8y3RLhCxLIomHDsBOGQK8WvOlXFUg+9nvOaEMNi6raUWrGhA=';
         $this->assertEquals($validSignature, $signature);
     }
 

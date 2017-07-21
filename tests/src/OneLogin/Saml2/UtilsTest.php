@@ -1059,8 +1059,8 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $xmlAuthn = base64_decode(file_get_contents(TEST_ROOT . '/data/requests/authn_request.xml.base64'));
         $xmlAuthnSigned = OneLogin_Saml2_Utils::addSign($xmlAuthn, $key, $cert);
         $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $xmlAuthnSigned);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>', $xmlAuthnSigned);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlAuthnSigned);
+        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', $xmlAuthnSigned);
         $res = new DOMDocument();
         $res->loadXML($xmlAuthnSigned);
         $dsSignature = $res->firstChild->firstChild->nextSibling->nextSibling;
@@ -1068,9 +1068,9 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $dom = new DOMDocument();
         $dom->loadXML($xmlAuthn);
-        $xmlAuthnSigned2 = OneLogin_Saml2_Utils::addSign($dom, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
+        $xmlAuthnSigned2 = OneLogin_Saml2_Utils::addSign($dom, $key, $cert, XMLSecurityKey::RSA_SHA384, XMLSecurityDSig::SHA512);
         $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned2);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlAuthnSigned2);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>', $xmlAuthnSigned2);
         $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlAuthnSigned2);
         $res2 = new DOMDocument();
         $res2->loadXML($xmlAuthnSigned2);
