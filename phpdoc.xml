@@ -17,7 +17,6 @@
     </transformations>
     <files>
         <directory>lib/Saml2/*</directory>
-        <ignore>lib/Saml/*</ignore>
         <ignore>tests/*</ignore>
         <ignore>demo1/*</ignore>
         <ignore>demo2/*</ignore>
@@ -27,7 +26,6 @@
         <ignore>locale/*</ignore>
         <ignore>docs/*</ignore>
         <ignore>vendor/*</ignore>
-        <ignore>compatibility.php</ignore>
         <ignore>_toolkit_loader.php</ignore>
         <ignore>settings.php</ignore>
         <ignore>settings_example.php</ignore>

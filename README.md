@@ -122,22 +122,7 @@ Your settings are at risk of being deleted when updating packages using `compose
 Compatibility
 -------------
 
-This 2.0 version has a new library. The toolkit is still compatible.
-
-The old code that you used in order to add SAML support gonna continue working
-with minor changes. You only need to load the files of the `lib/Saml` folder.
-(notice that the `compatibility.php` file do that).
-
-The old-demo folder contains code from an old app that uses the old version of
-the toolkit (v.1). Take a look.
-
-Sometimes the names of the classes of the old code could be a bit different
-and if that is your case you must change them for `OneLogin_Saml_Settings`,
-`OneLogin_Saml_Response`, `OneLogin_Saml_AuthRequest` or `OneLogin_Saml_Metadata`.
-
-We recommend that you migrate the old code to the new one to be able to use
-the new features that the new library Saml2 carries.
-
+This 3.X version only supports PHP 7.X..
 
 Namespaces
 ----------
