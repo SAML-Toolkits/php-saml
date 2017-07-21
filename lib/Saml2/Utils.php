@@ -514,14 +514,13 @@ class OneLogin_Saml2_Utils
         $currentHost = self::getRawHost();
 
         // strip the port
-        if (false !== strpos($currentHost, ':')) {
-            list($currentHost, $port) = explode(':', $currentHost, 2);
-            if (is_numeric($port)) {
-                return $port;
-            }
+        if (false === strpos($currentHost, ':')) {
+            return null;
         }
 
-        return null;
+        list($currentHost, $port) = explode(':', $currentHost, 2);
+
+        return is_numeric($port) ? $port : null;
     }
 
     /**
