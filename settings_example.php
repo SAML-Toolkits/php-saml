@@ -125,15 +125,11 @@ $settings = array (
          *   or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
          *  If a fingerprint is provided, then the certFingerprintAlgorithm is required in order to
-         *  let the toolkit know which algorithm was used. Possible values: sha1, sha256, sha384 or sha512
-         *  'sha1' is the default value for compatibilty reasons but must not be
-         *  used for security reasons.
-         *
-         *  Notice that if you want to validate any SAML Message sent by the HTTP-Redirect binding, you
-         *  will need to provide the whole x509cert.
+         *  let the toolkit know which Algorithm was used. Possible values: sha1, sha256, sha384 or sha512
+         *  'sha1' is the default value.
          */
         // 'certFingerprint' => '',
-        // 'certFingerprintAlgorithm' => 'sha256',
+        // 'certFingerprintAlgorithm' => 'sha1',
 
         /* In some scenarios the IdP uses different certificates for
          * signing/encryption, or is under key rollover phase and more 
