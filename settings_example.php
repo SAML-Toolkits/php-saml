@@ -1,6 +1,25 @@
 <?php
 
 $settings = array (
+    // Security settings that must be set to avoid insecure SHA-1 usage.
+    'security' => array (
+        // Algorithm that the toolkit will use on signing process. Options:
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
+
+        // Algorithm that the toolkit will use on digest process. Options:
+        //    'http://www.w3.org/2001/04/xmlenc#sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
+        //    'http://www.w3.org/2001/04/xmlenc#sha512'
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#sha1'
+        'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+    ),
     // If 'strict' is True, then the PHP Toolkit will reject unsigned
     // or unencrypted messages if it expects them signed or encrypted
     // Also will reject the messages if not strictly follow the SAML
@@ -106,11 +125,15 @@ $settings = array (
          *   or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
          *  If a fingerprint is provided, then the certFingerprintAlgorithm is required in order to
-         *  let the toolkit know which Algorithm was used. Possible values: sha1, sha256, sha384 or sha512
-         *  'sha1' is the default value.
+         *  let the toolkit know which algorithm was used. Possible values: sha1, sha256, sha384 or sha512
+         *  'sha1' is the default value for compatibilty reasons but must not be
+         *  used for security reasons.
+         *
+         *  Notice that if you want to validate any SAML Message sent by the HTTP-Redirect binding, you
+         *  will need to provide the whole x509cert.
          */
         // 'certFingerprint' => '',
-        // 'certFingerprintAlgorithm' => 'sha1',
+        // 'certFingerprintAlgorithm' => 'sha256',
 
         /* In some scenarios the IdP uses different certificates for
          * signing/encryption, or is under key rollover phase and more 
