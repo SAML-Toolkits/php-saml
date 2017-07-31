@@ -658,7 +658,7 @@ class OneLogin_Saml2_Utils
     public static function parseTime2SAML($time)
     {
         $date = new DateTime("@$time", new DateTimeZone('UTC'));
-        $timestamp = $date->format("Y-m-d\Th:i:s\Z");
+        $timestamp = $date->format("Y-m-d\TH:i:s\Z");
         return $timestamp;
     }
 

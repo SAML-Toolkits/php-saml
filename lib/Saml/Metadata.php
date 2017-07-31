@@ -32,7 +32,7 @@ class OneLogin_Saml_Metadata
     {
         $timestamp = time() + self::VALIDITY_SECONDS;
         $date = new DateTime("@$timestamp", new DateTimeZone('UTC'));
-        $time = $date->format("Y-m-d\Th:i:s\Z");
+        $time = $date->format("Y-m-d\TH:i:s\Z");
         return $time;
     }
 }

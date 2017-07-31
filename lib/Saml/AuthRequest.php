@@ -57,7 +57,7 @@ class OneLogin_Saml_AuthRequest
     protected function _getTimestamp()
     {
         $date = new DateTime('now', new DateTimeZone('UTC'));
-        $timestamp = $date->format("Y-m-d\Th:i:s\Z");
+        $timestamp = $date->format("Y-m-d\TH:i:s\Z");
         return $timestamp;
     }
 }
