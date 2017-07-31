@@ -152,8 +152,10 @@ start, for example to use the static method getSelfURLNoQuery use:
 Security warning
 ----------------
 
-In production, the `strict` parameter **MUST** be set as `"true"`. Otherwise
-your environment is not secure and will be exposed to attacks.
+In production, the `strict` parameter **MUST** be set as `"true"` and the
+`signatureAlgorithm` and `digestAlgorithm` under `security` must be set to
+something other than SHA1 (see https://shattered.io/ ). Otherwise your
+environment is not secure and will be exposed to attacks.
 
 
 Getting started
