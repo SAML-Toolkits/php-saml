@@ -427,10 +427,14 @@ class OneLogin_Saml2_Response
             return true;
         } catch (Exception $e) {
             $this->_error = $e->getMessage();
-            $debug = $this->_settings->isDebugActive();
-            if ($debug) {
-                echo $this->_error;
-            }
+            $this->logger->error(
+                'SAML2 Response is invalid',
+                [
+                    'error' => $this->_error,
+                    'document' => $this->document,
+                ]
+            );
+
             return false;
         }
     }
