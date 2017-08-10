@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v.2.11.0
+* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecesary files from Composer production downloads
+* [#226](https://github.com/onelogin/php-saml/pull/226) Add possibility to handle nameId NameQualifier attribute in SLO Request
+* Improve logout documentation on Readme.
+* Improve multi-certificate support
+
 v.2.10.7
 * Fix IdPMetadataParser. The SingleLogoutService retrieved method was wrong
 * [#201](https://github.com/onelogin/php-saml/issues/201) Fix issues with SP entity_id, acs url and sls url that contains &
