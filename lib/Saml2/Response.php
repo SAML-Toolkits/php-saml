@@ -431,7 +431,7 @@ class OneLogin_Saml2_Response
                 'SAML2 Response is invalid',
                 [
                     'error' => $this->_error,
-                    'document' => $this->document,
+                    'document' => $this->document->saveXML(),
                 ]
             );
 
