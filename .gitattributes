@@ -3,7 +3,6 @@
 /.gitignore export-ignore
 /.travis.yml export-ignore
 /demo-old export-ignore
-/demo1 export-ignore
 /demo2 export-ignore
 /endpoints export-ignore
 /locale export-ignore
