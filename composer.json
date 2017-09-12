@@ -2,8 +2,7 @@
     "name": "onelogin/php-saml",
     "description": "OneLogin PHP SAML Toolkit",
     "license": "MIT",
-    "version": "2.11.0",
-    "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
+    "homepage": "https://developers.onelogin.com/saml/php",
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {
         "classmap": [
@@ -19,6 +18,7 @@
     },
     "require": {
         "php": ">=5.3.2",
+        "ext-curl": "*",
         "ext-openssl": "*",
         "ext-dom": "*",
         "ext-mcrypt": "*"
@@ -32,8 +32,6 @@
         "squizlabs/php_codesniffer": "2.9.0"
     },
     "suggest": {
-        "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
-        "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
         "ext-gettext": "Install gettext and php5-gettext libs to handle translations"
     }
 }

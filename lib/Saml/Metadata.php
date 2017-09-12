@@ -30,10 +30,9 @@ class OneLogin_Saml_Metadata
      */
     protected function _getMetadataValidTimestamp()
     {
-        $timeZone = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-        $time = strftime("%Y-%m-%dT%H:%M:%SZ", time() + self::VALIDITY_SECONDS);
-        date_default_timezone_set($timeZone);
+        $timestamp = time() + self::VALIDITY_SECONDS;
+        $date = new DateTime("@$timestamp", new DateTimeZone('UTC'));
+        $time = $date->format("Y-m-d\TH:i:s\Z");
         return $time;
     }
 }
