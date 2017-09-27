@@ -92,7 +92,7 @@ if (isset($_GET['sso'])) {
     if (empty($errors)) {
         echo '<p>Sucessfully logged out</p>';
     } else {
-        echo '<p>', implode(', ', $errors), '</p>');
+        echo '<p>', implode(', ', $errors), '</p>';
     }
 }
 
