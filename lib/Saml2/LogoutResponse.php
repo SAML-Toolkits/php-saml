@@ -188,7 +188,7 @@ class OneLogin_Saml2_LogoutResponse
             $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $this->_error;
+                echo htmlentities($this->_error);
             }
             return false;
         }
