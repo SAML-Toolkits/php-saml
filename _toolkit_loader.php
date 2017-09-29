@@ -20,6 +20,6 @@ $folderInfo = scandir($libDir);
 foreach ($folderInfo as $element) {
     if (is_file($libDir.$element) && (substr($element, -4) === '.php')) {
         include_once $libDir.$element;
-        break;
+        //break;
     }
 }
