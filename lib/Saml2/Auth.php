@@ -84,7 +84,7 @@ class OneLogin_Saml2_Auth
      * The NotOnOrAfter value of the valid SubjectConfirmationData
      * node (if any) of the last assertion processed
      *
-     * @var DateTime
+     * @var int
      */
     private $_lastAssertionNotOnOrAfter;
 
@@ -651,7 +651,7 @@ class OneLogin_Saml2_Auth
     }
 
     /**
-     * @return The NotOnOrAfter value of the valid
+     * @return int The NotOnOrAfter value of the valid
      *         SubjectConfirmationData node (if any)
      *         of the last assertion processed
      */
