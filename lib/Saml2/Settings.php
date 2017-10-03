@@ -997,6 +997,7 @@ class OneLogin_Saml2_Settings
      * Activates or deactivates the strict mode.
      *
      * @param bool $value Strict parameter
+     * @throws Exception
      */
     public function setStrict($value)
     {
