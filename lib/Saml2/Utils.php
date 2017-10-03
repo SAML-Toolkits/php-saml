@@ -651,7 +651,7 @@ class OneLogin_Saml2_Utils
      * Converts a UNIX timestamp to SAML2 timestamp on the form
      * yyyy-mm-ddThh:mm:ss(\.s+)?Z.
      *
-     * @param string $time The time we should convert (DateTime).
+     * @param string|int $time The time we should convert (DateTime).
      *
      * @return string $timestamp SAML2 timestamp.
      */
