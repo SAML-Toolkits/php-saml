@@ -189,8 +189,8 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Inject metadata info into php-saml settings array
      *
-     * @param string $settings      php-saml settings array
-     * @param string $metadataInfo  array metadata info
+     * @param array $settings      php-saml settings array
+     * @param array $metadataInfo  array metadata info
      *
      * @return array settings
      */
