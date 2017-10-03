@@ -623,7 +623,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID provided by the SAML response from the IdP.
      *
-     * @return string Name ID Value
+     * @return string|null Name ID Value
      */
     public function getNameId()
     {
@@ -638,7 +638,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID Format provided by the SAML response from the IdP.
      *
-     * @return string Name ID Format
+     * @return string|null Name ID Format
      */
     public function getNameIdFormat()
     {
@@ -653,7 +653,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID NameQualifier provided by the SAML response from the IdP.
      *
-     * @return string Name ID NameQualifier
+     * @return string|null Name ID NameQualifier
      */
     public function getNameIdNameQualifier()
     {
