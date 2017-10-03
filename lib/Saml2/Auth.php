@@ -150,8 +150,7 @@ class OneLogin_Saml2_Auth
      * Set the strict mode active/disable
      *
      * @param bool $value Strict parameter
-     *
-     * @return array The settings data.
+     * @throws OneLogin_Saml2_Error
      */
     public function setStrict($value)
     {
