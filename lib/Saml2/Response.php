@@ -47,7 +47,7 @@ class OneLogin_Saml2_Response
     /**
      * NotOnOrAfter value of a valid SubjectConfirmationData node
      *
-     * @var DateTime
+     * @var int
      */
     private $_validSCDNotOnOrAfter;
 
@@ -439,7 +439,8 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the NotOnOrAfter value of the valid SubjectConfirmationData *         node if any
+     * @return int the NotOnOrAfter value of the valid SubjectConfirmationData
+     * node if any
      */
     public function getAssertionNotOnOrAfter()
     {
