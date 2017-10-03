@@ -87,7 +87,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Gets the Status of the Logout Response.
      *
-     * @return string The Status
+     * @return string|null The Status
      */
     public function getStatus()
     {
