@@ -677,7 +677,7 @@ class OneLogin_Saml2_Auth
      * If the SAMLResponse was encrypted, by default tries
      * to return the decrypted XML.
      *
-     * @return string The Response XML
+     * @return string|null The Response XML
      */
     public function getLastResponseXML()
     {
