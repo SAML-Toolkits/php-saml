@@ -62,7 +62,7 @@ class OneLogin_Saml2_Auth
      * SessionNotOnOrAfter. When the user is logged, this stored it
      * from the AuthnStatement of the SAML Response
      *
-     * @var DateTime
+     * @var int|null
      */
     private $_sessionExpiration;
 
