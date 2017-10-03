@@ -409,7 +409,7 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the ID of the Response
+     * @return string|null the ID of the Response
      */
     public function getId()
     {
@@ -421,7 +421,7 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the ID of the assertion in the Response
+     * @return string|null the ID of the assertion in the Response
      */
     public function getAssertionId()
     {
