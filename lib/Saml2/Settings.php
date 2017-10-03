@@ -150,6 +150,7 @@ class OneLogin_Saml2_Settings
 
     /**
      * Sets the paths of the different folders
+	 * @suppress PhanUndeclaredConstant
      */
     private function _loadPaths()
     {
