@@ -800,7 +800,7 @@ class OneLogin_Saml2_Utils
      * @param string $cacheDuration The duration, as a string.
      * @param string $validUntil    The valid until date, as a string or as a timestamp
      *
-     * @return int $expireTime  The expiration time.
+     * @return int|null $expireTime  The expiration time.
      */
     public static function getExpireTime($cacheDuration = null, $validUntil = null)
     {
