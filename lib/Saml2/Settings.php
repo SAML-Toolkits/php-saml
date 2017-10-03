@@ -1050,7 +1050,7 @@ class OneLogin_Saml2_Settings
     /**
      * Sets the IdP certificate.
      *
-     * @param string $value IdP certificate
+     * @param string $cert IdP certificate
      */
     public function setIdPCert($cert)
     {
