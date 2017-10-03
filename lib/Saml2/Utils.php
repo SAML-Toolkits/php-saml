@@ -73,7 +73,7 @@ class OneLogin_Saml2_Utils
      *
      * @throws Exception
      *
-     * @return DOMDocument $dom The result of load the XML at the DomDocument
+     * @return DOMDocument|false $dom The result of load the XML at the DomDocument
      */
     public static function loadXML($dom, $xml)
     {
