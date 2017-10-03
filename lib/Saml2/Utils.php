@@ -884,6 +884,7 @@ class OneLogin_Saml2_Utils
      * Calculates the fingerprint of a x509cert.
      *
      * @param string $x509cert x509 cert
+     * @param string $alg
      *
      * @return null|string Formatted fingerprint
      */
