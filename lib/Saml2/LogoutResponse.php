@@ -32,7 +32,7 @@ class OneLogin_Saml2_LogoutResponse
 
     /**
     * After execute a validation process, if it fails, this var contains the cause
-    * @var string
+    * @var string|null
     */
     private $_error;
 
