@@ -271,7 +271,7 @@ LOGOUTRESPONSE;
     }
 
    /**
-    * @return the ID of the Response
+    * @return string the ID of the Response
     */
     public function getId()
     {
