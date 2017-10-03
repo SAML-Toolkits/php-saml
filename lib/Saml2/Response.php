@@ -426,7 +426,7 @@ class OneLogin_Saml2_Response
     public function getAssertionId()
     {
         if (!$this->validateNumAssertions()) {
-            throw new IllegalArgumentException("SAML Response must contain 1 Assertion.");
+            throw new InvalidArgumentException("SAML Response must contain 1 Assertion.");
         }
         $assertionNodes = $this->_queryAssertion("");
         $id = null;
