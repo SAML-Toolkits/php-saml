@@ -288,6 +288,7 @@ class OneLogin_Saml2_Settings
      *
      * @return bool True if the settings info is valid
      * @throws OneLogin_Saml2_Error
+     * @suppress PhanUndeclaredVariable
      */
     private function _loadSettingsFromFile()
     {
@@ -301,13 +302,15 @@ class OneLogin_Saml2_Settings
             );
         }
 
-        include $filename;
+        /** @var array $settings */
+		include $filename;
 
         // Add advance_settings if exists
 
         $advancedFilename = $this->getConfigPath().'advanced_settings.php';
 
         if (file_exists($advancedFilename)) {
+            /** @var array $advancedSettings */
             include $advancedFilename;
             $settings = array_merge($settings, $advancedSettings);
         }
