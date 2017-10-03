@@ -88,7 +88,7 @@ class OneLogin_Saml2_Settings
     /**
      * Setting errors.
      *
-     * @var array
+     * @var bool
      */
     private $_spValidationOnly = false;
 
@@ -98,6 +98,7 @@ class OneLogin_Saml2_Settings
      * - Loads settings info from settings file or array/object provided
      *
      * @param array|object|null $settings SAML Toolkit Settings
+     * @param bool $spValidationOnly
      *
      * @throws OneLogin_Saml2_Error If any settings parameter is invalid
      * @throws Exception If OneLogin_Saml2_Settings is incorrectly supplied
