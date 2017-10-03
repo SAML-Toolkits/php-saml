@@ -18,22 +18,22 @@ class OneLogin_Saml2_Utils
 
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $_host;
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $_protocol;
 
     /**
-     * @var int
+     * @var int|null
      */
     private static $_port;
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $_baseurlpath;
 
