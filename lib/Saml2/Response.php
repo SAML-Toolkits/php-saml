@@ -525,6 +525,7 @@ class OneLogin_Saml2_Response
      * Gets the Issuers (from Response and Assertion).
      *
      * @return array @issuers The issuers of the assertion/response
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getIssuers()
     {
