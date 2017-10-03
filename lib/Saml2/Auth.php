@@ -98,7 +98,7 @@ class OneLogin_Saml2_Auth
     /**
      * Reason of the last error.
      *
-     * @var string
+     * @var string|null
      */
     private $_errorReason;
 
@@ -387,7 +387,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the reason for the last error
      *
-     * @return string  Error reason
+     * @return string|null Error reason
      */
     public function getLastErrorReason()
     {
