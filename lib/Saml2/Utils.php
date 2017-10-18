@@ -253,7 +253,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?://@i', $url)) {
+        if (!preg_match('@^https?://@i', $url) || empty($url = filter_var($url, FILTER_VALIDATE_URL))) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
