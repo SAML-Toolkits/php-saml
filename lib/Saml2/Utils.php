@@ -954,7 +954,7 @@ class OneLogin_Saml2_Utils
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $cert = null, $nq = null)
+    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null)
     {
 
         $doc = new DOMDocument();
@@ -966,7 +966,9 @@ class OneLogin_Saml2_Utils
         if (isset($nq)) {
             $nameId->setAttribute('NameQualifier', $nq);
         }
-        $nameId->setAttribute('Format', $format);
+        if (isset($format)) {
+            $nameId->setAttribute('Format', $format);
+        }
         $nameId->appendChild($doc->createTextNode($value));
 
         $doc->appendChild($nameId);

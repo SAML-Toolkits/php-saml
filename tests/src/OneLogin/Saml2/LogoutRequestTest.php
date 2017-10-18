@@ -109,7 +109,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_LogoutRequest
     */
-    public function testConstructorWithNameIdFormat()
+    public function testConstructorWithNameIdFormatOnParameter()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -135,6 +135,74 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         $logoutNameIdData = OneLogin_Saml2_LogoutRequest::getNameIdData($inflated);
         $this->assertEquals($nameIdFormat, $logoutNameIdData['Format']);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_LogoutRequest Constructor.
+    *
+    * @covers OneLogin_Saml2_LogoutRequest
+    */
+    public function testConstructorWithNameIdFormatOnSettings()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $nameId = 'test@example.com';
+        $nameIdFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient';
+        $settingsInfo['sp']['NameIDFormat'] = $nameIdFormat;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, null, $nameId, null, null);
+
+        $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
+        $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
+        parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
+        // parse_url already urldecode de params so is not required.
+        $payload = $exploded['SAMLRequest'];
+        $decoded = base64_decode($payload);
+        $inflated = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
+
+        $logoutNameId = OneLogin_Saml2_LogoutRequest::getNameId($inflated);
+        $this->assertEquals($nameId, $logoutNameId);
+
+        $logoutNameIdData = OneLogin_Saml2_LogoutRequest::getNameIdData($inflated);
+        $this->assertEquals($nameIdFormat, $logoutNameIdData['Format']);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_LogoutRequest Constructor.
+    *
+    * @covers OneLogin_Saml2_LogoutRequest
+    */
+    public function testConstructorWithoutNameIdFormat()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $nameId = 'test@example.com';
+        $nameIdFormat = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
+        $settingsInfo['sp']['NameIDFormat'] = $nameIdFormat;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, null, $nameId, null, null);
+
+        $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
+        $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
+        parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
+        // parse_url already urldecode de params so is not required.
+        $payload = $exploded['SAMLRequest'];
+        $decoded = base64_decode($payload);
+        $inflated = gzinflate($decoded);
+        $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
+
+        $logoutNameId = OneLogin_Saml2_LogoutRequest::getNameId($inflated);
+        $this->assertEquals($nameId, $logoutNameId);
+
+        $logoutNameIdData = OneLogin_Saml2_LogoutRequest::getNameIdData($inflated);
+        $this->assertFalse(isset($logoutNameIdData['Format']));
     }
 
     /**

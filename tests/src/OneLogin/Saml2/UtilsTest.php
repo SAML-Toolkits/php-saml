@@ -817,6 +817,25 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_Utils::generateNameId
     */
+    public function testGenerateNameIdWithoutFormat()
+    {
+        $nameIdValue = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde';
+
+        $nameId = OneLogin_Saml2_Utils::generateNameId(
+            $nameIdValue,
+            null,
+            null
+        );
+
+        $expectedNameId = '<saml:NameID>ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde</saml:NameID>';
+        $this->assertEquals($nameId, $expectedNameId);
+    }
+
+    /**
+    * Tests the generateNameId method of the OneLogin_Saml2_Utils
+    *
+    * @covers OneLogin_Saml2_Utils::generateNameId
+    */
     public function testGenerateNameIdWithoutSPNameQualifier()
     {
         //$xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
