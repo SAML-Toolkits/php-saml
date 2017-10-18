@@ -1420,4 +1420,25 @@ class OneLogin_Saml2_Utils
         }
         return $signatureValid;
     }
+
+    /**
+     * Validates a URL with fallback for URL's that don't comply with RFC 2396
+     *
+     * @param string $url The url we should validate
+     *
+     * @return bool
+     */
+    public static function validateUrl($url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL) !== false) {
+            return true;
+        }
+
+        $check = parse_url($url, PHP_URL_HOST);
+        if ($check !== false) {
+            return true;
+        }
+
+        return false;
+    }
 }
