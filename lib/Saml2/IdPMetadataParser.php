@@ -156,7 +156,19 @@ class OneLogin_Saml2_IdPMetadataParser
                     }
 
                     $idpCertdata = $metadataInfo['idp']['x509certMulti'];
-                    if (count($idpCertdata) == 1 || ((isset($idpCertdata['signing']) && count($idpCertdata['signing']) == 1) && isset($idpCertdata['encryption']) && count($idpCertdata['encryption']) == 1 && strcmp($idpCertdata['signing'][0], $idpCertdata['encryption'][0]) == 0)) {
+                    if (
+                        // Maximum of 1 signing certificate
+                        (!isset($idpCertdata['signing'])    || count($idpCertdata['signing']) == 1)
+                        // Maximum of 1 encryption certificate
+                     && (!isset($idpCertdata['encryption']) || count($idpCertdata['encryption']) == 1)
+                        // Either
+                     && (
+                            // only 1 certificate total
+                            count($idpCertdata) == 1
+                            // or the only signing certificate matches the only encryption certificate
+                         || (isset($idpCertdata['signing'][0]) && isset($idpCertdata['encryption'][0]) && strcmp($idpCertdata['signing'][0], $idpCertdata['encryption'][0]) == 0)
+                        )
+                    ) {
                         if (isset($metadataInfo['idp']['x509certMulti']['signing'][0])) {
                             $metadataInfo['idp']['x509cert'] = $metadataInfo['idp']['x509certMulti']['signing'][0];
                         } else {
