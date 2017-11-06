@@ -285,8 +285,14 @@ class OneLogin_Saml2_Response
                 }
 
                 // Check the SubjectConfirmation, at least one SubjectConfirmation must be valid
-                $anySubjectConfirmation = false;
+                $validSubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
+
+                // Zero nodes are also acceptable according to SAML 2.0 spec
+                if (count($subjectConfirmationNodes) == 0) {
+                    $validSubjectConfirmation = true;
+                }
+
                 foreach ($subjectConfirmationNodes as $scn) {
                     if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != OneLogin_Saml2_Constants::CM_BEARER) {
                         continue;
@@ -325,12 +331,12 @@ class OneLogin_Saml2_Response
                         if ($scnData->hasAttribute('NotOnOrAfter')) {
                             $this->_validSCDNotOnOrAfter = $noa;
                         }
-                        $anySubjectConfirmation = true;
+                        $validSubjectConfirmation = true;
                         break;
                     }
                 }
 
-                if (!$anySubjectConfirmation) {
+                if (!$validSubjectConfirmation) {
                     throw new OneLogin_Saml2_ValidationError(
                         "A valid SubjectConfirmation was not found on this Response",
                         OneLogin_Saml2_ValidationError::WRONG_SUBJECTCONFIRMATION
