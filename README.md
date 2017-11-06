@@ -152,8 +152,10 @@ start, for example to use the static method getSelfURLNoQuery use:
 Security warning
 ----------------
 
-In production, the `strict` parameter **MUST** be set as `"true"`. Otherwise
-your environment is not secure and will be exposed to attacks.
+In production, the `strict` parameter **MUST** be set as `"true"` and the
+`signatureAlgorithm` and `digestAlgorithm` under `security` must be set to
+something other than SHA1 (see https://shattered.io/ ). Otherwise your
+environment is not secure and will be exposed to attacks.
 
 
 Getting started
@@ -496,14 +498,16 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
-        'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+        // Notice that sha1 is a deprecated algorithm and should not be used
+        'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
 
         // Algorithm that the toolkit will use on digest process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#sha1'
         //    'http://www.w3.org/2001/04/xmlenc#sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
-        'digestAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1',
+        // Notice that sha1 is a deprecated algorithm and should not be used
+        'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
