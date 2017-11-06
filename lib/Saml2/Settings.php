@@ -150,7 +150,7 @@ class OneLogin_Saml2_Settings
 
     /**
      * Sets the paths of the different folders
-	 * @suppress PhanUndeclaredConstant
+     * @suppress PhanUndeclaredConstant
      */
     private function _loadPaths()
     {
@@ -304,7 +304,7 @@ class OneLogin_Saml2_Settings
         }
 
         /** @var array $settings */
-		include $filename;
+        include $filename;
 
         // Add advance_settings if exists
 
