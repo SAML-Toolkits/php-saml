@@ -47,7 +47,7 @@ class OneLogin_Saml2_Response
     /**
      * NotOnOrAfter value of a valid SubjectConfirmationData node
      *
-     * @var DateTime
+     * @var int
      */
     private $_validSCDNotOnOrAfter;
 
@@ -409,7 +409,7 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the ID of the Response
+     * @return string|null the ID of the Response
      */
     public function getId()
     {
@@ -421,12 +421,12 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the ID of the assertion in the Response
+     * @return string|null the ID of the assertion in the Response
      */
     public function getAssertionId()
     {
         if (!$this->validateNumAssertions()) {
-            throw new IllegalArgumentException("SAML Response must contain 1 Assertion.");
+            throw new InvalidArgumentException("SAML Response must contain 1 Assertion.");
         }
         $assertionNodes = $this->_queryAssertion("");
         $id = null;
@@ -439,7 +439,8 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * @return the NotOnOrAfter value of the valid SubjectConfirmationData *         node if any
+     * @return int the NotOnOrAfter value of the valid SubjectConfirmationData
+     * node if any
      */
     public function getAssertionNotOnOrAfter()
     {
@@ -524,6 +525,7 @@ class OneLogin_Saml2_Response
      * Gets the Issuers (from Response and Assertion).
      *
      * @return array @issuers The issuers of the assertion/response
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getIssuers()
     {
@@ -621,7 +623,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID provided by the SAML response from the IdP.
      *
-     * @return string Name ID Value
+     * @return string|null Name ID Value
      */
     public function getNameId()
     {
@@ -636,7 +638,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID Format provided by the SAML response from the IdP.
      *
-     * @return string Name ID Format
+     * @return string|null Name ID Format
      */
     public function getNameIdFormat()
     {
@@ -651,7 +653,7 @@ class OneLogin_Saml2_Response
     /**
      * Gets the NameID NameQualifier provided by the SAML response from the IdP.
      *
-     * @return string Name ID NameQualifier
+     * @return string|null Name ID NameQualifier
      */
     public function getNameIdNameQualifier()
     {

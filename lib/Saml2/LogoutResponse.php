@@ -32,7 +32,7 @@ class OneLogin_Saml2_LogoutResponse
 
     /**
     * After execute a validation process, if it fails, this var contains the cause
-    * @var string
+    * @var string|null
     */
     private $_error;
 
@@ -87,7 +87,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Gets the Status of the Logout Response.
      *
-     * @return string The Status
+     * @return string|null The Status
      */
     public function getStatus()
     {
@@ -271,7 +271,7 @@ LOGOUTRESPONSE;
     }
 
    /**
-    * @return the ID of the Response
+    * @return string the ID of the Response
     */
     public function getId()
     {

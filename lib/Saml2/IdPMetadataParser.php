@@ -85,6 +85,7 @@ class OneLogin_Saml2_IdPMetadataParser
      * @param string $desiredSLOBinding     Parse specific binding SLO endpoint.
      *
      * @return array metadata info in php-saml settings format
+     * @throws \Exception
      */
     public static function parseXML($xml, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT)
     {
@@ -149,13 +150,11 @@ class OneLogin_Saml2_IdPMetadataParser
                 if (!empty($keyDescriptorCertSigningNodes) || !empty($keyDescriptorCertEncryptionNodes)) {
                     $metadataInfo['idp']['x509certMulti'] = array();
                     if (!empty($keyDescriptorCertSigningNodes)) {
-                        $idpInfo['x509certMulti']['signing'] = array();
                         foreach ($keyDescriptorCertSigningNodes as $keyDescriptorCertSigningNode) {
                             $metadataInfo['idp']['x509certMulti']['signing'][] = OneLogin_Saml2_Utils::formatCert($keyDescriptorCertSigningNode->nodeValue, false);
                         }
                     }
                     if (!empty($keyDescriptorCertEncryptionNodes)) {
-                        $idpInfo['x509certMulti']['encryption'] = array();
                         foreach ($keyDescriptorCertEncryptionNodes as $keyDescriptorCertEncryptionNode) {
                             $metadataInfo['idp']['x509certMulti']['encryption'][] = OneLogin_Saml2_Utils::formatCert($keyDescriptorCertEncryptionNode->nodeValue, false);
                         }
@@ -197,8 +196,8 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Inject metadata info into php-saml settings array
      *
-     * @param string $settings      php-saml settings array
-     * @param string $metadataInfo  array metadata info
+     * @param array $settings      php-saml settings array
+     * @param array $metadataInfo  array metadata info
      *
      * @return array settings
      */
