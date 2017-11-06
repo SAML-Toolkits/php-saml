@@ -1,6 +1,25 @@
 <?php
 
 $settings = array (
+    // Security settings that must be set to avoid insecure SHA-1 usage.
+    'security' => array (
+        // Algorithm that the toolkit will use on signing process. Options:
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
+        //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
+
+        // Algorithm that the toolkit will use on digest process. Options:
+        //    'http://www.w3.org/2001/04/xmlenc#sha256'
+        //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
+        //    'http://www.w3.org/2001/04/xmlenc#sha512'
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#sha1'
+        'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+    ),
     // If 'strict' is True, then the PHP Toolkit will reject unsigned
     // or unencrypted messages if it expects them signed or encrypted
     // Also will reject the messages if not strictly follow the SAML

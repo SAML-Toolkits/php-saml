@@ -82,19 +82,21 @@ $advancedSettings = array (
         'relaxDestinationValidation' => false,
 
         // Algorithm that the toolkit will use on signing process. Options:
-        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
-        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
-        'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+        //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
 
         // Algorithm that the toolkit will use on digest process. Options:
-        //    'http://www.w3.org/2000/09/xmldsig#sha1'
         //    'http://www.w3.org/2001/04/xmlenc#sha256'
         //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
-        'digestAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1',
+        // Insecure options that must not be used (still available for backwards compatibility):
+        //    'http://www.w3.org/2000/09/xmldsig#sha1'
+        'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
