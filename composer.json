@@ -18,7 +18,7 @@
         "source": "https://github.com/onelogin/php-saml/"
     },
     "require": {
-        "php": ">=5.6.2",
+        "php": ">= 5.4",
         "ext-openssl": "*",
         "ext-dom": "*"
     },
