@@ -727,11 +727,24 @@ class OneLogin_Saml2_Response
 
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
+            $attributeName         = $entry->attributes->getNamedItem('Name')->nodeValue;
+            $attributeFriendlyName = null;
+
+            $attributeFriendlyNameNode = $entry->attributes->getNamedItem('FriendlyName');
+            if ($attributeFriendlyNameNode !== null) {
+                $attributeFriendlyName = $attributeFriendlyNameNode->nodeValue;
+            }
 
             if (in_array($attributeName, array_keys($attributes))) {
                 throw new OneLogin_Saml2_ValidationError(
                     "Found an Attribute element with duplicated Name",
+                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
+                );
+            }
+
+            if (!empty($attributeFriendlyName) && in_array($attributeFriendlyName, array_keys($attributes))) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Found an Attribute element with duplicated FriendlyName",
                     OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
                 );
             }
@@ -745,6 +758,10 @@ class OneLogin_Saml2_Response
             }
 
             $attributes[$attributeName] = $attributeValues;
+
+            if (!empty($attributeFriendlyName)) {
+                $attributes[$attributeFriendlyName] = $attributeValues;
+            }
         }
         return $attributes;
     }
