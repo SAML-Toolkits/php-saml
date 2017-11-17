@@ -727,7 +727,7 @@ class OneLogin_Saml2_Response
 
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeName         = $entry->attributes->getNamedItem('Name')->nodeValue;
+            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
 
             if (in_array($attributeName, array_keys($attributes))) {
                 throw new OneLogin_Saml2_ValidationError(
