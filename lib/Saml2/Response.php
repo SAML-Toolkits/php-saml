@@ -784,7 +784,7 @@ class OneLogin_Saml2_Response
 
             $attributeFriendlyName = $attributeFriendlyNameNode->nodeValue;
 
-            if (!empty($attributeFriendlyName) && in_array($attributeFriendlyName, array_keys($attributes))) {
+            if (in_array($attributeFriendlyName, array_keys($attributes))) {
                 throw new OneLogin_Saml2_ValidationError(
                     "Found an Attribute element with duplicated FriendlyName",
                     OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
