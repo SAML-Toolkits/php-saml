@@ -1,37 +1,19 @@
 <?php
 /**
- * Squiz_Sniffs_NamingConventions_ValidVariableNameSniff.
- *
- * PHP version 5
- *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
- * @copyright 2006-2012 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @link      http://pear.php.net/package/PHP_CodeSniffer
- */
-
-if (class_exists('PHP_CodeSniffer_Standards_AbstractVariableSniff', true) === false) {
-    throw new PHP_CodeSniffer_Exception('Class PHP_CodeSniffer_Standards_AbstractVariableSniff not found');
-}
-
-/**
- * Squiz_Sniffs_NamingConventions_ValidVariableNameSniff.
- *
  * Checks the naming of variables and member variables.
  *
- * @category  PHP
- * @package   PHP_CodeSniffer
  * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
- * @copyright 2006-2012 Squiz Pty Ltd (ABN 77 084 670 600)
+ * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @version   Release: 1.5.2
- * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PHP_CodeSniffer_Standards_AbstractVariableSniff
+
+namespace PHP_CodeSniffer\Standards\Zend\Sniffs\NamingConventions;
+
+use PHP_CodeSniffer\Sniffs\AbstractVariableSniff;
+use PHP_CodeSniffer\Util\Common;
+use PHP_CodeSniffer\Files\File;
+
+class ValidVariableNameSniff extends AbstractVariableSniff
 {
 
     /**
@@ -39,40 +21,43 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
      *
      * @var array
      */
-    private $_ignore = array(
-                        T_WHITESPACE,
-                        T_COMMENT,
-                       );
+    private $ignore = array(
+                       T_WHITESPACE,
+                       T_COMMENT,
+                      );
 
 
     /**
      * Processes this test, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token in the
-     *                                        stack passed in $tokens.
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile The file being scanned.
+     * @param int                         $stackPtr  The position of the current token in the
+     *                                               stack passed in $tokens.
      *
      * @return void
      */
-    protected function processVariable(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processVariable(File $phpcsFile, $stackPtr)
     {
         $tokens  = $phpcsFile->getTokens();
         $varName = ltrim($tokens[$stackPtr]['content'], '$');
 
         $phpReservedVars = array(
-                            '_SERVER',
-                            '_GET',
-                            '_POST',
-                            '_REQUEST',
-                            '_SESSION',
-                            '_ENV',
-                            '_COOKIE',
-                            '_FILES',
-                            'GLOBALS',
+                            '_SERVER'              => true,
+                            '_GET'                 => true,
+                            '_POST'                => true,
+                            '_REQUEST'             => true,
+                            '_SESSION'             => true,
+                            '_ENV'                 => true,
+                            '_COOKIE'              => true,
+                            '_FILES'               => true,
+                            'GLOBALS'              => true,
+                            'http_response_header' => true,
+                            'HTTP_RAW_POST_DATA'   => true,
+                            'php_errormsg'         => true,
                            );
 
         // If it's a php reserved var, then its ok.
-        if (in_array($varName, $phpReservedVars) === true) {
+        if (isset($phpReservedVars[$varName]) === true) {
             return;
         }
 
@@ -95,18 +80,11 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
                         $objVarName = substr($objVarName, 1);
                     }
 
-                    if (PHP_CodeSniffer::isCamelCaps($objVarName, false, true, false) === false) {
+                    if (Common::isCamelCaps($objVarName, false, true, false) === false) {
                         $error = 'Variable "%s" is not in valid camel caps format';
                         $data  = array($originalVarName);
                         $phpcsFile->addError($error, $var, 'NotCamelCaps', $data);
                     }
-/*
-		    else if (preg_match('|\d|', $objVarName)) {
-                        $warning = 'Variable "%s" contains numbers but this is discouraged';
-                        $data    = array($originalVarName);
-                        $phpcsFile->addWarning($warning, $stackPtr, 'ContainsNumbers', $data);
-                    }
-*/
                 }//end if
             }//end if
         }//end if
@@ -130,31 +108,25 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
             }
         }
 
-        if (PHP_CodeSniffer::isCamelCaps($varName, false, true, false) === false) {
+        if (Common::isCamelCaps($varName, false, true, false) === false) {
             $error = 'Variable "%s" is not in valid camel caps format';
             $data  = array($originalVarName);
             $phpcsFile->addError($error, $stackPtr, 'NotCamelCaps', $data);
         }
-/*
-        else if (preg_match('|\d|', $varName)) {
-            $warning = 'Variable "%s" contains numbers but this is discouraged';
-            $data    = array($originalVarName);
-            $phpcsFile->addWarning($warning, $stackPtr, 'ContainsNumbers', $data);
-        }
-*/
+
     }//end processVariable()
 
 
     /**
      * Processes class member variables.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token in the
-     *                                        stack passed in $tokens.
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile The file being scanned.
+     * @param int                         $stackPtr  The position of the current token in the
+     *                                               stack passed in $tokens.
      *
      * @return void
      */
-    protected function processMemberVar(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processMemberVar(File $phpcsFile, $stackPtr)
     {
         $tokens      = $phpcsFile->getTokens();
         $varName     = ltrim($tokens[$stackPtr]['content'], '$');
@@ -181,31 +153,29 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
             }
         }
 
-        if (PHP_CodeSniffer::isCamelCaps($varName, false, $public, false) === false) {
-            $error = 'Variable "%s" is not in valid camel caps format';
+        if (Common::isCamelCaps($varName, false, $public, false) === false) {
+            $error = 'Member variable "%s" is not in valid camel caps format';
             $data  = array($varName);
             $phpcsFile->addError($error, $stackPtr, 'MemberVarNotCamelCaps', $data);
-        }
-/*
-        else if (preg_match('|\d|', $varName)) {
-            $warning = 'Variable "%s" contains numbers but this is discouraged';
+        } else if (preg_match('|\d|', $varName) === 1) {
+            $warning = 'Member variable "%s" contains numbers but this is discouraged';
             $data    = array($varName);
             $phpcsFile->addWarning($warning, $stackPtr, 'MemberVarContainsNumbers', $data);
         }
-*/
+
     }//end processMemberVar()
 
 
     /**
      * Processes the variable found within a double quoted string.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the double quoted
-     *                                        string.
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile The file being scanned.
+     * @param int                         $stackPtr  The position of the double quoted
+     *                                               string.
      *
      * @return void
      */
-    protected function processVariableInString(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processVariableInString(File $phpcsFile, $stackPtr)
     {
         $tokens = $phpcsFile->getTokens();
 
@@ -219,6 +189,9 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
                             '_COOKIE',
                             '_FILES',
                             'GLOBALS',
+                            'http_response_header',
+                            'HTTP_RAW_POST_DATA',
+                            'php_errormsg',
                            );
 
         if (preg_match_all('|[^\\\]\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)|', $tokens[$stackPtr]['content'], $matches) !== 0) {
@@ -228,32 +201,19 @@ class ZendModStandard_Sniffs_NamingConventions_ValidVariableNameSniff extends PH
                     continue;
                 }
 
-                // There is no way for us to know if the var is public or private,
-                // so we have to ignore a leading underscore if there is one and just
-                // check the main part of the variable name.
-                $originalVarName = $varName;
-                if (substr($varName, 0, 1) === '_') {
-                    if ($phpcsFile->hasCondition($stackPtr, array(T_CLASS, T_INTERFACE, T_TRAIT)) === true) {
-                        $varName = substr($varName, 1);
-                    }
-                }
-
-                if (PHP_CodeSniffer::isCamelCaps($varName, false, true, false) === false) {
-                    $varName = $matches[0];
-                    $error   = 'Variable "%s" is not in valid camel caps format';
-                    $data    = array($originalVarName);
+                if (Common::isCamelCaps($varName, false, true, false) === false) {
+                    $error = 'Variable "%s" is not in valid camel caps format';
+                    $data  = array($varName);
                     $phpcsFile->addError($error, $stackPtr, 'StringVarNotCamelCaps', $data);
-                } else if (preg_match('|\d|', $varName)) {
+                } else if (preg_match('|\d|', $varName) === 1) {
                     $warning = 'Variable "%s" contains numbers but this is discouraged';
-                    $data    = array($originalVarName);
+                    $data    = array($varName);
                     $phpcsFile->addWarning($warning, $stackPtr, 'StringVarContainsNumbers', $data);
                 }
-            }
+            }//end foreach
         }//end if
 
     }//end processVariableInString()
 
 
 }//end class
-
-?>

@@ -1,11 +1,23 @@
 <?php
+/**
+ * This file is part of php-saml.
+ *
+ * (c) OneLogin Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @package OneLogin
+ * @author  OneLogin Inc <saml-info@onelogin.com>
+ * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
+ * @link    https://github.com/onelogin/php-saml
+ */
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 /**
  * Configuration of the OneLogin PHP Toolkit
- *
  */
 class OneLogin_Saml2_Settings
 {
@@ -99,7 +111,8 @@ class OneLogin_Saml2_Settings
      * - Sets the paths of the different folders
      * - Loads settings info from settings file or array/object provided
      *
-     * @param array|object|null $settings SAML Toolkit Settings
+     * @param array|object|null $settings         SAML Toolkit Settings
+     * @param boolean           $spValidationOnly Validate or not the IdP data
      *
      * @throws OneLogin_Saml2_Error If any settings parameter is invalid
      * @throws Exception If OneLogin_Saml2_Settings is incorrectly supplied
@@ -693,6 +706,7 @@ class OneLogin_Saml2_Settings
      * Returns the x509 public of the SP that is
      * planed to be used soon instead the other
      * public cert
+     *
      * @return string SP public cert New
      */
     public function getSPcertNew()
@@ -762,20 +776,20 @@ class OneLogin_Saml2_Settings
     }
 
     /**
-    * Should SAML requests be compressed?
-    *
-    * @return bool Yes/No as True/False
-    */
+     * Should SAML requests be compressed?
+     *
+     * @return bool Yes/No as True/False
+     */
     public function shouldCompressRequests()
     {
         return $this->_compress['requests'];
     }
 
     /**
-    * Should SAML responses be compressed?
-    *
-    * @return bool Yes/No as True/False
-    */
+     * Should SAML responses be compressed?
+     *
+     * @return bool Yes/No as True/False
+     */
     public function shouldCompressResponses()
     {
         return $this->_compress['responses'];
@@ -1018,6 +1032,8 @@ class OneLogin_Saml2_Settings
 
     /**
      * Set a baseurl value.
+     *
+     * @param string $baseurl Base URL.
      */
     public function setBaseURL($baseurl)
     {
@@ -1037,7 +1053,7 @@ class OneLogin_Saml2_Settings
     /**
      * Sets the IdP certificate.
      *
-     * @param string $value IdP certificate
+     * @param string $cert IdP certificate
      */
     public function setIdPCert($cert)
     {

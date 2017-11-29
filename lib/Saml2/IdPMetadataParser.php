@@ -1,21 +1,32 @@
 <?php
+/**
+ * This file is part of php-saml.
+ *
+ * (c) OneLogin Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @package OneLogin
+ * @author  OneLogin Inc <saml-info@onelogin.com>
+ * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
+ * @link    https://github.com/onelogin/php-saml
+ */
 
 /**
  * IdP Metadata Parser of OneLogin PHP Toolkit
- *
  */
-
 class OneLogin_Saml2_IdPMetadataParser
 {
     /**
      * Get IdP Metadata Info from URL
      *
-     * @param string $url                   URL where the IdP metadata is published
-     * @param string $entityId              Entity Id of the desired IdP, if no
-     *                                      entity Id is provided and the XML
-     *                                      metadata contains more than one
-     *                                      IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat   If available on IdP metadata, use that nameIdFormat
+     * @param string $url                 URL where the IdP metadata is published
+     * @param string $entityId            Entity Id of the desired IdP, if no
+     *                                    entity Id is provided and the XML
+     *                                    metadata contains more than one
+     *                                    IDPSSODescriptor, the first is returned
+     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
      *
      * @return array metadata info in php-saml settings format
      */
@@ -45,12 +56,12 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Get IdP Metadata Info from File
      *
-     * @param string $filepath              File path
-     * @param string $entityId              Entity Id of the desired IdP, if no
-     *                                      entity Id is provided and the XML
-     *                                      metadata contains more than one
-     *                                      IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat   If available on IdP metadata, use that nameIdFormat
+     * @param string $filepath            File path
+     * @param string $entityId            Entity Id of the desired IdP, if no
+     *                                    entity Id is provided and the XML
+     *                                    metadata contains more than one
+     *                                    IDPSSODescriptor, the first is returned
+     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
      *
      * @return array metadata info in php-saml settings format
      */
@@ -71,12 +82,12 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Get IdP Metadata Info from URL
      *
-     * @param string $xml                   XML that contains IdP metadata
-     * @param string $entityId              Entity Id of the desired IdP, if no
-     *                                      entity Id is provided and the XML
-     *                                      metadata contains more than one
-     *                                      IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat   If available on IdP metadata, use that nameIdFormat
+     * @param string $xml                 XML that contains IdP metadata
+     * @param string $entityId            Entity Id of the desired IdP, if no
+     *                                    entity Id is provided and the XML
+     *                                    metadata contains more than one
+     *                                    IDPSSODescriptor, the first is returned
+     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
      *
      * @return array metadata info in php-saml settings format
      */
@@ -189,8 +200,8 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Inject metadata info into php-saml settings array
      *
-     * @param string $settings      php-saml settings array
-     * @param string $metadataInfo  array metadata info
+     * @param string $settings     php-saml settings array
+     * @param string $metadataInfo array metadata info
      *
      * @return array settings
      */

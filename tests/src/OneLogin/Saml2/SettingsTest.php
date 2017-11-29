@@ -3,15 +3,15 @@
 /**
  * Unit tests for Setting class
  */
-class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml2_SettingsTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
-    * Tests the OneLogin_Saml2_Settings Constructor.
-    * Case load setting from array
-    *
-    * @covers OneLogin_Saml2_Settings
-    */
+     * Tests the OneLogin_Saml2_Settings Constructor.
+     * Case load setting from array
+     *
+     * @covers OneLogin_Saml2_Settings
+     */
     public function testLoadSettingsFromArray()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -43,11 +43,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_Settings Constructor.
-    * Case load setting from file
-    *
-    * @covers OneLogin_Saml2_Settings
-    */
+     * Tests the OneLogin_Saml2_Settings Constructor.
+     * Case load setting from file
+     *
+     * @covers OneLogin_Saml2_Settings
+     */
     public function testLoadSettingsFromFile()
     {
         $settings = new OneLogin_Saml2_Settings();
@@ -56,11 +56,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests getCertPath method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getBasePath
-    * @covers OneLogin_Saml2_Settings::getCertPath
-    */
+     * Tests getCertPath method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getBasePath
+     * @covers OneLogin_Saml2_Settings::getCertPath
+     */
     public function testGetCertPath()
     {
         $settings = new OneLogin_Saml2_Settings();
@@ -69,10 +69,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests getLibPath method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getLibPath
-    */
+     * Tests getLibPath method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getLibPath
+     */
     public function testGetLibPath()
     {
         $settings = new OneLogin_Saml2_Settings();
@@ -82,10 +82,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests getSchemasPath method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getSchemasPath
-    */
+     * Tests getSchemasPath method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getSchemasPath
+     */
     public function testGetSchemasPath()
     {
         $settings = new OneLogin_Saml2_Settings();
@@ -96,10 +96,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests shouldCompressRequests method of OneLogin_Saml2_Settings.
-    *
-    * @covers OneLogin_Saml2_settings::shouldCompressRequests
-    */
+     * Tests shouldCompressRequests method of OneLogin_Saml2_Settings.
+     *
+     * @covers OneLogin_Saml2_settings::shouldCompressRequests
+     */
     public function testShouldCompressRequests()
     {
         //The default value should be true.
@@ -122,10 +122,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests shouldCompressResponses method of OneLogin_Saml2_Settings.
-    *
-    * @covers OneLogin_Saml2_settings::shouldCompressResponses
-    */
+     * Tests shouldCompressResponses method of OneLogin_Saml2_Settings.
+     *
+     * @covers OneLogin_Saml2_settings::shouldCompressResponses
+     */
     public function testShouldCompressResponses()
     {
         //The default value should be true.
@@ -149,12 +149,14 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests the checkCompressionSettings method of OneLogin_Saml2_settings.
+     *
      * @dataProvider invalidCompressSettingsProvider
+     * @param string $invalidValue invalidCompressSettingsProvider
+     *
      * @covers OneLogin_Saml2_settings::checkCompressionSettings
      */
     public function testNonArrayCompressionSettingsCauseSyntaxError($invalidValue)
     {
-
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
@@ -174,12 +176,14 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests the checkCompressionSettings method of OneLogin_Saml2_settings.
+     *
      * @dataProvider invalidCompressSettingsProvider
+     * @param string $invalidValue invalidCompressSettingsProvider
+     *
      * @covers OneLogin_Saml2_settings::checkCompressionSettings
      */
     public function testThatOnlyBooleansCanBeUsedForCompressionSettings($invalidValue)
     {
-
         $requestsIsInvalid = false;
         $responsesIsInvalid = false;
 
@@ -224,13 +228,13 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the checkSPCerts method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::checkSPCerts
-    * @covers OneLogin_Saml2_Settings::getSPcert
-    * @covers OneLogin_Saml2_Settings::getSPcertNew
-    * @covers OneLogin_Saml2_Settings::getSPkey
-    */
+     * Tests the checkSPCerts method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::checkSPCerts
+     * @covers OneLogin_Saml2_Settings::getSPcert
+     * @covers OneLogin_Saml2_Settings::getSPcertNew
+     * @covers OneLogin_Saml2_Settings::getSPkey
+     */
     public function testCheckSPCerts()
     {
         $settings = new OneLogin_Saml2_Settings();
@@ -259,11 +263,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the checkSettings method of the OneLogin_Saml2_Settings
-    * The checkSettings method is private and is used at the constructor
-    *
-    * @covers OneLogin_Saml2_Settings::checkSettings
-    */
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings
+     * The checkSettings method is private and is used at the constructor
+     *
+     * @covers OneLogin_Saml2_Settings::checkSettings
+     */
     public function testCheckSettings()
     {
         $settingsInfo = array();
@@ -362,11 +366,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
-    * Case unsigned metadata
-    *
-    * @covers OneLogin_Saml2_Settings::getSPMetadata
-    */
+     * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+     * Case unsigned metadata
+     *
+     * @covers OneLogin_Saml2_Settings::getSPMetadata
+     */
     public function testGetSPMetadata()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -388,11 +392,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
-    * Case with x509certNew
-    *
-    * @covers OneLogin_Saml2_Settings::getSPMetadata
-    */
+     * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+     * Case with x509certNew
+     *
+     * @covers OneLogin_Saml2_Settings::getSPMetadata
+     */
     public function testGetSPMetadataWithX509CertNew()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -422,11 +426,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
-    * Case signed metadata
-    *
-    * @covers OneLogin_Saml2_Settings::getSPMetadata
-    */
+     * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+     * Case signed metadata
+     *
+     * @covers OneLogin_Saml2_Settings::getSPMetadata
+     */
     public function testGetSPMetadataSigned()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -485,11 +489,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
-    * Case signed metadata with specific certs
-    *
-    * @covers OneLogin_Saml2_Settings::getSPMetadata
-    */
+     * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+     * Case signed metadata with specific certs
+     *
+     * @covers OneLogin_Saml2_Settings::getSPMetadata
+     */
     public function testGetSPMetadataSignedNoMetadataCert()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -538,10 +542,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
 
     /**
-    * Tests the setIdPCert method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::setIdPCert
-    */
+     * Tests the setIdPCert method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::setIdPCert
+     */
     public function testSetIdPCert()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -565,11 +569,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case valid metadata
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case valid metadata
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateMetadata()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -583,11 +587,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case valid signed metadata
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case valid signed metadata
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateSignedMetadata()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -601,11 +605,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case expired metadata
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case expired metadata
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateMetadataExpired()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -621,11 +625,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case no metadata
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case no metadata
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateMetadataNoXML()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -649,11 +653,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case invalid xml metadata: No entity
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case invalid xml metadata: No entity
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateMetadataNoEntity()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -669,11 +673,11 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the validateMetadata method of the OneLogin_Saml2_Settings
-    * Case invalid xml metadata: Wrong order
-    *
-    * @covers OneLogin_Saml2_Settings::validateMetadata
-    */
+     * Tests the validateMetadata method of the OneLogin_Saml2_Settings
+     * Case invalid xml metadata: Wrong order
+     *
+     * @covers OneLogin_Saml2_Settings::validateMetadata
+     */
     public function testValidateMetadataWrongOrder()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -689,10 +693,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getIdPData method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getIdPData
-    */
+     * Tests the getIdPData method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getIdPData
+     */
     public function testGetIdPData()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -733,10 +737,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSPData method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getSPData
-    */
+     * Tests the getSPData method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getSPData
+     */
     public function testGetSPData()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -758,10 +762,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getSecurityData method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getSecurityData
-    */
+     * Tests the getSecurityData method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getSecurityData
+     */
     public function testGetSecurityData()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -786,10 +790,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests default values of Security advanced sesettings
-    *
-    * @covers OneLogin_Saml2_Settings::getSecurityData
-    */
+     * Tests default values of Security advanced sesettings
+     *
+     * @covers OneLogin_Saml2_Settings::getSecurityData
+     */
     public function testGetDefaultSecurityValues()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -839,10 +843,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getContacts method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getContacts
-    */
+     * Tests the getContacts method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getContacts
+     */
     public function testGetContacts()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -859,10 +863,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getOrganization method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::getOrganization
-    */
+     * Tests the getOrganization method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::getOrganization
+     */
     public function testGetOrganization()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -878,10 +882,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the setStrict method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::setStrict
-    */
+     * Tests the setStrict method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::setStrict
+     */
     public function testSetStrict()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -906,10 +910,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the isStrict method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::isStrict
-    */
+     * Tests the isStrict method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::isStrict
+     */
     public function testIsStrict()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -929,10 +933,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the isDebugActive method of the OneLogin_Saml2_Settings
-    *
-    * @covers OneLogin_Saml2_Settings::isDebugActive
-    */
+     * Tests the isDebugActive method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::isDebugActive
+     */
     public function testIsDebugActive()
     {
         $settingsDir = TEST_ROOT .'/settings/';

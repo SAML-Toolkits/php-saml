@@ -4,12 +4,24 @@
 // (can conflicts other autoloaders)
 // http://php.net/manual/en/language.oop5.autoload.php
 
-$libDir = dirname(__FILE__) . '/lib/Saml2/';
-
-// Load composer
+// Load composer vendor folder if any
 if (file_exists('vendor/autoload.php')) {
     require 'vendor/autoload.php';
 }
+
+/*
+// Load xmlseclibs
+
+$xmlseclibsSrcDir = '';
+
+include_once $xmlseclibsSrcDir.'/XMLSecEnc.php';
+include_once $xmlseclibsSrcDir.'/XMLSecurityDSig.php';
+include_once $xmlseclibsSrcDir.'/XMLSecurityKey.php';
+*/
+
+
+// Load php-saml
+$libDir = dirname(__FILE__) . '/lib/Saml2/';
 
 $folderInfo = scandir($libDir);
 

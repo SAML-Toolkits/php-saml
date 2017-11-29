@@ -1,10 +1,22 @@
 <?php
+/**
+ * This file is part of php-saml.
+ *
+ * (c) OneLogin Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @package OneLogin
+ * @author  OneLogin Inc <saml-info@onelogin.com>
+ * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
+ * @link    https://github.com/onelogin/php-saml
+ */
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 /**
  * Main class of OneLogin's PHP Toolkit
- *
  */
 class OneLogin_Saml2_Auth
 {
@@ -201,11 +213,11 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @param bool        $keepLocalSession              When false will destroy the local session, otherwise will keep it
-     * @param string|null $requestId                     The ID of the LogoutRequest sent by this SP to the IdP
-     * @param bool        $retrieveParametersFromServer
-     * @param callable    $cbDeleteSession
-     * @param bool        $stay                          True if we want to stay (returns the url string) False to redirect
+     * @param bool        $keepLocalSession             When false will destroy the local session, otherwise will keep it
+     * @param string|null $requestId                    The ID of the LogoutRequest sent by this SP to the IdP
+     * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
+     * @param callable    $cbDeleteSession              Method name to be executed to delete session
+     * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
      * @return string|void
      *
@@ -438,12 +450,12 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SLO process.
      *
-     * @param string|null $returnTo      The target URL the user should be returned to after logout.
-     * @param array       $parameters    Extra parameters to be added to the GET
-     * @param string|null $nameId        The NameID that will be set in the LogoutRequest.
-     * @param string|null $sessionIndex  The SessionIndex (taken from the SAML Response in the SSO process).
-     * @param bool        $stay          True if we want to stay (returns the url string) False to redirect
-     * @param string|null $nameIdFormat  The NameID Format will be set in the LogoutRequest.
+     * @param string|null $returnTo     The target URL the user should be returned to after logout.
+     * @param array       $parameters   Extra parameters to be added to the GET
+     * @param string|null $nameId       The NameID that will be set in the LogoutRequest.
+     * @param string|null $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param bool        $stay         True if we want to stay (returns the url string) False to redirect
+     * @param string|null $nameIdFormat The NameID Format will be set in the LogoutRequest.
      *
      * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      *
@@ -531,8 +543,8 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Request
      *
-     * @param string $samlRequest    The SAML Request
-     * @param string $relayState     The RelayState
+     * @param string $samlRequest   The SAML Request
+     * @param string $relayState    The RelayState
      * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
@@ -549,8 +561,6 @@ class OneLogin_Saml2_Auth
                 OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
             );
         }
-
-        $key = $this->_settings->getSPkey();
 
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);

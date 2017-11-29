@@ -16,21 +16,19 @@
         "source": "https://github.com/onelogin/php-saml/"
     },
     "require": {
-        "php": ">= 5.4",
-        "robrichards/xmlseclibs": "^3.0.0",
-        "ext-openssl": "*",
-        "ext-dom": "*"
+        "php": ">=5.4",
+        "robrichards/xmlseclibs": ">=3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7",
-        "satooshi/php-coveralls": "1.0.1",
+        "phpunit/phpunit": ">=4.8",
+        "satooshi/php-coveralls": ">=1.0.2",
         "sebastian/phpcpd": "*",
         "phploc/phploc": "*",
-        "pdepend/pdepend" : "1.1.0",
-        "squizlabs/php_codesniffer": "2.*"
+        "pdepend/pdepend" : ">=2.5.0"
     },
     "suggest": {
-        "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
+        "ext-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
+        "ext-curl": "Install curl lib to be able to use the IdPMetadataParser for parsing remote XMLs",
         "ext-gettext": "Install gettext and php5-gettext libs to handle translations"
     }
 }

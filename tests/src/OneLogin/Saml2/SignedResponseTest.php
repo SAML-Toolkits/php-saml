@@ -2,13 +2,13 @@
 /**
  * Unit tests for Response messages signed
  */
-class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml_SignedResponseTest extends \PHPUnit\Framework\TestCase
 {
     private $_settings;
 
     /**
-    * Initializes the Test Suite
-    */
+     * Initializes the Test Suite
+     */
     public function setUp()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -19,11 +19,11 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getNameId method of the OneLogin_Saml2_Response
-    * Case valid signed response, unsigned assertion
-    *
-    * @covers OneLogin_Saml2_Response::getNameId
-    */
+     * Tests the getNameId method of the OneLogin_Saml2_Response
+     * Case valid signed response, unsigned assertion
+     *
+     * @covers OneLogin_Saml2_Response::getNameId
+     */
     public function testResponseSignedAssertionNot()
     {
         // The Response is signed, the Assertion is not
@@ -34,11 +34,11 @@ class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the getNameId method of the OneLogin_Saml2_Response
-    * Case valid signed response, signed assertion
-    *
-    * @covers OneLogin_Saml2_Response::getNameId
-    */
+     * Tests the getNameId method of the OneLogin_Saml2_Response
+     * Case valid signed response, signed assertion
+     *
+     * @covers OneLogin_Saml2_Response::getNameId
+     */
     public function testResponseAndAssertionSigned()
     {
         $settingsDir = TEST_ROOT .'/settings/';

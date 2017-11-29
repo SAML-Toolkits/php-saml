@@ -1,33 +1,18 @@
 <?php
 /**
- * Zend_Sniffs_Files_ClosingTagsSniff.
- *
- * PHP version 5
- *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
- * @copyright 2006-2012 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @link      http://pear.php.net/package/PHP_CodeSniffer
- */
-
-/**
- * Zend_Sniffs_Files_LineEndingsSniff.
- *
  * Checks that the file does not end with a closing tag.
  *
- * @category  PHP
- * @package   PHP_CodeSniffer
  * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
- * @copyright 2006-2012 Squiz Pty Ltd (ABN 77 084 670 600)
+ * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @version   Release: 1.5.2
- * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ZendModStandard_Sniffs_Files_ClosingTagSniff implements PHP_CodeSniffer_Sniff
+
+namespace PHP_CodeSniffer\Standards\Zend\Sniffs\Files;
+
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+
+class ClosingTagSniff implements Sniff
 {
 
 
@@ -38,7 +23,7 @@ class ZendModStandard_Sniffs_Files_ClosingTagSniff implements PHP_CodeSniffer_Sn
      */
     public function register()
     {
-        return array(T_CLOSE_TAG);
+        return array(T_OPEN_TAG);
 
     }//end register()
 
@@ -46,39 +31,38 @@ class ZendModStandard_Sniffs_Files_ClosingTagSniff implements PHP_CodeSniffer_Sn
     /**
      * Processes this sniff, when one of its tokens is encountered.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token in
-     *                                        the stack passed in $tokens.
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile The file being scanned.
+     * @param int                         $stackPtr  The position of the current token in
+     *                                               the stack passed in $tokens.
      *
      * @return void
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    public function process(File $phpcsFile, $stackPtr)
     {
+        // Find the last non-empty token.
         $tokens = $phpcsFile->getTokens();
-
-        $next = $phpcsFile->findNext(T_INLINE_HTML, ($stackPtr + 1), null, true);
-        if ($next !== false) {
-            return;
+        for ($last = ($phpcsFile->numTokens - 1); $last > 0; $last--) {
+            if (trim($tokens[$last]['content']) !== '') {
+                break;
+            }
         }
 
-        // We've found the last closing tag in the file so the only thing
-        // potentially remaining is inline HTML. Now we need to figure out
-        // whether or not it's just a bunch of whitespace.
-        $content = '';
-        for ($i = ($stackPtr + 1); $i < $phpcsFile->numTokens; $i++) {
-            $content .= $tokens[$i]['content'];
-        }
-
-        // Check if the remaining inline HTML is just whitespace.
-        $content = trim($content);
-        if (empty($content) === true) {
+        if ($tokens[$last]['code'] === T_CLOSE_TAG) {
             $error = 'A closing tag is not permitted at the end of a PHP file';
-            $phpcsFile->addError($error, $stackPtr, 'NotAllowed');
+            $fix   = $phpcsFile->addFixableError($error, $last, 'NotAllowed');
+            if ($fix === true) {
+                $phpcsFile->fixer->replaceToken($last, '');
+            }
+
+            $phpcsFile->recordMetric($stackPtr, 'PHP closing tag at EOF', 'yes');
+        } else {
+            $phpcsFile->recordMetric($stackPtr, 'PHP closing tag at EOF', 'no');
         }
+
+        // Ignore the rest of the file.
+        return ($phpcsFile->numTokens + 1);
 
     }//end process()
 
 
 }//end class
-
-?>

@@ -3,13 +3,13 @@
 /**
  * Unit tests for AuthN Request
  */
-class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml2_AuthnRequestTest extends \PHPUnit\Framework\TestCase
 {
     private $_settings;
 
     /**
-    * Initializes the Test Suite
-    */
+     * Initializes the Test Suite
+     */
     public function setUp()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -20,11 +20,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testCreateDeflatedSAMLRequestURLParameter()
     {
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
@@ -40,11 +40,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request with AuthNContext
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request with AuthNContext
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testAuthNContext()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -97,11 +97,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request with ForceAuthn
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request with ForceAuthn
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testForceAuthN()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -128,11 +128,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request with isPassive
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request with isPassive
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testIsPassive()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -159,11 +159,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request with and without NameIDPolicy
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request with and without NameIDPolicy
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testNameIDPolicy()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -190,11 +190,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
-    * The creation of a deflated SAML Request
-    *
-    * @covers OneLogin_Saml2_AuthnRequest
-    */
+     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+     * The creation of a deflated SAML Request
+     *
+     * @covers OneLogin_Saml2_AuthnRequest
+     */
     public function testCreateEncSAMLRequest()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -228,11 +228,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests that a 'true' value for compress => requests gets honored when we
-    * try to obtain the request payload from getRequest()
-    *
-    * @covers OneLogin_Saml2_AuthnRequest::getRequest()
-    */
+     * Tests that a 'true' value for compress => requests gets honored when we
+     * try to obtain the request payload from getRequest()
+     *
+     * @covers OneLogin_Saml2_AuthnRequest::getRequest()
+     */
     public function testWeCanChooseToCompressARequest()
     {
         //Test that we can compress.
@@ -248,11 +248,11 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests that a 'false' value for compress => requests gets honored when we
-    * try to obtain the request payload from getRequest()
-    *
-    * @covers OneLogin_Saml2_AuthnRequest::getRequest()
-    */
+     * Tests that a 'false' value for compress => requests gets honored when we
+     * try to obtain the request payload from getRequest()
+     *
+     * @covers OneLogin_Saml2_AuthnRequest::getRequest()
+     */
     public function testWeCanChooseNotToCompressARequest()
     {
         //Test that we can choose not to compress the request payload.

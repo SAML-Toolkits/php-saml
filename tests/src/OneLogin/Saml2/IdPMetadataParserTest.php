@@ -3,13 +3,13 @@
 /**
  * Unit tests for IdPMetadataParser class
  */
-class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-    * Tests the parseFileXML method of IdPMetadataParser.
-    *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseFileXML
-    */
+     * Tests the parseFileXML method of IdPMetadataParser.
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::parseFileXML
+     */
     public function testParseFileXML()
     {
         $expectedInfo = array (
@@ -36,11 +36,11 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the parseXML method of IdPMetadataParser.
-    * Case: Multix509cert
-    *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
-    */
+     * Tests the parseXML method of IdPMetadataParser.
+     * Case: Multix509cert
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     */
     public function testParseXML()
     {
         $expectedInfo = array (
@@ -75,11 +75,11 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the parseXML method of IdPMetadataParser.
-    * Case: With and without specify EntityId
-    *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
-    */
+     * Tests the parseXML method of IdPMetadataParser.
+     * Case: With and without specify EntityId
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     */
     public function testParseXMLEntityId()
     {
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/shib_metadata.xml');
@@ -119,11 +119,11 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the parseXML method of IdPMetadataParser.
-    * Case: With and without specify NameIdFormat
-    *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
-    */
+     * Tests the parseXML method of IdPMetadataParser.
+     * Case: With and without specify NameIdFormat
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     */
     public function testParseXMLNameIdFormat()
     {
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/shib_metadata.xml');
@@ -163,10 +163,10 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the injectIntoSettings method of IdPMetadataParser.
-    *
-    * @covers OneLogin_Saml2_IdPMetadataParser::injectIntoSettings
-    */
+     * Tests the injectIntoSettings method of IdPMetadataParser.
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::injectIntoSettings
+     */
     public function testInjectIntoSettings()
     {
         $expectedMergedSettings = array(

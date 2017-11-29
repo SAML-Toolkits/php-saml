@@ -1,11 +1,23 @@
 <?php
+/**
+ * This file is part of php-saml.
+ *
+ * (c) OneLogin Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @package OneLogin
+ * @author  OneLogin Inc <saml-info@onelogin.com>
+ * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
+ * @link    https://github.com/onelogin/php-saml
+ */
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 /**
  * Metadata lib of OneLogin PHP Toolkit
- *
  */
 class OneLogin_Saml2_Metadata
 {
@@ -23,6 +35,7 @@ class OneLogin_Saml2_Metadata
      * @param array         $contacts      Contacts info
      * @param array         $organization  Organization ingo
      * @param array         $attributes
+     *
      * @return string SAML Metadata XML
      */
     public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
@@ -175,11 +188,11 @@ METADATA_TEMPLATE;
     /**
      * Signs the metadata with the key/cert provided
      *
-     * @param string $metadata          SAML Metadata XML
-     * @param string $key               x509 key
-     * @param string $cert              x509 cert
-     * @param string $signAlgorithm     Signature algorithm method
-     * @param string $digestAlgorithm   Digest algorithm method
+     * @param string $metadata        SAML Metadata XML
+     * @param string $key             x509 key
+     * @param string $cert            x509 cert
+     * @param string $signAlgorithm   Signature algorithm method
+     * @param string $digestAlgorithm Digest algorithm method
      *
      * @return string Signed Metadata
      */

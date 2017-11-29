@@ -6,14 +6,14 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 /**
  * Unit tests for Metadata class
  */
-class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml2_MetadataTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
-    * Tests the builder method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::builder
-    */
+     * Tests the builder method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::builder
+     */
     public function testBuilder()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -61,10 +61,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the builder method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::builder
-    */
+     * Tests the builder method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::builder
+     */
     public function testBuilderWithAttributeConsumingService()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -87,10 +87,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the builder method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::builder
-    */
+     * Tests the builder method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::builder
+     */
     public function testBuilderWithAttributeConsumingServiceWithMultipleAttributeValue()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -114,10 +114,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the signMetadata method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::signMetadata
-    */
+     * Tests the signMetadata method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::signMetadata
+     */
     public function testSignMetadata()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -163,10 +163,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the signMetadata method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::signMetadata
-    */
+     * Tests the signMetadata method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::signMetadata
+     */
     public function testSignMetadataDefaultAlgorithms()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -189,10 +189,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the signMetadata method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::signMetadata
-    */
+     * Tests the signMetadata method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::signMetadata
+     */
     public function testSignMetadataCustomAlgorithms()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -215,10 +215,10 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
-    *
-    * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
-    */
+     * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
+     *
+     * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
+     */
     public function testAddX509KeyDescriptors()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -268,11 +268,11 @@ class OneLogin_Saml2_MetadataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
-    * Case: Execute 2 addX509KeyDescriptors calls
-    *
-    * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
-    */
+     * Tests the addX509KeyDescriptors method of the OneLogin_Saml2_Metadata
+     * Case: Execute 2 addX509KeyDescriptors calls
+     *
+     * @covers OneLogin_Saml2_Metadata::addX509KeyDescriptors
+     */
     public function testAddX509KeyDescriptors2Times()
     {
         $settingsDir = TEST_ROOT .'/settings/';
