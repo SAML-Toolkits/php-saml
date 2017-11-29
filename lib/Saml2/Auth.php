@@ -568,8 +568,6 @@ class OneLogin_Saml2_Auth
             );
         }
 
-        $key = $this->_settings->getSPkey();
-
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
