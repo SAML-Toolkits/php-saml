@@ -973,10 +973,11 @@ class OneLogin_Saml2_Utils
      * @param string      $spnq   SP Name Qualifier
      * @param string      $format SP Format
      * @param string|null $cert   IdP Public cert to encrypt the nameID
+     * @param string|null $nq     IdP Name Qualifier
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $cert = null)
+    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null)
     {
 
         $doc = new DOMDocument();
@@ -985,7 +986,12 @@ class OneLogin_Saml2_Utils
         if (isset($spnq)) {
             $nameId->setAttribute('SPNameQualifier', $spnq);
         }
-        $nameId->setAttribute('Format', $format);
+        if (isset($nq)) {
+            $nameId->setAttribute('NameQualifier', $nq);
+        }
+        if (isset($format)) {
+            $nameId->setAttribute('Format', $format);
+        }
         $nameId->appendChild($doc->createTextNode($value));
 
         $doc->appendChild($nameId);

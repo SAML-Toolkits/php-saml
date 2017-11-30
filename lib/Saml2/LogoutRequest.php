@@ -51,13 +51,14 @@ class OneLogin_Saml2_LogoutRequest
     /**
      * Constructs the Logout Request object.
      *
-     * @param OneLogin_Saml2_Settings $settings     Settings
-     * @param string|null             $request      A UUEncoded Logout Request.
-     * @param string|null             $nameId       The NameID that will be set in the LogoutRequest.
-     * @param string|null             $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
-     * @param string|null             $nameIdFormat The NameID Format will be set in the LogoutRequest.
+     * @param OneLogin_Saml2_Settings $settings            Settings
+     * @param string|null             $request             A UUEncoded Logout Request.
+     * @param string|null             $nameId              The NameID that will be set in the LogoutRequest.
+     * @param string|null             $sessionIndex        The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param string|null             $nameIdFormat        The NameID Format will be set in the LogoutRequest.
+     * @param string|null             $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null)
     {
         $this->_settings = $settings;
 
@@ -89,7 +90,8 @@ class OneLogin_Saml2_LogoutRequest
             }
 
             if (!empty($nameId)) {
-                if (empty($nameIdFormat)) {
+                if (empty($nameIdFormat)
+                    && $spData['NameIDFormat'] != OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
                 $spNameQualifier = null;
@@ -103,7 +105,8 @@ class OneLogin_Saml2_LogoutRequest
                 $nameId,
                 $spNameQualifier,
                 $nameIdFormat,
-                $cert
+                $cert,
+                $nameIdNameQualifier
             );
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
