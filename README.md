@@ -1480,7 +1480,7 @@ At demo1, we saw how all the SAML Request and Responses were handler at an
 unique file, the `index.php` file. This demo1 uses high-level programming.
 
 At demo2, we have several views: `index.php`, `sso.php`, `slo.php`, `consume.php`
-and `metadata.php`. As we said, we gonna use the endpoints that are defined
+and `metadata.php`. As we said, we will use the endpoints that are defined
 in the toolkit (`acs.php`, `sls.php` of the endpoints folder). This demo2 uses
 low-level programming.
 
