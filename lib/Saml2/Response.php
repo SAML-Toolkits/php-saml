@@ -727,24 +727,26 @@ class OneLogin_Saml2_Response
 
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
+			foreach(array('Name', 'FriendlyName') as $fieldName) {
+				$attributeName = $entry->attributes->getNamedItem($fieldName)->nodeValue;
 
-            if (in_array($attributeName, array_keys($attributes))) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated Name",
-                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
-                );
-            }
+				if (in_array($attributeName, array_keys($attributes))) {
+					throw new OneLogin_Saml2_ValidationError(
+						"Found an Attribute element with duplicated Name",
+						OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
+					);
+				}
 
-            $attributeValues = array();
-            foreach ($entry->childNodes as $childNode) {
-                $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
-                    $attributeValues[] = $childNode->nodeValue;
-                }
-            }
+				$attributeValues = array();
+				foreach ($entry->childNodes as $childNode) {
+					$tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
+					if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+						$attributeValues[] = $childNode->nodeValue;
+					}
+				}
 
-            $attributes[$attributeName] = $attributeValues;
+				$attributes[$attributeName] = $attributeValues;
+			}
         }
         return $attributes;
     }
