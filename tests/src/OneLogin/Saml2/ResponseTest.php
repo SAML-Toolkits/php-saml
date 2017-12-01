@@ -535,9 +535,6 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-
-
-
     /**
      * Tests the getSessionIndex method of the OneLogin_Saml2_Response
      *
@@ -555,7 +552,6 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('_7164a9a9f97828bfdb8d0ebc004a05d2e7d873f70c', $response2->getSessionIndex());
     }
-
 
     /**
      * Tests the getAttributes method of the OneLogin_Saml2_Response
@@ -1193,7 +1189,6 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
         $response2->isValid($validRequestId);
         $this->assertContains('No Signature found. SAML Response rejected', $response2->getError());
     }
-
 
     /**
      * Tests the isValid method of the OneLogin_Saml2_Response class

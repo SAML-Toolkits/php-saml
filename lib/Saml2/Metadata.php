@@ -44,7 +44,7 @@ class OneLogin_Saml2_Metadata
         if (!isset($validUntil)) {
             $validUntil =  time() + self::TIME_VALID;
         }
-        $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
+        $validUntilTime =  OneLogin_Saml2_Utils::parseTime2SAML($validUntil);
 
         if (!isset($cacheDuration)) {
             $cacheDuration = self::TIME_CACHED;
