@@ -4,16 +4,16 @@ include ('compatibility.php');
 
 ob_start();
 
-$basePath = dirname(dirname(__FILE__));
+$basePath = dirname(__DIR__);
 
 require_once $basePath.'/_toolkit_loader.php';
 
 if (!defined('TEST_ROOT')) {
-    define('TEST_ROOT', dirname(__FILE__));
+    define('TEST_ROOT', __DIR__);
 }
 
 if (!defined('ONELOGIN_CUSTOMPATH')) {
-    define('ONELOGIN_CUSTOMPATH', dirname(__FILE__).'/data/customPath/');
+    define('ONELOGIN_CUSTOMPATH', __DIR__.'/data/customPath/');
 }
 
 date_default_timezone_set('America/Los_Angeles');

@@ -165,7 +165,7 @@ class OneLogin_Saml2_Settings
      */
     private function _loadPaths()
     {
-        $basePath = dirname(dirname(dirname(__FILE__))).'/';
+        $basePath = dirname(dirname(__DIR__)) . '/';
         $this->_paths = array (
             'base' => $basePath,
             'config' => $basePath,
@@ -175,7 +175,7 @@ class OneLogin_Saml2_Settings
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
             $this->_paths['config'] = ONELOGIN_CUSTOMPATH;
-            $this->_paths['cert'] = ONELOGIN_CUSTOMPATH.'certs/';
+            $this->_paths['cert'] = ONELOGIN_CUSTOMPATH . 'certs/';
         }
     }
 

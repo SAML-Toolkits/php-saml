@@ -8,7 +8,7 @@
 
 error_reporting(E_ALL);
 
-require_once '../_toolkit_loader.php';
+require_once dirname(__DIR__).'/_toolkit_loader.php';
 
 header('Content-Type: text/xml');
 

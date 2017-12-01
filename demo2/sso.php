@@ -10,7 +10,7 @@
 
 session_start();
 
-require_once '../_toolkit_loader.php';
+require_once dirname(__DIR__).'/_toolkit_loader.php';
 
 $auth = new OneLogin_Saml2_Auth();
 
