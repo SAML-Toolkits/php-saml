@@ -100,9 +100,9 @@ class OneLogin_Saml2_Settings
     private $_errors = array();
 
     /**
-     * Setting errors.
+     * Valitate SP data only flag
      *
-     * @var array
+     * @var bool
      */
     private $_spValidationOnly = false;
 
@@ -112,7 +112,7 @@ class OneLogin_Saml2_Settings
      * - Loads settings info from settings file or array/object provided
      *
      * @param array|object|null $settings         SAML Toolkit Settings
-     * @param boolean           $spValidationOnly Validate or not the IdP data
+     * @param bool              $spValidationOnly Validate or not the IdP data
      *
      * @throws OneLogin_Saml2_Error If any settings parameter is invalid
      * @throws Exception If OneLogin_Saml2_Settings is incorrectly supplied
@@ -162,6 +162,7 @@ class OneLogin_Saml2_Settings
 
     /**
      * Sets the paths of the different folders
+     * @suppress PhanUndeclaredConstant
      */
     private function _loadPaths()
     {
@@ -289,6 +290,7 @@ class OneLogin_Saml2_Settings
      *
      * @return bool True if the settings info is valid
      * @throws OneLogin_Saml2_Error
+     * @suppress PhanUndeclaredVariable
      */
     private function _loadSettingsFromFile()
     {
@@ -302,13 +304,14 @@ class OneLogin_Saml2_Settings
             );
         }
 
+        /** @var array $settings */
         include $filename;
 
         // Add advance_settings if exists
-
         $advancedFilename = $this->getConfigPath().'advanced_settings.php';
 
         if (file_exists($advancedFilename)) {
+            /** @var array $advancedSettings */
             include $advancedFilename;
             $settings = array_merge($settings, $advancedSettings);
         }
@@ -1000,6 +1003,7 @@ class OneLogin_Saml2_Settings
      * Activates or deactivates the strict mode.
      *
      * @param bool $value Strict parameter
+     * @throws Exception
      */
     public function setStrict($value)
     {

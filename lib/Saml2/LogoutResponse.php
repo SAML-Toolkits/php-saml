@@ -35,7 +35,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * The decoded, unprocessed XML response provided to the constructor.
      *
-     * @var string
+     * @var string|null
      */
     protected $_logoutResponse;
 
@@ -49,7 +49,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * After execute a validation process, if it fails, this var contains the cause
      *
-     * @var string
+     * @var string|null
      */
     private $_error;
 
@@ -104,7 +104,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Gets the Status of the Logout Response.
      *
-     * @return string The Status
+     * @return string|null The Status
      */
     public function getStatus()
     {
@@ -205,7 +205,7 @@ class OneLogin_Saml2_LogoutResponse
             $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $this->_error;
+                echo htmlentities($this->_error);
             }
             return false;
         }
@@ -266,16 +266,16 @@ LOGOUTRESPONSE;
      */
     public function getResponse($deflate = null)
     {
-        $subject = $this->_logoutResponse;
+        $logoutResponse = $this->_logoutResponse;
 
         if (is_null($deflate)) {
             $deflate = $this->_settings->shouldCompressResponses();
         }
 
         if ($deflate) {
-            $subject = gzdeflate($this->_logoutResponse);
+            $logoutResponse = gzdeflate($this->_logoutResponse);
         }
-        return base64_encode($subject);
+        return base64_encode($logoutResponse);
     }
 
     /**
@@ -289,7 +289,7 @@ LOGOUTRESPONSE;
     }
 
     /**
-     * @return the ID of the Response
+     * @return string the ID of the Response
      */
     public function getId()
     {
@@ -300,7 +300,7 @@ LOGOUTRESPONSE;
      * Returns the XML that will be sent as part of the response
      * or that was received at the SP
      *
-     * @return string
+     * @return string|null
      */
     public function getXML()
     {

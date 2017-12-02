@@ -32,27 +32,25 @@ class OneLogin_Saml2_Utils
      */
     private static $_proxyVars = false;
 
-
     /**
-     * @var string
+     * @var string|null
      */
     private static $_host;
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $_protocol;
 
     /**
-     * @var int
+     * @var int|null
      */
     private static $_port;
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $_baseurlpath;
-
 
     /**
      * Translates any string. Accepts args
@@ -88,9 +86,8 @@ class OneLogin_Saml2_Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
+     * @return DOMDocument|false $dom The result of load the XML at the DomDocument
      * @throws Exception
-     *
-     * @return DOMDocument $dom The result of load the XML at the DomDocument
      */
     public static function loadXML($dom, $xml)
     {
@@ -151,7 +148,7 @@ class OneLogin_Saml2_Utils
 
             if ($debug) {
                 foreach ($xmlErrors as $error) {
-                    echo $error->message."\n";
+                    echo htmlentities($error->message)."\n";
                 }
             }
             return 'invalid_xml';
@@ -266,7 +263,9 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?://@i', $url)) {
+        $wrongProtocol = !preg_match('@^https?://@i', $url);
+        $url = filter_var($url, FILTER_VALIDATE_URL);
+        if ($wrongProtocol || empty($url)) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
@@ -663,14 +662,14 @@ class OneLogin_Saml2_Utils
      */
     public static function generateUniqueID()
     {
-        return 'ONELOGIN_' . sha1(uniqid(mt_rand(), true));
+        return 'ONELOGIN_' . sha1(uniqid((string)mt_rand(), true));
     }
 
     /**
      * Converts a UNIX timestamp to SAML2 timestamp on the form
      * yyyy-mm-ddThh:mm:ss(\.s+)?Z.
      *
-     * @param string $time The time we should convert (DateTime).
+     * @param string|int $time The time we should convert (DateTime).
      *
      * @return string $timestamp SAML2 timestamp.
      */
@@ -820,7 +819,7 @@ class OneLogin_Saml2_Utils
      * @param string $cacheDuration The duration, as a string.
      * @param string $validUntil    The valid until date, as a string or as a timestamp
      *
-     * @return int $expireTime  The expiration time.
+     * @return int|null $expireTime  The expiration time.
      */
     public static function getExpireTime($cacheDuration = null, $validUntil = null)
     {
@@ -936,15 +935,15 @@ class OneLogin_Saml2_Utils
         $decodedData = base64_decode($data);
 
         switch ($alg) {
-        case 'sha512':
-        case 'sha384':
-        case 'sha256':
-            $fingerprint = hash($alg, $decodedData, false);
-            break;
-        case 'sha1':
-        default:
-            $fingerprint = strtolower(sha1($decodedData));
-            break;
+            case 'sha512':
+            case 'sha384':
+            case 'sha256':
+                $fingerprint = hash($alg, $decodedData, false);
+                break;
+            case 'sha1':
+            default:
+                $fingerprint = strtolower(sha1($decodedData));
+                break;
         }
         return $fingerprint;
     }

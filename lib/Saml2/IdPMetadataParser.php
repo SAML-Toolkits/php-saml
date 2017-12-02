@@ -90,6 +90,7 @@ class OneLogin_Saml2_IdPMetadataParser
      * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
      *
      * @return array metadata info in php-saml settings format
+     * @throws \Exception
      */
     public static function parseXML($xml, $entityId = null, $desiredNameIdFormat = null)
     {
@@ -200,8 +201,8 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Inject metadata info into php-saml settings array
      *
-     * @param string $settings     php-saml settings array
-     * @param string $metadataInfo array metadata info
+     * @param array $settings     php-saml settings array
+     * @param array $metadataInfo array metadata info
      *
      * @return array settings
      */

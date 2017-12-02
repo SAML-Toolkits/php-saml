@@ -75,7 +75,7 @@ class OneLogin_Saml2_Auth
      * SessionNotOnOrAfter. When the user is logged, this stored it
      * from the AuthnStatement of the SAML Response
      *
-     * @var DateTime
+     * @var int|null
      */
     private $_sessionExpiration;
 
@@ -97,7 +97,7 @@ class OneLogin_Saml2_Auth
      * The NotOnOrAfter value of the valid SubjectConfirmationData
      * node (if any) of the last assertion processed
      *
-     * @var DateTime
+     * @var int
      */
     private $_lastAssertionNotOnOrAfter;
 
@@ -111,7 +111,7 @@ class OneLogin_Saml2_Auth
     /**
      * Reason of the last error.
      *
-     * @var string
+     * @var string|null
      */
     private $_errorReason;
 
@@ -164,7 +164,7 @@ class OneLogin_Saml2_Auth
      *
      * @param bool $value Strict parameter
      *
-     * @return array The settings data.
+     * @throws OneLogin_Saml2_Error
      */
     public function setStrict($value)
     {
@@ -305,6 +305,8 @@ class OneLogin_Saml2_Auth
      * @param string $url        The target URL to redirect the user.
      * @param array  $parameters Extra parameters to be passed as part of the url
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
+     *
+     * @return string|null
      */
     public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
@@ -401,7 +403,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the reason for the last error
      *
-     * @return string  Error reason
+     * @return string|null  Error reason
      */
     public function getLastErrorReason()
     {
@@ -436,7 +438,7 @@ class OneLogin_Saml2_Auth
      * @param bool        $stay            True if we want to stay (returns the url string) False to redirect
      * @param bool        $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
      *
-     * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
@@ -662,7 +664,7 @@ class OneLogin_Saml2_Auth
     }
 
     /**
-     * @return The NotOnOrAfter value of the valid
+     * @return int The NotOnOrAfter value of the valid
      *         SubjectConfirmationData node (if any)
      *         of the last assertion processed
      */
@@ -675,7 +677,7 @@ class OneLogin_Saml2_Auth
      * Returns the most recently-constructed/processed
      * XML SAML request (AuthNRequest, LogoutRequest)
      *
-     * @return string The Request XML
+     * @return string|null The Request XML
      */
     public function getLastRequestXML()
     {
@@ -688,7 +690,7 @@ class OneLogin_Saml2_Auth
      * If the SAMLResponse was encrypted, by default tries
      * to return the decrypted XML.
      *
-     * @return string The Response XML
+     * @return string|null The Response XML
      */
     public function getLastResponseXML()
     {

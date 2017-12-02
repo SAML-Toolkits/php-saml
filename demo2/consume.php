@@ -7,8 +7,6 @@
  * link where it will send a certified response via $_POST.
  */
 
-error_reporting(E_ALL);
-
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
 try {
