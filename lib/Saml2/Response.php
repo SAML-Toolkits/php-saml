@@ -100,312 +100,305 @@ class OneLogin_Saml2_Response
     public function isValid($requestId = null)
     {
         $this->_error = null;
-        try {
-            // Check SAML version
-            if ($this->document->documentElement->getAttribute('Version') != '2.0') {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Unsupported SAML version",
-                    OneLogin_Saml2_ValidationError::UNSUPPORTED_SAML_VERSION
-                );
-            }
 
-            if (!$this->document->documentElement->hasAttribute('ID')) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Missing ID attribute on SAML Response",
-                    OneLogin_Saml2_ValidationError::MISSING_ID
-                );
-            }
+        // Check SAML version
+        if ($this->document->documentElement->getAttribute('Version') != '2.0') {
+            throw new OneLogin_Saml2_ValidationError(
+                "Unsupported SAML version",
+                OneLogin_Saml2_ValidationError::UNSUPPORTED_SAML_VERSION
+            );
+        }
 
-            $status = $this->checkStatus();
+        if (!$this->document->documentElement->hasAttribute('ID')) {
+            throw new OneLogin_Saml2_ValidationError(
+                "Missing ID attribute on SAML Response",
+                OneLogin_Saml2_ValidationError::MISSING_ID
+            );
+        }
 
-            $singleAssertion = $this->validateNumAssertions();
-            if (!$singleAssertion) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "SAML Response must contain 1 assertion",
-                    OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_ASSERTIONS
-                );
-            }
+        $status = $this->checkStatus();
 
-            $idpData = $this->_settings->getIdPData();
-            $idPEntityId = $idpData['entityId'];
-            $spData = $this->_settings->getSPData();
-            $spEntityId = $spData['entityId'];
+        $singleAssertion = $this->validateNumAssertions();
+        if (!$singleAssertion) {
+            throw new OneLogin_Saml2_ValidationError(
+                "SAML Response must contain 1 assertion",
+                OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_ASSERTIONS
+            );
+        }
 
-            $signedElements = $this->processSignedElements();
+        $idpData = $this->_settings->getIdPData();
+        $idPEntityId = $idpData['entityId'];
+        $spData = $this->_settings->getSPData();
+        $spEntityId = $spData['entityId'];
 
-            $responseTag = '{'.OneLogin_Saml2_Constants::NS_SAMLP.'}Response';
-            $assertionTag = '{'.OneLogin_Saml2_Constants::NS_SAML.'}Assertion';
+        $signedElements = $this->processSignedElements();
 
-            $hasSignedResponse = in_array($responseTag, $signedElements);
-            $hasSignedAssertion = in_array($assertionTag, $signedElements);
+        $responseTag = '{'.OneLogin_Saml2_Constants::NS_SAMLP.'}Response';
+        $assertionTag = '{'.OneLogin_Saml2_Constants::NS_SAML.'}Assertion';
 
-            if ($this->_settings->isStrict()) {
-                $security = $this->_settings->getSecurityData();
+        $hasSignedResponse = in_array($responseTag, $signedElements);
+        $hasSignedAssertion = in_array($assertionTag, $signedElements);
 
-                if ($security['wantXMLValidation']) {
-                    $errorXmlMsg = "Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd";
-                    $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+        if ($this->_settings->isStrict()) {
+            $security = $this->_settings->getSecurityData();
+
+            if ($security['wantXMLValidation']) {
+                $errorXmlMsg = "Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd";
+                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                if (!$res instanceof DOMDocument) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        $errorXmlMsg,
+                        OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
+                    );
+                }
+
+                # If encrypted, check also the decrypted document
+                if ($this->encrypted) {
+                    $res = OneLogin_Saml2_Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                     if (!$res instanceof DOMDocument) {
                         throw new OneLogin_Saml2_ValidationError(
                             $errorXmlMsg,
                             OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
                         );
                     }
-
-                    # If encrypted, check also the decrypted document
-                    if ($this->encrypted) {
-                        $res = OneLogin_Saml2_Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                        if (!$res instanceof DOMDocument) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                $errorXmlMsg,
-                                OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
-                            );
-                        }
-                    }
-
                 }
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
-                
-                if ($this->document->documentElement->hasAttribute('InResponseTo')) {
-                    $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
-                }
+            }
 
-                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo)) {
-                    if ($requestId != $responseInResponseTo) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
-                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
-                        );
-                    }
-                }
+            $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
-                if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
+            if ($this->document->documentElement->hasAttribute('InResponseTo')) {
+                $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
+            }
+
+            // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
+            if (isset($requestId) && isset($responseInResponseTo)) {
+                if ($requestId != $responseInResponseTo) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "The assertion of the Response is not encrypted and the SP requires it",
-                        OneLogin_Saml2_ValidationError::NO_ENCRYPTED_ASSERTION
-                    );
-                }
-
-                if ($security['wantNameIdEncrypted']) {
-                    $encryptedIdNodes = $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData');
-                    if ($encryptedIdNodes->length != 1) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The NameID of the Response is not encrypted and the SP requires it",
-                            OneLogin_Saml2_ValidationError::NO_ENCRYPTED_NAMEID
-                        );
-                    }
-                }
-
-                // Validate Conditions element exists
-                if (!$this->checkOneCondition()) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The Assertion must include a Conditions element",
-                        OneLogin_Saml2_ValidationError::MISSING_CONDITIONS
-                    );
-                }
-
-                // Validate Asserion timestamps
-                $this->validateTimestamps();
-
-                // Validate AuthnStatement element exists and is unique
-                if (!$this->checkOneAuthnStatement()) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The Assertion must include an AuthnStatement element",
-                        OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_AUTHSTATEMENTS
-                    );
-                }
-
-                // EncryptedAttributes are not supported
-                $encryptedAttributeNodes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
-                if ($encryptedAttributeNodes->length > 0) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "There is an EncryptedAttribute in the Response and this SP not support them",
-                        OneLogin_Saml2_ValidationError::ENCRYPTED_ATTRIBUTES
-                    );
-                }
-
-                // Check destination
-                if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
-                    if (empty($destination)) {
-                        if (!$security['relaxDestinationValidation']) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The response has an empty Destination value",
-                                OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
-                            );
-                        }
-                    } else {
-                        if (strpos($destination, $currentURL) !== 0) {
-                            $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
-
-                            if (strpos($destination, $currentURLNoRouted) !== 0) {
-                                throw new OneLogin_Saml2_ValidationError(
-                                    "The response was received at $currentURL instead of $destination",
-                                    OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                                );
-                            }
-                        }
-                    }
-                }
-
-                // Check audience
-                $validAudiences = $this->getAudiences();
-                if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences, true)) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        sprintf(
-                            "Invalid audience for this Response (expected '%s', got '%s')",
-                            $spEntityId,
-                            implode(',', $validAudiences)
-                        ),
-                        OneLogin_Saml2_ValidationError::WRONG_AUDIENCE
-                    );
-                }
-
-                // Check the issuers
-                $issuers = $this->getIssuers();
-                foreach ($issuers as $issuer) {
-                    $trimmedIssuer = trim($issuer);
-                    if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "Invalid issuer in the Assertion/Response (expected '$idPEntityId', got '$trimmedIssuer')",
-                            OneLogin_Saml2_ValidationError::WRONG_ISSUER
-                        );
-                    }
-                }
-
-                // Check the session Expiration
-                $sessionExpiration = $this->getSessionNotOnOrAfter();
-                if (!empty($sessionExpiration) && $sessionExpiration + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response",
-                        OneLogin_Saml2_ValidationError::SESSION_EXPIRED
-                    );
-                }
-
-                // Check the SubjectConfirmation, at least one SubjectConfirmation must be valid
-                $anySubjectConfirmation = false;
-                $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
-                foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != OneLogin_Saml2_Constants::CM_BEARER) {
-                        continue;
-                    }
-                    $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
-                    if ($subjectConfirmationDataNodes->length == 0) {
-                        continue;
-                    } else {
-                        $scnData = $subjectConfirmationDataNodes->item(0);
-                        if ($scnData->hasAttribute('InResponseTo')) {
-                            $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
-                                continue;
-                            }
-                        }
-                        if ($scnData->hasAttribute('Recipient')) {
-                            $recipient = $scnData->getAttribute('Recipient');
-                            if (!empty($recipient) && strpos($recipient, $currentURL) === false) {
-                                continue;
-                            }
-                        }
-                        if ($scnData->hasAttribute('NotOnOrAfter')) {
-                            $noa = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotOnOrAfter'));
-                            if ($noa + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
-                                continue;
-                            }
-                        }
-                        if ($scnData->hasAttribute('NotBefore')) {
-                            $nb = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotBefore'));
-                            if ($nb > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
-                                continue;
-                            }
-                        }
-
-                        // Save NotOnOrAfter value
-                        if ($scnData->hasAttribute('NotOnOrAfter')) {
-                            $this->_validSCDNotOnOrAfter = $noa;
-                        }
-                        $anySubjectConfirmation = true;
-                        break;
-                    }
-                }
-
-                if (!$anySubjectConfirmation) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "A valid SubjectConfirmation was not found on this Response",
-                        OneLogin_Saml2_ValidationError::WRONG_SUBJECTCONFIRMATION
-                    );
-                }
-
-                if ($security['wantAssertionsSigned'] && !$hasSignedAssertion) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The Assertion of the Response is not signed and the SP requires it",
-                        OneLogin_Saml2_ValidationError::NO_SIGNED_ASSERTION
-                    );
-                }
-                
-                if ($security['wantMessagesSigned'] && !$hasSignedResponse) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The Message of the Response is not signed and the SP requires it",
-                        OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
                     );
                 }
             }
 
-            // Detect case not supported
-            if ($this->encrypted) {
-                $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
-                if ($encryptedIDNodes->length > 0) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        'Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.',
-                        OneLogin_Saml2_ValidationError::NOT_SUPPORTED
-                    );
-                }
-            }
-
-            if (empty($signedElements) || (!$hasSignedResponse && !$hasSignedAssertion)) {
+            if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
                 throw new OneLogin_Saml2_ValidationError(
-                    'No Signature found. SAML Response rejected',
-                    OneLogin_Saml2_ValidationError::NO_SIGNATURE_FOUND
+                    "The assertion of the Response is not encrypted and the SP requires it",
+                    OneLogin_Saml2_ValidationError::NO_ENCRYPTED_ASSERTION
                 );
-            } else {
-                $cert = $idpData['x509cert'];
-                $fingerprint = $idpData['certFingerprint'];
-                $fingerprintalg = $idpData['certFingerprintAlgorithm'];
+            }
 
-                $multiCerts = null;
-                $existsMultiX509Sign = isset($idpData['x509certMulti']) && isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing']);
-
-                if ($existsMultiX509Sign) {
-                    $multiCerts = $idpData['x509certMulti']['signing'];
-                }
-
-                # If find a Signature on the Response, validates it checking the original response
-                if ($hasSignedResponse && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+            if ($security['wantNameIdEncrypted']) {
+                $encryptedIdNodes = $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData');
+                if ($encryptedIdNodes->length != 1) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "Signature validation failed. SAML Response rejected",
-                        OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
-                    );
-                }
-
-                # If find a Signature on the Assertion (decrypted assertion if was encrypted)
-                $documentToCheckAssertion = $this->encrypted ? $this->decryptedDocument : $this->document;
-                if ($hasSignedAssertion && !OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH, $multiCerts)) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "Signature validation failed. SAML Response rejected",
-                        OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                        "The NameID of the Response is not encrypted and the SP requires it",
+                        OneLogin_Saml2_ValidationError::NO_ENCRYPTED_NAMEID
                     );
                 }
             }
-            return true;
-        } catch (Exception $e) {
-            $this->_error = $e->getMessage();
-            $debug = $this->_settings->isDebugActive();
-            if ($debug) {
-                echo htmlentities($this->_error);
+
+            // Validate Conditions element exists
+            if (!$this->checkOneCondition()) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The Assertion must include a Conditions element",
+                    OneLogin_Saml2_ValidationError::MISSING_CONDITIONS
+                );
             }
-            return false;
+
+            // Validate Asserion timestamps
+            $this->validateTimestamps();
+
+            // Validate AuthnStatement element exists and is unique
+            if (!$this->checkOneAuthnStatement()) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The Assertion must include an AuthnStatement element",
+                    OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_AUTHSTATEMENTS
+                );
+            }
+
+            // EncryptedAttributes are not supported
+            $encryptedAttributeNodes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
+            if ($encryptedAttributeNodes->length > 0) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "There is an EncryptedAttribute in the Response and this SP not support them",
+                    OneLogin_Saml2_ValidationError::ENCRYPTED_ATTRIBUTES
+                );
+            }
+
+            // Check destination
+            if ($this->document->documentElement->hasAttribute('Destination')) {
+                $destination = trim($this->document->documentElement->getAttribute('Destination'));
+                if (empty($destination)) {
+                    if (!$security['relaxDestinationValidation']) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The response has an empty Destination value",
+                            OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
+                        );
+                    }
+                } else {
+                    if (strpos($destination, $currentURL) !== 0) {
+                        $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+
+                        if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            throw new OneLogin_Saml2_ValidationError(
+                                "The response was received at $currentURL instead of $destination",
+                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Check audience
+            $validAudiences = $this->getAudiences();
+            if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences, true)) {
+                throw new OneLogin_Saml2_ValidationError(
+                    sprintf(
+                        "Invalid audience for this Response (expected '%s', got '%s')",
+                        $spEntityId,
+                        implode(',', $validAudiences)
+                    ),
+                    OneLogin_Saml2_ValidationError::WRONG_AUDIENCE
+                );
+            }
+
+            // Check the issuers
+            $issuers = $this->getIssuers();
+            foreach ($issuers as $issuer) {
+                $trimmedIssuer = trim($issuer);
+                if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "Invalid issuer in the Assertion/Response (expected '$idPEntityId', got '$trimmedIssuer')",
+                        OneLogin_Saml2_ValidationError::WRONG_ISSUER
+                    );
+                }
+            }
+
+            // Check the session Expiration
+            $sessionExpiration = $this->getSessionNotOnOrAfter();
+            if (!empty($sessionExpiration) && $sessionExpiration + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The attributes have expired, based on the SessionNotOnOrAfter of the AttributeStatement of this Response",
+                    OneLogin_Saml2_ValidationError::SESSION_EXPIRED
+                );
+            }
+
+            // Check the SubjectConfirmation, at least one SubjectConfirmation must be valid
+            $anySubjectConfirmation = false;
+            $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
+            foreach ($subjectConfirmationNodes as $scn) {
+                if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != OneLogin_Saml2_Constants::CM_BEARER) {
+                    continue;
+                }
+                $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
+                if ($subjectConfirmationDataNodes->length == 0) {
+                    continue;
+                } else {
+                    $scnData = $subjectConfirmationDataNodes->item(0);
+                    if ($scnData->hasAttribute('InResponseTo')) {
+                        $inResponseTo = $scnData->getAttribute('InResponseTo');
+                        if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
+                            continue;
+                        }
+                    }
+                    if ($scnData->hasAttribute('Recipient')) {
+                        $recipient = $scnData->getAttribute('Recipient');
+                        if (!empty($recipient) && strpos($recipient, $currentURL) === false) {
+                            continue;
+                        }
+                    }
+                    if ($scnData->hasAttribute('NotOnOrAfter')) {
+                        $noa = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotOnOrAfter'));
+                        if ($noa + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
+                            continue;
+                        }
+                    }
+                    if ($scnData->hasAttribute('NotBefore')) {
+                        $nb = OneLogin_Saml2_Utils::parseSAML2Time($scnData->getAttribute('NotBefore'));
+                        if ($nb > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
+                            continue;
+                        }
+                    }
+
+                    // Save NotOnOrAfter value
+                    if ($scnData->hasAttribute('NotOnOrAfter')) {
+                        $this->_validSCDNotOnOrAfter = $noa;
+                    }
+                    $anySubjectConfirmation = true;
+                    break;
+                }
+            }
+
+            if (!$anySubjectConfirmation) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "A valid SubjectConfirmation was not found on this Response",
+                    OneLogin_Saml2_ValidationError::WRONG_SUBJECTCONFIRMATION
+                );
+            }
+
+            if ($security['wantAssertionsSigned'] && !$hasSignedAssertion) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The Assertion of the Response is not signed and the SP requires it",
+                    OneLogin_Saml2_ValidationError::NO_SIGNED_ASSERTION
+                );
+            }
+
+            if ($security['wantMessagesSigned'] && !$hasSignedResponse) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The Message of the Response is not signed and the SP requires it",
+                    OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                );
+            }
         }
+
+        // Detect case not supported
+        if ($this->encrypted) {
+            $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
+            if ($encryptedIDNodes->length > 0) {
+                throw new OneLogin_Saml2_ValidationError(
+                    'Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.',
+                    OneLogin_Saml2_ValidationError::NOT_SUPPORTED
+                );
+            }
+        }
+
+        if (empty($signedElements) || (!$hasSignedResponse && !$hasSignedAssertion)) {
+            throw new OneLogin_Saml2_ValidationError(
+                'No Signature found. SAML Response rejected',
+                OneLogin_Saml2_ValidationError::NO_SIGNATURE_FOUND
+            );
+        } else {
+            $cert = $idpData['x509cert'];
+            $fingerprint = $idpData['certFingerprint'];
+            $fingerprintalg = $idpData['certFingerprintAlgorithm'];
+
+            $multiCerts = null;
+            $existsMultiX509Sign = isset($idpData['x509certMulti']) && isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing']);
+
+            if ($existsMultiX509Sign) {
+                $multiCerts = $idpData['x509certMulti']['signing'];
+            }
+
+            # If find a Signature on the Response, validates it checking the original response
+            if ($hasSignedResponse && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                );
+            }
+
+            # If find a Signature on the Assertion (decrypted assertion if was encrypted)
+            $documentToCheckAssertion = $this->encrypted ? $this->decryptedDocument : $this->document;
+            if ($hasSignedAssertion && !OneLogin_Saml2_Utils::validateSign($documentToCheckAssertion, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::ASSERTION_SIGNATURE_XPATH, $multiCerts)) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                );
+            }
+        }
+
+        return true;
     }
 
     /**
