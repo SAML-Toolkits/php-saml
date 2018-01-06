@@ -158,6 +158,47 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * Import a node tree into a target document
+     * Copy it before a reference node as a sibling
+     * and at the end of the copy remove
+     * the reference node in the target document
+     * As it were 'replacing' it
+     * Leaving nested default namespaces alone
+     * (Standard importNode with deep copy
+     *  mangles nested default namespaces)
+     *
+     * The reference node must not be a DomDocument
+     * It CAN be the top element of a document
+     * Returns the copied node in the target document
+     *
+     * @param DomNode $targetNode
+     * @param DomNode $sourceNode
+     * @param bool $recurse
+     * @return DOMNode
+     * @throws Exception
+     */
+    public static function treeCopyReplace(DomNode $targetNode, DomNode $sourceNode, $recurse=false) {
+        if ($targetNode->parentNode === null) {
+            throw new Exception('Illegal argument targetNode. It has no parentNode.');
+        }
+        $clonedNode = $targetNode->ownerDocument->importNode($sourceNode, false);
+        if ($recurse) {
+            $resultNode = $targetNode->appendChild($clonedNode);
+        } else {
+            $resultNode = $targetNode->parentNode->insertBefore($clonedNode, $targetNode);
+        }
+        if ($sourceNode->childNodes !== null) {
+            foreach($sourceNode->childNodes as $child) {
+                self::treeCopyReplace($resultNode, $child, true);
+            }
+        }
+        if (!$recurse) {
+            $targetNode->parentNode->removeChild($targetNode);
+        }
+        return $resultNode;
+    }
+
+    /**
      * Returns a x509 cert (adding header & footer if required).
      *
      * @param string $cert  A x509 unformated cert
