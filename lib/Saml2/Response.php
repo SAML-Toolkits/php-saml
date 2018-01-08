@@ -1086,7 +1086,10 @@ class OneLogin_Saml2_Response
 
         $decryptedXML = $objenc->decryptNode($objKey, false);
         $decrypted = new DOMDocument();
-        $decrypted->loadXML($decryptedXML);
+        $check = OneLogin_Saml2_Utils::loadXML($decrypted, $decryptedXML);
+        if ($check === false) {
+            throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
+        }
         if ($encData->parentNode instanceof DOMDocument) {
             return $decrypted;
         } else {
