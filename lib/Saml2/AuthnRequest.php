@@ -43,7 +43,7 @@ class OneLogin_Saml2_AuthnRequest
     /**
      * Constructs the AuthnRequest object.
      *
-     * @param OneLogin_Saml2_Settings $settings        Settings
+     * @param OneLogin_Saml2_Settings $settings        SAML Toolkit Settings
      * @param bool                    $forceAuthn      When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool                    $isPassive       When true the AuthNReuqest will set the Ispassive='true'
      * @param bool                    $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy

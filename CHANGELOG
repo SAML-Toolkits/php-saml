@@ -1,5 +1,26 @@
 CHANGELOG
 =========
+
+v.3.0.0 (pending)
+* Remove mcrypt dependency. Compatible with PHP 7.2
+* xmlseclibs now is not part of the toolkit and need to be installed from original source
+
+v.2.12.0
+* Improve Time management. Use DateTime/DateTimeZone classes.
+* Escape error messages in debug mode
+* Improve phpdoc
+* Add an extra filter to the url to be used on redirection
+
+* [#242](https://github.com/onelogin/php-saml/pull/242) Document that SHA-1 must not be used
+* [#250](https://github.com/onelogin/php-saml/pull/250) Fixed issue with IdPMetadataParser only keeping 1 certificate when multiple certificates of a single type were provided.
+* [#263](https://github.com/onelogin/php-saml/issues/263) Fix incompatibility with ADFS on SLO. When on php saml settings NameID Format is set as unspecified but the SAMLResponse has no NameID Format, no NameID Format should be specified on LogoutRequest.
+
+v.2.11.0
+* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecesary files from Composer production downloads
+* [#226](https://github.com/onelogin/php-saml/pull/226) Add possibility to handle nameId NameQualifier attribute in SLO Request
+* Improve logout documentation on Readme.
+* Improve multi-certificate support
+
 v.2.10.7
 * Fix IdPMetadataParser. The SingleLogoutService retrieved method was wrong
 * [#201](https://github.com/onelogin/php-saml/issues/201) Fix issues with SP entity_id, acs url and sls url that contains &
