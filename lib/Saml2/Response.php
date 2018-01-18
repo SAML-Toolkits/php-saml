@@ -60,7 +60,7 @@ class OneLogin_Saml2_Response
     /**
      * After validation, if it fail this var has the cause of the problem
      *
-     * @var string
+     * @var Exception
      */
     private $_error;
 
@@ -419,10 +419,10 @@ class OneLogin_Saml2_Response
             }
             return true;
         } catch (Exception $e) {
-            $this->_error = $e->getMessage();
+            $this->_error = $e;
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo htmlentities($this->_error);
+                echo htmlentities($e->getMessage());
             }
             return false;
         }
@@ -1119,11 +1119,25 @@ class OneLogin_Saml2_Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause
+     * @return Exception Cause
+     */
+    public function getErrorException()
+    {
+        return $this->_error;
+    }
+
+    /**
+     * After execute a validation process, if fails this method returns the cause
+     *
+     * @return null|string Error reason
      */
     public function getError()
     {
-        return $this->_error;
+        $errorMsg = null;
+        if (isset($this->_error)) {
+            $errorMsg = htmlentities($this->_error->getMessage());
+        }
+        return $errorMsg;
     }
 
     /**

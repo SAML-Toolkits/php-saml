@@ -115,6 +115,7 @@ class OneLogin_Saml2_AuthTest extends \PHPUnit\Framework\TestCase
      * @covers OneLogin_Saml2_Auth::getSessionIndex
      * @covers OneLogin_Saml2_Auth::getSessionExpiration
      * @covers OneLogin_Saml2_Auth::getLastErrorReason
+     * * @covers OneLogin_Saml2_Auth::getLastErrorException
      */
     public function testProcessResponseInvalid()
     {
@@ -132,6 +133,8 @@ class OneLogin_Saml2_AuthTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->_auth->getAttribute('uid'));
         $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
         $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("Reference validation failed", $errorException->getMessage());
     }
 
     /**
@@ -154,6 +157,8 @@ class OneLogin_Saml2_AuthTest extends \PHPUnit\Framework\TestCase
         $this->_auth->processResponse($requestId);
 
         $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("No Signature found. SAML Response rejected", $errorException->getMessage());
 
         $this->_auth->setStrict(true);
         $this->_auth->processResponse($requestId);

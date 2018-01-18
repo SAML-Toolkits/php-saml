@@ -622,6 +622,29 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response4.xml.base64');
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
 
+        $this->assertNull($response->getErrorException());
+
+        $this->assertFalse($response->isValid());
+        $errorException = $response->getErrorException();
+        $this->assertEquals('SAML Response must contain 1 assertion', $errorException->getMessage());
+
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
+
+        $this->assertTrue($response2->isValid());
+        $this->assertNull($response2->getErrorException());
+    }
+
+    /**
+     * Tests the getErrorException method of the OneLogin_Saml2_Response
+     *
+     * @covers OneLogin_Saml2_Response::getErrorException
+     */
+    public function testGetErrorException()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response4.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+
         $this->assertNull($response->getError());
 
         $this->assertFalse($response->isValid());
