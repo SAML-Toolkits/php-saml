@@ -707,31 +707,38 @@ class OneLogin_Saml2_Response
      */
     public function getAttributes()
     {
+        return $this->_getAttributesByKeyName('Name');
+    }
+
+    /**
+     * Gets the Attributes from the AttributeStatement element using their FriendlyName.
+     *
+     * @return array The attributes of the SAML Assertion
+     */
+    public function getAttributesWithFriendlyName()
+    {
+        return $this->_getAttributesByKeyName('FriendlyName');
+    }
+
+    private function _getAttributesByKeyName($keyName="Name")
+    {
         $attributes = array();
-
-        /* EncryptedAttributes not supported
-
-        $encriptedAttributes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
-
-        if ($encriptedAttributes->length > 0) {
-            foreach ($encriptedAttributes as $encriptedAttribute) {
-                $key = $this->_settings->getSPkey();
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-                $seckey->loadKey($key);
-                $attribute = OneLogin_Saml2_Utils::decryptElement($encriptedAttribute->firstChild(), $seckey);
-            }
-        }
-        */
 
         $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
 
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
+            $attributeKeyNode = $entry->attributes->getNamedItem($keyName);
 
-            if (in_array($attributeName, array_keys($attributes))) {
+            if ($attributeKeyNode === null) {
+                continue;
+            }
+
+            $attributeKeyName = $attributeKeyNode->nodeValue;
+
+            if (in_array($attributeKeyName, array_keys($attributes))) {
                 throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated Name",
+                    "Found an Attribute element with duplicated ".$keyName,
                     OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
                 );
             }
@@ -744,7 +751,7 @@ class OneLogin_Saml2_Response
                 }
             }
 
-            $attributes[$attributeName] = $attributeValues;
+            $attributes[$attributeKeyName] = $attributeValues;
         }
         return $attributes;
     }
