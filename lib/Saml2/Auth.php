@@ -113,6 +113,13 @@ class OneLogin_Saml2_Auth
      *
      * @var Exception|null
      */
+    private $_lastErrorException;
+
+    /**
+     * Last error.
+     *
+     * @var String|null
+     */
     private $_lastError;
 
     /**
@@ -188,7 +195,7 @@ class OneLogin_Saml2_Auth
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
-        $this->_lastError = null;
+        $this->_lastError = $this->_lastErrorException = null;
         if (isset($_POST) && isset($_POST['SAMLResponse'])) {
             // AuthnResponse -- HTTP_POST Binding
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
@@ -207,6 +214,7 @@ class OneLogin_Saml2_Auth
                 $this->_lastAssertionNotOnOrAfter = $response->getAssertionNotOnOrAfter();
             } else {
                 $this->_errors[] = 'invalid_response';
+                $this->_lastErrorException = $response->getErrorException();
                 $this->_lastError = $response->getError();
             }
         } else {
@@ -234,13 +242,15 @@ class OneLogin_Saml2_Auth
     public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false)
     {
         $this->_errors = array();
-        $this->_lastError = null;
+        $this->_lastError = $this->_lastErrorException = null;
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
             $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
+                $this->_lastErrorException = $logoutResponse->getErrorException();
                 $this->_lastError = $logoutResponse->getError();
+
             } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
             } else {
@@ -258,6 +268,7 @@ class OneLogin_Saml2_Auth
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
+                $this->_lastErrorException = $logoutRequest->getErrorException();
                 $this->_lastError = $logoutRequest->getError();
             } else {
                 if (!$keepLocalSession) {
@@ -407,7 +418,7 @@ class OneLogin_Saml2_Auth
      */
     public function getLastErrorReason()
     {
-        return htmlentities($this->_lastError->getMessage());
+        return $this->_lastError;
     }
 
 
@@ -416,9 +427,9 @@ class OneLogin_Saml2_Auth
      *
      * @return Exception Error
      */
-    public function getLastError()
+    public function getLastErrorException()
     {
-        return $this->_errorReason;
+        return $this->_lastErrorException;
     }
 
     /**

@@ -407,13 +407,27 @@ LOGOUTREQUEST;
     }
 
     /**
+     * After execute a validation process, if fails this method returns the Exception of the cause
+     *
+     * @return Exception Cause
+     */
+    public function getErrorException()
+    {
+        return $this->_error;
+    }
+
+    /**
      * After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause
+     * @return null|string Error reason
      */
     public function getError()
     {
-        return $this->_error;
+        $errorMsg = null;
+        if (isset($this->_error)) {
+            $errorMsg = htmlentities($this->_error->getMessage());
+        }
+        return $errorMsg;
     }
 
     /**

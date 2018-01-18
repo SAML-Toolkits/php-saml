@@ -248,7 +248,7 @@ class OneLogin_Saml2_LogoutRequestTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the OneLogin_Saml2_LogoutRequest Constructor.
      * Case: Able to generate encryptedID with MultiCert
-     * 
+     *
      * @covers OneLogin_Saml2_LogoutRequest
      */
     public function testConstructorEncryptIdUsingX509certMulti()
@@ -447,6 +447,34 @@ class OneLogin_Saml2_LogoutRequestTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($logoutRequest2->isValid());
         $this->assertContains('The LogoutRequest was received at', $logoutRequest2->getError());
+    }
+
+    /**
+     * Tests the getErrorException method of the OneLogin_Saml2_LogoutRequest
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getErrorException
+     */
+    public function testGetErrorException()
+    {
+        $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+
+        $deflatedRequest = gzdeflate($request);
+        $encodedRequest = base64_encode($deflatedRequest);
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $encodedRequest);
+
+        $this->assertNull($logoutRequest->getError());
+
+        $this->assertTrue($logoutRequest->isValid());
+        $this->assertNull($logoutRequest->getError());
+
+        $this->_settings->setStrict(true);
+        $logoutRequest2 = new OneLogin_Saml2_LogoutRequest($this->_settings, $encodedRequest);
+
+        $this->assertFalse($logoutRequest2->isValid());
+        $errorException = $logoutRequest2->getErrorException();
+        $this->assertContains('The LogoutRequest was received at', $errorException->getMessage());
+        $this->assertEquals($errorException->getMessage(), $logoutRequest2->getError());
     }
 
     /**
