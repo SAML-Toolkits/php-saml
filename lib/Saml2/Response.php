@@ -750,6 +750,61 @@ class OneLogin_Saml2_Response
     }
 
     /**
+     * Gets the Attributes from the AttributeStatement element using their FriendlyName.
+     *
+     * @return array The attributes of the SAML Assertion
+     */
+    public function getAttributesWithFriendlyName()
+    {
+        $attributes = array();
+
+        /* EncryptedAttributes not supported
+
+        $encriptedAttributes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
+
+        if ($encriptedAttributes->length > 0) {
+            foreach ($encriptedAttributes as $encriptedAttribute) {
+                $key = $this->_settings->getSPkey();
+                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+                $seckey->loadKey($key);
+                $attribute = OneLogin_Saml2_Utils::decryptElement($encriptedAttribute->firstChild(), $seckey);
+            }
+        }
+        */
+
+        $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
+
+        /** @var $entry DOMNode */
+        foreach ($entries as $entry) {
+            $attributeFriendlyNameNode = $entry->attributes->getNamedItem('FriendlyName');
+
+            if ($attributeFriendlyNameNode === null) {
+                continue;
+            }
+
+            $attributeFriendlyName = $attributeFriendlyNameNode->nodeValue;
+
+            if (in_array($attributeFriendlyName, array_keys($attributes))) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Found an Attribute element with duplicated FriendlyName",
+                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
+                );
+            }
+
+            $attributeValues = array();
+            foreach ($entry->childNodes as $childNode) {
+                $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
+                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+                    $attributeValues[] = $childNode->nodeValue;
+                }
+            }
+
+            $attributes[$attributeFriendlyName] = $attributeValues;
+        }
+        return $attributes;
+    }
+
+    /**
      * Verifies that the document only contains a single Assertion (encrypted or not).
      *
      * @return bool TRUE if the document passes.
