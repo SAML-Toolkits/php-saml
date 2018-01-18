@@ -44,7 +44,7 @@ class OneLogin_Saml2_LogoutRequest
     /**
      * After execute a validation process, this var contains the cause
      *
-     * @var string
+     * @var Exception
      */
     private $_error;
 
@@ -397,10 +397,10 @@ LOGOUTREQUEST;
 
             return true;
         } catch (Exception $e) {
-            $this->_error = $e->getMessage();
+            $this->_error = $e;
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo htmlentities($this->_error);
+                echo htmlentities($this->_error->getMessage());
             }
             return false;
         }
