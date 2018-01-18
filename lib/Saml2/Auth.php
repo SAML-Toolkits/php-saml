@@ -21,6 +21,13 @@ class OneLogin_Saml2_Auth
     private $_attributes = array();
 
     /**
+     * User attributes data with FriendlyName index.
+     *
+     * @var array
+     */
+    private $_attributesWithFriendlyName = array();
+
+    /**
      * NameID
      *
      * @var string
@@ -182,6 +189,7 @@ class OneLogin_Saml2_Auth
 
             if ($response->isValid($requestId)) {
                 $this->_attributes = $response->getAttributes();
+                $this->_attributesWithFriendlyName = $response->getAttributesWithFriendlyName();
                 $this->_nameid = $response->getNameId();
                 $this->_nameidFormat = $response->getNameIdFormat();
                 $this->_nameidNameQualifier = $response->getNameIdNameQualifier();
@@ -326,6 +334,16 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Returns the set of SAML attributes indexed by FriendlyName
+     *
+     * @return array  Attributes of the user.
+     */
+    public function getAttributesWithFriendlyName()
+    {
+        return $this->_attributesWithFriendlyName;
+    }
+
+    /**
      * Returns the nameID
      *
      * @return string  The nameID of the assertion
@@ -409,6 +427,24 @@ class OneLogin_Saml2_Auth
         $value = null;
         if (isset($this->_attributes[$name])) {
             return $this->_attributes[$name];
+        }
+        return $value;
+    }
+
+    /**
+     * Returns the requested SAML attribute indexed by FriendlyName
+     *
+     * @param string $friendlyName The requested attribute of the user.
+     *
+     * @return array|null Requested SAML attribute ($friendlyName).
+     */
+    public function getAttributeWithFriendlyName($friendlyName)
+    {
+        assert('is_string($friendlyName)');
+
+        $value = null;
+        if (isset($this->_attributesWithFriendlyName[$friendlyName])) {
+            return $this->_attributesWithFriendlyName[$friendlyName];
         }
         return $value;
     }

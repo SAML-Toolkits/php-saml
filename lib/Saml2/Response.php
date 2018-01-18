@@ -707,46 +707,7 @@ class OneLogin_Saml2_Response
      */
     public function getAttributes()
     {
-        $attributes = array();
-
-        /* EncryptedAttributes not supported
-
-        $encriptedAttributes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
-
-        if ($encriptedAttributes->length > 0) {
-            foreach ($encriptedAttributes as $encriptedAttribute) {
-                $key = $this->_settings->getSPkey();
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-                $seckey->loadKey($key);
-                $attribute = OneLogin_Saml2_Utils::decryptElement($encriptedAttribute->firstChild(), $seckey);
-            }
-        }
-        */
-
-        $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
-
-        /** @var $entry DOMNode */
-        foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
-
-            if (in_array($attributeName, array_keys($attributes))) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated Name",
-                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
-                );
-            }
-
-            $attributeValues = array();
-            foreach ($entry->childNodes as $childNode) {
-                $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
-                    $attributeValues[] = $childNode->nodeValue;
-                }
-            }
-
-            $attributes[$attributeName] = $attributeValues;
-        }
-        return $attributes;
+        return $this->_getAttributesByKeyName('Name');
     }
 
     /**
@@ -756,37 +717,28 @@ class OneLogin_Saml2_Response
      */
     public function getAttributesWithFriendlyName()
     {
+        return $this->_getAttributesByKeyName('FriendlyName');
+    }
+
+    private function _getAttributesByKeyName($keyName="Name")
+    {
         $attributes = array();
-
-        /* EncryptedAttributes not supported
-
-        $encriptedAttributes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
-
-        if ($encriptedAttributes->length > 0) {
-            foreach ($encriptedAttributes as $encriptedAttribute) {
-                $key = $this->_settings->getSPkey();
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-                $seckey->loadKey($key);
-                $attribute = OneLogin_Saml2_Utils::decryptElement($encriptedAttribute->firstChild(), $seckey);
-            }
-        }
-        */
 
         $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
 
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeFriendlyNameNode = $entry->attributes->getNamedItem('FriendlyName');
+            $attributeKeyNode = $entry->attributes->getNamedItem($keyName);
 
-            if ($attributeFriendlyNameNode === null) {
+            if ($attributeKeyNode === null) {
                 continue;
             }
 
-            $attributeFriendlyName = $attributeFriendlyNameNode->nodeValue;
+            $attributeKeyName = $attributeKeyNode->nodeValue;
 
-            if (in_array($attributeFriendlyName, array_keys($attributes))) {
+            if (in_array($attributeKeyName, array_keys($attributes))) {
                 throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated FriendlyName",
+                    "Found an Attribute element with duplicated ".$keyName,
                     OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
                 );
             }
@@ -799,7 +751,7 @@ class OneLogin_Saml2_Response
                 }
             }
 
-            $attributes[$attributeFriendlyName] = $attributeValues;
+            $attributes[$attributeKeyName] = $attributeValues;
         }
         return $attributes;
     }
