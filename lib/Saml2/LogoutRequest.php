@@ -163,7 +163,7 @@ LOGOUTREQUEST;
 
             if (false === $dom) {
                 throw new OneLogin_Saml2_Error(
-                    "XML is invalid",
+                    "LogoutRequest could not be processed",
                     OneLogin_Saml2_Error::SAML_LOGOUTREQUEST_INVALID
                 );
             }

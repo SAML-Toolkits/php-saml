@@ -67,7 +67,7 @@ class OneLogin_Saml2_LogoutResponse
 
             if (false === $this->document) {
                 throw new OneLogin_Saml2_Error(
-                    "XML is invalid",
+                    "LogoutResponse could not be processed",
                     OneLogin_Saml2_Error::SAML_LOGOUTRESPONSE_INVALID
                 );
             }

@@ -861,7 +861,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
      * @covers OneLogin_Saml2_LogoutRequest::getID()
      *
      * @expectedException OneLogin_Saml2_Error
-     * @expectedExceptionMessage XML is invalid
+     * @expectedExceptionMessage LogoutRequest could not be processed
      */
     public function testGetIDException()
     {
