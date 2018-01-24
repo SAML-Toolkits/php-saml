@@ -42,6 +42,8 @@ class OneLogin_Saml2_LogoutResponse
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
      * @param string|null             $response An UUEncoded SAML Logout response from the IdP.
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response = null)
     {
@@ -62,6 +64,13 @@ class OneLogin_Saml2_LogoutResponse
             }
             $this->document = new DOMDocument();
             $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->_logoutResponse);
+
+            if (false === $this->document) {
+                throw new OneLogin_Saml2_Error(
+                    "XML is invalid",
+                    OneLogin_Saml2_Error::SAML_LOGOUTRESPONSE_INVALID
+                );
+            }
 
             if ($this->document->documentElement->hasAttribute('ID')) {
                 $this->id = $this->document->documentElement->getAttribute('ID');

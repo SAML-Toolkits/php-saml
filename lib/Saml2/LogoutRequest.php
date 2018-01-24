@@ -160,7 +160,7 @@ LOGOUTREQUEST;
         } else {
             $dom = new DOMDocument();
             $dom = OneLogin_Saml2_Utils::loadXML($dom, $request);
-            
+
             if (false === $dom) {
                 throw new OneLogin_Saml2_Error(
                     "XML is invalid",
