@@ -394,7 +394,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the SessionNotOnOrAfter
      *
-     * @return DateTime|null  The SessionNotOnOrAfter of the assertion
+     * @return int|null  The SessionNotOnOrAfter of the assertion
      */
     public function getSessionExpiration()
     {
