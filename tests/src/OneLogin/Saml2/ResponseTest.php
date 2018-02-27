@@ -535,9 +535,6 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         }
     }
 
-
-
-
     /**
     * Tests the getSessionIndex method of the OneLogin_Saml2_Response
     *
@@ -555,7 +552,6 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('_7164a9a9f97828bfdb8d0ebc004a05d2e7d873f70c', $response2->getSessionIndex());
     }
-
 
     /**
     * Tests the getAttributes method of the OneLogin_Saml2_Response
@@ -718,6 +714,26 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $valid = $response->isValid();
 
         $this->assertFalse($valid);
+    }
+
+    /**
+     * Tests the getNameId and getAttributes methods of the
+     * OneLogin_Saml2_Response
+     *
+     * Test that the node text with comment attack (VU#475445)
+     * is not allowed
+     *
+     * @covers OneLogin_Saml2_Response::getNameId
+     * @covers OneLogin_Saml2_Response::getAttributes
+     */
+    public function testNodeTextAttack()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_node_text_attack.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $nameId = $response->getNameId();
+        $attributes = $response->getAttributes();
+        $this->assertEquals("support@onelogin.com", $nameId);
+        $this->assertEquals("smith", $attributes['surname'][0]);
     }
 
     /**
