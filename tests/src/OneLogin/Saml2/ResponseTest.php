@@ -698,6 +698,26 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the getNameId and getAttributes methods of the
+     * OneLogin_Saml2_Response
+     *
+     * Test that the node text with comment attack (VU#475445)
+     * is not allowed
+     *
+     * @covers OneLogin_Saml2_Response::getNameId
+     * @covers OneLogin_Saml2_Response::getAttributes
+     */
+    public function testNodeTextAttack()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_node_text_attack.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $nameId = $response->getNameId();
+        $attributes = $response->getAttributes();
+        $this->assertEquals("support@onelogin.com", $nameId);
+        $this->assertEquals("smith", $attributes['surname'][0]);
+    }
+
+    /**
      * Tests the getSessionNotOnOrAfter method of the OneLogin_Saml2_Response
      *
      * @covers OneLogin_Saml2_Response::getSessionNotOnOrAfter
