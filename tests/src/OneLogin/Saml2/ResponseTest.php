@@ -1456,7 +1456,8 @@ class OneLogin_Saml2_ResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($settingsInfo['idp']['x509cert']);
+        $cert = OneLogin_Saml2_Utils::formatCert($settingsInfo['idp']['x509cert']);
+        $settingsInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert);
         $settingsInfo['idp']['x509cert'] = null;
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);

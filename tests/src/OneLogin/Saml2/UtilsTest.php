@@ -958,6 +958,12 @@ class OneLogin_Saml2_UtilsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull(OneLogin_Saml2_Utils::calculateX509Fingerprint($key));
 
+        $this->assertNull(OneLogin_Saml2_Utils::calculateX509Fingerprint(""));
+
+        $this->assertNull(OneLogin_Saml2_Utils::calculateX509Fingerprint($settingsInfo['idp']['x509cert']));
+
+        $this->assertEquals('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils::calculateX509Fingerprint(OneLogin_Saml2_Utils::formatCert($settingsInfo['idp']['x509cert'])));
+
         $this->assertEquals('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert));
 
         $this->assertEquals('afe71c28ef740bc87425be13a2263d37971da1f9', OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha1'));

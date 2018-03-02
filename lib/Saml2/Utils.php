@@ -902,7 +902,7 @@ class OneLogin_Saml2_Utils
     /**
      * Calculates the fingerprint of a x509cert.
      *
-     * @param string $x509cert x509 cert
+     * @param string $x509cert x509 cert formatted
      * @param string $alg      Algorithm to be used in order to calculate the fingerprint
      *
      * @return null|string Formatted fingerprint
@@ -911,27 +911,30 @@ class OneLogin_Saml2_Utils
     {
         assert(is_string($x509cert));
 
-        $lines = explode("\n", $x509cert);
-
+        $arCert = explode("\n", $x509cert);
         $data = '';
+        $inData = false;
 
-        foreach ($lines as $line) {
-            /* Remove '\r' from end of line if present. */
-            $line = rtrim($line);
-            if ($line === '-----BEGIN CERTIFICATE-----') {
-                /* Delete junk from before the certificate. */
-                $data = '';
-            } elseif ($line === '-----END CERTIFICATE-----') {
-                /* Ignore data after the certificate. */
-                break;
-            } elseif ($line === '-----BEGIN PUBLIC KEY-----' || $line === '-----BEGIN RSA PRIVATE KEY-----') {
-                /* This isn't an X509 certificate. */
-                return null;
+        foreach ($arCert as $curData) {
+            if (! $inData) {
+                if (strncmp($curData, '-----BEGIN CERTIFICATE', 22) == 0) {
+                    $inData = true;
+                } elseif ((strncmp($curData, '-----BEGIN PUBLIC KEY', 21) == 0) || (strncmp($curData, '-----BEGIN RSA PRIVATE KEY', 26) == 0)) {
+                    /* This isn't an X509 certificate. */
+                    return null;
+                }
             } else {
-                /* Append the current line to the certificate data. */
-                $data .= $line;
+                if (strncmp($curData, '-----END CERTIFICATE', 20) == 0) {
+                    break;
+                }
+                $data .= trim($curData);
             }
         }
+
+        if (empty($data)) {
+            return null;
+        }
+
         $decodedData = base64_decode($data);
 
         switch ($alg) {
