@@ -1207,13 +1207,16 @@ class OneLogin_Saml2_Utils
 
     public static function isSupportedSigningAlgorithm($algorithm)
     {
-        return in_array($algorithm, array(
-            XMLSecurityKey::RSA_1_5,
-            XMLSecurityKey::RSA_SHA1,
-            XMLSecurityKey::RSA_SHA256,
-            XMLSecurityKey::RSA_SHA384,
-            XMLSecurityKey::RSA_SHA512
-        ));
+        return in_array(
+            $algorithm,
+            array(
+                XMLSecurityKey::RSA_1_5,
+                XMLSecurityKey::RSA_SHA1,
+                XMLSecurityKey::RSA_SHA256,
+                XMLSecurityKey::RSA_SHA384,
+                XMLSecurityKey::RSA_SHA512
+            )
+        );
     }
 
     /**

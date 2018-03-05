@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v.2.13.0
+* Update xmlseclibs with some fixes.
+* Add extra protection verifying the Signature algorithm used on SignedInfo element, not only rely on the xmlseclibs verify / verifySignature methods.
+* Add getAttributesWithFriendlyName method which returns the set of SAML attributes indexed by FriendlyName
+* Fix bug on parseRemoteXML and parseFileXML. Internal calls to parseXML missed the desiredNameIdFormat parameter
+
 v.2.12.0
 * Improve Time management. Use DateTime/DateTimeZone classes.
 * Escape error messages in debug mode
