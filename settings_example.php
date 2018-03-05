@@ -101,7 +101,10 @@ $settings = array (
         // Public x509 certificate of the IdP
         'x509cert' => '',
         /*
-         *  Instead of use the whole x509cert you can use a fingerprint
+         *  Instead of use the whole x509cert you can use a fingerprint in
+         *  order to validate the SAMLResponse, but we don't recommend to use
+         *  that method on production since is exploitable by a collision
+         *  attack.
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *   or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
