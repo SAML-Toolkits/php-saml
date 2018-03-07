@@ -1206,6 +1206,11 @@ class OneLogin_Saml2_Utils
         if ($key->type === $algorithm) {
             return $key;
         }
+
+        if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($algorithm)) {
+            throw new \Exception('Unsupported signing algorithm.');
+        }
+
         $keyInfo = openssl_pkey_get_details($key->key);
         if ($keyInfo === false) {
             throw new Exception('Unable to get key details from XMLSecurityKey.');
@@ -1216,6 +1221,17 @@ class OneLogin_Saml2_Utils
         $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
         $newKey->loadKey($keyInfo['key']);
         return $newKey;
+    }
+
+    public static function isSupportedSigningAlgorithm($algorithm)
+    {
+        return in_array($algorithm, array(
+            XMLSecurityKey::RSA_1_5,
+            XMLSecurityKey::RSA_SHA1,
+            XMLSecurityKey::RSA_SHA256,
+            XMLSecurityKey::RSA_SHA384,
+            XMLSecurityKey::RSA_SHA512
+        ));
     }
 
     /**
@@ -1327,6 +1343,10 @@ class OneLogin_Saml2_Utils
         $objKey = $objXMLSecDSig->locateKey();
         if (!$objKey) {
             throw new Exception('We have no idea about the key');
+        }
+
+        if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($objKey->type)) {
+            throw new \Exception('Unsupported signing algorithm.');
         }
 
         $objXMLSecDSig->canonicalizeSignedInfo();
