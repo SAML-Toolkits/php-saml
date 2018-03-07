@@ -135,6 +135,7 @@ In production, the `strict` parameter **MUST** be set as `"true"` and the
 something other than SHA1 (see https://shattered.io/ ). Otherwise your
 environment is not secure and will be exposed to attacks.
 
+In production also we highly recommended to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a siganture validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
 
 Getting started
 ---------------
@@ -345,7 +346,8 @@ $settings = array (
         'x509cert' => '',
         /*
          *  Instead of use the whole x509cert you can use a fingerprint in order to
-         *  validate a SAMLResponse.
+         *  validate a SAMLResponse, but we don't recommend to use that
+         *  method on production since is exploitable by a collision attack.
          *  (openssl x509 -noout -fingerprint -in "idp.crt" to generate it,
          *   or add for example the -sha256 , -sha384 or -sha512 parameter)
          *
