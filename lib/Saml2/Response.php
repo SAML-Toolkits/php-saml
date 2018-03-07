@@ -1084,12 +1084,17 @@ class OneLogin_Saml2_Response
             $objKey->loadKey($key);
         }
 
-        $decrypted = $objenc->decryptNode($objKey, true);
-
-        if ($decrypted instanceof DOMDocument) {
+        $decryptedXML = $objenc->decryptNode($objKey, false);
+        $decrypted = new DOMDocument();
+        $check = OneLogin_Saml2_Utils::loadXML($decrypted, $decryptedXML);
+        if ($check === false) {
+            throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
+        }
+        if ($encData->parentNode instanceof DOMDocument) {
             return $decrypted;
         } else {
-            $encryptedAssertion = $decrypted->parentNode;
+            $decrypted = $decrypted->documentElement;
+            $encryptedAssertion = $encData->parentNode;
             $container = $encryptedAssertion->parentNode;
 
             // Fix possible issue with saml namespace
@@ -1106,13 +1111,10 @@ class OneLogin_Saml2_Response
                 } else {
                     $ns = 'xmlns';
                 }
-
                 $decrypted->setAttributeNS('http://www.w3.org/2000/xmlns/', $ns, OneLogin_Saml2_Constants::NS_SAML);
             }
-
-            $container->replaceChild($decrypted, $encryptedAssertion);
-
-            return $decrypted->ownerDocument;
+            OneLogin_Saml2_Utils::treeCopyReplace($encryptedAssertion, $decrypted);
+            return $container->ownerDocument;
         }
     }
 
