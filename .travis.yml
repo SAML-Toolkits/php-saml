@@ -23,10 +23,10 @@ before_script:
 script:
   - vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
   - php vendor/bin/phpcpd --exclude tests --exclude vendor .
-  - php vendor/bin/phploc lib/.
+  - php vendor/bin/phploc src/.
   - mkdir -p tests/build/dependences
-  - php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
-  - php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 endpoints tests/src
+  - php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  src/.
+  - php vendor/bin/phpcs --standard=tests/ZendModStandard src/Saml2 demo1 demo2 endpoints tests/src
 
 after_script:
   - export TRAVIS=https://travis-ci.org/onelogin/php-saml
