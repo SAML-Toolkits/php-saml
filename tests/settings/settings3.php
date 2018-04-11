@@ -16,18 +16,18 @@
                 'serviceDescription' => 'Service Description',
                 'requestedAttributes' => array (
                     array (
-                        'nameFormat' => \OneLogin_Saml2_Constants::ATTRNAME_FORMAT_URI,
+                        'nameFormat' => OneLogin\Saml2\Constants::ATTRNAME_FORMAT_URI,
                         'isRequired' => true,
                         'name' => 'Email',
                         'friendlyName' => 'Email'
                     ),
                     array (
-                        'nameFormat' => \OneLogin_Saml2_Constants::ATTRNAME_FORMAT_URI,
+                        'nameFormat' => OneLogin\Saml2\Constants::ATTRNAME_FORMAT_URI,
                         'isRequired' => true,
                         'name' => 'FirstName'
                     ),
                     array (
-                        'nameFormat' => \OneLogin_Saml2_Constants::ATTRNAME_FORMAT_URI,
+                        'nameFormat' => OneLogin\Saml2\Constants::ATTRNAME_FORMAT_URI,
                         'isRequired' => true,
                         'name' => 'LastName',
                     ),

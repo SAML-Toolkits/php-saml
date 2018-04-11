@@ -1,14 +1,19 @@
 <?php
 
+namespace OneLogin\Saml2\Tests;
+
+use OneLogin\Saml2\Constants;
+use OneLogin\Saml2\IdPMetadataParser;
+
 /**
  * Unit tests for IdPMetadataParser class
  */
-class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
+class IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Tests the parseFileXML method of IdPMetadataParser.
      *
-     * @covers OneLogin_Saml2_IdPMetadataParser::parseFileXML
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseFileXML
      */
     public function testParseFileXML()
     {
@@ -31,7 +36,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
 
         $filepath = TEST_ROOT .'/data/metadata/idp/onelogin_metadata.xml';
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseFileXML($filepath);
+        $idpInfo = IdPMetadataParser::parseFileXML($filepath);
         $this->assertEquals($expectedInfo, $idpInfo);
 
         $expectedInfo2 = array(
@@ -48,7 +53,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $filepath = TEST_ROOT .'/data/metadata/idp/idp_metadata.xml';
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseFileXML($filepath);
+        $idpInfo = IdPMetadataParser::parseFileXML($filepath);
         $this->assertEquals($expectedInfo2, $idpInfo);
     }
 
@@ -56,7 +61,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
      * Tests the parseXML method of IdPMetadataParser.
      * Case: Multix509cert
      *
-     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
      */
     public function testParseXML()
     {
@@ -87,7 +92,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
 
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/metadata.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
         $this->assertEquals($expectedInfo, $idpInfo);
     }
 
@@ -98,7 +103,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     *       Note that the testshib metadata does not contain an SLO specification
     *       in the first <IDPSSODescriptor> tag.
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseTestshibDesiredBindingSSORedirect()
     {
@@ -116,8 +121,8 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
           )
         );
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/testshib-providers.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, null, null, OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
+        $idpInfo2 = IdPMetadataParser::parseXML($xml, null, null, Constants::BINDING_HTTP_REDIRECT, Constants::BINDING_HTTP_REDIRECT);
         $this->assertEquals($expectedInfo, $idpInfo);
         $this->assertEquals($expectedInfo, $idpInfo2);
     }
@@ -128,7 +133,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     *       Note that the testshib metadata does not contain an SLO specification
     *       in the first <IDPSSODescriptor> tag.
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseTestshibDesiredBindingSSOPost()
     {
@@ -146,8 +151,8 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
           )
         );
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/testshib-providers.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, null, null, OneLogin_Saml2_Constants::BINDING_HTTP_POST, OneLogin_Saml2_Constants::BINDING_HTTP_POST);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
+        $idpInfo2 = IdPMetadataParser::parseXML($xml, null, null, Constants::BINDING_HTTP_POST, Constants::BINDING_HTTP_POST);
         $this->assertNotEquals($expectedInfo, $idpInfo);
         $this->assertEquals($expectedInfo, $idpInfo2);
     }
@@ -158,7 +163,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     *       Note: IdP metadata contains a SSO and SLO
     *       service and does not specify any endpoint for the POST binding.
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseDesiredBindingAll()
     {
@@ -180,9 +185,9 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/idp_metadata2.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, null, null, OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT);
-        $idpInfo3 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, null, null, OneLogin_Saml2_Constants::BINDING_HTTP_POST, OneLogin_Saml2_Constants::BINDING_HTTP_POST);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
+        $idpInfo2 = IdPMetadataParser::parseXML($xml, null, null, Constants::BINDING_HTTP_REDIRECT, Constants::BINDING_HTTP_REDIRECT);
+        $idpInfo3 = IdPMetadataParser::parseXML($xml, null, null, Constants::BINDING_HTTP_POST, Constants::BINDING_HTTP_POST);
         $this->assertEquals($expectedInfo, $idpInfo);
         $this->assertEquals($expectedInfo, $idpInfo2);
         $this->assertEquals($expectedInfo, $idpInfo3);
@@ -192,7 +197,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
      * Tests the parseXML method of IdPMetadataParser.
      * Case: With and without specify EntityId
      *
-     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
      */
     public function testParseXMLEntityId()
     {
@@ -211,7 +216,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'NameIDFormat' => 'urn:mace:shibboleth:1.0:nameIdentifier'
             )
         );
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
         $this->assertEquals($expectedInfo, $idpInfo);
 
         $expectedInfo2 = array (
@@ -228,7 +233,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $desiredEntityId = 'https://idp.fccn.pt/idp/shibboleth';
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, $desiredEntityId);
+        $idpInfo2 = IdPMetadataParser::parseXML($xml, $desiredEntityId);
         $this->assertEquals($expectedInfo2, $idpInfo2);
     }
 
@@ -236,7 +241,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
      * Tests the parseXML method of IdPMetadataParser.
      * Case: With and without specify NameIdFormat
      *
-     * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
      */
     public function testParseXMLNameIdFormat()
     {
@@ -255,7 +260,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'NameIDFormat' => 'urn:mace:shibboleth:1.0:nameIdentifier'
             )
         );
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
         $this->assertEquals($expectedInfo, $idpInfo);
 
         $expectedInfo2 = array (
@@ -272,7 +277,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $desiredNameIdFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient';
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseXML($xml, null, $desiredNameIdFormat);
+        $idpInfo2 = IdPMetadataParser::parseXML($xml, null, $desiredNameIdFormat);
         $this->assertEquals($expectedInfo2, $idpInfo2);
     }
 
@@ -280,7 +285,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     * Tests the parseXML method of IdPMetadataParser.
     * Case: IdP metadata contains multiple certs
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseMultiCerts()
     {
@@ -310,14 +315,14 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/idp_metadata_multi_certs.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
         $this->assertEquals($expectedInfo, $idpInfo);
     }
     /**
     * Tests the parseXML method of IdPMetadataParser.
     * Case: IdP metadata contains multiple certs
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseMultiSigningCerts()
     {
@@ -345,7 +350,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/idp_metadata_multi_signing_certs.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
         $this->assertEquals($expectedInfo, $idpInfo);
     }
 
@@ -354,7 +359,7 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     * Case: IdP metadata contains multiple signature cert and encrypt cert
     *       that is the same
     *
-    * @covers OneLogin_Saml2_IdPMetadataParser::parseXML
+    * @covers OneLogin\Saml2\IdPMetadataParser::parseXML
     */
     public function testParseMultiSameSigningAndEncryptCert()
     {
@@ -390,17 +395,17 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
             )
         );
         $filepath = TEST_ROOT .'/data/metadata/idp/idp_metadata_same_sign_and_encrypt_cert.xml';
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseFileXML($filepath);
+        $idpInfo = IdPMetadataParser::parseFileXML($filepath);
         $this->assertEquals($expectedInfo, $idpInfo);
         $filepath2 = TEST_ROOT .'/data/metadata/idp/idp_metadata_different_sign_and_encrypt_cert.xml';
-        $idpInfo2 = OneLogin_Saml2_IdPMetadataParser::parseFileXML($filepath2);
+        $idpInfo2 = IdPMetadataParser::parseFileXML($filepath2);
         $this->assertEquals($expectedInfo2, $idpInfo2);
     }
 
     /**
      * Tests the injectIntoSettings method of IdPMetadataParser.
      *
-     * @covers OneLogin_Saml2_IdPMetadataParser::injectIntoSettings
+     * @covers OneLogin\Saml2\IdPMetadataParser::injectIntoSettings
      */
     public function testInjectIntoSettings()
     {
@@ -440,9 +445,9 @@ class OneLogin_Saml2_IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
         include $settingsDir.'settings7.php';
 
         $xml = file_get_contents(TEST_ROOT .'/data/metadata/idp/FederationMetadata.xml');
-        $idpInfo = OneLogin_Saml2_IdPMetadataParser::parseXML($xml);
+        $idpInfo = IdPMetadataParser::parseXML($xml);
 
-        $newSettings = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, $idpInfo);
+        $newSettings = IdPMetadataParser::injectIntoSettings($settingsInfo, $idpInfo);
         
         $this->assertNotEquals($newSettings, $settingsInfo);
         $this->assertEquals($expectedMergedSettings, $newSettings);

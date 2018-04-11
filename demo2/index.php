@@ -12,17 +12,21 @@ session_start();
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
+use OneLogin\Saml2\AuthnRequest;
+use OneLogin\Saml2\Settings;
+use OneLogin\Saml2\Utils;
+
 if (!isset($_SESSION['samlUserdata'])) {
-    $settings = new OneLogin_Saml2_Settings();
-    $authRequest = new OneLogin_Saml2_AuthnRequest($settings);
+    $settings = new Settings();
+    $authRequest = new AuthnRequest($settings);
     $samlRequest = $authRequest->getRequest();
 
     $parameters = array('SAMLRequest' => $samlRequest);
-    $parameters['RelayState'] = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+    $parameters['RelayState'] = Utils::getSelfURLNoQuery();
 
     $idpData = $settings->getIdPData();
     $ssoUrl = $idpData['singleSignOnService']['url'];
-    $url = OneLogin_Saml2_Utils::redirect($ssoUrl, $parameters, true);
+    $url = Utils::redirect($ssoUrl, $parameters, true);
 
     header("Location: $url");
 } else {

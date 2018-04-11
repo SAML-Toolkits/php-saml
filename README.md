@@ -124,7 +124,7 @@ If you are using the library with a framework like Symfony2 that contains
 namespaces, remember that calls to the class must be done by adding a backslash (`\`) to the
 start, for example to use the static method getSelfURLNoQuery use:
 
-    \OneLogin_Saml2_Utils::getSelfURLNoQuery()
+    OneLogin\Saml2\Utils::getSelfURLNoQuery()
 
 
 Security warning
@@ -524,14 +524,14 @@ by the toolkit if not other array with settings info is provided in the construc
 
 ```php
 // Initializes toolkit with settings.php & advanced_settings files.
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 //or
-$settings = new OneLogin_Saml2_Settings();
+$settings = new OneLogin\Saml2\Settings();
 
 // Initializes toolkit with the array provided.
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin\Saml2\Auth($settingsInfo);
 //or
-$settings = new OneLogin_Saml2_Settings($settingsInfo);
+$settings = new OneLogin\Saml2\Settings($settingsInfo);
 ```
 
 You can declare the `$settingsInfo` in the file that constains the constructor
@@ -544,7 +544,7 @@ array available as we see in the following example:
 require_once 'custom_settings.php';  // The custom_settings.php contains a
                                      // $settingsInfo array.
 
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin\Saml2\Auth($settingsInfo);
 ```
 
 
@@ -583,7 +583,7 @@ In order to send an `AuthNRequest` to the IdP:
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once(TOOLKIT_PATH . '_toolkit_loader.php');   // We load the SAML2 lib
 
-$auth = new OneLogin_Saml2_Auth(); // Constructor of the SP, loads settings.php
+$auth = new OneLogin\Saml2\Auth(); // Constructor of the SP, loads settings.php
                                    // and advanced_settings.php
 $auth->login();   // Method that sent the AuthNRequest
 ```
@@ -598,7 +598,7 @@ We can set an `'returnTo'` url to change the workflow and redirect the user to t
 
 ```php
 $newTargetUrl = 'http://example.com/consume2.php';
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 $auth->login($newTargetUrl);
 ```
 
@@ -637,7 +637,7 @@ define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
 try {
-    $auth = new OneLogin_Saml2_Auth();
+    $auth = new OneLogin\Saml2\Auth();
     $settings = $auth->getSettings();
     $metadata = $settings->getSPMetadata();
     $errors = $settings->validateMetadata($metadata);
@@ -645,9 +645,9 @@ try {
         header('Content-Type: text/xml');
         echo $metadata;
     } else {
-        throw new OneLogin_Saml2_Error(
+        throw new OneLogin\Saml2\Error(
             'Invalid SP metadata: '.implode(', ', $errors),
-            OneLogin_Saml2_Error::METADATA_SP_INVALID
+            OneLogin\Saml2\Error::METADATA_SP_INVALID
         );
     }
 } catch (Exception $e) {
@@ -662,7 +662,7 @@ that the info to be provided is valid.
 
 Instead of use the Auth object, you can directly use
 ```
-$settings = new OneLogin_Saml2_Settings($settingsInfo, true);
+$settings = new OneLogin\Saml2\Settings($settingsInfo, true);
 ```
 to get the settings object and with the true parameter we will avoid the IdP Settings validation.
 
@@ -680,7 +680,7 @@ session_start();  // IMPORTANT: This is required in order to be able
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 
 if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
     $requestID = $_SESSION['AuthNRequestID'];
@@ -708,7 +708,7 @@ $_SESSION['samlNameId'] = $auth->getNameId();
 $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
 $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
 
-if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+if (isset($_POST['RelayState']) && OneLogin\Saml2\Utils::getSelfURL() != $_POST['RelayState']) {
     $auth->redirectTo($_POST['RelayState']);
 }
 
@@ -820,7 +820,7 @@ session_start();  // IMPORTANT: This is required in order to be able
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
 
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 
 if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
     $requestID = $_SESSION['LogoutRequestID'];
@@ -847,14 +847,14 @@ validated and the session could be closed
 ```php
 // part of the processSLO method
 
-$logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+$logoutResponse = new OneLogin\Saml2\LogoutResponse($this->_settings, $_GET['SAMLResponse']);
 if (!$logoutResponse->isValid($requestId)) {
     $this->_errors[] = 'invalid_logout_response';
-} else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
+} else if ($logoutResponse->getStatus() !== OneLogin\Saml2\Constants::STATUS_SUCCESS) {
     $this->_errors[] = 'logout_not_success';
 } else {
     if (!$keepLocalSession) {
-        OneLogin_Saml2_Utils::deleteLocalSession();
+        OneLogin\Saml2\Utils::deleteLocalSession();
     }
 }
 ```
@@ -868,15 +868,15 @@ the IdP.
 
 $decoded = base64_decode($_GET['SAMLRequest']);
 $request = gzinflate($decoded);
-if (!OneLogin_Saml2_LogoutRequest::isValid($this->_settings, $request)) {
+if (!OneLogin\Saml2\LogoutRequest::isValid($this->_settings, $request)) {
     $this->_errors[] = 'invalid_logout_request';
 } else {
     if (!$keepLocalSession) {
-        OneLogin_Saml2_Utils::deleteLocalSession();
+        OneLogin\Saml2\Utils::deleteLocalSession();
     }
 
     $inResponseTo = $request->id;
-    $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
+    $responseBuilder = new OneLogin\Saml2\LogoutResponse($this->_settings);
     $responseBuilder->build($inResponseTo);
     $logoutResponse = $responseBuilder->getResponse();
 
@@ -928,7 +928,7 @@ In order to send a Logout Request to the IdP:
 define("TOOLKIT_PATH", '/var/www/php-saml/');
 require_once(TOOLKIT_PATH . '_toolkit_loader.php');
 
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 
 $auth->logout();   // Method that sent the Logout Request.
 ```
@@ -956,12 +956,12 @@ to other php file.
 
 ```php
 $newTargetUrl = 'http://example.com/loggedOut.php';
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 $auth->logout($newTargetUrl);
 ```
 A more complex logout with all the parameters:
 ```
-$auth = new OneLogin_Saml2_Auth();
+$auth = new OneLogin\Saml2\Auth();
 $returnTo = null;
 $paramters = array();
 $nameId = null;
@@ -1008,7 +1008,7 @@ session_start();    // Initialize the session, we do that because
 require_once dirname(__DIR__) . '/_toolkit_loader.php'; // Load Saml2 and xmlseclibs
 require_once 'settings.php';    // Load the setting info as an Array
 
-$auth = new OneLogin_Saml2_Auth($settingsInfo);  // Initialize the SP SAML instance
+$auth = new OneLogin\Saml2\Auth($settingsInfo);  // Initialize the SP SAML instance
 
 if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the IdP
     $auth->login();
@@ -1035,7 +1035,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
     }
 
     $_SESSION['samlUserdata'] = $auth->getAttributes(); // Retrieves user data
-    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+    if (isset($_POST['RelayState']) && OneLogin\Saml2\Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);  // Redirect if there is a
     }                                             // relayState set
 } else if (isset($_GET['sls'])) {   // Single Logout Service
@@ -1074,7 +1074,7 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 
 #### URL-guessing methods ####
 
-php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
+php-saml toolkit uses a bunch of methods in OneLogin\Saml2\Utils that try to guess the URL where the SAML messages are processed.
 
 * `getSelfHost` Returns the current host.
 * `getSelfPort` Return the port number used for the request
@@ -1133,57 +1133,15 @@ Get the ID of the last processed message/assertion with the getLastMessageId/get
 
 Described below are the main classes and methods that can be invoked.
 
-#### The Old Saml library ####
-
-Lets start describing the classes and methods of the SAML library, an evolution
-of the old v.1 toolkit that is provided to keep the backward compability.
-Most of them use classes and methods of the new SAML2 library.
-
-##### OneLogin_Saml_AuthRequest - `AuthRequest.php` #####
-
-Has the protected attribute `$auth`, an `OneLogin_Saml2_Auth` object.
-
-* `OneLogin_Saml_AuthRequest` - Constructs `OneLogin_Saml2_Auth`,
-  initializing the SP SAML instance.
-* `getRedirectUrl($returnTo)` - Obtains the SSO URL containing the AuthRequest
-  message deflated.
-
-
-##### OneLogin_Saml_Response - `Response.php` #####
-
-* `OneLogin_Saml_Response` - Constructor that process the SAML Response,
-  Internally initializes an SP SAML instance and an `OneLogin_Saml2_Response`.
-* `get_saml_attributes` - Retrieves an Array with the logged user data.
-
-
-##### OneLogin_Saml_Settings - `Settings.php` #####
-
-A simple class used to build the Setting object used in the v1.0 of the toolkit.
-
-##### OneLogin_Saml_Metadata - `Metadata.php` #####
-
-* `OneLogin_Saml_Metadata` - Constructor that build the Metadata XML info based
-  on the settings of the SP
-* `getXml` - An XML with the metadata info of the SP
-
-
-##### OneLogin_Saml_XmlSec - `XmlSec.php` #####
-
-Auxiliary class that contains methods to validate the SAML Response:
-`validateNumAssertions`, `validateTimestamps`, `isValid` (which
-uses the other two previous methods and also validate the signature of
-SAML Response).
-
-
 #### Saml2 library ####
 
 Lets describe now the classes and methods of the SAML2 library.
 
-##### OneLogin_Saml2_Auth - Auth.php #####
+##### OneLogin\Saml2\Auth - Auth.php #####
 
 Main class of OneLogin PHP Toolkit
 
- * `OneLogin_Saml2_Auth` - Initializes the SP SAML instance
+ * `Auth` - Initializes the SP SAML instance
  * `login` - Initiates the SSO process.
  * `logout` - Initiates the SLO process.
  * `processResponse` - Process the SAML Response sent by the IdP.
@@ -1209,20 +1167,20 @@ Main class of OneLogin PHP Toolkit
  * `getLastResponseXML` - Returns the most recently-constructed/processed XML SAML response (SAMLResponse, LogoutResponse). If the SAMLResponse had an encrypted assertion, decrypts it.
 
 
-##### OneLogin_Saml2_AuthnRequest - `AuthnRequest.php` #####
+##### OneLogin\Saml2\AuthnRequest - `AuthnRequest.php` #####
 
 SAML 2 Authentication Request class
 
- * `OneLogin_Saml2_AuthnRequest` - Constructs the `AuthnRequest` object.
+ * `AuthnRequest` - Constructs the `AuthnRequest` object.
  * `getRequest` - Returns deflated, base64 encoded, unsigned `AuthnRequest`.
  * `getId` - Returns the `AuthNRequest` ID.
  * `getXML` - Returns the XML that will be sent as part of the request.
 
-##### OneLogin_Saml2_Response - `Response.php` #####
+##### OneLogin\Saml2\Response - `Response.php` #####
 
 SAML 2 Authentication Response class
 
- * `OneLogin_Saml2_Response` - Constructs the SAML Response object.
+ * `Response` - Constructs the SAML Response object.
  * `isValid` - Determines if the SAML Response is valid using the certificate.
  * `checkStatus` - Checks if the Status is success.
  * `getAudiences` - Gets the audiences.
@@ -1242,11 +1200,11 @@ SAML 2 Authentication Response class
  * `getError` - After executing a validation process, if it fails, this method returns the cause
  * `getXMLDocument` - Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
 
-##### OneLogin_Saml2_LogoutRequest - `LogoutRequest.php` #####
+##### OneLogin\Saml2\LogoutRequest - `LogoutRequest.php` #####
 
 SAML 2 Logout Request class
 
- * `OneLogin_Saml2_LogoutRequest` - Constructs the Logout Request object.
+ * `LogoutRequest` - Constructs the Logout Request object.
  * `getRequest` - Returns the Logout Request defated, base64encoded, unsigned
  * `getID` - Returns the ID of the Logout Request. (If you have the object you can access to the id attribute)
  * `getNameIdData` - Gets the NameID Data of the the Logout Request.
@@ -1257,11 +1215,11 @@ SAML 2 Logout Request class
  * `getError` - After executing a validation process, if it fails, this method returns the cause
  * `getXML` - Returns the XML that will be sent as part of the request or that was received at the SP.
 
-##### OneLogin_Saml2_LogoutResponse - `LogoutResponse.php` #####
+##### OneLogin\Saml2\LogoutResponse - `LogoutResponse.php` #####
 
 SAML 2 Logout Response class
 
- * `OneLogin_Saml2_LogoutResponse` - Constructs a Logout Response object
+ * `LogoutResponse` - Constructs a Logout Response object
    (Initialize params from settings and if provided load the Logout Response)
  * `getIssuer` - Gets the Issuer of the Logout Response.
  * `getStatus` - Gets the Status of the Logout Response.
@@ -1271,11 +1229,11 @@ SAML 2 Logout Response class
  * `getError` - After executing a validation process, if it fails, this method returns the cause.
  * `getXML` - Returns the XML that will be sent as part of the response or that was received at the SP.
 
-##### OneLogin_Saml2_Settings - `Settings.php` #####
+##### OneLogin\Saml2\Settings - `Settings.php` #####
 
 Configuration of the OneLogin PHP Toolkit
 
- * `OneLogin_Saml2_Settings` -  Initializes the settings: Sets the paths of
+ * `Settings` -  Initializes the settings: Sets the paths of
    the different folders and Loads settings info from settings file or
    array/object provided
  * `checkSettings` - Checks the settings info.
@@ -1308,7 +1266,7 @@ Configuration of the OneLogin PHP Toolkit
  * `isStrict` - Returns if the 'strict' mode is active.
  * `isDebugActive` - Returns if the debug is active.
 
-##### OneLogin_Saml2_Metadata - `Metadata.php` #####
+##### OneLogin\Saml2\Metadata - `Metadata.php` #####
 
 A class that contains functionality related to the metadata of the SP
 
@@ -1317,7 +1275,7 @@ A class that contains functionality related to the metadata of the SP
 * `addX509KeyDescriptors` - Adds the x509 descriptors (sign/encriptation) to
   the metadata
 
-##### OneLogin_Saml2_Utils - `Utils.php` #####
+##### OneLogin\Saml2\Utils - `Utils.php` #####
 
 Auxiliary class that contains several methods
 
@@ -1356,7 +1314,7 @@ Auxiliary class that contains several methods
    (Message or Assertion).
  * `validateSign` - Validates a signature (Message or Assertion).
 
-##### OneLogin_Saml2_IdPMetadataParser - `IdPMetadataParser.php` #####
+##### OneLogin\Saml2\IdPMetadataParser - `IdPMetadataParser.php` #####
 
 Auxiliary class that contains several methods to retrieve and process IdP metadata
 
@@ -1527,43 +1485,3 @@ demo1, only changes the targets.
     Response, process it and close the session at of the IdP. Notice that the
     SLO Workflow starts and ends at the IdP.
 
-
-## Demo Old ##
-
-### SP setup ###
-
-This demo uses the old style of the version 1 of the toolkit.
-An object of the class `OneLogin_Saml_Settings` must be provided to the
-constructor of the `AuthRequest`.
-
-You will find an `example_settings.php` file at the demo-old's folder that
-could be used as a template for your `settings.php` file.
-
-In that template, SAML settings are divided into two parts, the application
-specific (`const_assertion_consumer_service_url`, `const_issuer`,
-`const_name_identifier_format`) and the user/account specific
-`idp_sso_target_url`, `x509certificate`). You'll need to add your own code here
-to identify the user or user origin (e.g. by `subdomain`, `ip_address` etc.).
-
-
-### IdP setup ###
-
-Once the SP is configured, the metadata of the SP is published at the
-`metadata.php` file. After that, configure the IdP based on that information.
-
-
-### How it works ###
-
-At the `metadata.php` view is published the metadata of the SP.
-
-The `index.php` file acts as an initiater for the SAML conversation if it should
-should be initiated by the application. This is called Service Provider
-Initiated SAML. The service provider creates a SAML Authentication Request and
-sends it to the identity provider (IdP).
-
-The `consume.php` is the ACS endpoint. Receives the SAML assertion. After Response
-validation, the userdata and the nameID will be available, using `getNameId()` or
-`getAttributes()` we obtain them.
-
-Since the version 1 of the php toolkit does not support SLO we don't show how
-handle SLO in this demo-old.

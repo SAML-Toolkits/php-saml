@@ -8,7 +8,9 @@ session_start();
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
-$auth = new OneLogin_Saml2_Auth();
+use OneLogin\Saml2\Auth;
+
+$auth = new Auth();
 
 $auth->processSLO();
 

@@ -12,11 +12,14 @@ session_start();
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
-$auth = new OneLogin_Saml2_Auth();
+use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Utils;
+
+$auth = new OneLogin\Saml2\Auth();
 
 if (!isset($_SESSION['samlUserdata'])) {
     $auth->login();
 } else {
-    $indexUrl = str_replace('/sso.php', '/index.php', OneLogin_Saml2_Utils::getSelfURLNoQuery());
-    OneLogin_Saml2_Utils::redirect($indexUrl);
+    $indexUrl = str_replace('/sso.php', '/index.php', Utils::getSelfURLNoQuery());
+    Utils::redirect($indexUrl);
 }

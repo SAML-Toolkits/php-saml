@@ -8,10 +8,13 @@
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
+use OneLogin\Saml2\Metadata;
+use OneLogin\Saml2\Settings;
+
 header('Content-Type: text/xml');
 
-$samlSettings = new OneLogin_Saml2_Settings();
+$samlSettings = new Settings();
 $sp = $samlSettings->getSPData();
 
-$samlMetadata = OneLogin_Saml2_Metadata::builder($sp);
+$samlMetadata = Metadata::builder($sp);
 echo $samlMetadata;

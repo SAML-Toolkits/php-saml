@@ -1,19 +1,23 @@
 <?php
 
+namespace OneLogin\Saml2\Tests;
+
+use OneLogin\Saml2\Error;
+
 /**
  * Unit tests for Error class
  */
-class OneLogin_Saml2_ErrorTest extends \PHPUnit\Framework\TestCase
+class ErrorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Tests the OneLogin_Saml2_Error Constructor. 
+     * Tests the OneLogin\Saml2\Error Constructor. 
      * The creation of a deflated SAML Request
      *
-     * @covers OneLogin_Saml2_Error
+     * @covers OneLogin\Saml2\Error
      */
     public function testError()
     {
-        $samlException = new OneLogin_Saml2_Error('test');
+        $samlException = new Error('test');
         $this->assertEquals('test', $samlException->getMessage());
     }
 }

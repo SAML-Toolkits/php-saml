@@ -8,9 +8,12 @@ session_start();
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
+use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Utils;
+
 require_once 'settings.php';
 
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new Auth($settingsInfo);
 
 if (isset($_GET['sso'])) {
     $auth->login();
@@ -78,7 +81,7 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
-    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+    if (isset($_POST['RelayState']) && Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);
     }
 } else if (isset($_GET['sls'])) {

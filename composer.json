@@ -6,9 +6,9 @@
     "homepage": "https://developers.onelogin.com/saml/php",
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {
-        "classmap": [
-            "lib/Saml2"
-        ]
+        "psr-4": {
+            "OneLogin\\Saml2\\": "src/"
+        }
     },
     "support": {
         "email": "sixto.garcia@onelogin.com",

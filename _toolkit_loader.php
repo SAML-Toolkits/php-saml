@@ -5,8 +5,8 @@
 // http://php.net/manual/en/language.oop5.autoload.php
 
 // Load composer vendor folder if any
-if (file_exists('vendor/autoload.php')) {
-    require 'vendor/autoload.php';
+if (file_exists(__DIR__ . 'vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
 }
 
 /*
@@ -21,7 +21,7 @@ include_once $xmlseclibsSrcDir.'/XMLSecurityKey.php';
 
 
 // Load php-saml
-$libDir = __DIR__ . '/lib/Saml2/';
+$libDir = __DIR__ . '/src/Saml2/';
 
 $folderInfo = scandir($libDir);
 
@@ -30,4 +30,3 @@ foreach ($folderInfo as $element) {
         include_once $libDir.$element;
     }
 }
-    

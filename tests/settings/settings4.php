@@ -16,13 +16,13 @@
                 'serviceDescription' => 'Service Description',
                 'requestedAttributes' => array (
                     array (
-                        'nameFormat' => \OneLogin_Saml2_Constants::ATTRNAME_FORMAT_BASIC,
+                        'nameFormat' => OneLogin\Saml2\Constants::ATTRNAME_FORMAT_BASIC,
                         'isRequired' => false,
                         'name' => 'userType',
                         'attributeValue' => array('userType', 'admin')
                     ),
                     array (
-                        'nameFormat' => \OneLogin_Saml2_Constants::ATTRNAME_FORMAT_URI,
+                        'nameFormat' => OneLogin\Saml2\Constants::ATTRNAME_FORMAT_URI,
                         'isRequired' => true,
                         'name' => 'urn:oid:0.9.2342.19200300.100.1.1',
                         'friendlyName' => 'uid'

@@ -9,10 +9,13 @@
 
 require_once dirname(__DIR__).'/_toolkit_loader.php';
 
+use OneLogin\Saml2\Response;
+use OneLogin\Saml2\Settings;
+
 try {
     if (isset($_POST['SAMLResponse'])) {
-        $samlSettings = new OneLogin_Saml2_Settings();
-        $samlResponse = new OneLogin_Saml2_Response($samlSettings, $_POST['SAMLResponse']);
+        $samlSettings = new Settings();
+        $samlResponse = new Response($samlSettings, $_POST['SAMLResponse']);
         if ($samlResponse->isValid()) {
             echo 'You are: ' . $samlResponse->getNameId() . '<br>';
             $attributes = $samlResponse->getAttributes();

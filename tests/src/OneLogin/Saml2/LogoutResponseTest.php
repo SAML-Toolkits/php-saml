@@ -1,9 +1,18 @@
 <?php
 
+namespace OneLogin\Saml2\Tests;
+
+use OneLogin\Saml2\Constants;
+use OneLogin\Saml2\LogoutResponse;
+use OneLogin\Saml2\Settings;
+use OneLogin\Saml2\Utils;
+
+use DomDocument;
+
 /**
  * Unit tests for Logout Response
  */
-class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
+class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 {
     private $_settings;
 
@@ -15,36 +24,36 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings = new Settings($settingsInfo);
         $this->_settings = $settings;
     }
 
     /**
-     * Tests the OneLogin_Saml2_LogoutResponse Constructor.
+     * Tests the LogoutResponse Constructor.
      *
-     * @covers OneLogin_Saml2_LogoutResponse
+     * @covers OneLogin\Saml2\LogoutResponse
      */
     public function testConstructor()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->assertRegExp('#<samlp:LogoutResponse#', $response->document->saveXML());
     }
 
     /**
-     * Tests the OneLogin_Saml2_LogoutResponse Constructor.
+     * Tests the LogoutResponse Constructor.
      * The creation of a deflated SAML Logout Response
      *
-     * @covers OneLogin_Saml2_LogoutResponse
+     * @covers OneLogin\Saml2\LogoutResponse
      */
     public function testCreateDeflatedSAMLLogoutResponseURLParameter()
     {
         $inResponseTo = 'ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e';
-        $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
+        $responseBuilder = new LogoutResponse($this->_settings);
         $responseBuilder->build($inResponseTo);
         $parameters = array('SAMLResponse' => $responseBuilder->getResponse());
 
-        $logoutUrl = OneLogin_Saml2_Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
 
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
@@ -56,60 +65,60 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests the getStatus method of the OneLogin_Saml2_LogoutResponse
+     * Tests the getStatus method of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getStatus
+     * @covers OneLogin\Saml2\LogoutResponse::getStatus
      */
     public function testGetStatus()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $status = $response->getStatus();
-        $this->assertEquals($status, OneLogin_Saml2_Constants::STATUS_SUCCESS);
+        $this->assertEquals($status, Constants::STATUS_SUCCESS);
 
         $message2 = file_get_contents(TEST_ROOT . '/data/logout_responses/invalids/no_status.xml.base64');
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message2);
+        $response2 = new LogoutResponse($this->_settings, $message2);
         $this->assertNULL($response2->getStatus());
     }
 
     /**
-     * Tests the getIssuer of the OneLogin_Saml2_LogoutResponse
+     * Tests the getIssuer of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getIssuer
+     * @covers OneLogin\Saml2\LogoutResponse::getIssuer
      */
     public function testGetIssuer()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
 
         $issuer = $response->getIssuer($response);
         $this->assertEquals('http://idp.example.com/', $issuer);
     }
 
     /**
-     * Tests the private method _query of the OneLogin_Saml2_LogoutResponse
+     * Tests the private method _query of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::_query
+     * @covers OneLogin\Saml2\LogoutResponse::_query
      */
     public function testQuery()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
 
         $issuer = $response->getIssuer($response);
         $this->assertEquals('http://idp.example.com/', $issuer);
     }
 
     /**
-     * Tests the getError method of the OneLogin_Saml2_LogoutResponse
+     * Tests the getError method of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getError
+     * @covers OneLogin\Saml2\LogoutResponse::getError
      */
     public function testGetError()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
         $requestId = 'invalid_request_id';
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->_settings->setStrict(true);
         $this->assertFalse($response->isValid($requestId));
         $this->assertEquals($response->getError(), 'The InResponseTo of the Logout Response: ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e, does not match the ID of the Logout request sent by the SP: invalid_request_id');
@@ -117,15 +126,15 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
 
     /**
-     * Tests the getError method of the OneLogin_Saml2_LogoutRequest
+     * Tests the getError method of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutRequest::getErrorException
+     * @covers OneLogin\Saml2\LogoutResponse::getErrorException
      */
     public function testGetErrorException()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
         $requestId = 'invalid_request_id';
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->_settings->setStrict(true);
         $this->assertFalse($response->isValid($requestId));
         $errorException = $response->getErrorException();
@@ -134,10 +143,10 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      * Case invalid request Id
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -147,18 +156,18 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
         $requestId = 'invalid_request_id';
 
         $this->_settings->setStrict(false);
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->assertTrue($response->isValid($requestId));
 
         $this->_settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response2 = new LogoutResponse($this->_settings, $message);
 
         $this->assertTrue($response2->isValid());
 
@@ -167,10 +176,10 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      * Case invalid Issuer
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -180,27 +189,27 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $plainMessage = str_replace('http://idp.example.com/', 'http://invalid.issuer.example.com', $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
         $this->_settings->setStrict(false);
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->assertTrue($response->isValid());
 
         $this->_settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response2 = new LogoutResponse($this->_settings, $message);
 
         $this->assertFalse($response2->isValid());
         $this->assertEquals('Invalid issuer in the Logout Response', $response2->getError());
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      * Case invalid xml
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -212,37 +221,37 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsInfo['security']['wantXMLValidation'] = false;
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings = new Settings($settingsInfo);
         $settings->setStrict(false);
 
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/invalids/invalid_xml.xml.base64');
 
-        $response = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $response = new LogoutResponse($settings, $message);
 
         $this->assertTrue($response->isValid());
 
         $settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $response2 = new LogoutResponse($settings, $message);
         $response2->isValid();
         $this->assertNotEquals('Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd', $response2->getError());
 
         $settingsInfo['security']['wantXMLValidation'] = true;
-        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings2 = new Settings($settingsInfo);
         $settings2->setStrict(false);
-        $response3 = new OneLogin_Saml2_LogoutResponse($settings2, $message);
+        $response3 = new LogoutResponse($settings2, $message);
         $this->assertTrue($response3->isValid());
 
         $settings2->setStrict(true);
-        $response4 = new OneLogin_Saml2_LogoutResponse($settings2, $message);
+        $response4 = new LogoutResponse($settings2, $message);
         $this->assertFalse($response4->isValid());
         $this->assertEquals('Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd', $response4->getError());
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      * Case invalid Destination
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -252,23 +261,23 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
 
         $this->_settings->setStrict(false);
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
         $this->assertTrue($response->isValid());
 
         $this->_settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
         $this->assertContains('The LogoutResponse was received at', $response2->getError());
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      */
     public function testIsInValidSign()
     {
-        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = Utils::getSelfURLNoQuery();
 
         $this->_settings->setStrict(false);
         $_GET = array (
@@ -278,18 +287,18 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
             'Signature' => 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVfNKGA='
         );
 
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertTrue($response->isValid());
 
         $this->_settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response2 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response2->isValid());
         $this->assertContains('Invalid issuer in the Logout Response', $response2->getError());
 
         $this->_settings->setStrict(false);
         $oldSignature = $_GET['Signature'];
         $_GET['Signature'] = 'vfWbbc47PkP3ejx4bjKsRX7lo9Ml1WRoE5J5owF/0mnyKHfSY6XbhO1wwjBV5vWdrUVX+xp6slHyAf4YoAsXFS0qhan6txDiZY4Oec6yE+l10iZbzvie06I4GPak4QrQ4gAyXOSzwCrRmJu4gnpeUxZ6IqKtdrKfAYRAcVf3333=';
-        $response3 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response3 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
 
         $this->assertFalse($response3->isValid());
         $this->assertEquals('Signature validation failed. Logout Response rejected', $response3->getError());
@@ -297,12 +306,12 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $_GET['Signature'] = $oldSignature;
         $oldSigAlg = $_GET['SigAlg'];
         unset($_GET['SigAlg']);
-        $response4 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response4 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertTrue($response4->isValid());
 
         $oldRelayState = $_GET['RelayState'];
         $_GET['RelayState'] = 'http://example.com/relaystate';
-        $response5 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response5 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response5->isValid());
         $this->assertEquals('Signature validation failed. Logout Response rejected', $response5->getError());
 
@@ -313,17 +322,17 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $plainMessage6 = str_replace('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/', $plainMessage6);
         $_GET['SAMLResponse'] = base64_encode(gzdeflate($plainMessage6));
 
-        $response6 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response6 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response6->isValid());
         $this->assertEquals('Signature validation failed. Logout Response rejected', $response6->getError());
 
         $this->_settings->setStrict(false);
-        $response7 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response7 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response7->isValid());
         $this->assertEquals('Signature validation failed. Logout Response rejected', $response7->getError());
 
         $_GET['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1';
-        $response8 = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        $response8 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response8->isValid());
         $this->assertEquals('Invalid signAlg in the recieved Logout Response', $response8->getError());
 
@@ -332,13 +341,13 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $settingsInfo['strict'] = true;
         $settingsInfo['security']['wantMessagesSigned'] = true;
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings = new Settings($settingsInfo);
 
         $_GET['SigAlg'] = $oldSigAlg;
         $oldSignature = $_GET['Signature'];
         unset($_GET['Signature']);
         $_GET['SAMLResponse'] = base64_encode(gzdeflate($plainMessage6));
-        $response9 = new OneLogin_Saml2_LogoutResponse($settings, $_GET['SAMLResponse']);
+        $response9 = new LogoutResponse($settings, $_GET['SAMLResponse']);
         $this->assertFalse($response9->isValid());
         $this->assertEquals('The Message of the Logout Response is not signed and the SP requires it', $response9->getError());
 
@@ -346,18 +355,18 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsInfo['idp']['certFingerprint'] = 'afe71c28ef740bc87425be13a2263d37971da1f9';
         unset($settingsInfo['idp']['x509cert']);
-        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings2 = new Settings($settingsInfo);
 
-        $response10 = new OneLogin_Saml2_LogoutResponse($settings2, $_GET['SAMLResponse']);
+        $response10 = new LogoutResponse($settings2, $_GET['SAMLResponse']);
         $this->assertFalse($response10->isValid());
         $this->assertEquals('In order to validate the sign on the Logout Response, the x509cert of the IdP is required', $response10->getError());
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      * Case: Using x509certMulti
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      */
     public function testIsValidSignUsingX509certMulti()
     {
@@ -373,39 +382,39 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $settingsInfo['strict'] = true;
         $settingsInfo['security']['wantMessagesSigned'] = true;
         $encodedResponse = $_GET['SAMLResponse'];
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings = new Settings($settingsInfo);
         $settings->setBaseURL("http://stuff.com/endpoints/endpoints/");
         $_SERVER['REQUEST_URI'] = "/endpoints/endpoints/sls.php";
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $_GET['SAMLResponse']);
+        $logoutResponse = new LogoutResponse($settings, $_GET['SAMLResponse']);
         $valid = $logoutResponse->isValid();
         unset($_SERVER['REQUEST_URI']);
-        OneLogin_Saml2_Utils::setBaseURL(null);
+        Utils::setBaseURL(null);
         $this->assertTrue($valid);
     }
 
     /**
-     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+     * Tests the isValid method of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin\Saml2\LogoutResponse::isValid
      */
     public function testIsValid()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
-        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response = new LogoutResponse($this->_settings, $message);
 
         $this->assertTrue($response->isValid());
 
         $this->_settings->setStrict(true);
-        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
         $this->assertContains('The LogoutResponse was received at', $response2->getError());
 
         $plainMessage = gzinflate(base64_decode($message));
-        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+        $currentURL = Utils::getSelfURLNoQuery();
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message3 = base64_encode(gzdeflate($plainMessage));
 
-        $response3 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message3);
+        $response3 = new LogoutResponse($this->_settings, $message3);
         $this->assertTrue($response3->isValid());
     }
 
@@ -413,7 +422,7 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Tests that a 'true' value for compress => responses gets honored when we
      * try to obtain the request payload from getResponse()
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getResponse()
+     * @covers OneLogin\Saml2\LogoutResponse::getResponse()
      */
     public function testWeCanChooseToCompressAResponse()
     {
@@ -425,8 +434,8 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
             TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64'
         );
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse();
         $decoded = base64_decode($payload);
         $decompressed = gzinflate($decoded);
@@ -438,7 +447,7 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Tests that a 'false' value for compress => responses gets honored when we
      * try to obtain the request payload from getResponse()
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getResponse()
+     * @covers OneLogin\Saml2\LogoutResponse::getResponse()
      */
     public function testWeCanChooseNotToCompressAResponse()
     {
@@ -450,8 +459,8 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
             TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64'
         );
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse();
         $decoded = base64_decode($payload);
         $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
@@ -461,7 +470,7 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Test that we can choose to compress or not compress the request payload
      * with getResponse() method.
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getResponse()
+     * @covers OneLogin\Saml2\LogoutResponse::getResponse()
      */
     public function testWeCanChooseToDeflateAResponseBody()
     {
@@ -473,8 +482,8 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
         
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(false);
         $decoded = base64_decode($payload);
         $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
@@ -482,8 +491,8 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
         
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(true);
         $decoded = base64_decode($payload);
         $decompressed = gzinflate($decoded);
@@ -494,20 +503,20 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Tests that we can get the request XML directly without
      * going through intermediate steps
      *
-     * @covers OneLogin_Saml2_LogoutResponse::getXML()
+     * @covers OneLogin\Saml2\LogoutResponse::getXML()
      */
     public function testGetXML()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings);
         $logoutResponse->build('jhgvsadja');
         $xml = $logoutResponse->getXML();
         $this->assertRegExp('#^<samlp:LogoutResponse#', $xml);
 
-        $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
+        $processedLogoutResponse = new LogoutResponse($settings, base64_encode($xml));
         $xml2 = $processedLogoutResponse->getXML();
         $this->assertRegExp('#^<samlp:LogoutResponse#', $xml2);
     }
@@ -515,22 +524,22 @@ class OneLogin_Saml2_LogoutResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests that we can get the ID of the LogoutResponse
      *
-     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     * @covers OneLogin\Saml2\LogoutRequest::getID()
      */
     public function testGetID()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings);
+        $settings = new Settings($settingsInfo);
+        $logoutResponse = new LogoutResponse($settings);
         $logoutResponse->build('jhgvsadja');
 
         $xml = $logoutResponse->getXML();
         $id1 = $logoutResponse->getID();
         $this->assertNotNull($id1);
     
-        $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
+        $processedLogoutResponse = new LogoutResponse($settings, base64_encode($xml));
         $id2 = $processedLogoutResponse->getID();
         $this->assertEquals($id1, $id2);
     }
