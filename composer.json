@@ -7,7 +7,7 @@
     "keywords": ["saml", "saml2", "onelogin"],
     "autoload": {
         "psr-4": {
-            "OneLogin\\Saml2\\": "src/"
+            "OneLogin\\": "src/"
         }
     },
     "support": {
