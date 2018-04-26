@@ -4,7 +4,6 @@ namespace OneLogin\Saml2\Tests;
 
 use OneLogin\Saml2\Response;
 use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
 
 /**
  * Unit tests for Response messages signed

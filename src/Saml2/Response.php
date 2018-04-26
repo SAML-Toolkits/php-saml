@@ -15,9 +15,6 @@
 
 namespace OneLogin\Saml2;
 
-use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecEnc;
 
@@ -195,7 +192,7 @@ class Response
                 }
 
                 $currentURL = Utils::getSelfRoutedURLNoQuery();
-                
+
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
@@ -372,7 +369,7 @@ class Response
                         ValidationError::NO_SIGNED_ASSERTION
                     );
                 }
-                
+
                 if ($security['wantMessagesSigned'] && !$hasSignedResponse) {
                     throw new ValidationError(
                         "The Message of the Response is not signed and the SP requires it",
@@ -1088,7 +1085,7 @@ class Response
                 $objKeyInfo->loadKey($pem, false, false);
             }
         }
-                
+
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }

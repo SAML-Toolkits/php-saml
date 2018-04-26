@@ -15,10 +15,6 @@
 
 namespace OneLogin\Saml2;
 
-use OneLogin\Saml2\Constants;
-use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
-
 /**
  * SAML 2 Authentication Request
  */
