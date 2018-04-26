@@ -55,7 +55,7 @@ class LogoutResponse
     /**
      * After execute a validation process, if it fails, this var contains the cause
      *
-     * @var string|null
+     * @var Exception|null
      */
     private $_error;
 
@@ -129,8 +129,6 @@ class LogoutResponse
      * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
-     *
-     * @throws Exception
      */
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
@@ -287,7 +285,7 @@ LOGOUTRESPONSE;
     /**
      * After execute a validation process, if fails this method returns the cause.
      *
-     * @return Exception Cause
+     * @return Exception|null Cause
      */
     public function getErrorException()
     {
