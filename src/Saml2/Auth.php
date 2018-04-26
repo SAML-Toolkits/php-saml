@@ -15,15 +15,6 @@
 
 namespace OneLogin\Saml2;
 
-use OneLogin\Saml2\AuthnRequest;
-use OneLogin\Saml2\Constants;
-use OneLogin\Saml2\Error;
-use OneLogin\Saml2\LogoutRequest;
-use OneLogin\Saml2\LogoutResponse;
-use OneLogin\Saml2\Response;
-use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 use Exception;

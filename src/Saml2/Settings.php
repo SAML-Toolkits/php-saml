@@ -15,9 +15,6 @@
 
 namespace OneLogin\Saml2;
 
-use OneLogin\Saml2\Utils;
-use OneLogin\Saml2\Error;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 

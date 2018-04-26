@@ -15,10 +15,6 @@
 
 namespace OneLogin\Saml2;
 
-use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
-use OneLogin\Saml2\ValidationError;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 use DOMDocument;
