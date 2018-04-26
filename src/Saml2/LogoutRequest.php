@@ -172,6 +172,8 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string ID
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public static function getID($request)
     {
@@ -180,6 +182,14 @@ LOGOUTREQUEST;
         } else {
             $dom = new DOMDocument();
             $dom = Utils::loadXML($dom, $request);
+        }
+
+
+        if (false === $dom) {
+            throw new Error(
+                "LogoutRequest could not be processed",
+                Error::SAML_LOGOUTREQUEST_INVALID
+            );
         }
 
         $id = $dom->documentElement->getAttribute('ID');

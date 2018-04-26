@@ -875,4 +875,22 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $id2 = $logoutRequestProcessed->id;
         $this->assertEquals($id1, $id2);
     }
+
+    /**
+     * Tests that the LogoutRequest throws an exception
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::getID()
+     *
+     * @expectedException OneLogin\Saml2\Error
+     * @expectedExceptionMessage LogoutRequest could not be processed
+     */
+    public function testGetIDException()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settings = new Settings($settingsInfo);
+        $logoutRequest = new LogoutRequest($settings);
+        $xml = $logoutRequest->getXML();
+        $id1 = LogoutRequest::getID($xml.'<garbage>');
+    }
 }

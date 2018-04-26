@@ -86,6 +86,13 @@ class LogoutResponse
             $this->document = new DOMDocument();
             $this->document = Utils::loadXML($this->document, $this->_logoutResponse);
 
+            if (false === $this->document) {
+                throw new Error(
+                    "LogoutResponse could not be processed",
+                    Error::SAML_LOGOUTRESPONSE_INVALID
+                );
+            }
+
             if ($this->document->documentElement->hasAttribute('ID')) {
                 $this->id = $this->document->documentElement->getAttribute('ID');
             }
