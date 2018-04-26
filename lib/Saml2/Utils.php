@@ -406,7 +406,7 @@ class OneLogin_Saml2_Utils
     }
 
     /**
-     * return string The baseurlpath to be used when constructing URLs
+     * @return string The baseurlpath to be used when constructing URLs
      */
     public static function getBaseURLPath()
     {
@@ -716,7 +716,7 @@ class OneLogin_Saml2_Utils
      *                            duration to. Optional, default to the
      *                            current time.
      *
-     * @return int|null The new timestamp, after the duration is applied.
+     * @return int The new timestamp, after the duration is applied.
      *
      * @throws Exception
      */
@@ -799,8 +799,8 @@ class OneLogin_Saml2_Utils
     /**
      * Compares 2 dates and returns the earliest.
      *
-     * @param string $cacheDuration The duration, as a string.
-     * @param string $validUntil    The valid until date, as a string or as a timestamp
+     * @param string|null       $cacheDuration The duration, as a string.
+     * @param string|int|null   $validUntil    The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
      */
@@ -830,9 +830,9 @@ class OneLogin_Saml2_Utils
     /**
      * Extracts nodes from the DOMDocument.
      *
-     * @param DOMDocument $dom     The DOMDocument
-     * @param string      $query   Xpath Expresion
-     * @param DomElement  $context Context Node (DomElement)
+     * @param DOMDocument       $dom     The DOMDocument
+     * @param string            $query   Xpath Expresion
+     * @param DomElement|null   $context Context Node (DomElement)
      *
      * @return DOMNodeList The queried nodes
      */
@@ -953,7 +953,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string      $value  fingerprint
      * @param string      $spnq   SP Name Qualifier
-     * @param string      $format SP Format
+     * @param string|null $format SP Format
      * @param string|null $cert   IdP Public cert to encrypt the nameID
      * @param string|null $nq     IdP Name Qualifier
      *
@@ -1381,6 +1381,18 @@ class OneLogin_Saml2_Utils
         return $valid;
     }
 
+    /**
+     * Validates a binary signature
+     *
+     * @param string $messageType                    Type of SAML Message
+     * @param array  $getData                        HTTP GET array
+     * @param array  $idpData                        IdP setting data
+     * @param bool   $retrieveParametersFromServer   Indicates where to get the values in order to validate the Sign, from getData or from $_SERVER
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
     public static function validateBinarySign($messageType, $getData, $idpData, $retrieveParametersFromServer = false)
     {
         if (!isset($getData['SigAlg'])) {
