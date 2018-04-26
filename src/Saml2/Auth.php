@@ -122,7 +122,7 @@ class Auth
     /**
      * Last error.
      *
-     * @var String|null
+     * @var string|null
      */
     private $_lastError;
 
@@ -146,7 +146,7 @@ class Auth
      * (SAMLResponse, LogoutResponse). If the SAMLResponse was
      * encrypted, by default tries to return the decrypted XML
      *
-     * @var string
+     * @var string|\DomDocument|null
      */
     private $_lastResponse;
 
@@ -236,10 +236,10 @@ class Auth
      * @param bool        $keepLocalSession             When false will destroy the local session, otherwise will keep it
      * @param string|null $requestId                    The ID of the LogoutRequest sent by this SP to the IdP
      * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
-     * @param callable    $cbDeleteSession              Method name to be executed to delete session
+     * @param callable    $cbDeleteSession              Callback to be executed to delete session
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
-     * @return string|void
+     * @return string|null
      *
      * @throws Error
      */
@@ -397,7 +397,7 @@ class Auth
     /**
      * Returns the SessionNotOnOrAfter
      *
-     * @return DateTime|null  The SessionNotOnOrAfter of the assertion
+     * @return int|null  The SessionNotOnOrAfter of the assertion
      */
     public function getSessionExpiration()
     {
@@ -428,7 +428,7 @@ class Auth
     /**
      * Returns the last error
      *
-     * @return Exception Error
+     * @return Exception|null Error
      */
     public function getLastErrorException()
     {
@@ -458,10 +458,10 @@ class Auth
      *
      * @param string|null $returnTo        The target URL the user should be returned to after login.
      * @param array       $parameters      Extra parameters to be added to the GET
-     * @param bool        $forceAuthn      When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool        $isPassive       When true the AuthNReuqest will set the Ispassive='true'
+     * @param bool        $forceAuthn      When true the AuthNRequest will set the ForceAuthn='true'
+     * @param bool        $isPassive       When true the AuthNRequest will set the Ispassive='true'
      * @param bool        $stay            True if we want to stay (returns the url string) False to redirect
-     * @param bool        $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
+     * @param bool        $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
@@ -560,7 +560,7 @@ class Auth
     /**
      * Gets the SLO url.
      *
-     * @return string The url of the Single Logout Service
+     * @return string|null The url of the Single Logout Service
      */
     public function getSLOurl()
     {

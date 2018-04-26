@@ -66,7 +66,7 @@ class Response
     /**
      * After validation, if it fail this var has the cause of the problem
      *
-     * @var Exception
+     * @var Exception|null
      */
     private $_error;
 
@@ -1023,7 +1023,7 @@ class Response
     /**
      * Extracts nodes that match the query from the DOMDocument (Response Menssage)
      *
-     * @param string $query Xpath Expresion
+     * @param string $query Xpath Expression
      *
      * @return DOMNodeList The queried nodes
      */
@@ -1125,7 +1125,7 @@ class Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
-     * @return Exception Cause
+     * @return Exception|null Cause
      */
     public function getErrorException()
     {
