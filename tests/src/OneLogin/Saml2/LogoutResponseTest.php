@@ -437,7 +437,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         //Test that we can choose not to compress the request payload.
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        
+
         //Compression is currently turned on in settings.
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
@@ -448,7 +448,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         //Test that we can choose not to compress the request payload.
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
-        
+
         //Compression is currently turned on in settings.
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
@@ -497,9 +497,26 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $xml = $logoutResponse->getXML();
         $id1 = $logoutResponse->getID();
         $this->assertNotNull($id1);
-    
+
         $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
         $id2 = $processedLogoutResponse->getID();
         $this->assertEquals($id1, $id2);
+    }
+
+    /**
+     * Tests that the LogoutRequest throws an exception
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     *
+     * @expectedException OneLogin_Saml2_Error
+     * @expectedExceptionMessage LogoutResponse could not be processed
+     */
+    public function testGetIDException()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, '<garbage>');
     }
 }

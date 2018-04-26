@@ -265,7 +265,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     /**
     * Tests the OneLogin_Saml2_LogoutRequest Constructor.
     * Case: Able to generate encryptedID with MultiCert
-    * 
+    *
     * @covers OneLogin_Saml2_LogoutRequest
     */
     public function testConstructorEncryptIdUsingX509certMulti()
@@ -828,7 +828,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
         $xml = $logoutRequest->getXML();
         $this->assertRegExp('#^<samlp:LogoutRequest#', $xml);
-    
+
         $logoutRequestProcessed = new OneLogin_Saml2_LogoutRequest($settings, base64_encode($xml));
         $xml2 = $logoutRequestProcessed->getXML();
         $this->assertRegExp('#^<samlp:LogoutRequest#', $xml2);
@@ -849,9 +849,28 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $xml = $logoutRequest->getXML();
         $id1 = OneLogin_Saml2_LogoutRequest::getID($xml);
         $this->assertNotNull($id1);
-    
+
         $logoutRequestProcessed = new OneLogin_Saml2_LogoutRequest($settings, base64_encode($xml));
         $id2 = $logoutRequestProcessed->id;
         $this->assertEquals($id1, $id2);
+    }
+
+    /**
+     * Tests that the LogoutRequest throws an exception
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     *
+     * @expectedException OneLogin_Saml2_Error
+     * @expectedExceptionMessage LogoutRequest could not be processed
+     */
+    public function testGetIDException()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+        $xml = $logoutRequest->getXML();
+        $id1 = OneLogin_Saml2_LogoutRequest::getID($xml.'<garbage>');
     }
 }
