@@ -404,33 +404,74 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
      * Case with x509certNew
      *
      * @covers OneLogin\Saml2\Settings::getSPMetadata
+     * @dataProvider getSPMetadataWithX509CertNewDataProvider
      */
-    public function testGetSPMetadataWithX509CertNew()
+    public function testGetSPMetadataWithX509CertNew($alwaysIncludeEncryption, $wantNameIdEncrypted, $wantAssertionsEncrypted, $expectEncryptionKeyDescriptor)
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings5.php';
-
-        $settingsInfo['security']['wantNameIdEncrypted'] = false;
-        $settingsInfo['security']['wantAssertionsEncrypted'] = false;
+        $settingsInfo['security']['wantNameIdEncrypted'] = $wantNameIdEncrypted;
+        $settingsInfo['security']['wantAssertionsEncrypted'] = $wantAssertionsEncrypted;
         $settings = new Settings($settingsInfo);
-        $metadata = $settings->getSPMetadata();
-
-        $this->assertEquals(2, substr_count($metadata, "<md:KeyDescriptor"));
-
+        $metadata = $settings->getSPMetadata($alwaysIncludeEncryption);
+        $this->assertEquals($expectEncryptionKeyDescriptor ? 4 : 2, substr_count($metadata, "<md:KeyDescriptor"));
+        // signing KeyDescriptor should always be included
         $this->assertEquals(2, substr_count($metadata, '<md:KeyDescriptor use="signing"'));
+        $this->assertEquals($expectEncryptionKeyDescriptor ? 2 : 0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
+    }
 
-        $this->assertEquals(0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
-
-        $settingsInfo['security']['wantNameIdEncrypted'] = true;
-        $settingsInfo['security']['wantAssertionsEncrypted'] = true;
-        $settings2 = new Settings($settingsInfo);
-        $metadata2 = $settings2->getSPMetadata();
-
-        $this->assertEquals(4, substr_count($metadata2, "<md:KeyDescriptor"));
-
-        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="signing"'));
-
-        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="encryption"'));
+    public function getSPMetadataWithX509CertNewDataProvider()
+    {
+        return [
+            'settings do not require encryption' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => false,
+            ],
+            'wantNameIdEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'wantAssertionsEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'both settings enabled'=> [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and wantNameIdEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and wantAssertionsEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and both settings enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+        ];
     }
 
     /**

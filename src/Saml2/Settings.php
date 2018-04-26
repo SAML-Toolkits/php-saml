@@ -788,11 +788,17 @@ class Settings
     /**
      * Gets the SP metadata. The XML representation.
      *
+     * @param bool $alwaysPublishEncryptionCert When 'true', the returned
+     * metadata will always include an 'encryption' KeyDescriptor. Otherwise,
+     * the 'encryption' KeyDescriptor will only be included if 
+     * $advancedSettings['security']['wantNameIdEncrypted'] or
+     * $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
+     *
      * @return string  SP metadata (xml)
      * @throws Exception
      * @throws Error
      */
-    public function getSPMetadata()
+    public function getSPMetadata($alwaysPublishEncryptionCert = false)
     {
         $metadata = Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
 
@@ -801,7 +807,7 @@ class Settings
             $metadata = Metadata::addX509KeyDescriptors(
                 $metadata,
                 $certNew,
-                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
             );
         }
 
@@ -810,7 +816,7 @@ class Settings
             $metadata = Metadata::addX509KeyDescriptors(
                 $metadata,
                 $cert,
-                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
             );
         }
 
