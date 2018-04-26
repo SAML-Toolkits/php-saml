@@ -31,6 +31,9 @@
         "pdepend/pdepend" : "1.1.0",
         "squizlabs/php_codesniffer": "2.9.0"
     },
+    "replace": {
+        "robrichards/xmlseclibs": "*"
+    },
     "suggest": {
         "ext-gettext": "Install gettext and php5-gettext libs to handle translations"
     }
