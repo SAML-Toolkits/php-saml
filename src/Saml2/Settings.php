@@ -245,7 +245,7 @@ class Settings
      *
      * @return bool True if the settings info is valid
      */
-    private function _loadSettingsFromArray($settings)
+    private function _loadSettingsFromArray(array $settings)
     {
         if (isset($settings['sp'])) {
             $this->_sp = $settings['sp'];
@@ -444,11 +444,9 @@ class Settings
      *
      * @return array $errors  Errors found on the settings data
      */
-    public function checkSettings($settings)
+    public function checkSettings(array $settings)
     {
-        assert(is_array($settings));
-
-        if (!is_array($settings) || empty($settings)) {
+        if (empty($settings)) {
             $errors = array('invalid_syntax');
         } else {
             $errors = array();
@@ -502,11 +500,9 @@ class Settings
      *
      * @return array $errors  Errors found on the IdP settings data
      */
-    public function checkIdPSettings($settings)
+    public function checkIdPSettings(array $settings)
     {
-        assert(is_array($settings));
-
-        if (!is_array($settings) || empty($settings)) {
+        if (empty($settings)) {
             return array('invalid_syntax');
         }
 
@@ -567,11 +563,9 @@ class Settings
      *
      * @return array $errors  Errors found on the SP settings data
      */
-    public function checkSPSettings($settings)
+    public function checkSPSettings(array $settings)
     {
-        assert(is_array($settings));
-
-        if (!is_array($settings) || empty($settings)) {
+        if (empty($settings)) {
             return array('invalid_syntax');
         }
 
@@ -900,7 +894,7 @@ class Settings
      *
      * @param string $xml Metadata's XML that will be validate
      *
-     * @return Array The list of found errors
+     * @return array The list of found errors
      */
     public function validateMetadata($xml)
     {
