@@ -153,11 +153,11 @@ class Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array|object|null $oldSettings Setting data (You can provide a OneLogin\Saml\Settings, the settings object of the Saml folder implementation)
+     * @param array|null $settings Setting data
      */
-    public function __construct($oldSettings = null)
+    public function __construct(array $settings = null)
     {
-        $this->_settings = new Settings($oldSettings);
+        $this->_settings = new Settings($settings);
     }
 
     /**

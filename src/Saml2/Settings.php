@@ -116,13 +116,13 @@ class Settings
      * - Sets the paths of the different folders
      * - Loads settings info from settings file or array/object provided
      *
-     * @param array|object|null $settings         SAML Toolkit Settings
-     * @param bool              $spValidationOnly Validate or not the IdP data
+     * @param array|null $settings         SAML Toolkit Settings
+     * @param bool       $spValidationOnly Validate or not the IdP data
      *
      * @throws Error If any settings parameter is invalid
      * @throws Exception If Settings is incorrectly supplied
      */
-    public function __construct($settings = null, $spValidationOnly = false)
+    public function __construct(array $settings = null, $spValidationOnly = false)
     {
         $this->_spValidationOnly = $spValidationOnly;
         $this->_loadPaths();
@@ -136,7 +136,7 @@ class Settings
                 );
             }
             $this->_addDefaultValues();
-        } else if (is_array($settings)) {
+        } else {
             if (!$this->_loadSettingsFromArray($settings)) {
                 throw new Error(
                     'Invalid array settings: %s',
@@ -144,18 +144,6 @@ class Settings
                     array(implode(', ', $this->_errors))
                 );
             }
-        } else if ($settings instanceof \Settings) {
-            throw new Error(
-                'Only OneLogin\Saml\Settings objects are supported.',
-                Error::UNSUPPORTED_SETTINGS_OBJECT,
-                array(implode(', ', $this->_errors))
-            );
-        } else {
-            throw new Error(
-                'Invalid array settings: %s',
-                Error::SETTINGS_INVALID,
-                array(implode(', ', $this->_errors))
-            );
         }
 
         $this->formatIdPCert();
