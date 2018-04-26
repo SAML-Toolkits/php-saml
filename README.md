@@ -119,7 +119,7 @@ After installation has completed you will find at the `vendor/` folder a new fol
 **Important** In this option, the x509 certs must be stored at `vendor/onelogin/php-saml/certs`
 and settings file stored at `vendor/onelogin/php-saml`.
 
-Your settings are at risk of being deleted when updating packages using `composer update` or similiar commands. So it is **highly** recommended that instead of using settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similiar commands.
+Your settings are at risk of being deleted when updating packages using `composer update` or similar commands. So it is **highly** recommended that instead of using settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similar commands.
 
 Compatibility
 -------------
@@ -144,7 +144,7 @@ the new features that the new library Saml2 carries.
 Namespaces
 ----------
 
-If you are using the library with a framework like Symfony2 that contains
+If you are using the library with a framework like Symfony that contains
 namespaces, remember that calls to the class must be done by adding a backslash (`\`) to the
 start, for example to use the static method getSelfURLNoQuery use:
 
@@ -159,7 +159,7 @@ In production, the `strict` parameter **MUST** be set as `"true"` and the
 something other than SHA1 (see https://shattered.io/ ). Otherwise your
 environment is not secure and will be exposed to attacks.
 
-In production also we highly recommended to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a siganture validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
+In production also we highly recommended to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
 
 Getting started
 ---------------
@@ -173,7 +173,7 @@ Let's start describing the folders:
 
 #### `certs/` ####
 
-SAML requires a x.509 cert to sign and encrypt elements like `NameID`, `Message`,
+SAML requires a x509 cert to sign and encrypt elements like `NameID`, `Message`,
 `Assertion`, `Metadata`.
 
 If our environment requires sign or encrypt support, this folder may contain
@@ -186,11 +186,11 @@ Or also we can provide those data in the setting file at the `$settings['sp']['x
 and the `$settings['sp']['privateKey']`.
 
 Sometimes we could need a signature on the metadata published by the SP, in
-this case we could use the x.509 cert previously mentioned or use a new x.509
+this case we could use the x509 cert previously mentioned or use a new x509
 cert: `metadata.crt` and `metadata.key`.
 
 Use `sp_new.crt` if you are in a key rollover process and you want to
-publish that x509certificate on Service Provider metadata.
+publish that x509 certificate on Service Provider metadata.
 
 #### `extlib/` ####
 
@@ -545,7 +545,7 @@ $advancedSettings = array (
 
 The compression settings allow you to instruct whether or not the IdP can accept
 data that has been compressed using [gzip](gzip) ('requests' and 'responses').
-But if we provide a $deflate boolean parameter to the getRequest or getResponse method it will have priority over the compression settings.
+But if we provide a `$deflate` boolean parameter to the `getRequest` or `getResponse` method it will have priority over the compression settings.
 
 In the security section, you can set the way that the SP will handle the messages
 and assertions. Contact the admin of the IdP and ask him what the IdP expects,
@@ -556,7 +556,7 @@ Once we know what kind of data could be configured, let's talk about the way
 settings are handled within the toolkit.
 
 The settings files described (`settings.php` and `advanced_settings.php`) are loaded
-by the toolkit if not other array with settings info is provided in the constructors of the toolkit. Let's see some examples.
+by the toolkit if no other array with settings info is provided in the constructor of the toolkit. Let's see some examples.
 
 ```php
 // Initializes toolkit with settings.php & advanced_settings files.
@@ -570,7 +570,7 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 $settings = new OneLogin_Saml2_Settings($settingsInfo);
 ```
 
-You can declare the `$settingsInfo` in the file that constains the constructor
+You can declare the `$settingsInfo` in the file that contains the constructor
 execution or locate them in any file and load the file in order to get the
 array available as we see in the following example:
 
@@ -632,9 +632,9 @@ The `AuthNRequest` will be sent signed or unsigned based on the security info
 of the `advanced_settings.php` (`'authnRequestsSigned'`).
 
 
-The IdP will then return the SAML Response to the user's client. The client is then forwarded to the Attribute Consumer Service of the SP with this information. If we do not set a 'url' param in the login method and we are using the default ACS provided by the toolkit (`endpoints/acs.php`), then the ACS endpoint will redirect the user to the file that launched the SSO request.
+The IdP will then return the SAML Response to the user's client. The client is then forwarded to the Attribute Consumer Service of the SP with this information. If we do not set a `'url'` param in the login method and we are using the default ACS provided by the toolkit (`endpoints/acs.php`), then the ACS endpoint will redirect the user to the file that launched the SSO request.
 
-We can set an `'returnTo'` url to change the workflow and redirect the user to the other PHP file.
+We can set a `'returnTo'` url to change the workflow and redirect the user to the other PHP file.
 
 ```php
 $newTargetUrl = 'http://example.com/consume2.php';
@@ -701,7 +701,8 @@ Before the XML metadata is exposed, a check takes place to ensure
 that the info to be provided is valid.
 
 Instead of use the Auth object, you can directly use
-```
+
+```php
 $settings = new OneLogin_Saml2_Settings($settingsInfo, true);
 ```
 to get the settings object and with the true parameter we will avoid the IdP Settings validation.
@@ -1126,11 +1127,11 @@ php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to gue
 
 getSelfURLNoQuery and getSelfRoutedURLNoQuery are used to calculate the currentURL in order to valdate SAML elements like Destination or Recipient.
 
-When the PHP application is behind a proxy or a load balancer we can execute setProxyVars(true) and getSelfPort and isHTTPS will take care of the $_SERVER["HTTP_X_FORWARDED_PORT"] and $_SERVER['HTTP_X_FORWARDED_PROTO'] vars (otherwise they are ignored).
+When the PHP application is behind a proxy or a load balancer we can execute `setProxyVars(true)` and `setSelfPort` and `isHTTPS` will take care of the `$_SERVER["HTTP_X_FORWARDED_PORT"]` and `$_SERVER['HTTP_X_FORWARDED_PROTO']` vars (otherwise they are ignored).
 
-Also a developer can use setSelfProtocol, setSelfHost, setSelfPort and getBaseURLPath to define a specific value to be returned by isHTTPS, getSelfHost, getSelfPort and getBaseURLPath. And define a setBasePath to be used on the getSelfURL and getSelfRoutedURLNoQuery to replace the data extracted from $_SERVER["REQUEST_URI"].
+Also a developer can use `setSelfProtocol`, `setSelfHost`, `setSelfPort` and `getBaseURLPath` to define a specific value to be returned by `isHTTPS`, `getSelfHost`, `getSelfPort` and `getBaseURLPath`. And define a `setBasePath` to be used on the `getSelfURL` and `getSelfRoutedURLNoQuery` to replace the data extracted from `$_SERVER["REQUEST_URI"]`.
 
-At the settings the developer will be able to set a 'baseurl' parameter that automatically will use setBaseURL to set values for setSelfProtocol, setSelfHost, setSelfPort and setBaseURLPath.
+At the settings the developer will be able to set a `'baseurl'` parameter that automatically will use `setBaseURL` to set values for `setSelfProtocol`, `setSelfHost`, `setSelfPort` and `setBaseURLPath`.
 
 
 ### Working behind load balancer ###
@@ -1144,7 +1145,7 @@ Or by using the method described on the previous section.
 
 ### SP Key rollover ###
 
-If you plan to update the SP x509cert and privateKey you can define the new x509cert as $settings['sp']['x509certNew'] and it will be
+If you plan to update the SP x509cert and privateKey you can define the new x509cert as `$settings['sp']['x509certNew']` and it will be
 published on the SP metadata so Identity Providers can read them and get ready for rollover.
 
 
@@ -1153,20 +1154,20 @@ published on the SP metadata so Identity Providers can read them and get ready f
 In some scenarios the IdP uses different certificates for
 signing/encryption, or is under key rollover phase and more than one certificate is published on IdP metadata.
 
-In order to handle that the toolkit offers the $settings['idp']['x509certMulti'] parameter.
+In order to handle that the toolkit offers the `$settings['idp']['x509certMulti']` parameter.
 
-When that parameter is used, 'x509cert' and 'certFingerprint' values will be ignored by the toolkit.
+When that parameter is used, `'x509cert'` and `'certFingerprint'` values will be ignored by the toolkit.
 
-The 'x509certMulti' is an array with 2 keys:
-- 'signing'. An array of certs that will be used to validate IdP signature
-- 'encryption' An array with one unique cert that will be used to encrypt data to be sent to the IdP
+The `'x509certMulti'` is an array with 2 keys:
+- `'signing'`. An array of certs that will be used to validate IdP signature
+- `'encryption'` An array with one unique cert that will be used to encrypt data to be sent to the IdP
 
 
 ### Replay attacks ###
 
 In order to avoid replay attacks, you can store the ID of the SAML messages already processed, to avoid processing them twice. Since the Messages expires and will be invalidated due that fact, you don't need to store those IDs longer than the time frame that you currently accepting.
 
-Get the ID of the last processed message/assertion with the getLastMessageId/getLastAssertionId method of the Auth object.
+Get the ID of the last processed message/assertion with the `getLastMessageId/getLastAssertionId` methods of the Auth object.
 
 
 ### Main classes and methods ###
