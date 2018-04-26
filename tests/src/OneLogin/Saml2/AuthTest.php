@@ -2,7 +2,6 @@
 
 namespace OneLogin\Saml2\Tests;
 
-use OneLogin\Saml2\AuthnRequest;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Error;
 use OneLogin\Saml2\LogoutRequest;

@@ -9,7 +9,6 @@ use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
 
 use DomDocument;
-use Exception;
 
 /**
  * Unit tests for Logout Request
@@ -850,7 +849,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings);
         $xml = $logoutRequest->getXML();
         $this->assertRegExp('#^<samlp:LogoutRequest#', $xml);
-    
+
         $logoutRequestProcessed = new LogoutRequest($settings, base64_encode($xml));
         $xml2 = $logoutRequestProcessed->getXML();
         $this->assertRegExp('#^<samlp:LogoutRequest#', $xml2);
@@ -871,7 +870,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $xml = $logoutRequest->getXML();
         $id1 = LogoutRequest::getID($xml);
         $this->assertNotNull($id1);
-    
+
         $logoutRequestProcessed = new LogoutRequest($settings, base64_encode($xml));
         $id2 = $logoutRequestProcessed->id;
         $this->assertEquals($id1, $id2);
