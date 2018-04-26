@@ -605,6 +605,43 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the getAttributesWithFriendlyName method of the OneLogin_Saml2_Response
+     *
+     * @covers OneLogin\Saml2\Response::getAttributesWithFriendlyName
+     */
+    public function testGetAttributesWithFriendlyName()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response6.xml.base64');
+        $response = new Response($this->_settings, $xml);
+        $expectedAttributes = array(
+            'uid' => array(
+                'demo'
+            ),
+            'givenName' => array(
+                'value'
+            ),
+        );
+        $this->assertEquals($expectedAttributes, $response->getAttributesWithFriendlyName());
+        // An assertion that has no attributes should return an empty array when asked for the attributes
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response2.xml.base64');
+        $response2 = new Response($this->_settings, $xml2);
+        $this->assertEmpty($response2->getAttributesWithFriendlyName());
+        // Encrypted Attributes are not supported
+        $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_attrs.xml.base64');
+        $response3 = new Response($this->_settings, $xml3);
+        $this->assertEmpty($response3->getAttributesWithFriendlyName());
+        // Duplicated Attribute names
+        $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/duplicated_attributes_with_friendly_names.xml.base64');
+        $response4 = new Response($this->_settings, $xml4);
+        try {
+            $attrs = $response4->getAttributesWithFriendlyName();
+            $this->fail('OneLogin\Saml2\ValidationError was not raised');
+        } catch (ValidationError $e) {
+            $this->assertContains('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
+        }
+    }
+
+    /**
      * Tests the getNameId method of the Response
      *
      * The Assertion is unsigned, the response is invalid but is able to retrieve the NameID

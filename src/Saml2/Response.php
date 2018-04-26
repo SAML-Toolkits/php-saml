@@ -732,35 +732,36 @@ class Response
      */
     public function getAttributes()
     {
+        return $this->_getAttributesByKeyName('Name');
+    }
+
+    /**
+     * Gets the Attributes from the AttributeStatement element using their FriendlyName.
+     *
+     * @return array The attributes of the SAML Assertion
+     */
+    public function getAttributesWithFriendlyName()
+    {
+        return $this->_getAttributesByKeyName('FriendlyName');
+    }
+
+    private function _getAttributesByKeyName($keyName="Name")
+    {
         $attributes = array();
-
-        /* EncryptedAttributes not supported
-
-        $encriptedAttributes = $this->_queryAssertion('/saml:AttributeStatement/saml:EncryptedAttribute');
-
-        if ($encriptedAttributes->length > 0) {
-            foreach ($encriptedAttributes as $encriptedAttribute) {
-                $key = $this->_settings->getSPkey();
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-                $seckey->loadKey($key);
-                $attribute = Utils::decryptElement($encriptedAttribute->firstChild(), $seckey);
-            }
-        }
-        */
-
         $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
-
-        // @var $entry DOMNode
+        /** @var $entry DOMNode */
         foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
-
-            if (in_array($attributeName, array_keys($attributes))) {
+            $attributeKeyNode = $entry->attributes->getNamedItem($keyName);
+            if ($attributeKeyNode === null) {
+                continue;
+            }
+            $attributeKeyName = $attributeKeyNode->nodeValue;
+            if (in_array($attributeKeyName, array_keys($attributes))) {
                 throw new ValidationError(
-                    "Found an Attribute element with duplicated Name",
+                    "Found an Attribute element with duplicated ".$keyName,
                     ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
                 );
             }
-
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
@@ -768,8 +769,7 @@ class Response
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
-
-            $attributes[$attributeName] = $attributeValues;
+            $attributes[$attributeKeyName] = $attributeValues;
         }
         return $attributes;
     }
