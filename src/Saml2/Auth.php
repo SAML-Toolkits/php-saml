@@ -332,10 +332,9 @@ class Auth
      *
      * @return string|null
      */
-    public function redirectTo($url = '', $parameters = array(), $stay = false)
+    public function redirectTo($url = '', array $parameters = array(), $stay = false)
     {
         assert(is_string($url));
-        assert(is_array($parameters));
 
         if (empty($url) && isset($_REQUEST['RelayState'])) {
             $url = $_REQUEST['RelayState'];
@@ -475,10 +474,8 @@ class Auth
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      */
-    public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
+    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
-        assert(is_array($parameters));
-
         $authnRequest = new AuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy);
 
         $this->_lastRequest = $authnRequest->getXML();
@@ -513,14 +510,12 @@ class Auth
      * @param string|null $nameIdFormat        The NameID Format will be set in the LogoutRequest.
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
-     * @return If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      *
      * @throws Error
      */
-    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null)
+    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null)
     {
-        assert(is_array($parameters));
-
         $sloUrl = $this->getSLOurl();
         if (empty($sloUrl)) {
             throw new Error(

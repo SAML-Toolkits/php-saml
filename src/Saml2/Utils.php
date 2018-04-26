@@ -237,10 +237,9 @@ class Utils
      *
      * @throws Error
      */
-    public static function redirect($url, $parameters = array(), $stay = false)
+    public static function redirect($url, array $parameters = array(), $stay = false)
     {
         assert(is_string($url));
-        assert(is_array($parameters));
 
         if (substr($url, 0, 1) === '/') {
             $url = self::getSelfURLhost() . $url;
