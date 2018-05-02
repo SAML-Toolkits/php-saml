@@ -803,14 +803,17 @@ class OneLogin_Saml2_Settings
      * @param bool $alwaysPublishEncryptionCert When 'true', the returned metadata
      *   will always include an 'encryption' KeyDescriptor. Otherwise, the 'encryption'
      *   KeyDescriptor will only be included if $advancedSettings['security']['wantNameIdEncrypted']
-     *   or $advancedSettings['security']['wantAssertionsEncrypted'] are enabled. 
+     *   or $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
+     * @param DateTime|null $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
+     *
      * @return string  SP metadata (xml)
      * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
-    public function getSPMetadata($alwaysPublishEncryptionCert = false)
+    public function getSPMetadata($alwaysPublishEncryptionCert = false, $validUntil = null, $cacheDuration = null)
     {
-        $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
+        $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], $validUntil, $cacheDuration, $this->getContacts(), $this->getOrganization());
 
         $certNew = $this->getSPcertNew();
         if (!empty($certNew)) {

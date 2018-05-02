@@ -498,6 +498,35 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+    * Case ValidUntil CacheDuration
+    *
+    * @covers OneLogin_Saml2_Settings::getSPMetadata
+    */
+    public function testGetSPMetadataTiming()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $currentValidUntil =  time() + OneLogin_Saml2_Metadata::TIME_VALID;
+        $currentValidUntilStr =  gmdate('Y-m-d\TH:i:s\Z', $currentValidUntil);
+        $defaultCacheDuration = OneLogin_Saml2_Metadata::TIME_CACHED;
+
+        $metadata = $settings->getSPMetadata();
+        $this->assertContains('validUntil="'.$currentValidUntilStr.'"', $metadata);
+        $this->assertContains('cacheDuration="PT604800S"', $metadata);
+
+        $newValidUntil = 2524668343;
+        $newValidUntilStr = gmdate('Y-m-d\TH:i:s\Z', $newValidUntil);
+        $newCacheDuration = 1209600;
+        $metadata2 = $settings->getSPMetadata(false, $newValidUntil, $newCacheDuration);
+        $this->assertContains('validUntil="'.$newValidUntilStr.'"', $metadata2);
+        $this->assertContains('cacheDuration="PT1209600S"', $metadata2);
+    }
+
+    /**
+    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
     * Case signed metadata
     *
     * @covers OneLogin_Saml2_Settings::getSPMetadata
