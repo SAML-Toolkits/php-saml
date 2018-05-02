@@ -3,6 +3,7 @@
 namespace OneLogin\Saml2\Tests;
 
 use OneLogin\Saml2\Error;
+use OneLogin\Saml2\Metadata;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 
@@ -472,6 +473,35 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
                 'expectEncryptionKeyDescriptor' => true,
             ],
         ];
+    }
+
+    /**
+    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+    * Case ValidUntil CacheDuration
+    *
+    * @covers OneLogin\Saml2\Settings::getSPMetadata
+    */
+    public function testGetSPMetadataTiming()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+
+        $currentValidUntil =  time() + Metadata::TIME_VALID;
+        $currentValidUntilStr =  gmdate('Y-m-d\TH:i:s\Z', $currentValidUntil);
+        $defaultCacheDuration = Metadata::TIME_CACHED;
+
+        $metadata = $settings->getSPMetadata();
+        $this->assertContains('validUntil="'.$currentValidUntilStr.'"', $metadata);
+        $this->assertContains('cacheDuration="PT604800S"', $metadata);
+
+        $newValidUntil = 2524668343;
+        $newValidUntilStr = gmdate('Y-m-d\TH:i:s\Z', $newValidUntil);
+        $newCacheDuration = 1209600;
+        $metadata2 = $settings->getSPMetadata(false, $newValidUntil, $newCacheDuration);
+        $this->assertContains('validUntil="'.$newValidUntilStr.'"', $metadata2);
+        $this->assertContains('cacheDuration="PT1209600S"', $metadata2);
     }
 
     /**

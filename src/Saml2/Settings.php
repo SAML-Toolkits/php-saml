@@ -793,14 +793,16 @@ class Settings
      * the 'encryption' KeyDescriptor will only be included if 
      * $advancedSettings['security']['wantNameIdEncrypted'] or
      * $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
+     * @param int|null      $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
      *
      * @return string  SP metadata (xml)
      * @throws Exception
      * @throws Error
      */
-    public function getSPMetadata($alwaysPublishEncryptionCert = false)
+    public function getSPMetadata($alwaysPublishEncryptionCert = false, $validUntil = null, $cacheDuration = null)
     {
-        $metadata = Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
+        $metadata = Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], $validUntil, $cacheDuration, $this->getContacts(), $this->getOrganization());
 
         $certNew = $this->getSPcertNew();
         if (!empty($certNew)) {
