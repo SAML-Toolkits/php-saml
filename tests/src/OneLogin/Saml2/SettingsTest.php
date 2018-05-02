@@ -446,49 +446,49 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     {
         return [
             'settings do not require encryption' => [
-                'alwaysIncludeEncryption' => false,    
+                'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => false,
             ],
             'wantNameIdEncrypted setting enabled' => [
-                'alwaysIncludeEncryption' => false,    
+                'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
             ],
             'wantAssertionsEncrypted setting enabled' => [
-                'alwaysIncludeEncryption' => false,    
+                'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
             ],
             'both settings enabled'=> [
-                'alwaysIncludeEncryption' => false,    
+                'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
             ],
             'metadata requested with encryption' => [
-                'alwaysIncludeEncryption' => true,    
+                'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
             ],
-           'metadata requested with encryption and wantNameIdEncrypted setting enabled' => [
-                'alwaysIncludeEncryption' => true,    
+            'metadata requested with encryption and wantNameIdEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
             ],
             'metadata requested with encryption and wantAssertionsEncrypted setting enabled' => [
-                'alwaysIncludeEncryption' => true,    
+                'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
             ],
             'metadata requested with encryption and both settings enabled' => [
-                'alwaysIncludeEncryption' => true,    
+                'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
