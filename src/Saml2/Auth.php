@@ -481,7 +481,7 @@ class Auth
      */
     public function getAttributeWithFriendlyName($friendlyName)
     {
-        assert('is_string($friendlyName)');
+        assert(is_string($friendlyName));
         $value = null;
         if (isset($this->_attributesWithFriendlyName[$friendlyName])) {
             return $this->_attributesWithFriendlyName[$friendlyName];
