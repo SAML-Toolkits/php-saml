@@ -1098,12 +1098,13 @@ class Utils
      *
      * @param DOMElement     $encryptedData The encrypted data.
      * @param XMLSecurityKey $inputKey      The decryption key.
+     * @param bool           $formatOutput  Format or not the output.
      *
      * @return DOMElement  The decrypted element.
      *
      * @throws Exception
      */
-    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey)
+    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true)
     {
 
         $enc = new XMLSecEnc();
@@ -1188,8 +1189,10 @@ class Utils
 
         $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
         $newDoc = new DOMDocument();
-        $newDoc->preserveWhiteSpace = false;
-        $newDoc->formatOutput = true;
+        if ($formatOutput) {
+            $newDoc->preserveWhiteSpace = false;
+            $newDoc->formatOutput = true;
+        }
         $newDoc = self::loadXML($newDoc, $xml);
         if (!$newDoc) {
             throw new ValidationError(
