@@ -55,9 +55,10 @@ class OneLogin_Saml2_Response
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
-     * @param string                  $response A UUEncoded SAML response from the IdP.
+     * @param string $response A UUEncoded SAML response from the IdP.
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response)
     {
@@ -94,8 +95,6 @@ class OneLogin_Saml2_Response
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
      *
      * @return bool Validate the document
-     *
-     * @throws Exception
      */
     public function isValid($requestId = null)
     {
@@ -422,6 +421,8 @@ class OneLogin_Saml2_Response
 
     /**
      * @return string|null the ID of the assertion in the Response
+     *
+     * @throws InvalidArgumentException
      */
     public function getAssertionId()
     {
@@ -450,7 +451,7 @@ class OneLogin_Saml2_Response
     /**
      * Checks if the Status is success
      *
-     * @throws $statusExceptionMsg If status is not success
+     * @throws OneLogin_Saml2_ValidationError If status is not success
      */
     public function checkStatus()
     {
@@ -525,6 +526,7 @@ class OneLogin_Saml2_Response
      * Gets the Issuers (from Response and Assertion).
      *
      * @return array @issuers The issuers of the assertion/response
+     *
      * @throws OneLogin_Saml2_ValidationError
      */
     public function getIssuers()
@@ -560,6 +562,8 @@ class OneLogin_Saml2_Response
      * Gets the NameID Data provided by the SAML response from the IdP.
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getNameIdData()
     {
@@ -714,6 +718,8 @@ class OneLogin_Saml2_Response
      * Gets the Attributes from the AttributeStatement element using their FriendlyName.
      *
      * @return array The attributes of the SAML Assertion
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getAttributesWithFriendlyName()
     {
@@ -782,6 +788,8 @@ class OneLogin_Saml2_Response
      *   - Check that IDs and reference URI are unique and consistent.
      *
      * @return array Signed element tags
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function processSignedElements()
     {
@@ -904,6 +912,8 @@ class OneLogin_Saml2_Response
      * Verifies that the document has the expected signed nodes.
      *
      * @return bool
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function validateSignedElements($signedElements)
     {
@@ -953,8 +963,6 @@ class OneLogin_Saml2_Response
      * @param string $assertionXpath Xpath Expression
      *
      * @return DOMNodeList The queried node
-     *
-     * @throws Exception
      */
     protected function _queryAssertion($assertionXpath)
     {
@@ -1023,7 +1031,8 @@ class OneLogin_Saml2_Response
      *
      * @return DOMDocument Decrypted Assertion
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     protected function _decryptAssertion($dom)
     {

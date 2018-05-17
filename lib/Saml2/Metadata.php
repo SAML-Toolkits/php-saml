@@ -190,11 +190,13 @@ METADATA_TEMPLATE;
      * Adds the x509 descriptors (sign/encriptation) to the metadata
      * The same cert will be used for sign/encrypt
      *
-     * @param string $metadata       SAML Metadata XML
-     * @param string $cert           x509 cert
-     * @param bool   $wantsEncrypted Whether to include the KeyDescriptor for encryption
+     * @param string $metadata SAML Metadata XML
+     * @param string $cert x509 cert
+     * @param bool $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
+     *
+     * @throws Exception
      */
     public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
     {

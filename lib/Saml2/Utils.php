@@ -71,9 +71,9 @@ class OneLogin_Saml2_Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
-     * @throws Exception
-     *
      * @return DOMDocument|false $dom The result of load the XML at the DomDocument
+     *
+     * @throws Exception
      */
     public static function loadXML($dom, $xml)
     {
@@ -1014,7 +1014,7 @@ class OneLogin_Saml2_Utils
      *
      * @return array $status The Status, an array with the code and a message.
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_ValidationError
      */
     public static function getStatus($dom)
     {
@@ -1061,7 +1061,7 @@ class OneLogin_Saml2_Utils
      *
      * @return DOMElement  The decrypted element.
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_ValidationError
      */
     public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey)
     {
@@ -1190,7 +1190,7 @@ class OneLogin_Saml2_Utils
         }
 
         if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($algorithm)) {
-            throw new \Exception('Unsupported signing algorithm.');
+            throw new Exception('Unsupported signing algorithm.');
         }
 
         $keyInfo = openssl_pkey_get_details($key->key);
@@ -1331,7 +1331,7 @@ class OneLogin_Saml2_Utils
         }
 
         if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($objKey->type)) {
-            throw new \Exception('Unsupported signing algorithm.');
+            throw new Exception('Unsupported signing algorithm.');
         }
 
         $objXMLSecDSig->canonicalizeSignedInfo();

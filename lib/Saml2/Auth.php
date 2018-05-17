@@ -137,6 +137,8 @@ class OneLogin_Saml2_Auth
      * Initializes the SP SAML instance.
      *
      * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function __construct($oldSettings = null)
     {
@@ -157,6 +159,7 @@ class OneLogin_Saml2_Auth
      * Set the strict mode active/disable
      *
      * @param bool $value Strict parameter
+     *
      * @throws OneLogin_Saml2_Error
      */
     public function setStrict($value)
@@ -177,6 +180,7 @@ class OneLogin_Saml2_Auth
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
      *
      * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function processResponse($requestId = null)
     {
@@ -591,7 +595,6 @@ class OneLogin_Saml2_Auth
      *
      * @return string A base64 encoded signature
      *
-     * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
@@ -634,7 +637,6 @@ class OneLogin_Saml2_Auth
      *
      * @return string A base64 encoded signature
      *
-     * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)

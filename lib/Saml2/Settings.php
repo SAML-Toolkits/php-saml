@@ -288,7 +288,9 @@ class OneLogin_Saml2_Settings
      * Loads settings info from the settings file
      *
      * @return bool True if the settings info is valid
+     *
      * @throws OneLogin_Saml2_Error
+     *
      * @suppress PhanUndeclaredVariable
      */
     private function _loadSettingsFromFile()
@@ -808,6 +810,7 @@ class OneLogin_Saml2_Settings
      * @param int|null      $cacheDuration Duration of the cache in seconds
      *
      * @return string  SP metadata (xml)
+     *
      * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
@@ -1009,6 +1012,7 @@ class OneLogin_Saml2_Settings
      * Activates or deactivates the strict mode.
      *
      * @param bool $value Strict parameter
+     *
      * @throws Exception
      */
     public function setStrict($value)
