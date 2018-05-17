@@ -115,8 +115,6 @@ class OneLogin_Saml2_LogoutResponse
      * @param bool $retrieveParametersFromServer
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
-     *
-     * @throws Exception
      */
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
@@ -270,7 +268,8 @@ LOGOUTRESPONSE;
         return base64_encode($subject);
     }
 
-    /* After execute a validation process, if fails this method returns the cause.
+    /**
+     * After execute a validation process, if fails this method returns the cause.
      *
      * @return string Cause
      */

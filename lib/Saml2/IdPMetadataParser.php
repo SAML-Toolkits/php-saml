@@ -85,7 +85,8 @@ class OneLogin_Saml2_IdPMetadataParser
      * @param string $desiredSLOBinding     Parse specific binding SLO endpoint.
      *
      * @return array metadata info in php-saml settings format
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     public static function parseXML($xml, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT)
     {
