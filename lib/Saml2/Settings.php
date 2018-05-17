@@ -903,6 +903,8 @@ class OneLogin_Saml2_Settings
      * @param string $xml Metadata's XML that will be validate
      *
      * @return Array The list of found errors
+     *
+     * @throws Exception
      */
     public function validateMetadata($xml)
     {
@@ -1046,6 +1048,8 @@ class OneLogin_Saml2_Settings
 
     /**
      * Set a baseurl value.
+     *
+     * @param $baseurl
      */
     public function setBaseURL($baseurl)
     {

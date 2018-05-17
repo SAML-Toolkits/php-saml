@@ -268,7 +268,8 @@ LOGOUTRESPONSE;
         return base64_encode($subject);
     }
 
-    /* After execute a validation process, if fails this method returns the cause.
+    /**
+     * After execute a validation process, if fails this method returns the cause.
      *
      * @return string Cause
      */

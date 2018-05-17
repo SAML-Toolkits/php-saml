@@ -628,6 +628,8 @@ class OneLogin_Saml2_Response
      * Gets the NameID provided by the SAML response from the IdP.
      *
      * @return string|null Name ID Value
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getNameId()
     {
@@ -643,6 +645,8 @@ class OneLogin_Saml2_Response
      * Gets the NameID Format provided by the SAML response from the IdP.
      *
      * @return string|null Name ID Format
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getNameIdFormat()
     {
@@ -658,6 +662,8 @@ class OneLogin_Saml2_Response
      * Gets the NameID NameQualifier provided by the SAML response from the IdP.
      *
      * @return string|null Name ID NameQualifier
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getNameIdNameQualifier()
     {
@@ -674,6 +680,8 @@ class OneLogin_Saml2_Response
      * Could be used to set the local session expiration
      *
      * @return int|null The SessionNotOnOrAfter value
+     *
+     * @throws Exception
      */
     public function getSessionNotOnOrAfter()
     {
@@ -708,6 +716,8 @@ class OneLogin_Saml2_Response
      * Gets the Attributes from the AttributeStatement element.
      *
      * @return array The attributes of the SAML Assertion
+     *
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function getAttributes()
     {
@@ -726,6 +736,13 @@ class OneLogin_Saml2_Response
         return $this->_getAttributesByKeyName('FriendlyName');
     }
 
+    /**
+     * @param string $keyName
+     *
+     * @return array
+     *
+     * @throws OneLogin_Saml2_ValidationError
+     */
     private function _getAttributesByKeyName($keyName="Name")
     {
         $attributes = array();
@@ -879,6 +896,9 @@ class OneLogin_Saml2_Response
      * Verifies that the document is still valid according Conditions Element.
      *
      * @return bool
+     *
+     * @throws Exception
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function validateTimestamps()
     {
@@ -910,6 +930,8 @@ class OneLogin_Saml2_Response
 
     /**
      * Verifies that the document has the expected signed nodes.
+     *
+     * @param $signedElements
      *
      * @return bool
      *
@@ -1111,7 +1133,8 @@ class OneLogin_Saml2_Response
         }
     }
 
-    /* After execute a validation process, if fails this method returns the cause
+    /**
+     * After execute a validation process, if fails this method returns the cause
      *
      * @return string Cause 
      */
@@ -1120,7 +1143,7 @@ class OneLogin_Saml2_Response
         return $this->_error;
     }
 
-    /*
+    /**
      * Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
      *
      * @return DomDocument SAML Response

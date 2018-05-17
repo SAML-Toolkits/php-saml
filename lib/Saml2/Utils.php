@@ -100,11 +100,13 @@ class OneLogin_Saml2_Utils
      *
      * It will parse the string into a DOM document and validate this document against the schema.
      *
-     * @param string|DOMDocument $xml    The XML string or document which should be validated.
-     * @param string             $schema The schema filename which should be used.
-     * @param bool               $debug  To disable/enable the debug mode
+     * @param string|DOMDocument $xml The XML string or document which should be validated.
+     * @param string $schema The schema filename which should be used.
+     * @param bool $debug To disable/enable the debug mode
      *
      * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
+     *
+     * @throws Exception
      */
     public static function validateXML($xml, $schema, $debug = false)
     {
@@ -605,6 +607,8 @@ class OneLogin_Saml2_Utils
     /**
      * Returns the part of the URL with the BaseURLPath.
      *
+     * @param $info
+     *
      * @return string
      */
     protected static function buildWithBaseURLPath($info)
@@ -799,10 +803,12 @@ class OneLogin_Saml2_Utils
     /**
      * Compares 2 dates and returns the earliest.
      *
-     * @param string|null       $cacheDuration The duration, as a string.
-     * @param string|int|null   $validUntil    The valid until date, as a string or as a timestamp
+     * @param string|null $cacheDuration The duration, as a string.
+     * @param string|int|null $validUntil The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
+     *
+     * @throws Exception
      */
     public static function getExpireTime($cacheDuration = null, $validUntil = null)
     {
@@ -951,13 +957,15 @@ class OneLogin_Saml2_Utils
     /**
      * Generates a nameID.
      *
-     * @param string      $value  fingerprint
-     * @param string      $spnq   SP Name Qualifier
+     * @param string $value fingerprint
+     * @param string $spnq SP Name Qualifier
      * @param string|null $format SP Format
-     * @param string|null $cert   IdP Public cert to encrypt the nameID
-     * @param string|null $nq     IdP Name Qualifier
+     * @param string|null $cert IdP Public cert to encrypt the nameID
+     * @param string|null $nq IdP Name Qualifier
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
+     *
+     * @throws Exception
      */
     public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null)
     {
@@ -1205,6 +1213,11 @@ class OneLogin_Saml2_Utils
         return $newKey;
     }
 
+    /**
+     * @param $algorithm
+     *
+     * @return bool
+     */
     public static function isSupportedSigningAlgorithm($algorithm)
     {
         return in_array(

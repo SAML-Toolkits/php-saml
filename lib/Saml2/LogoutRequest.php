@@ -242,9 +242,12 @@ LOGOUTREQUEST;
      * Gets the NameID of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string|null        $key     The SP key
+     * @param string|null $key The SP key
      *
      * @return string Name ID Value
+     *
+     * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public static function getNameId($request, $key = null)
     {
@@ -258,6 +261,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string|null $issuer The Issuer
+     * @throws Exception
      */
     public static function getIssuer($request)
     {
@@ -285,6 +289,8 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return array The SessionIndex value
+     *
+     * @throws Exception
      */
     public static function getSessionIndexes($request)
     {
@@ -305,6 +311,8 @@ LOGOUTREQUEST;
 
     /**
      * Checks if the Logout Request recieved is valid.
+     *
+     * @param bool $retrieveParametersFromServer
      *
      * @return bool If the Logout Request is or not valid
      */
@@ -399,7 +407,8 @@ LOGOUTREQUEST;
         }
     }
 
-    /* After execute a validation process, if fails this method returns the cause
+    /**
+     * After execute a validation process, if fails this method returns the cause
      *
      * @return string Cause
      */
