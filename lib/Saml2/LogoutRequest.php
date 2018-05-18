@@ -365,10 +365,10 @@ LOGOUTREQUEST;
                     }
                 }
 
-                $nameId = $this->getNameId($dom, $this->_settings->getSPkey());
+                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
 
                 // Check issuer
-                $issuer = $this->getIssuer($dom);
+                $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Invalid issuer in the Logout Request",
