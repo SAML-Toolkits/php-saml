@@ -1019,7 +1019,7 @@ class OneLogin_Saml2_Settings
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new Exception('Invalid value passed to setStrict()');
         }
 
