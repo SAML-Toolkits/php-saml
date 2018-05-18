@@ -1138,7 +1138,7 @@ class OneLogin_Saml2_Utils
                     $key = str_pad($key, $keySize);
                 }
             }
-            $symmetricKey->loadkey($key);
+            $symmetricKey->loadKey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {

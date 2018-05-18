@@ -912,13 +912,13 @@ class OneLogin_Saml2_Response
         for ($i = 0; $i < $timestampNodes->length; $i++) {
             $nbAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotBefore");
             $naAttribute = $timestampNodes->item($i)->attributes->getNamedItem("NotOnOrAfter");
-            if ($nbAttribute && OneLogin_SAML2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
+            if ($nbAttribute && OneLogin_Saml2_Utils::parseSAML2Time($nbAttribute->textContent) > time() + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT) {
                 throw new OneLogin_Saml2_ValidationError(
                     'Could not validate timestamp: not yet valid. Check system clock.',
                     OneLogin_Saml2_ValidationError::ASSERTION_TOO_EARLY
                 );
             }
-            if ($naAttribute && OneLogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
+            if ($naAttribute && OneLogin_Saml2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALLOWED_CLOCK_DRIFT <= time()) {
                 throw new OneLogin_Saml2_ValidationError(
                     'Could not validate timestamp: expired. Check system clock.',
                     OneLogin_Saml2_ValidationError::ASSERTION_EXPIRED
