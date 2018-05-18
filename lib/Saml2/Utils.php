@@ -589,10 +589,8 @@ class OneLogin_Saml2_Utils
         $requestURI = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
-            if ($requestURI[0] !== '/') {
-                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
-                    $requestURI = $matches[1];
-                }
+            if ($requestURI[0] !== '/' && preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
+                $requestURI = $matches[1];
             }
         }
 

@@ -355,13 +355,11 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The LogoutRequest was received at $currentURL instead of $destination",
-                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                            );
-                        }
+                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The LogoutRequest was received at $currentURL instead of $destination",
+                            OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                        );
                     }
                 }
 
@@ -376,13 +374,11 @@ LOGOUTREQUEST;
                     );
                 }
 
-                if ($security['wantMessagesSigned']) {
-                    if (!isset($_GET['Signature'])) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The Message of the Logout Request is not signed and the SP require it",
-                            OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
-                        );
-                    }
+                if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "The Message of the Logout Request is not signed and the SP require it",
+                        OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                    );
                 }
             }
 
