@@ -164,7 +164,7 @@ class OneLogin_Saml2_Auth
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new OneLogin_Saml2_Error(
                 'Invalid value passed to setStrict()',
                 OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX

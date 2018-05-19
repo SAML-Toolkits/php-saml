@@ -768,8 +768,8 @@ class OneLogin_Saml2_Utils
              * gmtime function. Instead we use the gmdate function, and split the result.
              */
             $yearmonth = explode(':', gmdate('Y:n', $timestamp));
-            $year = (int)($yearmonth[0]);
-            $month = (int)($yearmonth[1]);
+            $year = (int)$yearmonth[0];
+            $month = (int)$yearmonth[1];
 
             /* Remove the year and month from the timestamp. */
             $timestamp -= gmmktime(0, 0, 0, $month, 1, $year);
