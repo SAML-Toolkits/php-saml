@@ -600,12 +600,9 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'sp_sls_url_invalid';
             }
 
-            if (isset($security['signMetadata']) && is_array($security['signMetadata'])) {
-                if (!isset($security['signMetadata']['keyFileName'])
-                    || !isset($security['signMetadata']['certFileName'])
-                ) {
-                    $errors[] = 'sp_signMetadata_invalid';
-                }
+            if (isset($security['signMetadata']) && is_array($security['signMetadata']) &&
+                (!isset($security['signMetadata']['keyFileName']) || !isset($security['signMetadata']['certFileName']))) {
+                $errors[] = 'sp_signMetadata_invalid';
             }
 
             if (((isset($security['authnRequestsSigned']) && $security['authnRequestsSigned'] == true)

@@ -171,13 +171,11 @@ class OneLogin_Saml2_Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo)) {
-                    if ($requestId != $responseInResponseTo) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
-                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
-                        );
-                    }
+                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                    );
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
@@ -431,10 +429,8 @@ class OneLogin_Saml2_Response
         }
         $assertionNodes = $this->_queryAssertion("");
         $id = null;
-        if ($assertionNodes->length == 1) {
-            if ($assertionNodes->item(0)->hasAttribute('ID')) {
-                $id = $assertionNodes->item(0)->getAttribute('ID');
-            }
+        if ($assertionNodes->length == 1 && $assertionNodes->item(0)->hasAttribute('ID')) {
+            $id = $assertionNodes->item(0)->getAttribute('ID');
         }
         return $id;
     }
@@ -880,14 +876,12 @@ class OneLogin_Saml2_Response
             $signedElements[] = $signedElement;
         }
 
-        if (!empty($signedElements)) {
-            // Check SignedElements
-            if (!$this->validateSignedElements($signedElements)) {
-                throw new OneLogin_Saml2_ValidationError(
-                    'Found an unexpected Signature Element. SAML Response rejected',
-                    OneLogin_Saml2_ValidationError::UNEXPECTED_SIGNED_ELEMENTS
-                );
-            }
+        // Check SignedElements
+        if (!empty($signedElements) && !$this->validateSignedElements($signedElements)) {
+            throw new OneLogin_Saml2_ValidationError(
+                'Found an unexpected Signature Element. SAML Response rejected',
+                OneLogin_Saml2_ValidationError::UNEXPECTED_SIGNED_ELEMENTS
+            );
         }
         return $signedElements;
     }
