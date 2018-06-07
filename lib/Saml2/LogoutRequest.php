@@ -355,7 +355,7 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                    if (!empty($destination) && strpos($currentURL, $destination) === false) {
                         throw new OneLogin_Saml2_ValidationError(
                             "The LogoutRequest was received at $currentURL instead of $destination",
                             OneLogin_Saml2_ValidationError::WRONG_DESTINATION
