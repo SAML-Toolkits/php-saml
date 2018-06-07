@@ -33,12 +33,14 @@ class OneLogin_Saml2_LogoutRequest
     /**
      * Constructs the Logout Request object.
      *
-     * @param OneLogin_Saml2_Settings $settings     Settings
-     * @param string|null             $request      A UUEncoded Logout Request.
-     * @param string|null             $nameId       The NameID that will be set in the LogoutRequest.
-     * @param string|null             $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
-     * @param string|null             $nameIdFormat The NameID Format will be set in the LogoutRequest.
-     * @param string|null             $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
+     * @param OneLogin_Saml2_Settings $settings Settings
+     * @param string|null $request A UUEncoded Logout Request.
+     * @param string|null $nameId The NameID that will be set in the LogoutRequest.
+     * @param string|null $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param string|null $nameIdFormat The NameID Format will be set in the LogoutRequest.
+     * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null)
     {
@@ -177,11 +179,12 @@ LOGOUTREQUEST;
      * Gets the NameID Data of the the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string|null        $key     The SP key
+     * @param string|null $key The SP key
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      *
-     * @throws Exception
+     * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public static function getNameIdData($request, $key = null)
     {
@@ -239,9 +242,12 @@ LOGOUTREQUEST;
      * Gets the NameID of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string|null        $key     The SP key
+     * @param string|null $key The SP key
      *
      * @return string Name ID Value
+     *
+     * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public static function getNameId($request, $key = null)
     {
@@ -255,6 +261,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string|null $issuer The Issuer
+     * @throws Exception
      */
     public static function getIssuer($request)
     {
@@ -282,6 +289,8 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return array The SessionIndex value
+     *
+     * @throws Exception
      */
     public static function getSessionIndexes($request)
     {
@@ -302,6 +311,8 @@ LOGOUTREQUEST;
 
     /**
      * Checks if the Logout Request recieved is valid.
+     *
+     * @param bool $retrieveParametersFromServer
      *
      * @return bool If the Logout Request is or not valid
      */
@@ -344,20 +355,18 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The LogoutRequest was received at $currentURL instead of $destination",
-                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                            );
-                        }
+                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The LogoutRequest was received at $currentURL instead of $destination",
+                            OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                        );
                     }
                 }
 
-                $nameId = $this->getNameId($dom, $this->_settings->getSPkey());
+                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
 
                 // Check issuer
-                $issuer = $this->getIssuer($dom);
+                $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Invalid issuer in the Logout Request",
@@ -365,13 +374,11 @@ LOGOUTREQUEST;
                     );
                 }
 
-                if ($security['wantMessagesSigned']) {
-                    if (!isset($_GET['Signature'])) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The Message of the Logout Request is not signed and the SP require it",
-                            OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
-                        );
-                    }
+                if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "The Message of the Logout Request is not signed and the SP require it",
+                        OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                    );
                 }
             }
 
@@ -396,7 +403,8 @@ LOGOUTREQUEST;
         }
     }
 
-    /* After execute a validation process, if fails this method returns the cause
+    /**
+     * After execute a validation process, if fails this method returns the cause
      *
      * @return string Cause
      */
