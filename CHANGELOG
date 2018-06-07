@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v.2.14.0
+* Add  parameter to the decryptElement method to make optional the formatting
+* [#283](https://github.com/onelogin/php-saml/pull/283) New method of importing a decrypted assertion into the XML document to replace the EncryptedAssertion. Fix signature issues on Signed Encrypted Assertions with default namespace
+* Allow the getSPMetadata() method to always include the encryption Key Descriptor
+* Change some Fatal Error to Exceptions
+* [#265](https://github.com/onelogin/php-saml/issues/265) Support parameters at getSPMetadata method
+* Avoid calling static method using this
+
 v.2.13.0
 * Update xmlseclibs with some fixes.
 * Add extra protection verifying the Signature algorithm used on SignedInfo element, not only rely on the xmlseclibs verify / verifySignature methods.
