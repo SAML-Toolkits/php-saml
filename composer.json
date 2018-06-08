@@ -1,5 +1,5 @@
 {
-    "name": "onelogin/php-saml",
+    "name": "sb-hacks/php-saml",
     "description": "OneLogin PHP SAML Toolkit",
     "license": "MIT",
     "homepage": "https://developers.onelogin.com/saml/php",
