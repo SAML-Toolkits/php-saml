@@ -37,6 +37,10 @@ class OneLogin_Saml2_Utils
      */
     private static $_baseurlpath;
 
+    /**
+     * @var string
+     */
+    private static $_protocolRegex = '@^https?://@i';
 
     /**
      * Translates any string. Accepts args
@@ -296,8 +300,11 @@ class OneLogin_Saml2_Utils
             $url = self::getSelfURLhost() . $url;
         }
 
-        /* Verify that the URL is to a http or https site. */
-        $wrongProtocol = !preg_match('@^https?://@i', $url);
+        /**
+         * Verify that the URL matches the regex for the protocol.
+         * By default this will check for http and https
+         */
+        $wrongProtocol = !preg_match(self::$_protocolRegex, $url);
         $url = filter_var($url, FILTER_VALIDATE_URL);
         if ($wrongProtocol || empty($url)) {
             throw new OneLogin_Saml2_Error(
@@ -342,6 +349,16 @@ class OneLogin_Saml2_Utils
         header('Cache-Control: no-cache, must-revalidate');
         header('Location: ' . $url);
         exit();
+    }
+
+    /**
+     * @var $protocolRegex string
+     */
+    public static function setProtocolRegex($protocolRegex)
+    {
+        if (!empty($protocolRegex)) {
+            self::$_protocolRegex = $protocolRegex;
+        }
     }
 
     /**
