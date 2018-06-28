@@ -553,25 +553,36 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfPort()
     {
-        $portnumber = null;
         if (self::$_port) {
-            $portnumber = self::$_port;
-        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
-            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
-        } else if (isset($_SERVER["SERVER_PORT"])) {
-            $portnumber = $_SERVER["SERVER_PORT"];
-        } else {
-            $currentHost = self::getRawHost();
-
-            // strip the port
-            if (false !== strpos($currentHost, ':')) {
-                list($currentHost, $port) = explode(':', $currentHost, 2);
-                if (is_numeric($port)) {
-                    $portnumber = $port;
-                }
-            }
+            return self::$_port;
         }
-        return $portnumber;
+
+        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+            return $_SERVER["HTTP_X_FORWARDED_PORT"];
+        }
+
+        if (isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"] == self::getSelfPortFromSelfRawHost()) {
+            return $_SERVER["SERVER_PORT"];
+        }
+
+        return self::getSelfPortFromSelfRawHost();
+    }
+
+    /**
+     * @return int|string|null
+     */
+    private static function getSelfPortFromSelfRawHost()
+    {
+        $currentHost = self::getRawHost();
+
+        // strip the port
+        if (false === strpos($currentHost, ':')) {
+            return null;
+        }
+
+        list($currentHost, $port) = explode(':', $currentHost, 2);
+
+        return is_numeric($port) ? $port : null;
     }
 
     /**

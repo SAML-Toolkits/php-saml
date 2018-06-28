@@ -385,21 +385,42 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $_SERVER['HTTP_HOST'] = 'example.org:ok';
         $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['HTTP_HOST']);
 
         $_SERVER['HTTP_HOST'] = 'example.org:8080';
         $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['HTTP_HOST']);
 
+        $_SERVER['HTTP_HOST'] = 'example.org:80';
         $_SERVER["SERVER_PORT"] = 80;
         $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['SERVER_PORT']);
+
+        $_SERVER["SERVER_PORT"] = 80;
+        $_SERVER['HTTP_HOST'] = 'example.org:80';
+        $_SERVER["HTTP_X_FORWARDED_PORT"] = 443;
+        OneLogin_Saml2_Utils::setProxyVars(false);
+        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['SERVER_PORT']);
+        unset($_SERVER['HTTP_X_FORWARDED_PORT']);
 
         $_SERVER["HTTP_X_FORWARDED_PORT"] = 443;
-        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
-
         OneLogin_Saml2_Utils::setProxyVars(true);
         $this->assertEquals(443, OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['HTTP_X_FORWARDED_PORT']);
+        OneLogin_Saml2_Utils::setProxyVars(false);
 
         OneLogin_Saml2_Utils::setSelfPort(8080);
         $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
+        OneLogin_Saml2_Utils::setSelfPort(null);
+
+        $_SERVER["SERVER_PORT"] = 443;
+        $_SERVER["HTTP_HOST"] = 'example.org:44300';
+        $this->assertEquals(44300, OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER["SERVER_PORT"]);
+        unset($_SERVER["HTTP_HOST"]);
     }
 
     /**
@@ -495,9 +516,11 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $_SERVER['SERVER_PORT'] = '80';
         $this->assertEquals("http://$hostname", OneLogin_Saml2_Utils::getSelfURLhost());
 
+        $_SERVER['HTTP_HOST'] = $hostname . ':81';
         $_SERVER['SERVER_PORT'] = '81';
         $this->assertEquals("http://$hostname:81", OneLogin_Saml2_Utils::getSelfURLhost());
 
+        $_SERVER['HTTP_HOST'] = $hostname . ':443';
         $_SERVER['SERVER_PORT'] = '443';
         $this->assertEquals("https://$hostname", OneLogin_Saml2_Utils::getSelfURLhost());
 
@@ -505,9 +528,11 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $_SERVER['HTTPS'] = 'on';
         $this->assertEquals("https://$hostname", OneLogin_Saml2_Utils::getSelfURLhost());
 
+        $_SERVER['HTTP_HOST'] = $hostname . ':444';
         $_SERVER['SERVER_PORT'] = '444';
         $this->assertEquals("https://$hostname:444", OneLogin_Saml2_Utils::getSelfURLhost());
 
+        $_SERVER['HTTP_HOST'] = $hostname . ':443';
         $_SERVER['SERVER_PORT'] = '443';
         $_SERVER['REQUEST_URI'] = '/onelogin';
         $this->assertEquals("https://$hostname", OneLogin_Saml2_Utils::getSelfURLhost());
