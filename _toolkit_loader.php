@@ -17,6 +17,7 @@ $xmlseclibsSrcDir = '';
 include_once $xmlseclibsSrcDir.'/XMLSecEnc.php';
 include_once $xmlseclibsSrcDir.'/XMLSecurityDSig.php';
 include_once $xmlseclibsSrcDir.'/XMLSecurityKey.php';
+include_once $xmlseclibsSrcDir.'/Utils/XPath.php';
 */
 
 
