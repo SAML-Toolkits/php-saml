@@ -1559,7 +1559,7 @@ demo1, only changes the targets.
     valid, close the user session of the local app. Notice that the SLO
     Workflow starts and ends at the SP.
 
-    5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP
+    4.2 SLO Initiated by IdP. In this case, the action takes place on the IdP
     side, the logout process is initiated at the idP, sends a Logout
     Request to the SP (SLS endpoint `sls.php` of the endpoint folder).
     The SLS endpoint of the SP process the Logout Request and if is valid,
