@@ -310,8 +310,8 @@ class OneLogin_Saml2_Auth
      */
     public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
-        assert('is_string($url)');
-        assert('is_array($parameters)');
+        assert(is_string($url));
+        assert(is_array($parameters));
 
         if (empty($url) && isset($_REQUEST['RelayState'])) {
             $url = $_REQUEST['RelayState'];
@@ -429,7 +429,7 @@ class OneLogin_Saml2_Auth
      */
     public function getAttribute($name)
     {
-        assert('is_string($name)');
+        assert(is_string($name));
 
         $value = null;
         if (isset($this->_attributes[$name])) {
@@ -447,7 +447,7 @@ class OneLogin_Saml2_Auth
      */
     public function getAttributeWithFriendlyName($friendlyName)
     {
-        assert('is_string($friendlyName)');
+        assert(is_string($friendlyName));
 
         $value = null;
         if (isset($this->_attributesWithFriendlyName[$friendlyName])) {
@@ -472,7 +472,7 @@ class OneLogin_Saml2_Auth
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
-        assert('is_array($parameters)');
+        assert(is_array($parameters));
 
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy);
 
@@ -514,7 +514,7 @@ class OneLogin_Saml2_Auth
      */
     public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null)
     {
-        assert('is_array($parameters)');
+        assert(is_array($parameters));
 
         $sloUrl = $this->getSLOurl();
         if (empty($sloUrl)) {

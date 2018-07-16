@@ -52,7 +52,7 @@ class OneLogin_Saml2_Utils
      */
     public static function t($msg, $args = array())
     {
-        assert('is_string($msg)');
+        assert(is_string($msg));
         if (extension_loaded('gettext')) {
             bindtextdomain("phptoolkit", dirname(dirname(__DIR__)).'/locale');
             textdomain('phptoolkit');
@@ -81,8 +81,8 @@ class OneLogin_Saml2_Utils
      */
     public static function loadXML($dom, $xml)
     {
-        assert('$dom instanceof DOMDocument');
-        assert('is_string($xml)');
+        assert($dom instanceof DOMDocument);
+        assert(is_string($xml));
 
         if (strpos($xml, '<!ENTITY') !== false) {
             throw new Exception('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks');
@@ -114,8 +114,8 @@ class OneLogin_Saml2_Utils
      */
     public static function validateXML($xml, $schema, $debug = false)
     {
-        assert('is_string($xml) || $xml instanceof DOMDocument');
-        assert('is_string($schema)');
+        assert(is_string($xml) || $xml instanceof DOMDocument);
+        assert(is_string($schema));
 
         libxml_clear_errors();
         libxml_use_internal_errors(true);
@@ -293,8 +293,8 @@ class OneLogin_Saml2_Utils
      */
     public static function redirect($url, $parameters = array(), $stay = false)
     {
-        assert('is_string($url)');
-        assert('is_array($parameters)');
+        assert(is_string($url));
+        assert(is_array($parameters));
 
         if (substr($url, 0, 1) === '/') {
             $url = self::getSelfURLhost() . $url;
@@ -783,8 +783,8 @@ class OneLogin_Saml2_Utils
      */
     public static function parseDuration($duration, $timestamp = null)
     {
-        assert('is_string($duration)');
-        assert('is_null($timestamp) || is_int($timestamp)');
+        assert(is_string($duration));
+        assert(is_null($timestamp) || is_int($timestamp));
 
         /* Parse the duration. We use a very strict pattern. */
         $durationRegEx = '#^(-?)P(?:(?:(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?)|(?:(\\d+)W))$#D';
@@ -955,7 +955,7 @@ class OneLogin_Saml2_Utils
      */
     public static function calculateX509Fingerprint($x509cert, $alg = 'sha1')
     {
-        assert('is_string($x509cert)');
+        assert(is_string($x509cert));
 
         $arCert = explode("\n", $x509cert);
         $data = '';
@@ -1250,8 +1250,8 @@ class OneLogin_Saml2_Utils
       */
     public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
     {
-        assert('is_string($algorithm)');
-        assert('$type === "public" || $type === "private"');
+        assert(is_string($algorithm));
+        assert($type === "public" || $type === "private");
         // do nothing if algorithm is already the type of the key
         if ($key->type === $algorithm) {
             return $key;
