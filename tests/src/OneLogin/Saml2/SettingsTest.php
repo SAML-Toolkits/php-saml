@@ -1000,7 +1000,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         unset($settingsInfo['strict']);
 
         $settings = new Settings($settingsInfo);
-        $this->assertFalse($settings->isStrict());
+        $this->assertTrue($settings->isStrict());
 
         $settingsInfo['strict'] = false;
         $settings2 = new Settings($settingsInfo);
