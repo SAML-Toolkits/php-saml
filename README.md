@@ -242,7 +242,7 @@ file, rename and edit it.
 ```php
 <?php
 
-$settings = array (
+$settings = array(
     // If 'strict' is True, then the PHP Toolkit will reject unsigned
     // or unencrypted messages if it expects them to be signed or encrypted.
     // Also it will reject the messages if the SAML standard is not strictly
@@ -259,12 +259,12 @@ $settings = array (
     'baseurl' => null,
 
     // Service Provider Data that we are deploying.
-    'sp' => array (
+    'sp' => array(
         // Identifier of the SP entity  (must be a URI)
         'entityId' => '',
         // Specifies info about where and how the <AuthnResponse> message MUST be
         // returned to the requester, in this case our SP.
-        'assertionConsumerService' => array (
+        'assertionConsumerService' => array(
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
@@ -290,7 +290,7 @@ $settings = array (
         ),
         // Specifies info about where and how the <Logout Response> message MUST be
         // returned to the requester, in this case our SP.
-        'singleLogoutService' => array (
+        'singleLogoutService' => array(
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
@@ -318,11 +318,11 @@ $settings = array (
     ),
 
     // Identity Provider Data that we want connected with our SP.
-    'idp' => array (
+    'idp' => array(
         // Identifier of the IdP entity  (must be a URI)
         'entityId' => '',
         // SSO endpoint info of the IdP. (Authentication Request protocol)
-        'singleSignOnService' => array (
+        'singleSignOnService' => array(
             // URL Target of the IdP where the Authentication Request Message
             // will be sent.
             'url' => '',
@@ -332,7 +332,7 @@ $settings = array (
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
         // SLO endpoint info of the IdP.
-        'singleLogoutService' => array (
+        'singleLogoutService' => array(
             // URL Location of the IdP where SLO Request will be sent.
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
@@ -386,15 +386,15 @@ that you can copy and rename it as `advanced_settings.php`
 ```php
 <?php
 
-$advancedSettings = array (
+$advancedSettings = array(
 
     // Compression settings
-    'compress' => array (
+    'compress' => array(
         'requests' => true,
         'responses' => true
     ),
     // Security settings
-    'security' => array (
+    'security' => array(
 
         /** signatures and encryptions offered */
 
@@ -415,7 +415,7 @@ $advancedSettings = array (
         'logoutResponseSigned' => false,
 
         /* Sign the Metadata
-         False || True (use sp certs) || array (
+         False || True (use sp certs) || array(
                                                     keyFileName => 'metadata.key',
                                                     certFileName => 'metadata.crt'
                                                 )
@@ -447,7 +447,7 @@ $advancedSettings = array (
         // Authentication context.
         // Set to false and no AuthContext will be sent in the AuthNRequest.
         // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
-        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
+        // Set an array with the possible auth context values: array('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
         'requestedAuthnContext' => true,
 
         // Indicates if the SP will validate all received xmls.
@@ -482,12 +482,12 @@ $advancedSettings = array (
 
     // Contact information template, it is recommended to supply a
     // technical and support contacts.
-    'contactPerson' => array (
-        'technical' => array (
+    'contactPerson' => array(
+        'technical' => array(
             'givenName' => '',
             'emailAddress' => ''
         ),
-        'support' => array (
+        'support' => array(
             'givenName' => '',
             'emailAddress' => ''
         ),
@@ -495,7 +495,7 @@ $advancedSettings = array (
 
     // Organization information template, the info in en_US lang is
     // recomended, add more if required.
-    'organization' => array (
+    'organization' => array(
         'en-US' => array(
             'name' => '',
             'displayname' => '',

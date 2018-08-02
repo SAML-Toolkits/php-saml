@@ -280,7 +280,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $currentURL = Utils::getSelfURLNoQuery();
 
         $this->_settings->setStrict(false);
-        $_GET = array (
+        $_GET = array(
             'SAMLResponse' => 'fZJva8IwEMa/Ssl7TZrW/gnqGHMMwSlM8cXeyLU9NaxNQi9lfvxVZczB5ptwSe733MPdjQma2qmFPdjOvyE5awiDU1MbUpevCetaoyyQJmWgQVK+VOvH14WSQ6Fca70tbc1ukPsEEGHrtTUsmM8mbDfKUhnFci8gliGINI/yXIAAiYnsw6JIRgWWAKlkwRZb6skJ64V6nKjDuSEPxvdPIowHIhpIsQkTFaYqSt9ZMEPy2oC/UEfvHSnOnfZFV38MjR1oN7TtgRv8tAZre9CGV9jYkGtT4Wnoju6Bauprme/ebOyErZbPi9XLfLnDoohwhHGc5WVSVhjCKM6rBMpYQpWJrIizfZ4IZNPxuTPqYrmd/m+EdONqPOfy8yG5rhxv0EMFHs52xvxWaHyd3tqD7+j37clWGGyh7vD+POiSrdZdWSIR49NrhR9R/teGTL8A',
             'RelayState' => 'https://pitbulk.no-ip.org/newonelogin/demo1/index.php',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
@@ -370,7 +370,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsValidSignUsingX509certMulti()
     {
-        $_GET = array (
+        $_GET = array(
             'SAMLResponse' => 'fZHbasJAEIZfJey9ZrNZc1gSodRSBKtQxYveyGQz1kCyu2Q24OM3jS21UHo3p++f4Z+CoGud2th3O/hXJGcNYXDtWkNqapVs6I2yQA0pAx2S8lrtH142Ssy5cr31VtuW3SH/E0CEvW+sYcF6VbLTIktFLMWZgxQR8DSP85wDB4GJGMOqShYVaoBUsOCIPY1kyUahEScacG3Ig/FjiUdyxuOZ4IcoUVGq4vSNBSsk3xjwE3Xx3qkwJD+cz3NtuxBN7WxjPN1F1NLcXdwob77tONiS7bZPm93zenvCqopxgVJmuU50jREsZF4noKWAOuNZJbNznnBky+LTDDVd2S+/dje1m+MVOtfidEER3g8Vt2fsPfiBfmePtsbgCO2A/9tL07TaD1ojEQuXtw0/ouFfD19+AA==',
             'RelayState' => 'http://stuff.com/endpoints/endpoints/index.php',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',

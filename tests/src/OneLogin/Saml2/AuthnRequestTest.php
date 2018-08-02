@@ -82,7 +82,7 @@ class AuthnRequestTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains('<samlp:RequestedAuthnContext Comparison="exact">', $request3);
         $this->assertNotContains('<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>', $request3);
 
-        $settingsInfo['security']['requestedAuthnContext']= array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509');
+        $settingsInfo['security']['requestedAuthnContext']= array('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509');
         $settings4 = new Settings($settingsInfo);
         $authnRequest4 = new AuthnRequest($settings4);
         $encodedRequest4 = $authnRequest4->getRequest();
@@ -206,8 +206,8 @@ class AuthnRequestTest extends \PHPUnit\Framework\TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $settingsInfo['organization'] = array (
-            'es' => array (
+        $settingsInfo['organization'] = array(
+            'es' => array(
                 'name' => 'sp_prueba',
                 'displayname' => 'SP prueba',
                 'url' => 'http://sp.example.com'
