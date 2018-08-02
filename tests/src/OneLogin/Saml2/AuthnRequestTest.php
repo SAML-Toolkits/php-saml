@@ -35,7 +35,7 @@ class AuthnRequestTest extends \PHPUnit\Framework\TestCase
     {
         $authnRequest = new AuthnRequest($this->_settings);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
-        $authUrl = Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
+        $authUrl = Utils::buildUrlWithQuery('http://idp.example.com/SSOService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=#', $authUrl);
         parse_str(parse_url($authUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -219,7 +219,7 @@ class AuthnRequestTest extends \PHPUnit\Framework\TestCase
 
         $authnRequest = new AuthnRequest($settings);
         $parameters = array('SAMLRequest' => $authnRequest->getRequest());
-        $authUrl = Utils::redirect('http://idp.example.com/SSOService.php', $parameters, true);
+        $authUrl = Utils::buildUrlWithQuery('http://idp.example.com/SSOService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SSOService\.php\?SAMLRequest=#', $authUrl);
         parse_str(parse_url($authUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.

@@ -207,19 +207,19 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests the redirect method of the Utils
+     * Tests the buildUrlWithQuery method of the Utils
      *
-     * @covers OneLogin\Saml2\Utils::redirect
+     * @covers OneLogin\Saml2\Utils::buildUrlWithQuery
      */
-    public function testRedirect()
+    public function testBuildUrlWithQuery()
     {
         // Check relative and absolute
         $hostname = Utils::getSelfHost();
         $url = "http://$hostname/example";
         $url2 = '/example';
 
-        $targetUrl = Utils::redirect($url, array(), true);
-        $targetUrl2 = Utils::redirect($url2, array(), true);
+        $targetUrl = Utils::buildUrlWithQuery($url, array());
+        $targetUrl2 = Utils::buildUrlWithQuery($url2, array());
 
         $this->assertEquals($targetUrl, $targetUrl2);
 
@@ -227,10 +227,10 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $url3 = "https://$hostname/example?test=true";
         $url4 = "ftp://$hostname/example";
 
-        $targetUrl3 = Utils::redirect($url3, array(), true);
+        $targetUrl3 = Utils::buildUrlWithQuery($url3, array());
 
         try {
-            $targetUrl4 = Utils::redirect($url4, array(), true);
+            $targetUrl4 = Utils::buildUrlWithQuery($url4, array());
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Redirect to invalid URL', $e->getMessage());
@@ -239,10 +239,10 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         // Review parameter prefix
         $parameters1 = array ('value1' => 'a');
 
-        $targetUrl5 = Utils::redirect($url, $parameters1, true);
+        $targetUrl5 = Utils::buildUrlWithQuery($url, $parameters1);
         $this->assertEquals("http://$hostname/example?value1=a", $targetUrl5);
 
-        $targetUrl6 = Utils::redirect($url3, $parameters1, true);
+        $targetUrl6 = Utils::buildUrlWithQuery($url3, $parameters1);
         $this->assertEquals("https://$hostname/example?test=true&value1=a", $targetUrl6);
 
         // Review parameters
@@ -252,7 +252,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             'testing' => null,
         );
 
-        $targetUrl7 = Utils::redirect($url, $parameters2, true);
+        $targetUrl7 = Utils::buildUrlWithQuery($url, $parameters2);
         $this->assertEquals("http://$hostname/example?alphavalue=a&numvalue[]=1&numvalue[]=2&testing", $targetUrl7);
 
         $parameters3 = array (
@@ -261,7 +261,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             'numvaluelist' => array (''),
         );
 
-        $targetUrl8 = Utils::redirect($url, $parameters3, true);
+        $targetUrl8 = Utils::buildUrlWithQuery($url, $parameters3);
         $this->assertEquals("http://$hostname/example?alphavalue=a&numvaluelist[]=", $targetUrl8);
     }
 

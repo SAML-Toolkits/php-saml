@@ -272,17 +272,16 @@ class Utils
     }
 
     /**
-     * Executes a redirection to the provided url (or return the target url).
+     * Builds and verifies a url.
      *
-     * @param string $url        The target url
-     * @param array  $parameters Extra parameters to be passed as part of the url
-     * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
+     * @param string $url        The base url
+     * @param array  $parameters Extra parameters to be appended to the url
      *
      * @return string|null $url
      *
      * @throws Error
      */
-    public static function redirect($url, array $parameters = array(), $stay = false)
+    public static function buildUrlWithQuery($url, array $parameters = array())
     {
         assert(is_string($url));
 
@@ -331,13 +330,24 @@ class Utils
             }
         }
 
-        if ($stay) {
-            return $url;
-        }
+        return $url;
+    }
 
+    /**
+     * Executes a redirection to the provided url.
+     *
+     * @param string $url        The target url
+     * @param array  $parameters Extra parameters to be passed as part of the url
+     *
+     * @return string|null $url
+     *
+     * @throws Error
+     */
+    public static function redirect($url, array $parameters = array())
+    {
         header('Pragma: no-cache');
         header('Cache-Control: no-cache, must-revalidate');
-        header('Location: ' . $url);
+        header('Location: ' . self::buildUrlWithQuery($url, $parameters));
         exit();
     }
 

@@ -53,7 +53,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $responseBuilder->build($inResponseTo);
         $parameters = array('SAMLResponse' => $responseBuilder->getResponse());
 
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
 
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);

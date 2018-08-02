@@ -33,6 +33,6 @@ $samlRequest = $logoutRequest->getRequest();
 
 $parameters = array('SAMLRequest' => $samlRequest);
 
-$url = Utils::redirect($sloUrl, $parameters, true);
+$url = Utils::buildUrlWithQuery($sloUrl, $parameters);
 
 header("Location: $url");

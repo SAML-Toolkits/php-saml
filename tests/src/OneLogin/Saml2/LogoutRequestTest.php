@@ -46,7 +46,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -74,7 +74,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings, $encodedDeflatedRequest);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -100,7 +100,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings, null, null, $sessionIndex);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -131,7 +131,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings, null, $nameId, null, $nameIdFormat);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -162,7 +162,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $logoutRequest = new LogoutRequest($settings, null, $nameId, null, null);
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -191,7 +191,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $logoutRequest = new LogoutRequest($settings, null, $nameId, null, null);
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -219,7 +219,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $logoutRequest = new LogoutRequest($settings, null, $nameId, null, $nameIdFormat, $nameIdNameQualifier);
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -245,7 +245,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($this->_settings);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
@@ -273,7 +273,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings);
 
         $parameters = array('SAMLRequest' => $logoutRequest->getRequest());
-        $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
+        $logoutUrl = Utils::buildUrlWithQuery('http://idp.example.com/SingleLogoutService.php', $parameters);
         $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLRequest=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.

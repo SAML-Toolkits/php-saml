@@ -339,7 +339,10 @@ class Auth
             $url = $_REQUEST['RelayState'];
         }
 
-        return Utils::redirect($url, $parameters, $stay);
+        if ($stay) {
+            return Utils::buildUrlWithQuery($url, $parameters);
+        }
+        return Utils::redirect($url, $parameters);
     }
 
     /**

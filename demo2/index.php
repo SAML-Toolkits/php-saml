@@ -26,7 +26,7 @@ if (!isset($_SESSION['samlUserdata'])) {
 
     $idpData = $settings->getIdPData();
     $ssoUrl = $idpData['singleSignOnService']['url'];
-    $url = Utils::redirect($ssoUrl, $parameters, true);
+    $url = Utils::buildUrlWithQuery($ssoUrl, $parameters);
 
     header("Location: $url");
 } else {
