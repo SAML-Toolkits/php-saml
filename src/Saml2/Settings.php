@@ -160,7 +160,7 @@ class Settings
     private function _loadPaths()
     {
         $basePath = dirname(dirname(__DIR__)) . '/';
-        $this->_paths = array (
+        $this->_paths = array(
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',

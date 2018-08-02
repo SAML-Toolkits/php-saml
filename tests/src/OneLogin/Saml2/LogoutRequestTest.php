@@ -322,7 +322,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetNameIdData()
     {
-        $expectedNameIdData = array (
+        $expectedNameIdData = array(
             'Value' => 'ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c',
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             'SPNameQualifier' => 'http://idp.example.com/'
@@ -351,7 +351,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $key = $this->_settings->getSPkey();
         $nameIdData4 = LogoutRequest::getNameIdData($request2, $key);
 
-        $expectedNameIdData = array (
+        $expectedNameIdData = array(
             'Value' => 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69',
             'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress',
             'SPNameQualifier' => 'https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php'
@@ -712,7 +712,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $currentURL = Utils::getSelfURLNoQuery();
 
         $this->_settings->setStrict(false);
-        $_GET = array (
+        $_GET = array(
             'SAMLRequest' => 'lVLBitswEP0Vo7tjeWzJtki8LIRCYLvbNksPewmyPc6K2pJqyXQ/v1LSQlroQi/DMJr33rwZbZ2cJysezNms/gt+X9H55G2etBOXlx1ZFy2MdMoJLWd0wvfieP/xQcCGCrsYb3ozkRvI+wjpHC5eGU2Sw35HTg3lA8hqZFwWFcMKsStpxbEsxoLXeQN9OdY1VAgk+YqLC8gdCUQB7tyKB+281D6UaF6mtEiBPudcABcMXkiyD26Ulv6CevXeOpFlVvlunb5ttEmV3ZjlnGn8YTRO5qx0NuBs8kzpAd829tXeucmR5NH4J/203I8el6gFRUqbFPJnyEV51Wq30by4TLW0/9ZyarYTxt4sBsjUYLMZvRykl1Fxm90SXVkfwx4P++T4KSafVzmpUcVJ/sfSrQZJPphllv79W8WKGtLx0ir8IrVTqD1pT2MH3QAMSs4KTvui71jeFFiwirOmprwPkYW063+5uRq4urHiiC4e8hCX3J5wqAEGaPpw9XB5JmkBdeDqSlkz6CmUXdl0Qae5kv2F/1384wu3PwE=',
             'RelayState' => '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
@@ -812,7 +812,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsValidSignUsingX509certMulti()
     {
-        $_GET = array (
+        $_GET = array(
             'SAMLRequest' => 'fZJNa+MwEIb/itHdiTz6sC0SQyEsBPoB27KHXoIsj7cGW3IlGfLzV7G7kN1DL2KYmeedmRcdgp7GWT26326JP/FzwRCz6zTaoNbKkSzeKqfDEJTVEwYVjXp9eHpUsKNq9i4640Zyh3xP6BDQx8FZkp1PR3KpqexAl72QmpUCS8SW01IiZz2TVVGD4X1VQYlAsl/oQyKPJAklPIQFzzZEbWNK0YLnlOVA3wqpQCoB7yQ7pWsGq+NKfcQ4q/0+xKXvd8ZNe7Td7AYbw10UxrCbP2aSPbv4Yl/8Qx/R3+SB5bTOoXiDQvFNvjnc7lXrIr75kh+6eYdXPc0jrkMO+/umjXhOtpxP2Q/nJx2/9+uWGbq8X1tV9NqGAW0kzaVvoe1AAJeCSWqYaUVRM2SilKKuqDTpFSlszdcK29RthVm9YriZebYdXpsLdhVAB7VJzif3haYMqqTVcl0JMBR4y+s2zak3sf/4v8l/vlHzBw==',
             'RelayState' => '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',

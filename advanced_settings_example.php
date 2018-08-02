@@ -1,18 +1,18 @@
 <?php
 
-$advancedSettings = array (
+$advancedSettings = array(
 
     // Compression settings
     // Handle if the getRequest/getResponse methods will return the Request/Response deflated.
     // But if we provide a $deflate boolean parameter to the getRequest or getResponse
     // method it will have priority over the compression settings.
-    'compress' => array (
+    'compress' => array(
         'requests' => true,
         'responses' => true
     ),
 
     // Security settings
-    'security' => array (
+    'security' => array(
 
         /** signatures and encryptions offered */
 
@@ -33,7 +33,7 @@ $advancedSettings = array (
         'logoutResponseSigned' => false,
 
         /* Sign the Metadata
-         False || True (use sp certs) || array (
+         False || True (use sp certs) || array(
                                                     keyFileName => 'metadata.key',
                                                     certFileName => 'metadata.crt'
                                                 )
@@ -66,7 +66,7 @@ $advancedSettings = array (
         // Authentication context.
         // Set to false and no AuthContext will be sent in the AuthNRequest,
         // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
-        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
+        // Set an array with the possible auth context values: array('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
         'requestedAuthnContext' => false,
 
         // Allows the authn comparison parameter to be set, defaults to 'exact' if
@@ -104,19 +104,19 @@ $advancedSettings = array (
     ),
 
     // Contact information template, it is recommended to suply a technical and support contacts
-    'contactPerson' => array (
-        'technical' => array (
+    'contactPerson' => array(
+        'technical' => array(
             'givenName' => '',
             'emailAddress' => ''
         ),
-        'support' => array (
+        'support' => array(
             'givenName' => '',
             'emailAddress' => ''
         ),
     ),
 
     // Organization information template, the info in en_US lang is recomended, add more if required
-    'organization' => array (
+    'organization' => array(
         'en-US' => array(
             'name' => '',
             'displayname' => '',

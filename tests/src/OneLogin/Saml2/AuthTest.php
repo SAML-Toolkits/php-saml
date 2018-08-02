@@ -899,7 +899,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         try {
             $relayState = 'http://sp.example.com';
-            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+            $parameters = array('test1' => 'value1', 'test2' => 'value2');
 
             // The Header of the redirect produces an Exception
             $this->_auth->login($relayState, $parameters);
@@ -1286,7 +1286,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         try {
             $relayState = 'http://sp.example.com';
-            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+            $parameters = array('test1' => 'value1', 'test2' => 'value2');
 
             // The Header of the redirect produces an Exception
             $this->_auth->logout($relayState, $parameters);
@@ -1595,7 +1595,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $decodedLogoutResponse = gzinflate(base64_decode($parsedQuery['SAMLResponse']));
         $this->assertEquals($decodedLogoutResponse, $auth->getLastResponseXML());
 
-        $settingsInfo['compress'] = array (
+        $settingsInfo['compress'] = array(
             'responses' => true
         );
         $auth2 = new Auth($settingsInfo);
@@ -1604,7 +1604,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $decodedLogoutResponse2 = gzinflate(base64_decode($parsedQuery2['SAMLResponse']));
         $this->assertEquals($decodedLogoutResponse2, $auth2->getLastResponseXML());
 
-        $settingsInfo['compress'] = array (
+        $settingsInfo['compress'] = array(
             'responses' => false
         );
         $auth3 = new Auth($settingsInfo);

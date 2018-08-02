@@ -1,7 +1,7 @@
 <?php
 
-    $advancedSettings = array (
-        'security' => array (
+    $advancedSettings = array(
+        'security' => array(
             'nameIdEncrypted' => false,
             'authnRequestsSigned' => false,
             'logoutRequestSigned' => false,

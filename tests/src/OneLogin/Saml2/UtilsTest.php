@@ -237,7 +237,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         }
 
         // Review parameter prefix
-        $parameters1 = array ('value1' => 'a');
+        $parameters1 = array('value1' => 'a');
 
         $targetUrl5 = Utils::redirect($url, $parameters1, true);
         $this->assertEquals("http://$hostname/example?value1=a", $targetUrl5);
@@ -246,19 +246,19 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("https://$hostname/example?test=true&value1=a", $targetUrl6);
 
         // Review parameters
-        $parameters2 = array (
+        $parameters2 = array(
             'alphavalue' => 'a',
-            'numvalue' => array ('1', '2'),
+            'numvalue' => array('1', '2'),
             'testing' => null,
         );
 
         $targetUrl7 = Utils::redirect($url, $parameters2, true);
         $this->assertEquals("http://$hostname/example?alphavalue=a&numvalue[]=1&numvalue[]=2&testing", $targetUrl7);
 
-        $parameters3 = array (
+        $parameters3 = array(
             'alphavalue' => 'a',
-            'emptynumvaluelist' => array (),
-            'numvaluelist' => array (''),
+            'emptynumvaluelist' => array(),
+            'numvaluelist' => array(''),
         );
 
         $targetUrl8 = Utils::redirect($url, $parameters3, true);

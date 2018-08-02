@@ -276,7 +276,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
         $response = new Response($this->_settings, $xml);
-        $expectedNameIdData = array (
+        $expectedNameIdData = array(
             'Value' => 'support@onelogin.com',
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
             'NameQualifier' => 'https://test.example.com/saml/metadata'
@@ -286,7 +286,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
         $response2 = new Response($this->_settings, $xml2);
-        $expectedNameIdData2 = array (
+        $expectedNameIdData2 = array(
             'Value' => '2de11defd199f8d5bb63f9b7deb265ba5c675c10',
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             'SPNameQualifier' => 'http://stuff.com/endpoints/metadata.php'
@@ -296,7 +296,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $response3 = new Response($this->_settings, $xml3);
-        $expectedNameIdData3 = array (
+        $expectedNameIdData3 = array(
             'Value' => '_68392312d490db6d355555cfbbd8ec95d746516f60',
             'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
             'SPNameQualifier' => 'http://stuff.com/endpoints/metadata.php'

@@ -348,17 +348,17 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         include $settingsDir.'settings1.php';
 
         $settingsInfo['security']['signMetadata']['keyFileName'] = 'metadata.key';
-        $settingsInfo['organization'] = array (
+        $settingsInfo['organization'] = array(
             'en-US' => array(
                 'name' => 'miss_information'
             )
         );
 
-        $settingsInfo['contactPerson'] = array (
-            'support' => array (
+        $settingsInfo['contactPerson'] = array(
+            'support' => array(
                 'givenName' => 'support_name'
             ),
-            'auxiliar' => array (
+            'auxiliar' => array(
                 'givenName' => 'auxiliar_name',
                 'emailAddress' => 'auxiliar@example.com',
             ),
@@ -581,7 +581,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         if (!isset($settingsInfo['security'])) {
             $settingsInfo['security'] = array();
         }
-        $settingsInfo['security']['signMetadata'] = array ();
+        $settingsInfo['security']['signMetadata'] = array();
 
         try {
             $settings = new Settings($settingsInfo);
@@ -592,7 +592,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         }
 
 
-        $settingsInfo['security']['signMetadata'] = array (
+        $settingsInfo['security']['signMetadata'] = array(
             'keyFileName' => 'noexist.key',
             'certFileName' => 'sp.crt'
         );
@@ -605,7 +605,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
             $this->assertContains('Private key file not found', $e->getMessage());
         }
 
-        $settingsInfo['security']['signMetadata'] = array (
+        $settingsInfo['security']['signMetadata'] = array(
             'keyFileName' => 'sp.key',
             'certFileName' => 'noexist.crt'
         );
