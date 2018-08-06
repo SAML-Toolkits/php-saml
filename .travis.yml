@@ -21,7 +21,7 @@ before_script:
   - phpenv config-rm xdebug.ini
 
 script:
-  - vendor/bin/phpunit --bootstrap tests/bootstrap.php --configuration tests/phpunit.xml
+  - vendor/bin/phpunit
   - php vendor/bin/phpcpd --exclude tests --exclude vendor .
   - php vendor/bin/phploc . --exclude vendor
   - php vendor/bin/phploc lib/.
