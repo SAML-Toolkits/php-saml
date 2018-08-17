@@ -141,6 +141,8 @@ AUTHNREQUEST;
      * Returns deflated, base64 encoded, unsigned AuthnRequest.
      *
      * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
+     *
+     * @return string
      */
     public function getRequest($deflate = null)
     {

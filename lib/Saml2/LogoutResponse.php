@@ -32,7 +32,7 @@ class OneLogin_Saml2_LogoutResponse
 
     /**
     * After execute a validation process, if it fails, this var contains the cause
-    * @var string
+    * @var string|null
     */
     private $_error;
 
@@ -42,6 +42,8 @@ class OneLogin_Saml2_LogoutResponse
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
      * @param string|null             $response An UUEncoded SAML Logout response from the IdP.
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response = null)
     {
@@ -62,6 +64,13 @@ class OneLogin_Saml2_LogoutResponse
             }
             $this->document = new DOMDocument();
             $this->document = OneLogin_Saml2_Utils::loadXML($this->document, $this->_logoutResponse);
+
+            if (false === $this->document) {
+                throw new OneLogin_Saml2_Error(
+                    "LogoutResponse could not be processed",
+                    OneLogin_Saml2_Error::SAML_LOGOUTRESPONSE_INVALID
+                );
+            }
 
             if ($this->document->documentElement->hasAttribute('ID')) {
                 $this->id = $this->document->documentElement->getAttribute('ID');
@@ -87,7 +96,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Gets the Status of the Logout Response.
      *
-     * @return string The Status
+     * @return string|null The Status
      */
     public function getStatus()
     {
@@ -106,8 +115,6 @@ class OneLogin_Saml2_LogoutResponse
      * @param bool $retrieveParametersFromServer
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
-     *
-     * @throws Exception
      */
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
@@ -154,23 +161,19 @@ class OneLogin_Saml2_LogoutResponse
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The LogoutResponse was received at $currentURL instead of $destination",
-                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                            );
-                        }
+                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The LogoutResponse was received at $currentURL instead of $destination",
+                            OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                        );
                     }
                 }
 
-                if ($security['wantMessagesSigned']) {
-                    if (!isset($_GET['Signature'])) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The Message of the Logout Response is not signed and the SP requires it",
-                            OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
-                        );
-                    }
+                if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "The Message of the Logout Response is not signed and the SP requires it",
+                        OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+                    );
                 }
             }
 
@@ -188,7 +191,7 @@ class OneLogin_Saml2_LogoutResponse
             $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $this->_error;
+                echo htmlentities($this->_error);
             }
             return false;
         }
@@ -261,7 +264,8 @@ LOGOUTRESPONSE;
         return base64_encode($subject);
     }
 
-    /* After execute a validation process, if fails this method returns the cause.
+    /**
+     * After execute a validation process, if fails this method returns the cause.
      *
      * @return string Cause
      */
@@ -271,7 +275,7 @@ LOGOUTRESPONSE;
     }
 
    /**
-    * @return the ID of the Response
+    * @return string the ID of the Response
     */
     public function getId()
     {

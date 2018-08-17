@@ -422,33 +422,107 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     * Case with x509certNew
     *
     * @covers OneLogin_Saml2_Settings::getSPMetadata
+    * @dataProvider testGetSPMetadataWithX509CertNewDataProvider
     */
-    public function testGetSPMetadataWithX509CertNew()
+    public function testGetSPMetadataWithX509CertNew($alwaysIncludeEncryption, $wantNameIdEncrypted, $wantAssertionsEncrypted, $expectEncryptionKeyDescriptor)
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings5.php';
 
-        $settingsInfo['security']['wantNameIdEncrypted'] = false;
-        $settingsInfo['security']['wantAssertionsEncrypted'] = false;
+        $settingsInfo['security']['wantNameIdEncrypted'] = $wantNameIdEncrypted;
+        $settingsInfo['security']['wantAssertionsEncrypted'] = $wantAssertionsEncrypted;
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
-        $metadata = $settings->getSPMetadata();
+        $metadata = $settings->getSPMetadata($alwaysIncludeEncryption);
 
-        $this->assertEquals(2, substr_count($metadata, "<md:KeyDescriptor"));
+        $this->assertEquals($expectEncryptionKeyDescriptor ? 4 : 2, substr_count($metadata, "<md:KeyDescriptor"));
 
+        // signing KeyDescriptor should always be included
         $this->assertEquals(2, substr_count($metadata, '<md:KeyDescriptor use="signing"'));
 
-        $this->assertEquals(0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
+        $this->assertEquals($expectEncryptionKeyDescriptor ? 2 : 0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
+    }
 
-        $settingsInfo['security']['wantNameIdEncrypted'] = true;
-        $settingsInfo['security']['wantAssertionsEncrypted'] = true;
-        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
-        $metadata2 = $settings2->getSPMetadata();
+    public function testGetSPMetadataWithX509CertNewDataProvider()
+    {
+        return [
+            'settings do not require encryption' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => false,
+            ],
+            'wantNameIdEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'wantAssertionsEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'both settings enabled'=> [
+                'alwaysIncludeEncryption' => false,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and wantNameIdEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => false,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and wantAssertionsEncrypted setting enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => false,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+            'metadata requested with encryption and both settings enabled' => [
+                'alwaysIncludeEncryption' => true,
+                'wantNameIdEncrypted' => true,
+                'wantAssertionsEncrypted' => true,
+                'expectEncryptionKeyDescriptor' => true,
+            ],
+        ];
+    }
 
-        $this->assertEquals(4, substr_count($metadata2, "<md:KeyDescriptor"));
+    /**
+    * Tests the getSPMetadata method of the OneLogin_Saml2_Settings
+    * Case ValidUntil CacheDuration
+    *
+    * @covers OneLogin_Saml2_Settings::getSPMetadata
+    */
+    public function testGetSPMetadataTiming()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
 
-        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="signing"'));
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
 
-        $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="encryption"'));
+        $currentValidUntil =  time() + OneLogin_Saml2_Metadata::TIME_VALID;
+        $currentValidUntilStr =  gmdate('Y-m-d\TH:i:s\Z', $currentValidUntil);
+        $defaultCacheDuration = OneLogin_Saml2_Metadata::TIME_CACHED;
+
+        $metadata = $settings->getSPMetadata();
+        $this->assertContains('validUntil="'.$currentValidUntilStr.'"', $metadata);
+        $this->assertContains('cacheDuration="PT604800S"', $metadata);
+
+        $newValidUntil = 2524668343;
+        $newValidUntilStr = gmdate('Y-m-d\TH:i:s\Z', $newValidUntil);
+        $newCacheDuration = 1209600;
+        $metadata2 = $settings->getSPMetadata(false, $newValidUntil, $newCacheDuration);
+        $this->assertContains('validUntil="'.$newValidUntilStr.'"', $metadata2);
+        $this->assertContains('cacheDuration="PT1209600S"', $metadata2);
     }
 
     /**

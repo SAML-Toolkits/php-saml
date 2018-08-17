@@ -21,6 +21,7 @@ class OneLogin_Saml2_Metadata
      * @param array         $contacts      Contacts info
      * @param array         $organization  Organization ingo
      * @param array         $attributes
+     *
      * @return string SAML Metadata XML
      */
     public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
@@ -173,13 +174,15 @@ METADATA_TEMPLATE;
     /**
      * Signs the metadata with the key/cert provided
      *
-     * @param string $metadata          SAML Metadata XML
-     * @param string $key               x509 key
-     * @param string $cert              x509 cert
-     * @param string $signAlgorithm     Signature algorithm method
-     * @param string $digestAlgorithm   Digest algorithm method
+     * @param string $metadata SAML Metadata XML
+     * @param string $key x509 key
+     * @param string $cert x509 cert
+     * @param string $signAlgorithm Signature algorithm method
+     * @param string $digestAlgorithm Digest algorithm method
      *
      * @return string Signed Metadata
+     *
+     * @throws Exception
      */
     public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
@@ -190,11 +193,13 @@ METADATA_TEMPLATE;
      * Adds the x509 descriptors (sign/encriptation) to the metadata
      * The same cert will be used for sign/encrypt
      *
-     * @param string $metadata       SAML Metadata XML
-     * @param string $cert           x509 cert
-     * @param bool   $wantsEncrypted Whether to include the KeyDescriptor for encryption
+     * @param string $metadata SAML Metadata XML
+     * @param string $cert x509 cert
+     * @param bool $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
+     *
+     * @throws Exception
      */
     public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
     {

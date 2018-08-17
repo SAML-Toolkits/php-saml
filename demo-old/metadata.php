@@ -6,8 +6,6 @@
  * or expose it on a URL so your IdP can check it periodically.
  */
 
-error_reporting(E_ALL);
-
 $settings = null;
 require 'settings.php';
 
