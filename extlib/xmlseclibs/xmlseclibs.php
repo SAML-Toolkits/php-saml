@@ -282,7 +282,7 @@ class XMLSecurityKey {
             } else {
                 $this->key = openssl_get_privatekey($this->key, $this->passphrase);
             }
-        } else if ($this->cryptParams['cipher'] == MCRYPT_RIJNDAEL_128) {
+        } else if (isset($this->cryptParams['cipher']) && $this->cryptParams['cipher'] == MCRYPT_RIJNDAEL_128) {
             /* Check key length */
             switch ($this->type) {
                 case (XMLSecurityKey::AES256_CBC):
@@ -724,7 +724,7 @@ class XMLSecurityDSig {
         $digValue = $this->calculateDigest($digestAlgorithm, $data, false);
         $query = 'string(./secdsig:DigestValue)';
         $digestValue = $xpath->evaluate($query, $refNode);
-        return ($digValue == base64_decode($digestValue));
+        return ($digValue === base64_decode($digestValue));
     }
 
     public function processTransforms($refNode, $objData, $includeCommentNodes = true) {
@@ -846,8 +846,6 @@ class XMLSecurityDSig {
                 } else {
                     $dataObject = $refNode->ownerDocument;
                 }
-            } else {
-                $dataObject = file_get_contents($arUrl);
             }
         } else {
             /* This reference identifies the root node with an empty URI. This should

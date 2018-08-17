@@ -544,9 +544,6 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         }
     }
 
-
-
-
     /**
     * Tests the getSessionIndex method of the OneLogin_Saml2_Response
     *
@@ -564,7 +561,6 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('_7164a9a9f97828bfdb8d0ebc004a05d2e7d873f70c', $response2->getSessionIndex());
     }
-
 
     /**
     * Tests the getAttributes method of the OneLogin_Saml2_Response
@@ -605,6 +601,48 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $this->fail('OneLogin_Saml2_ValidationError was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
+        }
+    }
+
+    /**
+     * Tests the getAttributes method of the OneLogin_Saml2_Response
+     *
+     * @covers OneLogin_Saml2_Response::getAttributes
+     */
+    public function testGetAttributesWithFriendlyName()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response6.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+
+        $expectedAttributes = array(
+            'uid' => array(
+                'demo'
+            ),
+            'givenName' => array(
+                'value'
+            ),
+        );
+        $this->assertEquals($expectedAttributes, $response->getAttributesWithFriendlyName());
+
+        // An assertion that has no attributes should return an empty array when asked for the attributes
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response2.xml.base64');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
+
+        $this->assertEmpty($response2->getAttributesWithFriendlyName());
+
+        // Encrypted Attributes are not supported
+        $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_attrs.xml.base64');
+        $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
+        $this->assertEmpty($response3->getAttributesWithFriendlyName());
+
+        // Duplicated Attribute names
+        $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/duplicated_attributes_with_friendly_names.xml.base64');
+        $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
+        try {
+            $attrs = $response4->getAttributesWithFriendlyName();
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertContains('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
         }
     }
 
@@ -685,6 +723,26 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $valid = $response->isValid();
 
         $this->assertFalse($valid);
+    }
+
+    /**
+     * Tests the getNameId and getAttributes methods of the
+     * OneLogin_Saml2_Response
+     *
+     * Test that the node text with comment attack (VU#475445)
+     * is not allowed
+     *
+     * @covers OneLogin_Saml2_Response::getNameId
+     * @covers OneLogin_Saml2_Response::getAttributes
+     */
+    public function testNodeTextAttack()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_node_text_attack.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $nameId = $response->getNameId();
+        $attributes = $response->getAttributes();
+        $this->assertEquals("support@onelogin.com", $nameId);
+        $this->assertEquals("smith", $attributes['surname'][0]);
     }
 
     /**
@@ -1426,7 +1484,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($settingsInfo['idp']['x509cert']);
+        $cert = OneLogin_Saml2_Utils::formatCert($settingsInfo['idp']['x509cert']);
+        $settingsInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert);
         $settingsInfo['idp']['x509cert'] = null;
 
         $settings = new OneLogin_Saml2_Settings($settingsInfo);

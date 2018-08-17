@@ -4,7 +4,7 @@
  *  SAML Metadata view
  */
 
-require_once dirname(dirname(__FILE__)).'/_toolkit_loader.php';
+require_once dirname(__DIR__).'/_toolkit_loader.php';
 
 require_once 'settings.php' ;
 

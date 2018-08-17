@@ -7,8 +7,6 @@
  * link where it will send a certified response via $_POST.
  */
 
-error_reporting(E_ALL);
-
 $settings = null;
 require 'settings.php';
 
