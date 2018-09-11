@@ -5,7 +5,7 @@
 // http://php.net/manual/en/language.oop5.autoload.php
 
 // Load composer vendor folder if any
-if (file_exists(__DIR__ . 'vendor/autoload.php')) {
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require __DIR__ . '/vendor/autoload.php';
 }
 
@@ -31,3 +31,4 @@ foreach ($folderInfo as $element) {
         include_once $libDir.$element;
     }
 }
+
