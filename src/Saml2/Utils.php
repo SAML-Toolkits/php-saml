@@ -345,7 +345,7 @@ class Utils
     }
 
      /**
-     * @var $protocolRegex string
+     * @param $protocolRegex string
      */
     public static function setProtocolRegex($protocolRegex)
     {
