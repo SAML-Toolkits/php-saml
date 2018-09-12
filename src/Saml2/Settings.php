@@ -282,7 +282,9 @@ class Settings
      * Loads settings info from the settings file
      *
      * @return bool True if the settings info is valid
+     *
      * @throws Error
+     *
      * @suppress PhanUndeclaredVariable
      */
     private function _loadSettingsFromFile()
@@ -888,6 +890,8 @@ class Settings
      * @param string $xml Metadata's XML that will be validate
      *
      * @return array The list of found errors
+     *
+     * @throws Exception
      */
     public function validateMetadata($xml)
     {
@@ -997,11 +1001,12 @@ class Settings
      * Activates or deactivates the strict mode.
      *
      * @param bool $value Strict parameter
+     *
      * @throws Exception
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new Exception('Invalid value passed to setStrict()');
         }
 

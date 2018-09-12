@@ -101,6 +101,7 @@ class IdPMetadataParser
      * @param string $desiredSLOBinding   Parse specific binding SLO endpoint
      *
      * @return array metadata info in php-saml settings format
+     *
      * @throws Exception
      */
     public static function parseXML($xml, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT)

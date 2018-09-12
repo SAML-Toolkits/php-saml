@@ -81,9 +81,10 @@ class Response
      * Constructs the SAML Response object.
      *
      * @param Settings $settings Settings.
-     * @param string                  $response A UUEncoded SAML response from the IdP.
+     * @param string   $response A UUEncoded SAML response from the IdP.
      *
      * @throws Exception
+     * @throws ValidationError
      */
     public function __construct(\OneLogin\Saml2\Settings $settings, $response)
     {
@@ -122,6 +123,7 @@ class Response
      * @return bool Validate the document
      *
      * @throws Exception
+     * @throws ValidationError
      */
     public function isValid($requestId = null)
     {
@@ -198,13 +200,11 @@ class Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo)) {
-                    if ($requestId != $responseInResponseTo) {
-                        throw new ValidationError(
-                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
-                            ValidationError::WRONG_INRESPONSETO
-                        );
-                    }
+                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                    throw new ValidationError(
+                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        ValidationError::WRONG_INRESPONSETO
+                    );
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
@@ -448,18 +448,18 @@ class Response
 
     /**
      * @return string|null the ID of the assertion in the Response
+     * 
+     * @throws ValidationError
      */
     public function getAssertionId()
     {
         if (!$this->validateNumAssertions()) {
-            throw new InvalidArgumentException("SAML Response must contain 1 Assertion.");
+            throw new ValidationError("SAML Response must contain 1 Assertion.", ValidationError::WRONG_NUMBER_OF_ASSERTIONS);
         }
         $assertionNodes = $this->_queryAssertion("");
         $id = null;
-        if ($assertionNodes->length == 1) {
-            if ($assertionNodes->item(0)->hasAttribute('ID')) {
-                $id = $assertionNodes->item(0)->getAttribute('ID');
-            }
+        if ($assertionNodes->length == 1 && $assertionNodes->item(0)->hasAttribute('ID')) {
+            $id = $assertionNodes->item(0)->getAttribute('ID');
         }
         return $id;
     }
@@ -476,7 +476,7 @@ class Response
     /**
      * Checks if the Status is success
      *
-     * @throws $statusExceptionMsg If status is not success
+     * @throws ValidationError If status is not success
      */
     public function checkStatus()
     {
@@ -551,6 +551,7 @@ class Response
      * Gets the Issuers (from Response and Assertion).
      *
      * @return array @issuers The issuers of the assertion/response
+     *
      * @throws ValidationError
      */
     public function getIssuers()
@@ -586,6 +587,8 @@ class Response
      * Gets the NameID Data provided by the SAML response from the IdP.
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
+     *
+     * @throws ValidationError
      */
     public function getNameIdData()
     {
@@ -650,6 +653,8 @@ class Response
      * Gets the NameID provided by the SAML response from the IdP.
      *
      * @return string|null Name ID Value
+     *
+     * @throws ValidationError
      */
     public function getNameId()
     {
@@ -665,6 +670,8 @@ class Response
      * Gets the NameID Format provided by the SAML response from the IdP.
      *
      * @return string|null Name ID Format
+     *
+     * @throws ValidationError
      */
     public function getNameIdFormat()
     {
@@ -680,6 +687,8 @@ class Response
      * Gets the NameID NameQualifier provided by the SAML response from the IdP.
      *
      * @return string|null Name ID NameQualifier
+     *
+     * @throws ValidationError
      */
     public function getNameIdNameQualifier()
     {
@@ -696,6 +705,8 @@ class Response
      * Could be used to set the local session expiration
      *
      * @return int|null The SessionNotOnOrAfter value
+     *
+     * @throws Exception
      */
     public function getSessionNotOnOrAfter()
     {
@@ -729,6 +740,8 @@ class Response
      * Gets the Attributes from the AttributeStatement element.
      *
      * @return array The attributes of the SAML Assertion
+     *
+     * @throws ValidationError
      */
     public function getAttributes()
     {
@@ -739,12 +752,21 @@ class Response
      * Gets the Attributes from the AttributeStatement element using their FriendlyName.
      *
      * @return array The attributes of the SAML Assertion
+     *
+     * @throws ValidationError
      */
     public function getAttributesWithFriendlyName()
     {
         return $this->_getAttributesByKeyName('FriendlyName');
     }
 
+    /**
+     * @param string $keyName
+     *
+     * @return array
+     *
+     * @throws ValidationError
+     */
     private function _getAttributesByKeyName($keyName = "Name")
     {
         $attributes = array();
@@ -800,6 +822,8 @@ class Response
      *   - Check that IDs and reference URI are unique and consistent.
      *
      * @return array Signed element tags
+     *
+     * @throws ValidationError
      */
     public function processSignedElements()
     {
@@ -873,14 +897,12 @@ class Response
             $signedElements[] = $signedElement;
         }
 
-        if (!empty($signedElements)) {
-            // Check SignedElements
-            if (!$this->validateSignedElements($signedElements)) {
-                throw new ValidationError(
-                    'Found an unexpected Signature Element. SAML Response rejected',
-                    ValidationError::UNEXPECTED_SIGNED_ELEMENTS
-                );
-            }
+        // Check SignedElements
+        if (!empty($signedElements) && !$this->validateSignedElements($signedElements)) {
+            throw new ValidationError(
+                'Found an unexpected Signature Element. SAML Response rejected',
+                ValidationError::UNEXPECTED_SIGNED_ELEMENTS
+            );
         }
         return $signedElements;
     }
@@ -889,6 +911,9 @@ class Response
      * Verifies that the document is still valid according Conditions Element.
      *
      * @return bool
+     *
+     * @throws Exception
+     * @throws ValidationError
      */
     public function validateTimestamps()
     {
@@ -924,6 +949,8 @@ class Response
      * @param array $signedElements Signed elements
      *
      * @return bool
+     *
+     * @throws ValidationError
      */
     public function validateSignedElements($signedElements)
     {
@@ -973,8 +1000,6 @@ class Response
      * @param string $assertionXpath Xpath Expresion
      *
      * @return DOMNodeList The queried node
-     *
-     * @throws Exception
      */
     protected function _queryAssertion($assertionXpath)
     {
@@ -1044,6 +1069,7 @@ class Response
      * @return DOMDocument Decrypted Assertion
      *
      * @throws Exception
+     * @throws ValidationError
      */
     protected function decryptAssertion(\DomNode $dom)
     {

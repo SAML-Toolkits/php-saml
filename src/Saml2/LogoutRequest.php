@@ -139,7 +139,7 @@ LOGOUTREQUEST;
             } else {
                 $logoutRequest = $decoded;
             }
-            $this->id = self::getID($logoutRequest);
+            $this->id = static::getID($logoutRequest);
         }
         $this->_logoutRequest = $logoutRequest;
     }
@@ -204,7 +204,9 @@ LOGOUTREQUEST;
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      *
+     * @throws Error
      * @throws Exception
+     * @throws ValidationError
      */
     public static function getNameIdData($request, $key = null)
     {
@@ -265,6 +267,10 @@ LOGOUTREQUEST;
      * @param string|null        $key     The SP key
      *
      * @return string Name ID Value
+     * 
+     * @throws Error
+     * @throws Exception
+     * @throws ValidationError
      */
     public static function getNameId($request, $key = null)
     {
@@ -278,6 +284,8 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string|null $issuer The Issuer
+     * 
+     * @throws Exception
      */
     public static function getIssuer($request)
     {
@@ -305,6 +313,8 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return array The SessionIndex value
+     * 
+     * @throws Exception
      */
     public static function getSessionIndexes($request)
     {
@@ -329,6 +339,9 @@ LOGOUTREQUEST;
      * @param bool $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool If the Logout Request is or not valid
+     * 
+     * @throws Exception
+     * @throws ValidationError
      */
     public function isValid($retrieveParametersFromServer = false)
     {
@@ -369,20 +382,18 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new ValidationError(
-                                "The LogoutRequest was received at $currentURL instead of $destination",
-                                ValidationError::WRONG_DESTINATION
-                            );
-                        }
+                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                        throw new ValidationError(
+                            "The LogoutRequest was received at $currentURL instead of $destination",
+                            ValidationError::WRONG_DESTINATION
+                        );
                     }
                 }
 
-                $nameId = $this->getNameId($dom, $this->_settings->getSPkey());
+                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
 
                 // Check issuer
-                $issuer = $this->getIssuer($dom);
+                $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new ValidationError(
                         "Invalid issuer in the Logout Request",
@@ -390,13 +401,11 @@ LOGOUTREQUEST;
                     );
                 }
 
-                if ($security['wantMessagesSigned']) {
-                    if (!isset($_GET['Signature'])) {
-                        throw new ValidationError(
-                            "The Message of the Logout Request is not signed and the SP require it",
-                            ValidationError::NO_SIGNED_MESSAGE
-                        );
-                    }
+                if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
+                    throw new ValidationError(
+                        "The Message of the Logout Request is not signed and the SP require it",
+                        ValidationError::NO_SIGNED_MESSAGE
+                    );
                 }
             }
 

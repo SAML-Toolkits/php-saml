@@ -161,6 +161,9 @@ class Auth
      * Initializes the SP SAML instance.
      *
      * @param array|null $settings Setting data
+     *
+     * @throws Exception
+     * @throws Error
      */
     public function __construct(array $settings = null)
     {
@@ -186,7 +189,7 @@ class Auth
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new Error(
                 'Invalid value passed to setStrict()',
                 Error::SETTINGS_INVALID_SYNTAX
@@ -202,12 +205,13 @@ class Auth
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
      *
      * @throws Error
+     * @throws ValidationError
      */
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
-        if (isset($_POST) && isset($_POST['SAMLResponse'])) {
+        if (isset($_POST['SAMLResponse'])) {
             // AuthnResponse -- HTTP_POST Binding
             $response = new Response($this->_settings, $_POST['SAMLResponse']);
             $this->_lastResponse = $response->getXMLDocument();
@@ -255,7 +259,7 @@ class Auth
     {
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
-        if (isset($_GET) && isset($_GET['SAMLResponse'])) {
+        if (isset($_GET['SAMLResponse'])) {
             $logoutResponse = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
@@ -275,7 +279,7 @@ class Auth
                     }
                 }
             }
-        } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
+        } else if (isset($_GET['SAMLRequest'])) {
             $logoutRequest = new LogoutRequest($this->_settings, $_GET['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
@@ -500,6 +504,8 @@ class Auth
      * @param bool        $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * 
+     * @throws Error
      */
     public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
@@ -632,33 +638,7 @@ class Auth
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256)
     {
-        $key = $this->_settings->getSPkey();
-        if (empty($key)) {
-            throw new Error(
-                "Trying to sign the SAML Request but can't load the SP private key",
-                Error::PRIVATE_KEY_NOT_FOUND
-            );
-        }
-
-        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
-        $objKey->loadKey($key, false);
-
-        $security = $this->_settings->getSecurityData();
-        if ($security['lowercaseUrlencoding']) {
-            $msg = 'SAMLRequest='.rawurlencode($samlRequest);
-            if (isset($relayState)) {
-                $msg .= '&RelayState='.rawurlencode($relayState);
-            }
-            $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
-        } else {
-            $msg = 'SAMLRequest='.urlencode($samlRequest);
-            if (isset($relayState)) {
-                $msg .= '&RelayState='.urlencode($relayState);
-            }
-            $msg .= '&SigAlg=' . urlencode($signAlgorithm);
-        }
-        $signature = $objKey->signData($msg);
-        return base64_encode($signature);
+        return $this->buildMessageSignature($samlRequest, $relayState, $signAlgorithm, "SAMLRequest");
     }
 
     /**
@@ -675,12 +655,33 @@ class Auth
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256)
     {
+        return $this->buildMessageSignature($samlResponse, $relayState, $signAlgorithm, "SAMLResponse");
+    }
+
+    /**
+     * Generates the Signature for a SAML Message
+     *
+     * @param string $samlMessage   The SAML Message
+     * @param string $relayState    The RelayState
+     * @param string $signAlgorithm Signature algorithm method
+     * @param string $type          "SAMLRequest" or "SAMLResponse"
+     *
+     * @return string A base64 encoded signature
+     *
+     * @throws Exception
+     * @throws Error
+     */
+    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type="SAMLRequest")
+    {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
-            throw new Error(
-                "Trying to sign the SAML Response but can't load the SP private key",
-                Error::PRIVATE_KEY_NOT_FOUND
-            );
+            if ($type == "SAMLRequest") {
+                $errorMsg = "Trying to sign the SAML Request but can't load the SP private key";
+            } else {
+                $errorMsg = "Trying to sign the SAML Response but can't load the SP private key";
+            }
+
+            throw new Error($errorMsg, Error::PRIVATE_KEY_NOT_FOUND);
         }
 
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
@@ -688,13 +689,13 @@ class Auth
 
         $security = $this->_settings->getSecurityData();
         if ($security['lowercaseUrlencoding']) {
-            $msg = 'SAMLResponse='.rawurlencode($samlResponse);
+            $msg = $type.'='.rawurlencode($samlMessage);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.rawurlencode($relayState);
             }
             $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
         } else {
-            $msg = 'SAMLResponse='.urlencode($samlResponse);
+            $msg = $type.'='.urlencode($samlMessage);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.urlencode($relayState);
             }

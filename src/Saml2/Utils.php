@@ -74,6 +74,7 @@ class Utils
      * @param string      $xml The XML string to be loaded.
      *
      * @return DOMDocument|false $dom The result of load the XML at the DOMDocument
+     *
      * @throws Exception
      */
     public static function loadXML(DOMDocument $dom, $xml)
@@ -106,6 +107,8 @@ class Utils
      * @param bool               $debug  To disable/enable the debug mode
      *
      * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
+     *
+     * @throws Exception
      */
     public static function validateXML($xml, $schema, $debug = false)
     {
@@ -641,11 +644,9 @@ class Utils
         $requestURI = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
-            if ($requestURI[0] !== '/') {
-                $matches = array();
-                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
-                    $requestURI = $matches[1];
-                }
+            $matches = array();
+            if ($requestURI[0] !== '/' && preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
+                $requestURI = $matches[1];
             }
         }
 
@@ -822,8 +823,8 @@ class Utils
              * gmtime function. Instead we use the gmdate function, and split the result.
              */
             $yearmonth = explode(':', gmdate('Y:n', $timestamp));
-            $year = (int)($yearmonth[0]);
-            $month = (int)($yearmonth[1]);
+            $year = (int)$yearmonth[0];
+            $month = (int)$yearmonth[1];
 
             /* Remove the year and month from the timestamp. */
             $timestamp -= gmmktime(0, 0, 0, $month, 1, $year);
@@ -861,6 +862,8 @@ class Utils
      * @param string|int|null $validUntil    The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
+     *
+     * @throws Exception
      */
     public static function getExpireTime($cacheDuration = null, $validUntil = null)
     {
@@ -1016,6 +1019,8 @@ class Utils
      * @param string|null $nq     IdP Name Qualifier
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
+     *
+     * @throws Exception
      */
     public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null)
     {
@@ -1072,7 +1077,7 @@ class Utils
      *
      * @return array $status The Status, an array with the code and a message.
      *
-     * @throws Exception
+     * @throws ValidationError
      */
     public static function getStatus(DOMDocument $dom)
     {
@@ -1120,7 +1125,7 @@ class Utils
      *
      * @return DOMElement  The decrypted element.
      *
-     * @throws Exception
+     * @throws ValidationError
      */
     public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true)
     {
@@ -1189,7 +1194,7 @@ class Utils
                     $key = str_pad($key, $keySize);
                 }
             }
-            $symmetricKey->loadkey($key);
+            $symmetricKey->loadKey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {
@@ -1267,6 +1272,11 @@ class Utils
         return $newKey;
     }
 
+    /**
+     * @param $algorithm
+     *
+     * @return bool
+     */
     public static function isSupportedSigningAlgorithm($algorithm)
     {
         return in_array(

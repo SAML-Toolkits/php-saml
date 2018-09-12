@@ -65,6 +65,10 @@ class LogoutResponse
      *
      * @param Settings $settings Settings.
      * @param string|null             $response An UUEncoded SAML Logout response from the IdP.
+     * 
+     * @throws Error
+     * @throws Exception
+     * 
      */
     public function __construct(\OneLogin\Saml2\Settings $settings, $response = null)
     {
@@ -136,6 +140,8 @@ class LogoutResponse
      * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
+     * 
+     * @throws ValidationError
      */
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
@@ -182,23 +188,19 @@ class LogoutResponse
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (!empty($destination)) {
-                        if (strpos($destination, $currentURL) === false) {
-                            throw new ValidationError(
-                                "The LogoutResponse was received at $currentURL instead of $destination",
-                                ValidationError::WRONG_DESTINATION
-                            );
-                        }
+                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
+                        throw new ValidationError(
+                            "The LogoutResponse was received at $currentURL instead of $destination",
+                            ValidationError::WRONG_DESTINATION
+                        );
                     }
                 }
 
-                if ($security['wantMessagesSigned']) {
-                    if (!isset($_GET['Signature'])) {
-                        throw new ValidationError(
-                            "The Message of the Logout Response is not signed and the SP requires it",
-                            ValidationError::NO_SIGNED_MESSAGE
-                        );
-                    }
+                if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
+                    throw new ValidationError(
+                        "The Message of the Logout Response is not signed and the SP requires it",
+                        ValidationError::NO_SIGNED_MESSAGE
+                    );
                 }
             }
 
