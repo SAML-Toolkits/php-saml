@@ -180,7 +180,7 @@ If our environment requires sign or encrypt support, this folder may contain
 the x509 cert and the private key that the SP will use:
 
  * `sp.crt` - The public cert of the SP
- * `sp.key` - The privake key of the SP
+ * `sp.key` - The private key of the SP
 
 Or also we can provide those data in the setting file at the `$settings['sp']['x509cert']`
 and the `$settings['sp']['privateKey']`.
