@@ -604,33 +604,7 @@ class OneLogin_Saml2_Auth
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        $key = $this->_settings->getSPkey();
-        if (empty($key)) {
-            throw new OneLogin_Saml2_Error(
-                "Trying to sign the SAML Request but can't load the SP private key",
-                OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
-            );
-        }
-
-        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
-        $objKey->loadKey($key, false);
-
-        $security = $this->_settings->getSecurityData();
-        if ($security['lowercaseUrlencoding']) {
-            $msg = 'SAMLRequest='.rawurlencode($samlRequest);
-            if (isset($relayState)) {
-                $msg .= '&RelayState='.rawurlencode($relayState);
-            }
-            $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
-        } else {
-            $msg = 'SAMLRequest='.urlencode($samlRequest);
-            if (isset($relayState)) {
-                $msg .= '&RelayState='.urlencode($relayState);
-            }
-            $msg .= '&SigAlg=' . urlencode($signAlgorithm);
-        }
-        $signature = $objKey->signData($msg);
-        return base64_encode($signature);
+        return $this->buildMessageSignature($samlRequest, $relayState, $signAlgorithm, "SAMLRequest");
     }
 
     /**
@@ -646,12 +620,32 @@ class OneLogin_Saml2_Auth
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
+        return $this->buildMessageSignature($samlResponse, $relayState, $signAlgorithm, "SAMLResponse");
+    }
+
+    /**
+     * Generates the Signature for a SAML Response
+     *
+     * @param string $samlMessage   The SAML Response
+     * @param string $relayState    The RelayState
+     * @param string $signAlgorithm Signature algorithm method
+     * @param string $type          "SAMLRequest" or "SAMLResponse"
+     *
+     * @return string A base64 encoded signature
+     *
+     * @throws OneLogin_Saml2_Error
+     */
+    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type="SAMLRequest")
+    {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
-            throw new OneLogin_Saml2_Error(
-                "Trying to sign the SAML Response but can't load the SP private key",
-                OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
-            );
+            if ($type == "SAMLRequest") {
+                $errorMsg = "Trying to sign the SAML Request but can't load the SP private key";
+            } else {
+                $errorMsg = "Trying to sign the SAML Response but can't load the SP private key";
+            }
+
+            throw new OneLogin_Saml2_Error($errorMsg, OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND);
         }
 
         $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
@@ -659,13 +653,13 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if ($security['lowercaseUrlencoding']) {
-            $msg = 'SAMLResponse='.rawurlencode($samlResponse);
+            $msg = $type.'='.rawurlencode($samlMessage);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.rawurlencode($relayState);
             }
             $msg .= '&SigAlg=' . rawurlencode($signAlgorithm);
         } else {
-            $msg = 'SAMLResponse='.urlencode($samlResponse);
+            $msg = $type.'='.urlencode($samlMessage);
             if (isset($relayState)) {
                 $msg .= '&RelayState='.urlencode($relayState);
             }
