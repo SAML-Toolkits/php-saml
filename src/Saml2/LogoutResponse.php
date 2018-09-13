@@ -227,7 +227,7 @@ class LogoutResponse
     /**
      * Extracts a node from the DOMDocument (Logout Response Menssage)
      *
-     * @param string $query Xpath Expresion
+     * @param string $query Xpath Expression
      *
      * @return DOMNodeList The queried node
      */

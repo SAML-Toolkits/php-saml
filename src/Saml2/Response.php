@@ -997,7 +997,7 @@ class Response
     /**
      * Extracts a node from the DOMDocument (Assertion).
      *
-     * @param string $assertionXpath Xpath Expresion
+     * @param string $assertionXpath Xpath Expression
      *
      * @return DOMNodeList The queried node
      */

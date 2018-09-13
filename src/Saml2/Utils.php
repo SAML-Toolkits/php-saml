@@ -892,7 +892,7 @@ class Utils
      * Extracts nodes from the DOMDocument.
      *
      * @param DOMDocument      $dom     The DOMDocument
-     * @param string           $query   \Xpath Expresion
+     * @param string           $query   \Xpath Expression
      * @param DOMElement|null  $context Context Node (DOMElement)
      *
      * @return DOMNodeList The queried nodes
