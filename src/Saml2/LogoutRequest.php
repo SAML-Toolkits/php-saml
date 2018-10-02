@@ -62,8 +62,9 @@ class LogoutRequest
      * @param string|null             $sessionIndex        The SessionIndex (taken from the SAML Response in the SSO process).
      * @param string|null             $nameIdFormat        The NameID Format will be set in the LogoutRequest.
      * @param string|null             $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
+     * @param string|null             $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
      */
-    public function __construct(\OneLogin\Saml2\Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null)
+    public function __construct(\OneLogin\Saml2\Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         $this->_settings = $settings;
 
@@ -80,7 +81,6 @@ class LogoutRequest
             $id = Utils::generateUniqueID();
             $this->id = $id;
 
-            $nameIdValue = Utils::generateUniqueID();
             $issueInstant = Utils::parseTime2SAML(time());
 
             $cert = null;
@@ -99,16 +99,27 @@ class LogoutRequest
                     && $spData['NameIDFormat'] != Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
-                $spNameQualifier = null;
             } else {
                 $nameId = $idpData['entityId'];
                 $nameIdFormat = Constants::NAMEID_ENTITY;
-                $spNameQualifier = $spData['entityId'];
+            }
+
+            /* From saml-core-2.0-os 8.3.6, when the entity Format is used: 
+               "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
+            */
+            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_ENTITY) {
+                $nameIdNameQualifier = null;
+                $nameIdSPNameQualifier = null;
+            }
+
+            // NameID Format UNSPECIFIED omitted
+            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_UNSPECIFIED) {
+                $nameIdFormat = null;
             }
 
             $nameIdObj = Utils::generateNameId(
                 $nameId,
-                $spNameQualifier,
+                $nameIdSPNameQualifier,
                 $nameIdFormat,
                 $cert,
                 $nameIdNameQualifier

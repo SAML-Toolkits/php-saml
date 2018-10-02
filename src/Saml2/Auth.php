@@ -67,6 +67,13 @@ class Auth
     private $_nameidNameQualifier;
 
     /**
+     * NameID SP NameQualifier
+     *
+     * @var string
+     */
+    private $_nameidSPNameQualifier;
+
+    /**
      * If user is authenticated.
      *
      * @var bool
@@ -222,6 +229,7 @@ class Auth
                 $this->_nameid = $response->getNameId();
                 $this->_nameidFormat = $response->getNameIdFormat();
                 $this->_nameidNameQualifier = $response->getNameIdNameQualifier();
+                $this->_nameidSPNameQualifier = $response->getNameIdSPNameQualifier();
                 $this->_authenticated = true;
                 $this->_sessionIndex = $response->getSessionIndex();
                 $this->_sessionExpiration = $response->getSessionNotOnOrAfter();
@@ -408,6 +416,16 @@ class Auth
     }
 
     /**
+     * Returns the nameID SP NameQualifier
+     *
+     * @return string  The nameID SP NameQualifier of the assertion
+     */
+    public function getNameIdSPNameQualifier()
+    {
+        return $this->_nameidSPNameQualifier;
+    }
+
+    /**
      * Returns the SessionIndex
      *
      * @return string|null  The SessionIndex of the assertion
@@ -547,7 +565,7 @@ class Auth
      *
      * @throws Error
      */
-    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null)
+    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         $sloUrl = $this->getSLOurl();
         if (empty($sloUrl)) {
@@ -564,7 +582,7 @@ class Auth
             $nameIdFormat = $this->_nameidFormat;
         }
 
-        $logoutRequest = new LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier);
+        $logoutRequest = new LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 
         $this->_lastRequest = $logoutRequest->getXML();
         $this->_lastRequestID = $logoutRequest->id;

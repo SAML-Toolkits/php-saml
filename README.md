@@ -705,6 +705,8 @@ if (!$auth->isAuthenticated()) {
 $_SESSION['samlUserdata'] = $auth->getAttributes();
 $_SESSION['samlNameId'] = $auth->getNameId();
 $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
+$_SESSION['samlNameidNameQualifier' = $auth->getNameIdNameQualifier();
+$_SESSION['samlNameidSPNameQualifier' = $auth->getNameIdSPNameQualifier();
 $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
 
 if (isset($_POST['RelayState']) && OneLogin\Saml2\Utils::getSelfURL() != $_POST['RelayState']) {
@@ -932,7 +934,7 @@ $auth = new OneLogin\Saml2\Auth();
 $auth->logout();   // Method that sent the Logout Request.
 ```
 
-Also there are six optional parameters that can be set:
+Also there are eight optional parameters that can be set:
 * `$returnTo` - The target URL the user should be returned to after logout.
 * `$parameters` - Extra parameters to be added to the GET.
 * `$name_id` - That will be used to build the LogoutRequest. If `name_id` parameter is not set and the auth object processed a
@@ -940,6 +942,8 @@ SAML Response with a `NameId`, then this `NameId` will be used.
 * `$session_index` - SessionIndex that identifies the session of the user.
 * `$stay` - True if we want to stay (returns the url string) False to redirect.
 * `$nameIdFormat` - The NameID Format will be set in the LogoutRequest.
+* `$nameIdNameQualifier` - The NameID NameQualifier will be set in the LogoutRequest.
+* `$nameIdSPNameQualifier` - The NameID SP NameQualifier will be set in the LogoutRequest.
 
 The Logout Request will be sent signed or unsigned based on the security
 info of the `advanced_settings.php` (`'logoutRequestSigned'`).
@@ -966,6 +970,9 @@ $paramters = array();
 $nameId = null;
 $sessionIndex = null;
 $nameIdFormat = null;
+$nameIdNameQualifier = null;
+$nameIdSPNameQualifier = null;
+
 if (isset($_SESSION['samlNameId'])) {
     $nameId = $_SESSION['samlNameId'];
 }
@@ -975,7 +982,13 @@ if (isset($_SESSION['samlSessionIndex'])) {
 if (isset($_SESSION['samlNameIdFormat'])) {
     $nameIdFormat = $_SESSION['samlNameIdFormat'];
 }
-$auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat);
+if (isset($_SESSION['samlNameIdNameQualifier'])) {
+    $nameIdNameQualifier = $_SESSION['samlNameIdNameQualifier'];
+}
+if (isset($_SESSION['samlNameIdSPNameQualifier'])) {
+    $nameIdSPNameQualifier = $_SESSION['samlNameIdSPNameQualifier'];
+}
+$auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 ```
 
 If a match on the future LogoutResponse ID and the LogoutRequest ID to be sent is required, that LogoutRequest ID must to be extracted and stored.
@@ -1152,6 +1165,9 @@ Main class of OneLogin PHP Toolkit
  * `getAttributes` - Returns the set of SAML attributes.
  * `getAttribute` - Returns the requested SAML attribute
  * `getNameId` - Returns the nameID
+ * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
+ * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
+ * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
  * `getSSOurl` - Gets the SSO url.
@@ -1188,6 +1204,8 @@ SAML 2 Authentication Response class
    IdP.
  * `getNameId` - Gets the NameID provided by the SAML response from the IdP.
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
+ * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
+ * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionNotOnOrAfter` - Gets the SessionNotOnOrAfter from the
    AuthnStatement
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.

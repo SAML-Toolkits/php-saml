@@ -2,6 +2,7 @@
 
 namespace OneLogin\Saml2\Tests;
 
+use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\Error;
 use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
@@ -367,6 +368,27 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
             $this->assertContains('NameID not found in the Logout Request', $e->getMessage());
         }
 
+
+        $logoutRequest = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_PERSISTENT, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
+        $logoutRequestStr = $logoutRequest->getXML();
+        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr);
+        $this->assertContains('Format="'.Constants::NAMEID_PERSISTENT, $logoutRequestStr);
+        $this->assertContains('NameQualifier="'.$this->_settings->getIdPData()['entityId'], $logoutRequestStr);
+        $this->assertContains('SPNameQualifier="'.$this->_settings->getSPData()['entityId'], $logoutRequestStr);
+
+        $logoutRequest2 = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_ENTITY, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
+        $logoutRequestStr2 = $logoutRequest2->getXML();
+        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr2);
+        $this->assertContains('Format="'.Constants::NAMEID_ENTITY, $logoutRequestStr2);
+        $this->assertNotContains('NameQualifier', $logoutRequestStr2);
+        $this->assertNotContains('SPNameQualifier', $logoutRequestStr2);
+
+        $logoutRequest3 = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_UNSPECIFIED);
+        $logoutRequestStr3 = $logoutRequest3->getXML();
+        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr3);
+        $this->assertNotContains('Format', $logoutRequestStr3);
+        $this->assertNotContains('NameQualifier', $logoutRequestStr3);
+        $this->assertNotContains('SPNameQualifier', $logoutRequestStr3);
     }
 
     /**
