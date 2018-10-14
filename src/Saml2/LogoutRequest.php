@@ -104,7 +104,7 @@ class LogoutRequest
                 $nameIdFormat = Constants::NAMEID_ENTITY;
             }
 
-            /* From saml-core-2.0-os 8.3.6, when the entity Format is used: 
+            /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
             if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_ENTITY) {
@@ -141,6 +141,15 @@ class LogoutRequest
     {$sessionIndexStr}
 </samlp:LogoutRequest>
 LOGOUTREQUEST;
+
+            // Sign the request
+            $security = $this->_settings->getSecurityData();
+            $logoutRequest = Utils::addSign(
+                $logoutRequest,
+                $spData['privateKey'],
+                $spData['x509cert'],
+                $security['signatureAlgorithm']
+            );
         } else {
             $decoded = base64_decode($request);
             // We try to inflate
@@ -278,7 +287,7 @@ LOGOUTREQUEST;
      * @param string|null        $key     The SP key
      *
      * @return string Name ID Value
-     * 
+     *
      * @throws Error
      * @throws Exception
      * @throws ValidationError
@@ -295,7 +304,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string|null $issuer The Issuer
-     * 
+     *
      * @throws Exception
      */
     public static function getIssuer($request)
@@ -324,7 +333,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return array The SessionIndex value
-     * 
+     *
      * @throws Exception
      */
     public static function getSessionIndexes($request)
@@ -350,7 +359,7 @@ LOGOUTREQUEST;
      * @param bool $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool If the Logout Request is or not valid
-     * 
+     *
      * @throws Exception
      * @throws ValidationError
      */
