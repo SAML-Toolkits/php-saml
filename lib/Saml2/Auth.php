@@ -233,8 +233,9 @@ class OneLogin_Saml2_Auth
     {
         $this->_errors = array();
         $this->_errorReason = null;
-        if (isset($_GET['SAMLResponse'])) {
-            $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        if (isset($_GET['SAMLResponse']) || isset($_POST['SAMLResponse'])) {
+            $samlResponse = isset($_GET['SAMLResponse']) ? $_GET['SAMLResponse'] : $_POST['SAMLResponse'];
+            $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $samlResponse);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
