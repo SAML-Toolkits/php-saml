@@ -41,11 +41,37 @@ class OneLogin_Saml2_Metadata
         if (isset($sp['singleLogoutService'])) {
             $slsUrl = htmlspecialchars($sp['singleLogoutService']['url'], ENT_QUOTES);
             $sls = <<<SLS_TEMPLATE
-        <md:SingleLogoutService Binding="{$sp['singleLogoutService']['binding']}"
-                                Location="{$slsUrl}" />
-
+                <md:SingleLogoutService Binding="{$sp['singleLogoutService']['binding']}" Location="{$slsUrl}" />
 SLS_TEMPLATE;
         }
+
+
+            $SPextensions = <<<SP_EXTENSIONS
+                <md:Extensions>
+                    <mdrpi:RegistrationInfo registrationAuthority="http://www.surfconext.nl/">
+                        <mdrpi:RegistrationPolicy xml:lang="en">https://wiki.surfnet.nl/display/eduGAIN/EduGAIN</mdrpi:RegistrationPolicy>
+                    </mdrpi:RegistrationInfo>
+                    <mdattr:EntityAttributes>
+                        <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                            <saml:AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</saml:AttributeValue>
+                        </saml:Attribute>
+                        </mdattr:EntityAttributes>
+                </md:Extensions>
+SP_EXTENSIONS;
+        $UInfo = '';
+        if($sp['UIinfo'] !== '') {
+            $UInfo = <<<UI_INFO
+
+                    <mdui:UIInfo>
+                        <mdui:DisplayName xml:lang="en">{$sp['UIinfo']['DisplayName']}</mdui:DisplayName>
+                        <mdui:Description xml:lang="en">
+                            {$sp['UIinfo']['Description']}
+                        </mdui:Description>
+                        <mdui:PrivacyStatementURL xml:lang="en">{$sp['UIinfo']['PrivacyStatementURL']}</mdui:PrivacyStatementURL>
+                    </mdui:UIInfo>
+UI_INFO;
+        }
+
 
         if ($authnsign) {
             $strAuthnsign = 'true';
@@ -155,17 +181,26 @@ METADATA_TEMPLATE;
         $acsUrl = htmlspecialchars($sp['assertionConsumerService']['url'], ENT_QUOTES);
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" 
+                     xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi"
+                     xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute"
+                     xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+                     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
                      validUntil="{$validUntilTime}"
                      cacheDuration="PT{$cacheDuration}S"
                      entityID="{$spEntityId}">
+        {$SPextensions}
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-{$sls}        <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
+        {$sls}
+        {$UInfo}
+        <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
                                      Location="{$acsUrl}"
                                      index="1" />
         {$strAttributeConsumingService}
-    </md:SPSSODescriptor>{$strOrganization}{$strContacts}
+    </md:SPSSODescriptor>
+    {$strOrganization}
+    {$strContacts}
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
         return $metadata;
@@ -201,7 +236,7 @@ METADATA_TEMPLATE;
      *
      * @throws Exception
      */
-    public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
+    public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true, $sp_extensions = null)
     {
         $xml = new DOMDocument();
         $xml->preserveWhiteSpace = false;

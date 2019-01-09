@@ -829,7 +829,8 @@ class OneLogin_Saml2_Settings
             $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
                 $metadata,
                 $cert,
-                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted'],
+                $this->_sp['UIinfo']
             );
         }
 

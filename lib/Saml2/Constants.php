@@ -31,6 +31,7 @@ class OneLogin_Saml2_Constants
     const NS_SAMLP = 'urn:oasis:names:tc:SAML:2.0:protocol';
     const NS_SOAP = 'http://schemas.xmlsoap.org/soap/envelope/';
     const NS_MD = 'urn:oasis:names:tc:SAML:2.0:metadata';
+    const NS_MDUI = 'urn:oasis:names:tc:SAML:metadata:ui';
     const NS_XS = 'http://www.w3.org/2001/XMLSchema';
     const NS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
     const NS_XENC = 'http://www.w3.org/2001/04/xmlenc#';
