@@ -415,6 +415,9 @@ class Settings
         if (!isset($this->_idp['certFingerprintAlgorithm'])) {
             $this->_idp['certFingerprintAlgorithm'] = 'sha1';
         }
+        if (!isset($this->_idp['x509certRemote'])) {
+            $this->_idp['x509certRemote'] = false;
+        }
 
         if (!isset($this->_sp['x509cert'])) {
             $this->_sp['x509cert'] = '';
@@ -422,6 +425,7 @@ class Settings
         if (!isset($this->_sp['privateKey'])) {
             $this->_sp['privateKey'] = '';
         }
+
     }
 
     /**
@@ -523,12 +527,13 @@ class Settings
             if (isset($settings['security'])) {
                 $security = $settings['security'];
 
+                $existsX509Remote = isset($idp['x509certRemote']) && $idp['x509certRemote'] === true;
                 $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
                 $existsMultiX509Sign = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['signing']) && !empty($idp['x509certMulti']['signing']);
                 $existsMultiX509Enc = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['encryption']) && !empty($idp['x509certMulti']['encryption']);
 
                 $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
-                if (!($existsX509 || $existsFingerprint || $existsMultiX509Sign)
+                if (!($existsX509Remote || $existsX509 || $existsFingerprint || $existsMultiX509Sign)
                 ) {
                     $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
                 }

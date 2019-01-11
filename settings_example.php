@@ -115,6 +115,13 @@ $settings = array(
         // 'certFingerprint' => '',
         // 'certFingerprintAlgorithm' => 'sha1',
 
+        /*
+         * Use the public certificate provided in the SAML Response, Azure for
+         * instance might update the signing certificate at any time, this way
+         * you don't need to update the public certificate everytime it changes.
+         */
+        'x509certRemote' => false,
+
         /* In some scenarios the IdP uses different certificates for
          * signing/encryption, or is under key rollover phase and more 
          * than one certificate is published on IdP metadata.

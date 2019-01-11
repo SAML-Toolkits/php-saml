@@ -395,15 +395,34 @@ class Response
                     ValidationError::NO_SIGNATURE_FOUND
                 );
             } else {
-                $cert = $idpData['x509cert'];
-                $fingerprint = $idpData['certFingerprint'];
-                $fingerprintalg = $idpData['certFingerprintAlgorithm'];
-
+                $cert = null;
                 $multiCerts = null;
                 $existsMultiX509Sign = isset($idpData['x509certMulti']) && isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing']);
 
                 if ($existsMultiX509Sign) {
                     $multiCerts = $idpData['x509certMulti']['signing'];
+                }
+
+                if (isset($idpData['x509certRemote']) && $idpData['x509certRemote'] === true) {
+                    $remoteCerts = [];
+                    $remoteCertsElement = $this->document->getElementsByTagName('X509Certificate');
+                    foreach ($remoteCertsElement as $certificate) {
+                        $remoteCerts[] = $certificate->nodeValue;
+                    }
+
+                    if (count($remoteCerts) === 1) {
+                        $cert = reset($remoteCerts);
+                        $cert = Utils::formatCert($cert);
+                    } else if (count($remoteCerts) > 1){
+                        foreach ($remoteCerts as $remoteCert) {
+                            $multiCerts[] = Utils::formatCert($remoteCert);
+                        }
+                    }
+
+                } else {
+                    $cert = $idpData['x509cert'];
+                    $fingerprint = $idpData['certFingerprint'];
+                    $fingerprintalg = $idpData['certFingerprintAlgorithm'];
                 }
 
                 // If find a Signature on the Response, validates it checking the original response
