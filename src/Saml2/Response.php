@@ -413,7 +413,7 @@ class Response
                     if (count($remoteCerts) === 1) {
                         $cert = reset($remoteCerts);
                         $cert = Utils::formatCert($cert);
-                    } else if (count($remoteCerts) > 1){
+                    } else if (count($remoteCerts) > 1) {
                         foreach ($remoteCerts as $remoteCert) {
                             $multiCerts[] = Utils::formatCert($remoteCert);
                         }
