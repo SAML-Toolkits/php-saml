@@ -34,7 +34,7 @@ $settings = array (
         // attributeConsumingService. nameFormat, attributeValue and
         // friendlyName can be omitted. Otherwise remove this section.
         "attributeConsumingService"=> array(
-                "serviceName" => "SP test"
+                "serviceName" => "SP test",
                 "serviceDescription" => "Test Service",
                 "requestedAttributes" => array(
                     array(
