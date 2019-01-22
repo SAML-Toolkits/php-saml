@@ -144,7 +144,7 @@ class Response
                 );
             }
 
-            $status = $this->checkStatus();
+            $this->checkStatus();
 
             $singleAssertion = $this->validateNumAssertions();
             if (!$singleAssertion) {
