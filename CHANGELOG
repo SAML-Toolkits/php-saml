@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+
+v.2.15.0
+* Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
+* Fix bug on settings_example.php
+
 v.2.14.0
 * Add  parameter to the decryptElement method to make optional the formatting
 * [#283](https://github.com/onelogin/php-saml/pull/283) New method of importing a decrypted assertion into the XML document to replace the EncryptedAssertion. Fix signature issues on Signed Encrypted Assertions with default namespace
