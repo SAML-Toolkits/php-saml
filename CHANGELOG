@@ -1,7 +1,10 @@
 CHANGELOG
 =========
+v.3.1.0
+* Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
+* Fix setting_example.php servicename parameter 
 
-v.3.0.0 (pending)
+v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
 * xmlseclibs now is not part of the toolkit and need to be installed from original source
 
