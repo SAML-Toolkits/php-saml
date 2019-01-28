@@ -90,11 +90,14 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
         }
 
-        $attackXEEutf16 = mb_convert_encoding('<?xml version="1.0" encoding="UTF-16"?>
+        $attackXEEutf16 = mb_convert_encoding(
+            '<?xml version="1.0" encoding="UTF-16"?>
                       <!DOCTYPE results [<!ENTITY harmless "completely harmless">]>
                       <results>
                         <result>This result is &harmless;</result>
-                      </results>', 'UTF-16');
+                      </results>',
+            'UTF-16'
+        );
         try {
             $res4 = Utils::loadXML($dom, $attackXEEutf16);
             $this->assertFalse($res4);
