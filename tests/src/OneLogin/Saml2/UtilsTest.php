@@ -70,9 +70,9 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                       <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
         try {
             $res = OneLogin_Saml2_Utils::loadXML($dom, $attackXXE);
-            $this->fail('Exception was not raised');
+            $this->assertFalse($res);
         } catch (Exception $e) {
-            $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+            $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
         }
 
         $xmlWithDTD = '<?xml version="1.0"?>
@@ -83,8 +83,12 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                           <results>
                             <result>test</result>
                           </results>';
-        $res2 = OneLogin_Saml2_Utils::loadXML($dom, $xmlWithDTD);
-        $this->assertTrue($res2 instanceof DOMDocument);
+        try {
+            $res2 = OneLogin_Saml2_Utils::loadXML($dom, $xmlWithDTD);
+            $this->assertFalse($res2);
+        } catch (Exception $e) {
+            $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+        }
 
         $attackXEE = '<?xml version="1.0"?>
                       <!DOCTYPE results [<!ENTITY harmless "completely harmless">]>
@@ -93,9 +97,24 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                       </results>';
         try {
             $res3 = OneLogin_Saml2_Utils::loadXML($dom, $attackXEE);
-            $this->fail('Exception was not raised');
+            $this->assertFalse($res3);
         } catch (Exception $e) {
-            $this->assertEquals('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+            $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
+        }
+
+        $attackXEEutf16 = mb_convert_encoding(
+            '<?xml version="1.0" encoding="UTF-16"?>
+                      <!DOCTYPE results [<!ENTITY harmless "completely harmless">]>
+                      <results>
+                        <result>This result is &harmless;</result>
+                      </results>',
+            'UTF-16'
+        );
+        try {
+            $res4 = OneLogin_Saml2_Utils::loadXML($dom, $attackXEEutf16);
+            $this->assertFalse($res4);
+        } catch (Exception $e) {
+            $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
         }
     }
 

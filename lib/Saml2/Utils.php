@@ -84,13 +84,19 @@ class OneLogin_Saml2_Utils
         assert('$dom instanceof DOMDocument');
         assert('is_string($xml)');
 
-        if (strpos($xml, '<!ENTITY') !== false) {
-            throw new Exception('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks');
-        }
-
         $oldEntityLoader = libxml_disable_entity_loader(true);
+
         $res = $dom->loadXML($xml);
+
         libxml_disable_entity_loader($oldEntityLoader);
+
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                throw new Exception(
+                    'Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks'
+                );
+            }
+        }
 
         if (!$res) {
             return false;

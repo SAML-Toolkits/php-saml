@@ -10,6 +10,8 @@ and supported by OneLogin Inc.
 Warning
 -------
 
+Update php-saml to 2.15.0, this version includes a security patch related to XEE attacks
+
 php-saml is not affected by [201803-01](https://simplesamlphp.org/security/201803-01) 
 
 Update php-saml to 2.10.4, this version includes a security patch related to

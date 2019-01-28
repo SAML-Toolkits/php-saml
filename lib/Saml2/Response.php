@@ -115,7 +115,7 @@ class OneLogin_Saml2_Response
                 );
             }
 
-            $status = $this->checkStatus();
+            $this->checkStatus();
 
             $singleAssertion = $this->validateNumAssertions();
             if (!$singleAssertion) {
