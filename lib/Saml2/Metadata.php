@@ -48,9 +48,6 @@ SLS_TEMPLATE;
 
             $SPextensions = <<<SP_EXTENSIONS
                 <md:Extensions>
-                    <mdrpi:RegistrationInfo registrationAuthority="http://www.surfconext.nl/">
-                        <mdrpi:RegistrationPolicy xml:lang="en">https://wiki.surfnet.nl/display/eduGAIN/EduGAIN</mdrpi:RegistrationPolicy>
-                    </mdrpi:RegistrationInfo>
                     <mdattr:EntityAttributes>
                         <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                             <saml:AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</saml:AttributeValue>
