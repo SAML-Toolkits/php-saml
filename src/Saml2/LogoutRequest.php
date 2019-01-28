@@ -184,7 +184,7 @@ LOGOUTREQUEST;
      *
      * @return string ID
      *
-     * @throws OneLogin_Saml2_Error
+     * @throws Error
      */
     public static function getID($request)
     {
