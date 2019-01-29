@@ -188,8 +188,10 @@ METADATA_TEMPLATE;
                      entityID="{$spEntityId}">
         {$SPextensions}
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:Extensions>
+            {$UInfo}
+        </md:Extensions>
         {$sls}
-        {$UInfo}
         <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
                                      Location="{$acsUrl}"
@@ -259,9 +261,9 @@ METADATA_TEMPLATE;
         $keyDescriptor = $xml->createElementNS(OneLogin_Saml2_Constants::NS_MD, "md:KeyDescriptor");
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
-        $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+        $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild->nextSibling);
         if ($wantsEncrypted === true) {
-            $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+            $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild->nextSibling);
         }
 
         $signing = $xml->getElementsByTagName('KeyDescriptor')->item(0);

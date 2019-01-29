@@ -50,14 +50,14 @@
             </extension>
         </simpleContent>
     </complexType>
-    
+
     <element name="Extensions" type="md:ExtensionsType"/>
     <complexType final="#all" name="ExtensionsType">
         <sequence>
             <any namespace="##other" processContents="lax" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="EndpointType">
         <sequence>
             <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -67,7 +67,7 @@
         <attribute name="ResponseLocation" type="anyURI" use="optional"/>
         <anyAttribute namespace="##other" processContents="lax"/>
     </complexType>
-    
+
     <complexType name="IndexedEndpointType">
         <complexContent>
             <extension base="md:EndpointType">
@@ -76,7 +76,7 @@
             </extension>
         </complexContent>
     </complexType>
-    
+
     <element name="EntitiesDescriptor" type="md:EntitiesDescriptorType"/>
     <complexType name="EntitiesDescriptorType">
         <sequence>
@@ -119,7 +119,7 @@
         <attribute name="ID" type="ID" use="optional"/>
         <anyAttribute namespace="##other" processContents="lax"/>
     </complexType>
-    
+
     <element name="Organization" type="md:OrganizationType"/>
     <complexType name="OrganizationType">
         <sequence>
@@ -205,14 +205,13 @@
         </restriction>
     </simpleType>
     <element name="EncryptionMethod" type="xenc:EncryptionMethodType"/>
-    
+
     <complexType name="SSODescriptorType" abstract="true">
         <complexContent>
             <extension base="md:RoleDescriptorType">
                 <sequence>
                     <element ref="md:ArtifactResolutionService" minOccurs="0" maxOccurs="unbounded"/>
                     <element ref="md:SingleLogoutService" minOccurs="0" maxOccurs="unbounded"/>
-                    <element ref="mdui:UIInfo" minOccurs="0"/>
                     <element ref="md:ManageNameIDService" minOccurs="0" maxOccurs="unbounded"/>
                     <element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
@@ -243,7 +242,7 @@
     <element name="NameIDMappingService" type="md:EndpointType"/>
     <element name="AssertionIDRequestService" type="md:EndpointType"/>
     <element name="AttributeProfile" type="anyURI"/>
-    
+
     <element name="SPSSODescriptor" type="md:SPSSODescriptorType"/>
     <complexType name="SPSSODescriptorType">
         <complexContent>
@@ -278,7 +277,7 @@
             </extension>
         </complexContent>
     </complexType>
-  
+
     <element name="AuthnAuthorityDescriptor" type="md:AuthnAuthorityDescriptorType"/>
     <complexType name="AuthnAuthorityDescriptorType">
         <complexContent>
@@ -322,7 +321,7 @@
         </complexContent>
     </complexType>
     <element name="AttributeService" type="md:EndpointType"/>
-   
+
     <element name="AffiliationDescriptor" type="md:AffiliationDescriptorType"/>
     <complexType name="AffiliationDescriptorType">
         <sequence>
