@@ -375,6 +375,9 @@ $settings = array (
         'singleLogoutService' => array (
             // URL Location of the IdP where SLO Request will be sent.
             'url' => '',
+            // URL location of the IdP where the SP will send the SLO Response (ResponseLocation)
+            // if not set, url for the SLO Request will be used
+            'responseUrl' => '',            
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.

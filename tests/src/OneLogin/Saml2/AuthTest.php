@@ -80,6 +80,17 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the getSLOResponseUrl method of the OneLogin_Saml2_Auth class
+     *
+     * @covers OneLogin_Saml2_Auth::getSLOurl
+     */
+    public function testGetSLOResponseUrl()
+    {
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertEquals($this->_auth->getSLOResponseUrl(), $sloResponseUrl);
+    }
+
+    /**
     * Tests the processResponse method of the OneLogin_Saml2_Auth class
     * Case No Response, An exception is throw
     *
@@ -548,8 +559,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $this->assertEmpty($this->_auth->getErrors());
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
         }
@@ -570,8 +581,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $this->assertEmpty($this->_auth->getErrors());
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
         }
@@ -636,8 +647,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -657,8 +668,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 

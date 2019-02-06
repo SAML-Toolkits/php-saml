@@ -588,7 +588,6 @@ class OneLogin_Saml2_Auth
      */
     public function getSLOResponseUrl()
     {
-        $url = null;
         $idpData = $this->_settings->getIdPData();
         if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['responseUrl'])) {
             return $idpData['singleLogoutService']['responseUrl'];
