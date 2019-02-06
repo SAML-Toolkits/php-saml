@@ -339,7 +339,7 @@ $settings = array(
             'url' => '',
             // URL location of the IdP where SLO Response will be sent (ResponseLocation)
             // if not set, url for the SLO Request will be used
-            'urlResponse' => '',
+            'responseUrl' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message. OneLogin Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.

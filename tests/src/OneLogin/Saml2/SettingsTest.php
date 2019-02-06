@@ -316,6 +316,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $settingsInfo['idp']['entityID'] = 'entityId';
         $settingsInfo['idp']['singleSignOnService']['url'] = 'invalid_value';
         $settingsInfo['idp']['singleLogoutService']['url'] = 'invalid_value';
+        $settingsInfo['idp']['singleLogoutService']['responseUrl'] = 'invalid_value';
         $settingsInfo['sp']['assertionConsumerService']['url'] = 'invalid_value';
         $settingsInfo['sp']['singleLogoutService']['url'] = 'invalid_value';
         try {
@@ -324,6 +325,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         } catch (Error $e) {
             $this->assertContains('idp_sso_url_invalid', $e->getMessage());
             $this->assertContains('idp_slo_url_invalid', $e->getMessage());
+            $this->assertContains('idp_slo_response_url_invalid', $e->getMessage());
             $this->assertContains('sp_acs_url_invalid', $e->getMessage());
             $this->assertContains('sp_sls_url_invalid', $e->getMessage());
         }
