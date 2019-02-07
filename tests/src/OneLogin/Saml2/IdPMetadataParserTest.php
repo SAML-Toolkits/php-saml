@@ -429,7 +429,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                 ),
                 'singleLogoutService' => array (
                     'url' => 'http://stuff.com/endpoints/endpoints/sls.php'
-
                 ),
                 'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
             ),
