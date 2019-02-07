@@ -156,6 +156,7 @@ class IdPMetadataParser
                 if ($sloNodes->length > 0) {
                     $metadataInfo['idp']['singleLogoutService'] = array(
                         'url' => $sloNodes->item(0)->getAttribute('Location'),
+                        'responseUrl' => $sloNodes->item(0)->getAttribute('ResponseLocation'),
                         'binding' => $sloNodes->item(0)->getAttribute('Binding')
                     );
                 }
