@@ -527,7 +527,7 @@ class Auth
      */
     public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
-        $authnRequest = new AuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy);
+        $authnRequest = $this->buildAuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy);
 
         $this->_lastRequest = $authnRequest->getXML();
         $this->_lastRequestID = $authnRequest->getId();
@@ -640,6 +640,21 @@ class Auth
     public function getLastRequestID()
     {
         return $this->_lastRequestID;
+    }
+
+    /**
+     * Creates an AuthnRequest
+     *
+     * @param Settings $settings        Setting data
+     * @param bool     $forceAuthn      When true the AuthNRequest will set the ForceAuthn='true'
+     * @param bool     $isPassive       When true the AuthNRequest will set the Ispassive='true'
+     * @param bool     $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
+     *
+     * @return AuthnRequest The AuthnRequest object
+     */
+    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy)
+    {
+        return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy);
     }
 
     /**
