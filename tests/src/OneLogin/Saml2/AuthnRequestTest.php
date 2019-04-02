@@ -191,6 +191,43 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the OneLogin_Saml2_AuthnRequest Constructor.
+    * The creation of a deflated SAML Request with and without Subject
+    *
+    * @covers OneLogin_Saml2_AuthnRequest
+    */
+    public function testSubject()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+        $encodedRequest = $authnRequest->getRequest();
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('<saml:Subject', $request);
+
+        $authnRequest2 = new OneLogin_Saml2_AuthnRequest($settings, false, false, true, "testuser@example.com");
+        $encodedRequest2 = $authnRequest2->getRequest();
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertContains('<saml:Subject', $request2);
+        $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
+        $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
+
+        $settingsInfo['sp']['NameIDFormat'] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest3 = new OneLogin_Saml2_AuthnRequest($settings, false, false, true, "testuser@example.com");
+        $encodedRequest3 = $authnRequest3->getRequest();
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('<saml:Subject', $request3);
+        $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', $request3);
+        $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
+    }
+
+    /**
+    * Tests the OneLogin_Saml2_AuthnRequest Constructor.
     * The creation of a deflated SAML Request
     *
     * @covers OneLogin_Saml2_AuthnRequest

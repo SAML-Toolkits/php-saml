@@ -1197,6 +1197,90 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the login method of the OneLogin_Saml2_Auth class
+    * Case Login with no parameters. A AuthN Request is built with and without Subject
+    *
+    * @covers OneLogin_Saml2_Auth::login
+    * @runInSeparateProcess
+    */
+    public function testLoginSubject()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace = $e->getTrace();
+            $targetUrl = getUrlFromRedirect($trace);
+            $parsedQuery = getParamsFromUrl($targetUrl);
+
+            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+            $encodedRequest = $parsedQuery['SAMLRequest'];
+            $decoded = base64_decode($encodedRequest);
+            $request = gzinflate($decoded);
+            $this->assertNotContains('<saml:Subject', $request);
+        }
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $auth->login($returnTo, array(), false, false, false, true, "testuser@example.com");
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace2 = $e->getTrace();
+            $targetUrl2 = getUrlFromRedirect($trace2);
+            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+
+            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+            $decoded2 = base64_decode($encodedRequest2);
+            $request2 = gzinflate($decoded2);
+            $this->assertContains('<saml:Subject', $request2);
+            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
+            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
+        }
+
+        try {
+            // The Header of the redirect produces an Exception
+            $returnTo = 'http://example.com/returnto';
+            $settingsInfo['sp']['NameIDFormat'] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+            $auth2 = new OneLogin_Saml2_Auth($settingsInfo);
+            $auth2->login($returnTo);
+            // Do not ever get here
+            $this->assertFalse(true);
+        } catch (Exception $e) {
+            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $trace3 = $e->getTrace();
+            $targetUrl3 = getUrlFromRedirect($trace3);
+            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+
+            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+            $decoded3 = base64_decode($encodedRequest3);
+            $request3 = gzinflate($decoded3);
+            $this->assertContains('<saml:Subject', $request3);
+            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', $request3);
+            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
+        }
+    }
+
+    /**
     * Tests the logout method of the OneLogin_Saml2_Auth class
     * Case Logout with no parameters. A logout Request is built and redirect executed
     *
