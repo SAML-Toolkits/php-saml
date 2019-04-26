@@ -1119,6 +1119,46 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 }
 ```
 
+#### Example (using Composer) that initiates the SSO request and handles the response (is the acs target) ####
+
+Install package via composer:
+```
+composer require onelogin/php-saml
+```
+
+Create an index.php:
+```php
+<?php
+require('vendor/autoload.php');
+
+session_start();
+$needsAuth = empty($_SESSION['samlUserdata']);
+
+if ($needsAuth) {
+    // put SAML settings into an array to avoid placing files in the
+    // composer vendor/ directories 
+    $samlsettings = array(/*...config goes here...*/);
+    
+    $auth = new \OneLogin\Saml2\Auth($samlsettings);
+
+    if (!empty($_REQUEST['SAMLResponse']) && !empty($_REQUEST['RelayState'])) {
+        $auth->processResponse(null);
+        $errors = $auth->getErrors();
+        if (empty($errors)) {
+            // user has authenticated successfully
+            $needsAuth = false;
+            $_SESSION['samlUserdata'] = $auth->getAttributes();
+        }
+    }
+
+    if ($needsAuth) {
+        $auth->login();
+    }
+}
+
+// rest of your app goes here
+```
+
 #### URL-guessing methods ####
 
 php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
