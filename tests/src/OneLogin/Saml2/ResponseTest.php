@@ -259,6 +259,35 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the getNameIdSPNameQualifier method of the Response
+    *
+    * @covers OneLogin_Saml2_Response::getNameIdSPNameQualifier
+    */
+    public function testGetNameIdSPNameQualifier()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response1.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertNull($response->getNameIdSPNameQualifier());
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
+        $this->assertEquals('http://stuff.com/endpoints/metadata.php', $response2->getNameIdSPNameQualifier());
+        $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $response3 = new OneLogin_Saml2_Response($this->_settings, $xml3);
+        $this->assertEquals('http://stuff.com/endpoints/metadata.php', $response3->getNameIdSPNameQualifier());
+        $xml4 = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
+        $this->assertEquals('http://stuff.com/endpoints/metadata.php', $response4->getNameIdSPNameQualifier());
+        $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_nameid.xml.base64');
+        $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);
+        try {
+            $nameId5 = $response5->getNameIdSPNameQualifier();
+            $this->fail('ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+        }
+    }
+
+    /**
     * Tests the getNameIdData method of the OneLogin_Saml2_Response
     *
     * @covers OneLogin_Saml2_Response::getNameIdData

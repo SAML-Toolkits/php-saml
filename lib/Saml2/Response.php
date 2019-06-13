@@ -672,6 +672,23 @@ class OneLogin_Saml2_Response
     }
 
     /**
+     * Gets the NameID SP NameQualifier provided by the SAML response from the IdP.
+     *
+     * @return string|null NameID SP NameQualifier
+     *
+     * @throws ValidationError
+     */
+    public function getNameIdSPNameQualifier()
+    {
+        $nameIdSPNameQualifier = null;
+        $nameIdData = $this->getNameIdData();
+        if (!empty($nameIdData) && isset($nameIdData['SPNameQualifier'])) {
+            $nameIdSPNameQualifier = $nameIdData['SPNameQualifier'];
+        }
+        return $nameIdSPNameQualifier;
+    }
+
+    /**
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
      *

@@ -39,10 +39,11 @@ class OneLogin_Saml2_LogoutRequest
      * @param string|null $sessionIndex The SessionIndex (taken from the SAML Response in the SSO process).
      * @param string|null $nameIdFormat The NameID Format will be set in the LogoutRequest.
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
+     * @param string|null             $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
      *
      * @throws OneLogin_Saml2_Error
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         $this->_settings = $settings;
 
@@ -59,7 +60,6 @@ class OneLogin_Saml2_LogoutRequest
             $id = OneLogin_Saml2_Utils::generateUniqueID();
             $this->id = $id;
 
-            $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
             $cert = null;
@@ -78,16 +78,26 @@ class OneLogin_Saml2_LogoutRequest
                   $spData['NameIDFormat'] != OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
-                $spNameQualifier = null;
             } else {
                 $nameId = $idpData['entityId'];
                 $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
-                $spNameQualifier = $spData['entityId'];
+            }
+
+            /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
+               "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
+            */
+            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_ENTITY) {
+                $nameIdNameQualifier = null;
+                $nameIdSPNameQualifier = null;
+            }
+             // NameID Format UNSPECIFIED omitted
+            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
+                $nameIdFormat = null;
             }
 
             $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
                 $nameId,
-                $spNameQualifier,
+                $nameIdSPNameQualifier,
                 $nameIdFormat,
                 $cert,
                 $nameIdNameQualifier

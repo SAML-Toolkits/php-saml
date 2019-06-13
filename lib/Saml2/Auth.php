@@ -50,6 +50,13 @@ class OneLogin_Saml2_Auth
     private $_nameidNameQualifier;
 
     /**
+     * NameID SP NameQualifier
+     *
+     * @var string
+     */
+    private $_nameidSPNameQualifier;
+
+    /**
      * If user is authenticated.
      *
      * @var bool
@@ -197,6 +204,7 @@ class OneLogin_Saml2_Auth
                 $this->_nameid = $response->getNameId();
                 $this->_nameidFormat = $response->getNameIdFormat();
                 $this->_nameidNameQualifier = $response->getNameIdNameQualifier();
+                $this->_nameidSPNameQualifier = $response->getNameIdSPNameQualifier();
                 $this->_authenticated = true;
                 $this->_sessionIndex = $response->getSessionIndex();
                 $this->_sessionExpiration = $response->getSessionNotOnOrAfter();
@@ -381,6 +389,16 @@ class OneLogin_Saml2_Auth
     }
 
     /**
+     * Returns the nameID SP NameQualifier
+     *
+     * @return string  The nameID SP NameQualifier of the assertion
+     */
+    public function getNameIdSPNameQualifier()
+    {
+        return $this->_nameidSPNameQualifier;
+    }
+
+    /**
      * Returns the SessionIndex
      *
      * @return string|null  The SessionIndex of the assertion
@@ -513,7 +531,7 @@ class OneLogin_Saml2_Auth
      *
      * @throws OneLogin_Saml2_Error
      */
-    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null)
+    public function logout($returnTo = null, $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         assert('is_array($parameters)');
 
@@ -532,7 +550,7 @@ class OneLogin_Saml2_Auth
             $nameIdFormat = $this->_nameidFormat;
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 
         $this->_lastRequest = $logoutRequest->getXML();
         $this->_lastRequestID = $logoutRequest->id;
@@ -650,7 +668,7 @@ class OneLogin_Saml2_Auth
      *
      * @throws OneLogin_Saml2_Error
      */
-    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type="SAMLRequest")
+    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type = "SAMLRequest")
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {

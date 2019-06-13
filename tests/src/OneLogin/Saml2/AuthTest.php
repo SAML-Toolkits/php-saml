@@ -120,6 +120,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
     * @covers OneLogin_Saml2_Auth::getNameIdFormat
+    * @covers OneLogin_Saml2_Auth::getNameIdNameQualifier
+    * @covers OneLogin_Saml2_Auth::getNameIdSPNameQualifier
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
@@ -136,6 +138,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($this->_auth->getAttributes());
         $this->assertNull($this->_auth->getNameId());
         $this->assertNull($this->_auth->getNameIdFormat());
+        $this->assertNull($this->_auth->getNameIdNameQualifier());
+        $this->assertNull($this->_auth->getNameIdSPNameQualifier());
         $this->assertNull($this->_auth->getSessionIndex());
         $this->assertNull($this->_auth->getSessionExpiration());
         $this->assertNull($this->_auth->getAttribute('uid'));
@@ -207,6 +211,63 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $sessionExpiration = $this->_auth->getSessionExpiration();
         $this->assertNotNull($sessionExpiration);
         $this->assertEquals('2655106621', $sessionExpiration);
+    }
+
+    /**
+     * Tests the getNameIdNameQualifier method of the Auth class
+     * Case found
+     * @covers OneLogin_Saml2_Auth::getNameIdNameQualifier
+     */
+    public function testGetNameIdNameQualifier()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response_with_namequalifier.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+        $this->assertNull($this->_auth->getNameIdNameQualifier());
+        $this->_auth->processResponse();
+        $this->assertTrue($this->_auth->isAuthenticated());
+        $this->assertEquals('https://test.example.com/saml/metadata', $this->_auth->getNameIdNameQualifier());
+    }
+     /**
+     * Tests the getNameIdNameQualifier method of the Auth class
+     * Case Null
+     * @covers OneLogin_Saml2_Auth::getNameIdNameQualifier
+     */
+    public function testGetNameIdNameQualifier2()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+        $this->assertNull($this->_auth->getNameIdNameQualifier());
+        $this->_auth->processResponse();
+        $this->assertTrue($this->_auth->isAuthenticated());
+        $this->assertNull($this->_auth->getNameIdNameQualifier());
+    }
+     /**
+     * Tests the getNameIdSPNameQualifier method of the Auth class
+     * Case Found
+     * @covers OneLogin_Saml2_Auth::getNameIdSPNameQualifier
+     */
+    public function testGetNameIdSPNameQualifier()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response_with_namequalifier.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+        $this->assertNull($this->_auth->getNameIdSPNameQualifier());
+        $this->_auth->processResponse();
+        $this->assertTrue($this->_auth->isAuthenticated());
+        $this->assertNull($this->_auth->getNameIdSPNameQualifier());
+    }
+     /**
+     * Tests the getNameIdSPNameQualifier method of the Auth class
+     * Case Null
+     * @covers OneLogin_Saml2_Auth::getNameIdSPNameQualifier
+     */
+    public function testGetNameIdSPNameQualifier2()
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+        $this->assertNull($this->_auth->getNameIdSPNameQualifier());
+        $this->_auth->processResponse();
+        $this->assertTrue($this->_auth->isAuthenticated());
+        $this->assertEquals('http://stuff.com/endpoints/metadata.php', $this->_auth->getNameIdSPNameQualifier());
     }
 
     /**
