@@ -7,6 +7,8 @@ Forget those complicated libraries and use this open source library provided
 and supported by OneLogin Inc.
 
 
+**The 3.X branch is compatible with PHP > 7.1, so if you are using that PHP version, use it and not the 2.X or the master branch**
+
 Warning
 -------
 
