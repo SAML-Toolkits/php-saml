@@ -1,5 +1,17 @@
 CHANGELOG
 =========
+v.3.2.0
+* Add support for Subjects on AuthNRequests by the new parameter nameIdValueReq
+* Support SLO ResponseLocation
+* [#344](https://github.com/onelogin/php-saml/issues/344) Raise errors on IdPMetadataParser::parseRemoteXML and IdPMetadataParser::parseFileXML
+* [#356](https://github.com/onelogin/php-saml/issues/356) Support 'x509cert' and 'privateKey' on signMetadata security setting
+
+v.3.1.1
+* Force to use at least xmlseclibs 3.0.3 for security reasons
+* [#367](https://github.com/onelogin/php-saml/pull/367) Move the creation of the AuthnRequest to separate function
+* Set strict=true on config examples
+* Move phpunit.xml
+
 v.3.1.0
 * Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
 * Fix setting_example.php servicename parameter 
@@ -7,6 +19,31 @@ v.3.1.0
 v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
 * xmlseclibs now is not part of the toolkit and need to be installed from original source
+
+v.2.16.0
+* Support SLO ResponseLocation
+* [#344](https://github.com/onelogin/php-saml/issues/344) Raise errors on IdPMetadataParser::parseRemoteXML and IdPMetadataParser::parseFileXML
+* Adjusted acs endpoint to extract NameQualifier and SPNameQualifier from SAMLResponse. Adjusted single logout service to provide NameQualifier and SPNameQualifier to logout method. Add getNameIdNameQualifier to Auth and SamlResponse. Extend logout method from Auth and LogoutRequest constructor to support SPNameQualifier parameter. Align LogoutRequest constructor with SAML specs
+* Add support for Subjects on AuthNRequests by the new parameter
+* Set strict=true on config examples
+
+v.2.15.0
+* Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
+* Fix bug on settings_example.php
+
+v.2.14.0
+* Add  parameter to the decryptElement method to make optional the formatting
+* [#283](https://github.com/onelogin/php-saml/pull/283) New method of importing a decrypted assertion into the XML document to replace the EncryptedAssertion. Fix signature issues on Signed Encrypted Assertions with default namespace
+* Allow the getSPMetadata() method to always include the encryption Key Descriptor
+* Change some Fatal Error to Exceptions
+* [#265](https://github.com/onelogin/php-saml/issues/265) Support parameters at getSPMetadata method
+* Avoid calling static method using this
+
+v.2.13.0
+* Update xmlseclibs with some fixes.
+* Add extra protection verifying the Signature algorithm used on SignedInfo element, not only rely on the xmlseclibs verify / verifySignature methods.
+* Add getAttributesWithFriendlyName method which returns the set of SAML attributes indexed by FriendlyName
+* Fix bug on parseRemoteXML and parseFileXML. Internal calls to parseXML missed the desiredNameIdFormat parameter
 
 v.2.12.0
 * Improve Time management. Use DateTime/DateTimeZone classes.
