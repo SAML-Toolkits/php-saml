@@ -93,6 +93,18 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the getSLOResponseUrl method of the Auth class
+     *
+     * @covers OneLogin\Saml2\Auth::getSLOurl
+     */
+    public function testGetSLOResponseUrl()
+    {
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertEquals($this->_auth->getSLOResponseUrl(), $sloUrl);
+    }
+
+
+    /**
      * Tests the processResponse method of the Auth class
      * Case No Response, An exception is throw
      *
@@ -620,8 +632,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $parsedQuery = getParamsFromUrl($targetUrl);
 
         $this->assertEmpty($this->_auth->getErrors());
-        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-        $this->assertContains($sloUrl, $targetUrl);
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -635,8 +647,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $parsedQuery = getParamsFromUrl($targetUrl);
 
         $this->assertEmpty($this->_auth->getErrors());
-        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-        $this->assertContains($sloUrl, $targetUrl);
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);
     }
@@ -704,8 +716,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -725,8 +737,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -778,8 +790,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];;;
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -828,8 +840,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
@@ -876,8 +888,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+            $this->assertContains($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertArrayHasKey('SigAlg', $parsedQuery);

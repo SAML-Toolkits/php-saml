@@ -68,7 +68,7 @@ WQO0LPxPqRiUqUzyhDhLo/xXNrHCu4VbMw==</ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
     </KeyDescriptor>
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.examle.com/saml/slo"/>    
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.examle.com/saml/slo" ResponseLocation="https://idp.examle.com/saml/slr"/>
     <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.examle.com/saml/sso"/>
   </IDPSSODescriptor>

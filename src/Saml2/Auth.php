@@ -322,7 +322,7 @@ class Auth
                     $parameters['Signature'] = $signature;
                 }
 
-                return $this->redirectTo($this->getSLOurl(), $parameters, $stay);
+                return $this->redirectTo($this->getSLOResponseUrl(), $parameters, $stay);
             }
         } else {
             $this->_errors[] = 'invalid_binding';
@@ -631,6 +631,20 @@ class Auth
             $url = $idpData['singleLogoutService']['url'];
         }
         return $url;
+    }
+
+    /**
+     * Gets the SLO response url.
+     *
+     * @return string|null The response url of the Single Logout Service
+     */
+    public function getSLOResponseUrl()
+    {
+        $idpData = $this->_settings->getIdPData();
+        if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['responseUrl'])) {
+            return $idpData['singleLogoutService']['responseUrl'];
+        }
+        return $this->getSLOurl();
     }
 
     /**
