@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v.2.16.0
+* Support SLO ResponseLocation
+* [#344](https://github.com/onelogin/php-saml/issues/344) Raise errors on IdPMetadataParser::parseRemoteXML and IdPMetadataParser::parseFileXML
+* Adjusted acs endpoint to extract NameQualifier and SPNameQualifier from SAMLResponse. Adjusted single logout service to provide NameQualifier and SPNameQualifier to logout method. Add getNameIdNameQualifier to Auth and SamlResponse. Extend logout method from Auth and LogoutRequest constructor to support SPNameQualifier parameter. Align LogoutRequest constructor with SAML specs
+* Add support for Subjects on AuthNRequests by the new parameter
+* Set strict=true on config examples
 
 v.2.15.0
 * Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
