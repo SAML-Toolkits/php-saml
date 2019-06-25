@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v.3.2.1
+* Add missed nameIdValueReq parameter to buildAuthnRequest method
+
 v.3.2.0
 * Add support for Subjects on AuthNRequests by the new parameter nameIdValueReq
 * Support SLO ResponseLocation
