@@ -520,7 +520,7 @@ class Auth
      * @param bool        $isPassive       When true the AuthNRequest will set the Ispassive='true'
      * @param bool        $stay            True if we want to stay (returns the url string) False to redirect
      * @param bool        $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
-     * @param string $nameIdValueReq Indicates to the IdP the subject that should be authenticated
+     * @param string      $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      *
@@ -664,12 +664,13 @@ class Auth
      * @param bool     $forceAuthn      When true the AuthNRequest will set the ForceAuthn='true'
      * @param bool     $isPassive       When true the AuthNRequest will set the Ispassive='true'
      * @param bool     $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
+     * @param string   $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy)
+    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
     {
-        return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy);
+        return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
     }
 
     /**
@@ -719,7 +720,7 @@ class Auth
      * @throws Exception
      * @throws Error
      */
-    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type="SAMLRequest")
+    private function buildMessageSignature($samlMessage, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $type = "SAMLRequest")
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
