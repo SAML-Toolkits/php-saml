@@ -755,8 +755,8 @@ if (!$auth->isAuthenticated()) {
 $_SESSION['samlUserdata'] = $auth->getAttributes();
 $_SESSION['samlNameId'] = $auth->getNameId();
 $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
-$_SESSION['samlNameidNameQualifier' = $auth->getNameIdNameQualifier();
-$_SESSION['samlNameidSPNameQualifier' = $auth->getNameIdSPNameQualifier();
+$_SESSION['samlNameidNameQualifier'] = $auth->getNameIdNameQualifier();
+$_SESSION['samlNameidSPNameQualifier'] = $auth->getNameIdSPNameQualifier();
 $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
 
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
