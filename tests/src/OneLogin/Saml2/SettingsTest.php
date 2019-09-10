@@ -391,6 +391,16 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
             $this->assertContains('organization_not_enought_data', $e->getMessage());
             $this->assertContains('contact_type_invalid', $e->getMessage());
         }
+
+        $settingsInfo['security']['signMetadata'] = ['privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key')];
+        try {
+            $settings = new OneLogin_Saml2_Settings($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('sp_signMetadata_invalid', $e->getMessage());
+            $this->assertContains('organization_not_enought_data', $e->getMessage());
+            $this->assertContains('contact_type_invalid', $e->getMessage());
+        }
     }
 
     /**
@@ -588,6 +598,26 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<ds:Reference', $metadata2);
         $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata2);
 
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.crt');
+        $settingsInfo['security']['signMetadata'] = [
+            'privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key'),
+            'x509cert' => $cert,
+        ];
+        $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
+        $metadata3 = $settings3->getSPMetadata();
+        $this->assertNotEmpty($metadata3);
+        $this->assertContains('<md:SPSSODescriptor', $metadata3);
+        $this->assertContains('entityID="http://stuff.com/endpoints/metadata.php"', $metadata3);
+        $this->assertContains('AuthnRequestsSigned="false"', $metadata3);
+        $this->assertContains('WantAssertionsSigned="false"', $metadata3);
+        $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', $metadata3);
+        $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata3);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata3);
+        $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata3);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>', $metadata3);
+        $this->assertContains('<ds:Reference', $metadata3);
+        $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata3);
+        $this->assertContains(OneLogin_Saml2_Utils::formatCert($cert, false), $metadata3);
     }
 
     /**

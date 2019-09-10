@@ -463,7 +463,11 @@ $advancedSettings = array (
          False || True (use sp certs) || array (
                                                     keyFileName => 'metadata.key',
                                                     certFileName => 'metadata.crt'
-                                                )
+                                               )
+                                      || array (
+                                                    'x509cert' => '',
+                                                    'privateKey' => ''
+                                               )
         */
         'signMetadata' => false,
 

@@ -608,9 +608,14 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'sp_sls_url_invalid';
             }
 
-            if (isset($security['signMetadata']) && is_array($security['signMetadata']) &&
-                (!isset($security['signMetadata']['keyFileName']) || !isset($security['signMetadata']['certFileName']))) {
-                $errors[] = 'sp_signMetadata_invalid';
+            if (isset($security['signMetadata']) && is_array($security['signMetadata'])) {
+                if ((!isset($security['signMetadata']['keyFileName'])
+                    || !isset($security['signMetadata']['certFileName'])) &&
+                    (!isset($security['signMetadata']['privateKey'])
+                    || !isset($security['signMetadata']['x509cert']))
+                ) {
+                    $errors[] = 'sp_signMetadata_invalid';
+                }
             }
 
             if (((isset($security['authnRequestsSigned']) && $security['authnRequestsSigned'] == true)
@@ -842,40 +847,28 @@ class OneLogin_Saml2_Settings
         }
 
         //Sign Metadata
-        if (isset($this->_security['signMetadata']) && $this->_security['signMetadata'] != false) {
+        if (isset($this->_security['signMetadata']) && $this->_security['signMetadata'] !== false) {
             if ($this->_security['signMetadata'] === true) {
                 $keyMetadata = $this->getSPkey();
                 $certMetadata = $cert;
-
                 if (!$keyMetadata) {
                     throw new OneLogin_Saml2_Error(
                         'SP Private key not found.',
                         OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
                     );
                 }
-
                 if (!$certMetadata) {
                     throw new OneLogin_Saml2_Error(
                         'SP Public cert not found.',
                         OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND
                     );
                 }
-            } else {
-                if (!isset($this->_security['signMetadata']['keyFileName'])
-                    || !isset($this->_security['signMetadata']['certFileName'])
-                ) {
-                    throw new OneLogin_Saml2_Error(
-                        'Invalid Setting: signMetadata value of the sp is not valid',
-                        OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
-                    );
-                }
+            } else if (isset($this->_security['signMetadata']['keyFileName']) &&
+                isset($this->_security['signMetadata']['certFileName'])) {
                 $keyFileName = $this->_security['signMetadata']['keyFileName'];
                 $certFileName = $this->_security['signMetadata']['certFileName'];
-
                 $keyMetadataFile = $this->_paths['cert'].$keyFileName;
                 $certMetadataFile = $this->_paths['cert'].$certFileName;
-
-
                 if (!file_exists($keyMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
                         'SP Private key file not found: %s',
@@ -883,7 +876,6 @@ class OneLogin_Saml2_Settings
                         array($keyMetadataFile)
                     );
                 }
-
                 if (!file_exists($certMetadataFile)) {
                     throw new OneLogin_Saml2_Error(
                         'SP Public cert file not found: %s',
@@ -893,6 +885,27 @@ class OneLogin_Saml2_Settings
                 }
                 $keyMetadata = file_get_contents($keyMetadataFile);
                 $certMetadata = file_get_contents($certMetadataFile);
+            } else if (isset($this->_security['signMetadata']['privateKey']) &&
+                isset($this->_security['signMetadata']['x509cert'])) {
+                $keyMetadata = OneLogin_Saml2_Utils::formatPrivateKey($this->_security['signMetadata']['privateKey']);
+                $certMetadata = OneLogin_Saml2_Utils::formatCert($this->_security['signMetadata']['x509cert']);
+                if (!$keyMetadata) {
+                    throw new OneLogin_Saml2_Error(
+                        'Private key not found.',
+                        OneLogin_Saml2_Error::PRIVATE_KEY_FILE_NOT_FOUND
+                    );
+                }
+                if (!$certMetadata) {
+                    throw new OneLogin_Saml2_Error(
+                        'Public cert not found.',
+                        OneLogin_Saml2_Error::PUBLIC_CERT_FILE_NOT_FOUND
+                    );
+                }
+            } else {
+                throw new OneLogin_Saml2_Error(
+                    'Invalid Setting: signMetadata value of the sp is not valid',
+                    OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
+                );
             }
 
             $signatureAlgorithm = $this->_security['signatureAlgorithm'];

@@ -2,7 +2,7 @@
 
 $advancedSettings = array (
 
-    // Compression settings 
+    // Compression settings
     // Handle if the getRequest/getResponse methods will return the Request/Response deflated.
     // But if we provide a $deflate boolean parameter to the getRequest or getResponse
     // method it will have priority over the compression settings.
@@ -36,7 +36,11 @@ $advancedSettings = array (
          False || True (use sp certs) || array (
                                                     keyFileName => 'metadata.key',
                                                     certFileName => 'metadata.crt'
-                                                )
+                                               )
+                                      || array (
+                                                    'x509cert' => '',
+                                                    'privateKey' => ''
+                                               )
         */
         'signMetadata' => false,
 
