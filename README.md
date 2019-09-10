@@ -102,7 +102,7 @@ Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend y
 
 The toolkit is hosted on github. You can download it from:
 
- * Lastest release: https://github.com/onelogin/php-saml/releases/latest
+ * Latest release: https://github.com/onelogin/php-saml/releases/latest
  * Master repo: https://github.com/onelogin/php-saml/tree/master
 
 Copy the core of the library inside the php application. (each application has its
@@ -199,7 +199,7 @@ publish that x509 certificate on Service Provider metadata.
 #### `extlib/` ####
 
 This folder contains the 3rd party libraries that the toolkit uses. At the
-moment only uses the `xmlseclibs` (autor Robert Richards, BSD Licensed) which
+moment only uses the `xmlseclibs` (author Robert Richards, BSD Licensed) which
 handle the sign and the encryption of xml elements.
 
 
@@ -1186,7 +1186,7 @@ php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to gue
 * `getSelfURLNoQuery` Returns the URL of the current host + current view.
 * `getSelfRoutedURLNoQuery` Returns the routed URL of the current host + current view.
 
-getSelfURLNoQuery and getSelfRoutedURLNoQuery are used to calculate the currentURL in order to valdate SAML elements like Destination or Recipient.
+getSelfURLNoQuery and getSelfRoutedURLNoQuery are used to calculate the currentURL in order to validate SAML elements like Destination or Recipient.
 
 When the PHP application is behind a proxy or a load balancer we can execute `setProxyVars(true)` and `setSelfPort` and `isHTTPS` will take care of the `$_SERVER["HTTP_X_FORWARDED_PORT"]` and `$_SERVER['HTTP_X_FORWARDED_PROTO']` vars (otherwise they are ignored).
 
@@ -1530,7 +1530,7 @@ Once the SP is configured, the metadata of the SP is published at the
     process, the `index.php` view.
 
     2.2 in the second link we access to (`attrs.php`) have the same process
-    described at 2.1 with the diference that as `RelayState` is set the `attrs.php`.
+    described at 2.1 with the difference that as `RelayState` is set the `attrs.php`.
 
  3. The SAML Response is processed in the ACS (`index.php?acs`), if the Response
     is not valid, the process stops here and a message is shown. Otherwise we
@@ -1557,7 +1557,7 @@ Once the SP is configured, the metadata of the SP is published at the
     session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
 
 Notice that all the SAML Requests and Responses are handled by a unique file,
-the `index.php` file and how `GET` paramters are used to know the action that
+the `index.php` file and how `GET` parameters are used to know the action that
 must be done.
 
 
