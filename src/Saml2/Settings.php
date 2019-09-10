@@ -835,7 +835,7 @@ class Settings
         }
 
         //Sign Metadata
-        if (isset($this->_security['signMetadata']) && $this->_security['signMetadata'] !== false) {
+        if (isset($this->_security['signMetadata']) && $this->_security['signMetadata'] != false) {
             if ($this->_security['signMetadata'] === true) {
                 $keyMetadata = $this->getSPkey();
                 $certMetadata = $cert;
