@@ -1004,16 +1004,15 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['strict'] = false;
 
         $settings = new Settings($settingsInfo);
         $this->assertFalse($settings->isStrict());
 
-        $settings->setStrict(true);
-        $this->assertTrue($settings->isStrict());
-
         $settings->setStrict(false);
         $this->assertFalse($settings->isStrict());
+
+        $settings->setStrict(true);
+        $this->assertTrue($settings->isStrict());
 
         try {
             $settings->setStrict('a');
@@ -1035,7 +1034,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         unset($settingsInfo['strict']);
 
         $settings = new Settings($settingsInfo);
-        $this->assertFalse($settings->isStrict());
+        $this->assertTrue($settings->isStrict());
 
         $settingsInfo['strict'] = false;
         $settings2 = new Settings($settingsInfo);
