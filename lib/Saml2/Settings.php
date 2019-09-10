@@ -26,7 +26,7 @@ class OneLogin_Saml2_Settings
      *
      * @var bool
      */
-    private $_strict = false;
+    private $_strict = true;
 
     /**
      * Activate debug mode
