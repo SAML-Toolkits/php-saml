@@ -374,13 +374,15 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
             $this->assertContains('NameID not found in the Logout Request', $e->getMessage());
         }
 
-        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, OneLogin_Saml2_Constants::NAMEID_PERSISTENT, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
+        $idpData = $this->_settings->getIdPData();
+        $spData = $this->_settings->getSPData();
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, OneLogin_Saml2_Constants::NAMEID_PERSISTENT, $idpData['entityId'], $spData['entityId']);
         $logoutRequestStr = $logoutRequest->getXML();
         $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr);
         $this->assertContains('Format="'.OneLogin_Saml2_Constants::NAMEID_PERSISTENT, $logoutRequestStr);
-        $this->assertContains('NameQualifier="'.$this->_settings->getIdPData()['entityId'], $logoutRequestStr);
-        $this->assertContains('SPNameQualifier="'.$this->_settings->getSPData()['entityId'], $logoutRequestStr);
-         $logoutRequest2 = new OneLogin_Saml2_LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, OneLogin_Saml2_Constants::NAMEID_ENTITY, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
+        $this->assertContains('NameQualifier="'.$idpData['entityId'], $logoutRequestStr);
+        $this->assertContains('SPNameQualifier="'.$spData['entityId'], $logoutRequestStr);
+         $logoutRequest2 = new OneLogin_Saml2_LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, OneLogin_Saml2_Constants::NAMEID_ENTITY, $idpData['entityId'], $spData['entityId']);
         $logoutRequestStr2 = $logoutRequest2->getXML();
         $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr2);
         $this->assertContains('Format="'.OneLogin_Saml2_Constants::NAMEID_ENTITY, $logoutRequestStr2);
