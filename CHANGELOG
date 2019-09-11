@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v.2.17.0
+* Set true as the default value for strict setting
+* Support 'x509cert' and 'privateKey' on signMetadata security settings
+* Relax comparision of false on SignMetadata
+* Fix CI
+
 v.2.16.0
 * Support SLO ResponseLocation
 * [#344](https://github.com/onelogin/php-saml/issues/344) Raise errors on IdPMetadataParser::parseRemoteXML and IdPMetadataParser::parseFileXML

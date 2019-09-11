@@ -12,6 +12,8 @@ and supported by OneLogin Inc.
 Warning
 -------
 
+Version 2.17.0 sets strict mode active by default
+
 Update php-saml to 2.15.0, this version includes a security patch related to XEE attacks
 
 php-saml is not affected by [201803-01](https://simplesamlphp.org/security/201803-01) 
