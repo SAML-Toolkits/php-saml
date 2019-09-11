@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v.3.3.0
+* Set true as the default value for strict setting
+* Relax comparision of false on SignMetadata
+* Fix CI
+
 v.3.2.1
 * Add missed nameIdValueReq parameter to buildAuthnRequest method
 
