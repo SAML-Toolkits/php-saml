@@ -392,7 +392,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
             $this->assertContains('contact_type_invalid', $e->getMessage());
         }
 
-        $settingsInfo['security']['signMetadata'] = ['privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key')];
+        $settingsInfo['security']['signMetadata'] = array('privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key'));
         try {
             $settings = new OneLogin_Saml2_Settings($settingsInfo);
             $this->fail('Error was not raised');
@@ -456,56 +456,56 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
     public function testGetSPMetadataWithX509CertNewDataProvider()
     {
-        return [
-            'settings do not require encryption' => [
+        return array(
+            'settings do not require encryption' => array(
                 'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => false,
-            ],
-            'wantNameIdEncrypted setting enabled' => [
+            ),
+            'wantNameIdEncrypted setting enabled' => array(
                 'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'wantAssertionsEncrypted setting enabled' => [
+            ),
+            'wantAssertionsEncrypted setting enabled' => array(
                 'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'both settings enabled'=> [
+            ),
+            'both settings enabled'=> array(
                 'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'metadata requested with encryption' => [
+            ),
+            'metadata requested with encryption' => array(
                 'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'metadata requested with encryption and wantNameIdEncrypted setting enabled' => [
+            ),
+            'metadata requested with encryption and wantNameIdEncrypted setting enabled' => array(
                 'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => false,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'metadata requested with encryption and wantAssertionsEncrypted setting enabled' => [
+            ),
+            'metadata requested with encryption and wantAssertionsEncrypted setting enabled' => array(
                 'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => false,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-            'metadata requested with encryption and both settings enabled' => [
+            ),
+            'metadata requested with encryption and both settings enabled' => array(
                 'alwaysIncludeEncryption' => true,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
-            ],
-        ];
+            ),
+        );
     }
 
     /**
@@ -599,10 +599,10 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata2);
 
         $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.crt');
-        $settingsInfo['security']['signMetadata'] = [
+        $settingsInfo['security']['signMetadata'] = array(
             'privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key'),
             'x509cert' => $cert,
-        ];
+        );
         $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
         $metadata3 = $settings3->getSPMetadata();
         $this->assertNotEmpty($metadata3);
