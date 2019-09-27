@@ -263,10 +263,10 @@ class Response
                             );
                         }
                     } else {
-                        if (strpos($destination, $currentURL) !== 0) {
+                        if (strcmp($destination, $currentURL) !== 0) {
                             $currentURLNoRouted = Utils::getSelfURLNoQuery();
 
-                            if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            if (strcmp($destination, $currentURLNoRouted) !== 0) {
                                 throw new ValidationError(
                                     "The response was received at $currentURL instead of $destination",
                                     ValidationError::WRONG_DESTINATION
