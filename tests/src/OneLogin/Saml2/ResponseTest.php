@@ -1011,6 +1011,10 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     */
     public function testIsInValidDestination()
     {
+        $_SERVER['HTTP_HOST'] = 'stuff.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/endpoints/endpoints/acs.php';
+
         $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
 
         $response = new OneLogin_Saml2_Response($this->_settings, $xml);
@@ -1031,10 +1035,28 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('The response has an empty Destination value', $response3->getError());
 
         include TEST_ROOT .'/settings/settings1.php';
+        $settingsInfo['strict'] = true;
         $settingsInfo['security']['relaxDestinationValidation'] = true;
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $response4 = new OneLogin_Saml2_Response($settings, $xml2);
         $this->assertTrue($response4->isValid());
+
+        // Destination strict match 
+        $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_strict_destination.xml.base64');
+        $response5 = new OneLogin_Saml2_Response($settings, $xml3);
+        $this->assertTrue($response5->isValid());
+
+        $settingsInfo['security']['destinationStrictlyMatches'] = true;
+        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $response6 = new OneLogin_Saml2_Response($settings2, $xml3);
+        $this->assertFalse($response6->isValid());
+        $this->assertContains('The response was received at', $response6->getError());
+
+        unset($settingsInfo['strict']);
+        unset($settingsInfo['security']['destinationStrictlyMatches']);
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
     }
 
     /**
