@@ -1280,6 +1280,47 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertContains('No Signature found. SAML Response rejected', $response2->getError());
     }
 
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_Response class
+    * Case invalid IssueInstant
+    *
+    * @covers OneLogin_Saml2_Response::isValid
+    */
+    public function testIsInvalidIssueInstant()
+    {
+        $_SERVER['HTTP_HOST'] = 'pitbulk.no-ip.org';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/newonelogin/demo1/index.php?acs';
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+
+        // Not strict, always valid
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertTrue($response->isValid(null, '2014-02-19T01:37:01Z'));
+        $this->assertTrue($response->isValid(null, '2014-02-19T01:39:01Z'));
+
+        // Strict, valid/invalid with 0 seconds (default) of clock skew tolerance
+        $this->_settings->setStrict(true);
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertTrue($response2->isValid(null, '2014-02-19T01:37:00Z'));
+        $this->assertTrue($response2->isValid(null, '2014-02-19T01:37:01Z'));
+        $this->assertFalse($response2->isValid(null, '2014-02-19T01:37:02Z'));
+        $this->assertContains('The IssueInstant of the Response', $response2->getError());
+
+        // Strict, valid/invalid with 180 seconds of configured clock skew tolerance
+        include TEST_ROOT .'/settings/settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['clockSkewTolerance'] = 180;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response3 = new OneLogin_Saml2_Response($settings, $xml);
+        $this->assertTrue($response3->isValid(null, '2014-02-19T01:40:01Z'));
+        $this->assertFalse($response3->isValid(null, '2014-02-19T01:40:02Z'));
+        $this->assertContains('The IssueInstant of the Response', $response3->getError());
+
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
+    }
 
     /**
     * Tests the isValid method of the OneLogin_Saml2_Response class

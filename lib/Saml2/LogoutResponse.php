@@ -116,7 +116,7 @@ class OneLogin_Saml2_LogoutResponse
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
      */
-    public function isValid($requestId = null, $retrieveParametersFromServer = false)
+    public function isValid($requestId = null, $retrieveParametersFromServer = false, $requestIssueInstant = null)
     {
         $this->_error = null;
         try {
@@ -143,6 +143,19 @@ class OneLogin_Saml2_LogoutResponse
                         throw new OneLogin_Saml2_ValidationError(
                             "The InResponseTo of the Logout Response: $inResponseTo, does not match the ID of the Logout request sent by the SP: $requestId",
                             OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
+                    }
+                }
+
+                // Check if the IssueInstant of the Logout Response is later than the one of the Logout Request if provided (considering a configured clock skew)
+                if (isset($requestIssueInstant)) {
+                    $issueInstant = $this->document->documentElement->getAttribute('IssueInstant');
+                    $issueInstantTime = OneLogin_Saml2_Utils::parseSAML2Time($issueInstant);
+                    $requestIssueInstantTime = OneLogin_Saml2_Utils::parseSAML2Time($requestIssueInstant);
+                    if ($requestIssueInstantTime > $issueInstantTime + $security['clockSkewTolerance']) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The IssueInstant of the Logout Response: $issueInstant is not equal or later than the IssueInstant of the Logout Request: $requestIssueInstant (considering the configured clock skew)",
+                            OneLogin_Saml2_ValidationError::INVALID_ISSUEINSTANT
                         );
                     }
                 }
