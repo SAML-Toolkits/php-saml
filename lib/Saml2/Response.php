@@ -171,7 +171,7 @@ class OneLogin_Saml2_Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                if (isset($requestId) && (!isset($responseInResponseTo) || $requestId != $responseInResponseTo)) {
                     throw new OneLogin_Saml2_ValidationError(
                         "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
                         OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
