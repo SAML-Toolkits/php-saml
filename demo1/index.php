@@ -22,6 +22,14 @@ if (isset($_GET['sso'])) {
     # header('Location: ' . $ssoBuiltUrl);
     # exit();
 
+    # If AuthNRequest IssueInstant need to be saved in order to later validate it, do instead
+    # $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
+    # $_SESSION['AuthNRequestIssueInstant'] = $auth->getLastRequestIssueInstant();
+    # header('Pragma: no-cache');
+    # header('Cache-Control: no-cache, must-revalidate');
+    # header('Location: ' . $ssoBuiltUrl);
+    # exit();
+
 } else if (isset($_GET['sso2'])) {
     $returnTo = $spBaseUrl.'/demo1/attrs.php';
     $auth->login($returnTo);
@@ -58,6 +66,14 @@ if (isset($_GET['sso'])) {
     # header('Location: ' . $sloBuiltUrl);
     # exit();
 
+    # If LogoutRequest IssueInstant need to be saved in order to later validate it, do instead
+    # $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
+    # $_SESSION['LogoutRequestIssueInstant'] = $auth->getLastRequestIssueInstant();
+    # header('Pragma: no-cache');
+    # header('Cache-Control: no-cache, must-revalidate');
+    # header('Location: ' . $sloBuiltUrl);
+    # exit();
+
 } else if (isset($_GET['acs'])) {
     if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
         $requestID = $_SESSION['AuthNRequestID'];
@@ -65,7 +81,13 @@ if (isset($_GET['sso'])) {
         $requestID = null;
     }
 
-    $auth->processResponse($requestID);
+    if (isset($_SESSION) && isset($_SESSION['AuthNRequestIssueInstant'])) {
+        $requestIssueInstant = $_SESSION['AuthNRequestIssueInstant'];
+    } else {
+        $requestIssueInstant = null;
+    }
+
+    $auth->processResponse($requestID, $requestIssueInstant);
 
     $errors = $auth->getErrors();
 
@@ -95,7 +117,13 @@ if (isset($_GET['sso'])) {
         $requestID = null;
     }
 
-    $auth->processSLO(false, $requestID);
+    if (isset($_SESSION) && isset($_SESSION['LogoutRequestIssueInstant'])) {
+        $requestIssueInstant = $_SESSION['LogoutRequestIssueInstant'];
+    } else {
+        $requestIssueInstant = null;
+    }
+
+    $auth->processSLO(false, $requestID, false, null, false, $requestIssueInstant);
     $errors = $auth->getErrors();
     if (empty($errors)) {
         echo '<p>Sucessfully logged out</p>';
