@@ -398,6 +398,11 @@ class OneLogin_Saml2_Settings
             $this->_security['wantXMLValidation'] = true;
         }
 
+        // Clock skew tolerance
+        if (!isset($this->_security['clockSkewTolerance'])) {
+            $this->_security['clockSkewTolerance'] = 0;
+        }
+
         // SignatureAlgorithm
         if (!isset($this->_security['signatureAlgorithm'])) {
             $this->_security['signatureAlgorithm'] = XMLSecurityKey::RSA_SHA1;
