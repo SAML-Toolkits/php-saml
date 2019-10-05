@@ -31,6 +31,12 @@ class OneLogin_Saml2_LogoutRequest
     private $_error;
 
     /**
+     * SAML LogoutRequest IssueInstant.
+     * @var string
+     */
+    private $_issueInstant;
+
+    /**
      * Constructs the Logout Request object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
@@ -61,6 +67,7 @@ class OneLogin_Saml2_LogoutRequest
             $this->id = $id;
 
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
+            $this->_issueInstant = $issueInstant;
 
             $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
@@ -421,6 +428,16 @@ LOGOUTREQUEST;
     public function getError()
     {
         return $this->_error;
+    }
+
+    /**
+     * Returns the LogoutRequest IssueInstant.
+     *
+     * @return string
+     */
+    public function getIssueInstant()
+    {
+        return $this->_issueInstant;
     }
 
     /**

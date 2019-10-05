@@ -26,6 +26,12 @@ class OneLogin_Saml2_AuthnRequest
     private $_id;
 
     /**
+     * SAML AuthNRequest IssueInstant.
+     * @var string
+     */
+    private $_issueInstant;
+
+    /**
      * Constructs the AuthnRequest object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
@@ -146,6 +152,7 @@ AUTHNREQUEST;
 
         $this->_id = $id;
         $this->_authnRequest = $request;
+        $this->_issueInstant = $issueInstant;
     }
 
     /**
@@ -179,6 +186,16 @@ AUTHNREQUEST;
     public function getId()
     {
         return $this->_id;
+    }
+
+    /**
+     * Returns the AuthNRequest IssueInstant.
+     *
+     * @return string
+     */
+    public function getIssueInstant()
+    {
+        return $this->_issueInstant;
     }
 
     /**
