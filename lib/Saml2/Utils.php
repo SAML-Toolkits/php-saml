@@ -623,22 +623,21 @@ class OneLogin_Saml2_Utils
         $selfURLhost = self::getSelfURLhost();
         $route = '';
 
-                if (!empty($_SERVER['REQUEST_URI'])) {
+        if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
-				$queries = explode("&", $_SERVER['QUERY_STRING']);
-				if(!empty($queries)) {
-					foreach($queries AS $query) {
-						$route = str_replace($query, '', $route);
-					}
-				}
-				while(substr($route, -1) == '&') {
-                    $route = substr($route, 0, -1);
-				}
-				if (substr($route, -1) == '?') {
+                $queries = explode("&", $_SERVER['QUERY_STRING']);
+                if(!empty($queries)) {
+                    foreach($queries AS $query) {
+                        $route = str_replace($query, '', $route);
+                    }
+                }
+                while(substr($route, -1) == '&') {
                     $route = substr($route, 0, -1);
                 }
-
+                if (substr($route, -1) == '?') {
+                    $route = substr($route, 0, -1);
+                }
             }
         }
 
