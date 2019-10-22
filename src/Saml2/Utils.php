@@ -108,15 +108,16 @@ class Utils
      *
      * It will parse the string into a DOMDocument and validate this document against the schema.
      *
-     * @param string|DOMDocument $xml    The XML string or document which should be validated.
-     * @param string             $schema The schema filename which should be used.
-     * @param bool               $debug  To disable/enable the debug mode
+     * @param string|DOMDocument $xml        The XML string or document which should be validated.
+     * @param string             $schema     The schema filename which should be used.
+     * @param bool               $debug      To disable/enable the debug mode
+     * @param string             $schemaPath Change schema path
      *
      * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
      *
      * @throws Exception
      */
-    public static function validateXML($xml, $schema, $debug = false)
+    public static function validateXML($xml, $schema, $debug = false, $schemaPath = null)
     {
         assert(is_string($xml) || $xml instanceof DOMDocument);
         assert(is_string($schema));
@@ -134,7 +135,13 @@ class Utils
             }
         }
 
-        $schemaFile = __DIR__ . '/schemas/' . $schema;
+        // Get schema file
+        if ($schemaPath) {
+            $schemaFile = $schemaPath . $schema;
+        } else {
+            $schemaFile = __DIR__ . '/schemas/' . $schema;
+        }
+
         $oldEntityLoader = libxml_disable_entity_loader(false);
         $res = $dom->schemaValidate($schemaFile);
         libxml_disable_entity_loader($oldEntityLoader);

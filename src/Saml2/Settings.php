@@ -220,7 +220,21 @@ class Settings
      */
     public function getSchemasPath()
     {
-        return $this->_paths['lib'].'schemas/';
+        if (isset($this->_paths['schemas'])) {
+            return $this->_paths['schemas'];
+        }
+        return $this->_paths['lib'].'Saml2/schemas/';
+    }
+
+    /**
+     * Set schemas path
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function setSchemasPath($path)
+    {
+        $this->_paths['schemas'] = $path;
     }
 
     /**
@@ -898,7 +912,7 @@ class Settings
         assert(is_string($xml));
 
         $errors = array();
-        $res = Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug);
+        $res = Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug, $this->getSchemasPath());
         if (!$res instanceof DOMDocument) {
             $errors[] = $res;
         } else {

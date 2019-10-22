@@ -154,7 +154,12 @@ class LogoutResponse
                 $security = $this->_settings->getSecurityData();
 
                 if ($security['wantXMLValidation']) {
-                    $res = Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    $res = Utils::validateXML(
+                        $this->document,
+                        'saml-schema-protocol-2.0.xsd',
+                        $this->_settings->isDebugActive(),
+                        $this->_settings->getSchemasPath()
+                    );
                     if (!$res instanceof DOMDocument) {
                         throw new ValidationError(
                             "Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd",

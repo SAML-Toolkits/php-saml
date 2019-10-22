@@ -172,7 +172,12 @@ class Response
 
                 if ($security['wantXMLValidation']) {
                     $errorXmlMsg = "Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd";
-                    $res = Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    $res = Utils::validateXML(
+                        $this->document,
+                        'saml-schema-protocol-2.0.xsd',
+                        $this->_settings->isDebugActive(),
+                        $this->_settings->getSchemasPath()
+                    );
                     if (!$res instanceof DOMDocument) {
                         throw new ValidationError(
                             $errorXmlMsg,
@@ -182,7 +187,12 @@ class Response
 
                     // If encrypted, check also the decrypted document
                     if ($this->encrypted) {
-                        $res = Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                        $res = Utils::validateXML(
+                            $this->decryptedDocument,
+                            'saml-schema-protocol-2.0.xsd',
+                            $this->_settings->isDebugActive(),
+                            $this->_settings->getSchemasPath()
+                        );
                         if (!$res instanceof DOMDocument) {
                             throw new ValidationError(
                                 $errorXmlMsg,
