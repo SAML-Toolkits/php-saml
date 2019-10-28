@@ -56,6 +56,7 @@ class IdPMetadataParser
                 throw new Exception(curl_error($ch), curl_errno($ch));
             }
         } catch (Exception $e) {
+            throw new Exception('Error on parseRemoteXML. '.$e->getMessage());
         }
         return $metadataInfo;
     }
@@ -84,6 +85,7 @@ class IdPMetadataParser
                 $metadataInfo = self::parseXML($data, $entityId, $desiredNameIdFormat, $desiredSSOBinding, $desiredSLOBinding);
             }
         } catch (Exception $e) {
+            throw new Exception('Error on parseFileXML. '.$e->getMessage());
         }
         return $metadataInfo;
     }
@@ -156,6 +158,7 @@ class IdPMetadataParser
                 if ($sloNodes->length > 0) {
                     $metadataInfo['idp']['singleLogoutService'] = array(
                         'url' => $sloNodes->item(0)->getAttribute('Location'),
+                        'responseUrl' => $sloNodes->item(0)->getAttribute('ResponseLocation'),
                         'binding' => $sloNodes->item(0)->getAttribute('Binding')
                     );
                 }

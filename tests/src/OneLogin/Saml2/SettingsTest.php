@@ -316,6 +316,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $settingsInfo['idp']['entityID'] = 'entityId';
         $settingsInfo['idp']['singleSignOnService']['url'] = 'invalid_value';
         $settingsInfo['idp']['singleLogoutService']['url'] = 'invalid_value';
+        $settingsInfo['idp']['singleLogoutService']['responseUrl'] = 'invalid_value';
         $settingsInfo['sp']['assertionConsumerService']['url'] = 'invalid_value';
         $settingsInfo['sp']['singleLogoutService']['url'] = 'invalid_value';
         try {
@@ -324,6 +325,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         } catch (Error $e) {
             $this->assertContains('idp_sso_url_invalid', $e->getMessage());
             $this->assertContains('idp_slo_url_invalid', $e->getMessage());
+            $this->assertContains('idp_slo_response_url_invalid', $e->getMessage());
             $this->assertContains('sp_acs_url_invalid', $e->getMessage());
             $this->assertContains('sp_sls_url_invalid', $e->getMessage());
         }
@@ -363,6 +365,17 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
                 'emailAddress' => 'auxiliar@example.com',
             ),
         );
+
+        try {
+            $settings = new Settings($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (Error $e) {
+            $this->assertContains('sp_signMetadata_invalid', $e->getMessage());
+            $this->assertContains('organization_not_enought_data', $e->getMessage());
+            $this->assertContains('contact_type_invalid', $e->getMessage());
+        }
+
+        $settingsInfo['security']['signMetadata'] = ['privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key')];
 
         try {
             $settings = new Settings($settingsInfo);
@@ -565,6 +578,28 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('<ds:Reference', $metadata2);
         $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata2);
 
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.crt');
+        $settingsInfo['security']['signMetadata'] = [
+            'privateKey' => file_get_contents(TEST_ROOT . '/data/customPath/certs/metadata.key'),
+            'x509cert' => $cert,
+        ];
+        $settings3 = new Settings($settingsInfo);
+        $metadata3 = $settings3->getSPMetadata();
+
+        $this->assertNotEmpty($metadata3);
+        $this->assertContains('<md:SPSSODescriptor', $metadata3);
+        $this->assertContains('entityID="http://stuff.com/endpoints/metadata.php"', $metadata3);
+        $this->assertContains('AuthnRequestsSigned="false"', $metadata3);
+        $this->assertContains('WantAssertionsSigned="false"', $metadata3);
+        $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://stuff.com/endpoints/endpoints/acs.php" index="1"/>', $metadata3);
+        $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata3);
+        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata3);
+
+        $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $metadata3);
+        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $metadata3);
+        $this->assertContains('<ds:Reference', $metadata3);
+        $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $metadata3);
+        $this->assertContains(Utils::formatCert($cert, false), $metadata3);
     }
 
     /**
@@ -969,16 +1004,15 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        $settingsInfo['strict'] = false;
 
         $settings = new Settings($settingsInfo);
         $this->assertFalse($settings->isStrict());
 
-        $settings->setStrict(true);
-        $this->assertTrue($settings->isStrict());
-
         $settings->setStrict(false);
         $this->assertFalse($settings->isStrict());
+
+        $settings->setStrict(true);
+        $this->assertTrue($settings->isStrict());
 
         try {
             $settings->setStrict('a');
@@ -1000,7 +1034,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         unset($settingsInfo['strict']);
 
         $settings = new Settings($settingsInfo);
-        $this->assertFalse($settings->isStrict());
+        $this->assertTrue($settings->isStrict());
 
         $settingsInfo['strict'] = false;
         $settings2 = new Settings($settingsInfo);
