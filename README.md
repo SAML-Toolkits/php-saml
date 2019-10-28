@@ -1152,6 +1152,15 @@ In order to avoid replay attacks, you can store the ID of the SAML messages alre
 
 Get the ID of the last processed message/assertion with the `getLastMessageId`/`getLastAssertionId` methods of the Auth object.
 
+### When using Phar ###
+XML is validated using DOMDocument::schemaValidate(). If the php-saml library is included in a phar file, this can lead 
+to some issues, as the schema files cannot be read correctly. To fix this, the schema files must be copied to a location
+outside of the phar file. This new location can be set in the settings:
+
+```php
+$settings = new OneLogin\Saml2\Settings();
+$settings->setSchemasPath('path\outside\phar\file');
+```
 
 ### Main classes and methods ###
 
