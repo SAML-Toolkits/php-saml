@@ -10,6 +10,8 @@ and supported by OneLogin Inc.
 Warning
 -------
 
+Version 3.3.1 updates xmlseclibs to 3.0.4 (CVE-2019-3465), but php-saml was not directly affected since it implements additional checks that prevent to exploit that vulnerability.
+
 Version 3.3.0 sets strict mode active by default
 
 Update php-saml to 3.1.0, this version includes a security patch related to XEE attacks.
