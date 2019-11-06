@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v.3.3.1
+* Update xmlseclibs to 3.0.4
+* Remove Comparison atribute from RequestedAuthnContext when setting has empty value
+
 v.3.3.0
 * Set true as the default value for strict setting
 * Relax comparision of false on SignMetadata
@@ -27,6 +31,16 @@ v.3.1.0
 v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
 * xmlseclibs now is not part of the toolkit and need to be installed from original source
+
+v.2.17.1
+* Update xmlseclibs to 3.0.4
+* Remove Comparison atribute from RequestedAuthnContext when setting has empty value
+
+v.2.17.0
+* Set true as the default value for strict setting
+* Support 'x509cert' and 'privateKey' on signMetadata security settings
+* Relax comparision of false on SignMetadata
+* Fix CI
 
 v.2.16.0
 * Support SLO ResponseLocation
