@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v.2.17.1
+* Update xmlseclibs to 3.0.4
+* Remove Comparison atribute from RequestedAuthnContext when setting has empty value
+
 v.2.17.0
 * Set true as the default value for strict setting
 * Support 'x509cert' and 'privateKey' on signMetadata security settings
