@@ -188,11 +188,15 @@ class LogoutResponse
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
-                        throw new ValidationError(
-                            "The LogoutResponse was received at $currentURL instead of $destination",
-                            ValidationError::WRONG_DESTINATION
-                        );
+                    if (!empty($destination) && strpos($destination, $currentURL) !== 0) {
+                        $currentURLNoRouted = Utils::getSelfURLNoQuery();
+
+                        if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            throw new ValidationError(
+                                "The LogoutResponse was received at $currentURL instead of $destination",
+                                ValidationError::WRONG_DESTINATION
+                            );
+                        }
                     }
                 }
 

@@ -393,11 +393,15 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
-                        throw new ValidationError(
-                            "The LogoutRequest was received at $currentURL instead of $destination",
-                            ValidationError::WRONG_DESTINATION
-                        );
+                    if (!empty($destination) && strpos($destination, $currentURL) !== 0) {
+                        $currentURLNoRouted = Utils::getSelfURLNoQuery();
+
+                        if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            throw new ValidationError(
+                                "The LogoutRequest was received at $currentURL instead of $destination",
+                                ValidationError::WRONG_DESTINATION
+                            );
+                        }
                     }
                 }
 
