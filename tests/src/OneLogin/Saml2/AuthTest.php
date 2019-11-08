@@ -58,6 +58,22 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Tests the getLastRequestIssueInstant method of the OneLogin_Saml2_Auth class
+    *
+    * @covers OneLogin_Saml2_Auth::getLastRequestIssueInstant
+    */
+    public function testGetLastRequestIssueInstant()
+    {
+        $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false, false);
+        $issueInstant1 = $this->_auth->getLastRequestIssueInstant();
+        $this->assertNotNull($issueInstant1);
+
+        $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null, null);
+        $issueInstant2 = $this->_auth->getLastRequestIssueInstant();
+        $this->assertNotNull($issueInstant2);
+    }
+
+    /**
     * Tests the getSSOurl method of the OneLogin_Saml2_Auth class
     *
     * @covers OneLogin_Saml2_Auth::getSSOurl

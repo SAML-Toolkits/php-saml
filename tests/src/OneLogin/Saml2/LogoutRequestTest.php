@@ -893,4 +893,21 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $xml = $logoutRequest->getXML();
         $id1 = OneLogin_Saml2_LogoutRequest::getID($xml.'<garbage>');
     }
+
+    /**
+     * Tests that we can get the IssueInstant attribute
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getIssueInstant()
+     */
+    public function testGetIssueInstant()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings);
+
+        $issueInstant = $logoutRequest->getIssueInstant();
+        $this->assertNotNull($issueInstant);
+    }
 }

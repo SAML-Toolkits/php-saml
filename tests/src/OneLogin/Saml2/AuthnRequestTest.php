@@ -361,4 +361,21 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $xml = $authnRequest->getXML();
         $this->assertRegExp('#^<samlp:AuthnRequest#', $xml);
     }
+
+    /**
+     * Tests that we can get the IssueInstant attribute
+     *
+     * @covers OneLogin_Saml2_AuthnRequest::getIssueInstant()
+     */
+    public function testGetIssueInstant()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest = new OneLogin_Saml2_AuthnRequest($settings);
+
+        $issueInstant = $authnRequest->getIssueInstant();
+        $this->assertNotNull($issueInstant);
+    }
 }

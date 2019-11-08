@@ -96,7 +96,7 @@ class OneLogin_Saml2_Response
      *
      * @return bool Validate the document
      */
-    public function isValid($requestId = null)
+    public function isValid($requestId = null, $requestIssueInstant = null)
     {
         $this->_error = null;
         try {
@@ -176,6 +176,19 @@ class OneLogin_Saml2_Response
                         "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
                         OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
                     );
+                }
+
+                // Check if the IssueInstant of the Response is not earlier than the one of the AuthNRequest if provided (considering a configured clock skew)
+                if (isset($requestIssueInstant)) {
+                    $issueInstant = $this->document->documentElement->getAttribute('IssueInstant');
+                    $issueInstantTime = OneLogin_Saml2_Utils::parseSAML2Time($issueInstant);
+                    $requestIssueInstantTime = OneLogin_Saml2_Utils::parseSAML2Time($requestIssueInstant);
+                    if ($requestIssueInstantTime > $issueInstantTime + $security['clockSkewTolerance']) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The IssueInstant of the Response: $issueInstant is not equal or later than the IssueInstant of the Request: $requestIssueInstant (considering the configured clock skew)",
+                            OneLogin_Saml2_ValidationError::INVALID_ISSUEINSTANT
+                        );
+                    }
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {

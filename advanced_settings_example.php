@@ -81,6 +81,10 @@ $advancedSettings = array (
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
 
+        // The clock skew tolerance (in seconds) for the validation of the
+        // IssueInstant attribute in the received responses.
+        'clockSkewTolerance' => 180,
+
         // If true, SAMLResponses with an empty value at its Destination
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,

@@ -145,6 +145,48 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $this->assertContains('The InResponseTo of the Logout Response:', $response2->getError());
     }
 
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse class
+    * Case invalid IssueInstant
+    *
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
+    */
+    public function testIsInvalidIssueInstant()
+    {
+        $_SERVER['HTTP_HOST'] = 'stuff.com';
+        $_SERVER['HTTPS'] = 'off';
+        $_SERVER['REQUEST_URI'] = '/endpoints/endpoints/sls.php';
+
+        $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64');
+
+        // Not strict, always valid
+        $response = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $this->assertTrue($response->isValid(null, false, '2013-12-10T04:39:31Z'));
+        $this->assertTrue($response->isValid(null, false, '2013-12-10T04:42:31Z'));
+
+        // Strict, valid/invalid with 0 seconds (default) of clock skew tolerance
+        $this->_settings->setStrict(true);
+        $response2 = new OneLogin_Saml2_LogoutResponse($this->_settings, $message);
+        $this->assertTrue($response2->isValid(null, false, '2013-12-10T04:39:30Z'));
+        $this->assertTrue($response2->isValid(null, false, '2013-12-10T04:39:31Z'));
+        $this->assertFalse($response2->isValid(null, false, '2013-12-10T04:39:32Z'));
+        $this->assertContains('The IssueInstant of the Logout Response', $response2->getError());
+
+        // Strict, valid/invalid with 180 seconds of configured clock skew tolerance
+        include TEST_ROOT .'/settings/settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['clockSkewTolerance'] = 180;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $response3 = new OneLogin_Saml2_LogoutResponse($settings, $message);
+        $this->assertTrue($response3->isValid(null, false, '2013-12-10T04:42:31Z'));
+        $this->assertFalse($response3->isValid(null, false, '2013-12-10T04:42:32Z'));
+        $this->assertContains('The IssueInstant of the Logout Response', $response3->getError());
+
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
+    }
+
    /**
     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     * Case invalid Issuer

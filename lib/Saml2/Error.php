@@ -100,6 +100,7 @@ class OneLogin_Saml2_ValidationError extends Exception
     const NOT_SUPPORTED = 46;
     const KEY_ALGORITHM_ERROR = 47;
     const MISSING_ENCRYPTED_ELEMENT = 48;
+    const INVALID_ISSUEINSTANT = 49;
 
 
     /**
