@@ -161,11 +161,15 @@ class OneLogin_Saml2_LogoutResponse
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (!empty($destination) && strpos($destination, $currentURL) === false) {
-                        throw new OneLogin_Saml2_ValidationError(
-                            "The LogoutResponse was received at $currentURL instead of $destination",
-                            OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                        );
+                    if (!empty($destination) && strpos($destination, $currentURL) !== 0) {
+                        $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+
+                        if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            throw new OneLogin_Saml2_ValidationError(
+                                "The LogoutResponse was received at $currentURL instead of $destination",
+                                OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                            );
+                        }
                     }
                 }
 
