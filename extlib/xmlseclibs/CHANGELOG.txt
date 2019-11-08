@@ -1,8 +1,64 @@
 xmlseclibs.php
-??, ??? ????, 2.0.0
-Features:
-- Support for locating specific signature when multiple exist in 
-  document. (griga3k)
+
+06, Nov 2019, 3.0.4
+Security Improvements:
+- Insure only a single SignedInfo element exists within a signature during 
+  verification. Refs CVE-2019-3465.
+Bug Fixes:
+- Fix variable casing.
+
+15, Nov 2018, 3.0.3
+Bug Fixes:
+- Fix casing of class name. (Willem Stuursma-Ruwen)
+- Fix Xpath casing. (Tim van Dijen)
+
+Improvements:
+- Make PCRE2 compliant. (Stefan Winter)
+- Add PHP 7.3 support. (Stefan Winter)
+
+27, Sep 2018, 3.0.2
+Security Improvements:
+- OpenSSL is now a requirement rather than suggestion. (Slaven Bacelic)
+- Filter input to avoid XPath injection. (Jaime Pérez)
+
+Bug Fixes:
+- Fix missing parentheses (Tim van Dijen)
+
+Improvements:
+- Use strict comparison operator to compare digest values. (Jaime Pérez)
+- Remove call to file_get_contents that doesn't even work. (Jaime Pérez)
+- Document potentially dangerous return value behaviour. (Thijs Kinkhorst)
+
+31, Aug 2017, 3.0.1
+Bug Fixes:
+- Fixed missing () in function call. (Dennis Væversted)
+
+Improvements:
+- Add OneLogin to supported software.
+- Add .gitattributes to remove unneeded files. (Filippo Tessarotto)
+- Fix bug in example code. (Dan Church)
+- Travis: add PHP 7.1, move hhvm to allowed failures. (Thijs Kinkhorst)
+- Drop failing extract-win-cert test (Thijs Kinkhorst). (Thijs Kinkhorst)
+- Add comments to warn about return values of verify(). (Thijs Kinkhorst)
+- Fix tests to properly check return code of verify(). (Thijs Kinkhorst)
+- Restore support for PHP >= 5.4. (Jaime Pérez)
+
+25, May 2017, 3.0.0
+Improvements:
+- Remove use of mcrypt (skymeyer)
+
+08, Sep 2016, 2.0.1
+Bug Fixes:
+- Strip whitespace characters when parsing X509Certificate. fixes #84
+  (klemen.bratec)
+- Certificate 'subject' values can be arrays. fixes #80 (Andreas Stangl)
+- HHVM signing node with ID attribute w/out namespace regenerates ID value.
+  fixes #88 (Milos Tomic)
+
+Improvements:
+- Fix typos and add some PHPDoc Blocks. (gfaust-qb)
+- Update lightSAML link. (Milos Tomic)
+- Update copyright dates.
 
 23, Jun 2015, 1.4.0
 Features:
