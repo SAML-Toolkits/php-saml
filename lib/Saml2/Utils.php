@@ -626,7 +626,7 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
-                $route = str_replace($_SERVER['QUERY_STRING'], '', $route);
+                $route = self::str_lreplace($_SERVER['QUERY_STRING'], '', $route);
                 if (substr($route, -1) == '?') {
                     $route = substr($route, 0, -1);
                 }
@@ -639,7 +639,24 @@ class OneLogin_Saml2_Utils
         }
 
         $selfRoutedURLNoQuery = $selfURLhost . $route;
+
+        $pos = strpos($selfRoutedURLNoQuery, "?");
+        if ($pos !== false) {
+            $selfRoutedURLNoQuery = substr($selfRoutedURLNoQuery, 0, $pos-1);
+        }
+
         return $selfRoutedURLNoQuery;
+    }
+
+    public static function str_lreplace($search, $replace, $subject)
+    {
+        $pos = strrpos($subject, $search);
+
+        if ($pos !== false) {
+            $subject = substr_replace($subject, $replace, $pos, strlen($search));
+        }
+
+        return $subject;
     }
 
     /**
