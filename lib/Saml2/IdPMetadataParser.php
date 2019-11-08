@@ -142,9 +142,12 @@ class OneLogin_Saml2_IdPMetadataParser
                 if ($sloNodes->length > 0) {
                     $metadataInfo['idp']['singleLogoutService'] = array(
                         'url' => $sloNodes->item(0)->getAttribute('Location'),
-                        'responseUrl' => $sloNodes->item(0)->getAttribute('ResponseLocation'),
                         'binding' => $sloNodes->item(0)->getAttribute('Binding')
                     );
+
+                    if ($sloNodes->item(0)->hasAttribute('ResponseLocation')) {
+                        $metadataInfo['idp']['singleLogoutService']['responseUrl'] = $sloNodes->item(0)->getAttribute('ResponseLocation');
+                    }
                 }
 
                 $keyDescriptorCertSigningNodes = OneLogin_Saml2_Utils::query($dom, './md:KeyDescriptor[not(contains(@use, "encryption"))]/ds:KeyInfo/ds:X509Data/ds:X509Certificate', $idpDescriptor);

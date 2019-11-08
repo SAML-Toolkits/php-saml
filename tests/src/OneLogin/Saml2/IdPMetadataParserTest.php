@@ -21,7 +21,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                 ),
                 'singleLogoutService' => array (
                     'url' => 'https://example.onelogin.com/trust/saml2/http-redirect/slo/645460',
-                    'responseUrl' => '',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'x509cert' => 'MIIEZTCCA02gAwIBAgIUPyy/A3bZAZ4m28PzEUUoT7RJhxIwDQYJKoZIhvcNAQEFBQAwcjELMAkGA1UEBhMCVVMxKzApBgNVBAoMIk9uZUxvZ2luIFRlc3QgKHNnYXJjaWEtdXMtcHJlcHJvZCkxFTATBgNVBAsMDE9uZUxvZ2luIElkUDEfMB0GA1UEAwwWT25lTG9naW4gQWNjb3VudCA4OTE0NjAeFw0xNjA4MDQyMjI5MzdaFw0yMTA4MDUyMjI5MzdaMHIxCzAJBgNVBAYTAlVTMSswKQYDVQQKDCJPbmVMb2dpbiBUZXN0IChzZ2FyY2lhLXVzLXByZXByb2QpMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgODkxNDYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDN6iqQGcLOCglNO42I2rkzE05UXSiMXT6c8ALThMMiaDw6qqzo3sd/tKK+NcNKWLIIC8TozWVyh5ykUiVZps+08xil7VsTU7E+wKu3kvmOsvw2wlRwtnoKZJwYhnr+RkBa+h1r3ZYUgXm1ZPeHMKj1g18KaWz9+MxYL6BhKqrOzfW/P2xxVRcFH7/pq+ZsDdgNzD2GD+apzY4MZyZj/N6BpBWJ0GlFsmtBegpbX3LBitJuFkk5L4/U/jjF1AJa3boBdCUVfATqO5G03H4XS1GySjBIRQXmlUF52rLjg6xCgWJ30/+t1X+IHLJeixiQ0vxyh6C4/usCEt94cgD1r8ADAgMBAAGjgfIwge8wDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUPW0DcH0G3IwynWgi74co4wZ6n7gwga8GA1UdIwSBpzCBpIAUPW0DcH0G3IwynWgi74co4wZ6n7ihdqR0MHIxCzAJBgNVBAYTAlVTMSswKQYDVQQKDCJPbmVMb2dpbiBUZXN0IChzZ2FyY2lhLXVzLXByZXByb2QpMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgODkxNDaCFD8svwN22QGeJtvD8xFFKE+0SYcSMA4GA1UdDwEB/wQEAwIHgDANBgkqhkiG9w0BAQUFAAOCAQEAQhB4q9jrycwbHrDSoYR1X4LFFzvJ9Us75wQquRHXpdyS9D6HUBXMGI6ahPicXCQrfLgN8vzMIiqZqfySXXv/8/dxe/X4UsWLYKYJHDJmxXD5EmWTa65chjkeP1oJAc8f3CKCpcP2lOBTthbnk2fEVAeLHR4xNdQO0VvGXWO9BliYPpkYqUIBvlm+Fg9mF7AM/Uagq2503XXIE1Lq//HON68P10vNMwLSKOtYLsoTiCnuIKGJqG37MsZVjQ1ZPRcO+LSLkq0i91gFxrOrVCrgztX4JQi5XkvEsYZGIXXjwHqxTVyt3adZWQO0LPxPqRiUqUzyhDhLo/xXNrHCu4VbMw=='
@@ -182,7 +181,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                     ),
                 "singleLogoutService" => array(
                     "url" => "http://idp.example.com/logout",
-                    'responseUrl' => '',
                     "binding" => "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                 )
             )
@@ -300,7 +298,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
             "idp" => array(
                 "singleLogoutService" => array(
                     "url" => "https://idp.examle.com/saml/slo",
-                    'responseUrl' => '',
                     "binding" => "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                 ),
                 "x509certMulti" => array(
@@ -340,7 +337,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
             "idp" => array(
                 "singleLogoutService" => array(
                     "url" => "https://idp.examle.com/saml/slo",
-                    'responseUrl' => '',
                     "binding" => "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                 ),
                 "x509certMulti" => array(
@@ -440,7 +436,6 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
                 ),
                 'singleLogoutService' => array (
                     'url' => 'https://idp.adfs.example.com/adfs/ls/',
-                    'responseUrl' => '',
                     'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 ),
                 'x509certMulti' => array (
