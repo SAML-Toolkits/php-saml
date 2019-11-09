@@ -383,7 +383,7 @@ class Response
                 $encryptedIDNodes = Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
                 if ($encryptedIDNodes->length > 0) {
                     throw new ValidationError(
-                        'Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.',
+                        'SAML Response that contains an encrypted Assertion with encrypted nameId is not supported.',
                         ValidationError::NOT_SUPPORTED
                     );
                 }
