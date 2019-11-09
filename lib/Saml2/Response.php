@@ -354,7 +354,7 @@ class OneLogin_Saml2_Response
                 $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
                 if ($encryptedIDNodes->length > 0) {
                     throw new OneLogin_Saml2_ValidationError(
-                        'Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.',
+                        'SAML Response that contains a an encrypted Assertion with encrypted nameId is not supported.',
                         OneLogin_Saml2_ValidationError::NOT_SUPPORTED
                     );
                 }
@@ -756,7 +756,7 @@ class OneLogin_Saml2_Response
      *
      * @throws OneLogin_Saml2_ValidationError
      */
-    private function _getAttributesByKeyName($keyName="Name")
+    private function _getAttributesByKeyName($keyName = "Name")
     {
         $attributes = array();
 
@@ -1148,7 +1148,7 @@ class OneLogin_Saml2_Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {
