@@ -1548,7 +1548,7 @@ class Utils
                 }
             }
 
-            if ($objKey->verifySignature($signedQuery, base64_decode($_GET['Signature'])) === 1) {
+            if ($objKey->verifySignature($signedQuery, base64_decode($getData['Signature'])) === 1) {
                 $signatureValid = true;
                 break;
             }
