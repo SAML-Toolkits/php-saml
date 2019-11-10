@@ -385,6 +385,11 @@ class OneLogin_Saml2_Settings
             $this->_security['relaxDestinationValidation'] = false;
         }
 
+        // InResponseTo
+        if (!isset($this->_security['rejectUnsolicitedResponsesWithInResponseTo'])) {
+            $this->_security['rejectUnsolicitedResponsesWithInResponseTo'] = false;
+        }
+
         // encrypt expected
         if (!isset($this->_security['wantAssertionsEncrypted'])) {
             $this->_security['wantAssertionsEncrypted'] = false;

@@ -166,16 +166,31 @@ class OneLogin_Saml2_Response
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
                 
+                $responseInResponseTo = null;
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
 
-                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                if (!isset($requestId) && isset($responseInResponseTo) && $security['rejectUnsolicitedResponsesWithInResponseTo']) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        "The Response has an InResponseTo attribute: " . $responseInResponseTo . " while no InResponseTo was expected",
                         OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
                     );
+                }
+
+                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
+                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                    if ($responseInResponseTo == null) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
+                    } else {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
+                    }
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {

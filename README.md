@@ -12,6 +12,8 @@ and supported by OneLogin Inc.
 Warning
 -------
 
+Version 2.18.0 introduces the 'rejectUnsolicitedResponsesWithInResponseTo' setting parameter, by default disabled, that will allow invalidate unsolicited SAMLResponse. This version as well will reject SAMLResponse if requestId was provided to the validator but the SAMLResponse does not contain a InResponseTo attribute.
+
 Version 2.17.1 updates xmlseclibs to 3.0.4 (CVE-2019-3465), but php-saml was not directly affected since it implements additional checks that prevent to exploit that vulnerability.
 
 Version 2.17.0 sets strict mode active by default
@@ -510,6 +512,10 @@ $advancedSettings = array (
         // If true, SAMLResponses with an empty value at its Destination
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
+
+        // If true, SAMLResponses with an InResponseTo value will be rejectd if not
+        // AuthNRequest ID provided to the validation method.
+        'rejectUnsolicitedResponsesWithInResponseTo' => false,
 
         // Algorithm that the toolkit will use on signing process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
