@@ -104,7 +104,11 @@ Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend y
 
 ### Code ###
 
-#### Option 1. Download from github ####
+#### Option 1. clone the repository from  github ####
+
+git clone git@github.com:onelogin/php-saml.git
+
+#### Option 2. Download from github ####
 
 The toolkit is hosted on github. You can download it from:
 
@@ -115,7 +119,10 @@ Copy the core of the library inside the php application. (each application has i
 structure so take your time to locate the PHP SAML toolkit in the best place).
 See the "Guide to add SAML support to my app" to know how.
 
-#### Option 2. Composer ####
+Take in mind that the compressed file only contains the main files.
+If you plan to play with the demos, use the Option 1.
+
+#### Option 3. Composer ####
 
 The toolkit supports [composer](https://getcomposer.org/). You can find the `onelogin/php-saml` package at https://packagist.org/packages/onelogin/php-saml
 
