@@ -2,6 +2,7 @@ CHANGELOG
 =========
 v.2.18.0
 * Support rejecting unsolicited SAMLResponses.
+* Support stric destination matching.
 * Reject SAMLResponse if requestID was provided to the validotr but the InResponseTo attributeof the SAMLResponse is missing
 * Check destination against the getSelfURLNoQuery as well on LogoutRequest and LogoutResponse as we do on Response
 * Improve getSelfRoutedURLNoQuery method
