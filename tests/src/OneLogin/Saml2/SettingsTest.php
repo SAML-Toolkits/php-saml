@@ -95,7 +95,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings();
         $base = $settings->getBasePath();
 
-        $this->assertEquals($base.'lib/', $settings->getLibPath());
+        $this->assertEquals($base.'lib/Saml2/', $settings->getLibPath());
     }
 
     /**
@@ -121,8 +121,22 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings();
         $base = $settings->getBasePath();
 
-        $this->assertEquals($base.'lib/schemas/', $settings->getSchemasPath());
+        $this->assertEquals($base.'lib/Saml2/schemas/', $settings->getSchemasPath());
 
+    }
+
+    /**
+     * Tests getSchemasPath method of the Settings
+     *
+     * @covers OneLogin_Saml2_Settings::setSchemasPath
+     */
+    public function testSetSchemasPath()
+    {
+        $settings = new OneLogin_Saml2_Settings();
+        $base = $settings->getBasePath();
+        $this->assertEquals($base.'lib/Saml2/schemas/', $settings->getSchemasPath());
+        $settings->setSchemasPath('custompath/');
+        $this->assertEquals('custompath/', $settings->getSchemasPath());
     }
 
     /**
