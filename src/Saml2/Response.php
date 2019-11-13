@@ -195,16 +195,31 @@ class Response
 
                 $currentURL = Utils::getSelfRoutedURLNoQuery();
 
+                $responseInResponseTo = null;
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
 
-                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                if (!isset($requestId) && isset($responseInResponseTo) && $security['rejectUnsolicitedResponsesWithInResponseTo']) {
                     throw new ValidationError(
-                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        "The Response has an InResponseTo attribute: " . $responseInResponseTo . " while no InResponseTo was expected",
                         ValidationError::WRONG_INRESPONSETO
                     );
+                }
+
+                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
+                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                    if ($responseInResponseTo == null) {
+                        throw new ValidationError(
+                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            ValidationError::WRONG_INRESPONSETO
+                        );
+                    } else {
+                        throw new ValidationError(
+                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                            ValidationError::WRONG_INRESPONSETO
+                        );
+                    }
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {

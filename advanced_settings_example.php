@@ -85,6 +85,10 @@ $advancedSettings = array(
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
 
+        // If true, SAMLResponses with an InResponseTo value will be rejectd if not
+        // AuthNRequest ID provided to the validation method.
+        'rejectUnsolicitedResponsesWithInResponseTo' => false,
+
         // Algorithm that the toolkit will use on signing process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
         //    'http://www.w3.org/2000/09/xmldsig#dsa-sha1'

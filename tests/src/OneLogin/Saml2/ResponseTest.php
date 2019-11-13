@@ -1309,6 +1309,61 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+    * Tests the isValid method of the Response class
+    * Case Invalid Response, Unexpected InResponseTo
+    *
+    * @covers OneLogin\Saml2\Response::isValid
+    */
+    public function testIsInValidUnexpectedInResponseTo()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64');
+        $plainMessage = base64_decode($xml);
+        $currentURL = Utils::getSelfURLNoQuery();
+        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
+        $message = base64_encode($plainMessage);
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['rejectUnsolicitedResponsesWithInResponseTo'] = true;
+        $settingsInfo['strict'] = true;
+        $settings = new Settings($settingsInfo);
+        $response = new Response($settings, $message);
+        $inResponseTo = "_57bcbf70-7b1f-012e-c821-782bcb13bb38";
+        $response->isValid();
+        $this->assertEquals('The Response has an InResponseTo attribute: '.$inResponseTo.' while no InResponseTo was expected', $response->getError());
+        $response->isValid($inResponseTo);
+        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+    }
+    /**
+    * Tests the isValid method of the Response class
+    * Case Invalid Response, No InResponseTo
+    *
+    * @covers OneLogin\Saml2\Response::isValid
+    */
+    public function testIsInValidNoInResponseTo()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_unpaired_inresponsesto.xml.base64');
+        $plainMessage = base64_decode($xml);
+        $currentURL = Utils::getSelfURLNoQuery();
+        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
+        $message = base64_encode($plainMessage);
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['rejectUnsolicitedResponsesWithInResponseTo'] = true;
+        $settingsInfo['strict'] = true;
+        $settings = new Settings($settingsInfo);
+
+        $response = new Response($settings, $message);
+
+        $inResponseTo = "_57bcbf70-7b1f-012e-c821-782bcb13bb38";
+
+        $response->isValid();
+        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        
+        $response->isValid($inResponseTo);
+        $this->assertEquals('No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
+    }
+
+    /**
      * Tests the isValid method of the Response class
      * Case Invalid Response, Invalid signing issues
      *
