@@ -143,7 +143,7 @@ class OneLogin_Saml2_Response
 
                 if ($security['wantXMLValidation']) {
                     $errorXmlMsg = "Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd";
-                    $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive(), $this->_settings->getSchemasPath());
                     if (!$res instanceof DOMDocument) {
                         throw new OneLogin_Saml2_ValidationError(
                             $errorXmlMsg,
@@ -153,7 +153,7 @@ class OneLogin_Saml2_Response
 
                     # If encrypted, check also the decrypted document
                     if ($this->encrypted) {
-                        $res = OneLogin_Saml2_Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                        $res = OneLogin_Saml2_Utils::validateXML($this->decryptedDocument, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive(), $this->_settings->getSchemasPath());
                         if (!$res instanceof DOMDocument) {
                             throw new OneLogin_Saml2_ValidationError(
                                 $errorXmlMsg,
@@ -166,16 +166,31 @@ class OneLogin_Saml2_Response
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
                 
+                $responseInResponseTo = null;
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                 }
 
-                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && isset($responseInResponseTo) && $requestId != $responseInResponseTo) {
+                if (!isset($requestId) && isset($responseInResponseTo) && $security['rejectUnsolicitedResponsesWithInResponseTo']) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                        "The Response has an InResponseTo attribute: " . $responseInResponseTo . " while no InResponseTo was expected",
                         OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
                     );
+                }
+
+                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
+                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                    if ($responseInResponseTo == null) {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
+                    } else {
+                        throw new OneLogin_Saml2_ValidationError(
+                            "The InResponseTo of the Response: $responseInResponseTo, does not match the ID of the AuthNRequest sent by the SP: $requestId",
+                            OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
+                        );
+                    }
                 }
 
                 if (!$this->encrypted && $security['wantAssertionsEncrypted']) {
@@ -356,7 +371,7 @@ class OneLogin_Saml2_Response
                 $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
                 if ($encryptedIDNodes->length > 0) {
                     throw new OneLogin_Saml2_ValidationError(
-                        'Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.',
+                        'SAML Response that contains a an encrypted Assertion with encrypted nameId is not supported.',
                         OneLogin_Saml2_ValidationError::NOT_SUPPORTED
                     );
                 }
@@ -758,7 +773,7 @@ class OneLogin_Saml2_Response
      *
      * @throws OneLogin_Saml2_ValidationError
      */
-    private function _getAttributesByKeyName($keyName="Name")
+    private function _getAttributesByKeyName($keyName = "Name")
     {
         $attributes = array();
 
@@ -1150,7 +1165,7 @@ class OneLogin_Saml2_Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {

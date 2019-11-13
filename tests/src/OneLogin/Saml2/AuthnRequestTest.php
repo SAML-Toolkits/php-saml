@@ -94,6 +94,14 @@ class OneLogin_Saml2_AuthnRequestTest extends PHPUnit_Framework_TestCase
         $decoded5 = base64_decode($encodedRequest5);
         $request5 = gzinflate($decoded5);
         $this->assertContains('<samlp:RequestedAuthnContext Comparison="minimum">', $request5);
+
+        $settingsInfo['security']['requestedAuthnContextComparison'] = '';
+        $settings6 = new OneLogin_Saml2_Settings($settingsInfo);
+        $authnRequest6 = new OneLogin_Saml2_AuthnRequest($settings6);
+        $encodedRequest6 = $authnRequest6->getRequest();
+        $decoded6 = base64_decode($encodedRequest6);
+        $request6 = gzinflate($decoded6);
+        $this->assertContains('<samlp:RequestedAuthnContext >', $request6);
     }
 
     /**

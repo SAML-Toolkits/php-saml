@@ -111,15 +111,20 @@ ISPASSIVE;
                 $authnComparison = $security['requestedAuthnContextComparison'];
             }
 
+            $authnComparisonAttr = '';
+            if (!empty($authnComparison)) {
+                $authnComparisonAttr = sprintf('Comparison="%s"', $authnComparison);
+            }
+
             if ($security['requestedAuthnContext'] === true) {
                 $requestedAuthnStr = <<<REQUESTEDAUTHN
 
-    <samlp:RequestedAuthnContext Comparison="$authnComparison">
+    <samlp:RequestedAuthnContext $authnComparisonAttr>
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
 REQUESTEDAUTHN;
             } else {
-                $requestedAuthnStr .= "    <samlp:RequestedAuthnContext Comparison=\"$authnComparison\">\n";
+                $requestedAuthnStr .= "    <samlp:RequestedAuthnContext $authnComparisonAttr>\n";
                 foreach ($security['requestedAuthnContext'] as $contextValue) {
                     $requestedAuthnStr .= "        <saml:AuthnContextClassRef>".$contextValue."</saml:AuthnContextClassRef>\n";
                 }
