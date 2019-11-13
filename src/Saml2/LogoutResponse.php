@@ -65,10 +65,9 @@ class LogoutResponse
      *
      * @param Settings $settings Settings.
      * @param string|null             $response An UUEncoded SAML Logout response from the IdP.
-     * 
+     *
      * @throws Error
      * @throws Exception
-     * 
      */
     public function __construct(\OneLogin\Saml2\Settings $settings, $response = null)
     {
@@ -140,7 +139,7 @@ class LogoutResponse
      * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool Returns if the SAML LogoutResponse is or not valid
-     * 
+     *
      * @throws ValidationError
      */
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
@@ -154,7 +153,7 @@ class LogoutResponse
                 $security = $this->_settings->getSecurityData();
 
                 if ($security['wantXMLValidation']) {
-                    $res = Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    $res = Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive(), $this->_settings->getSchemasPath());
                     if (!$res instanceof DOMDocument) {
                         throw new ValidationError(
                             "Invalid SAML Logout Response. Not match the saml-schema-protocol-2.0.xsd",
