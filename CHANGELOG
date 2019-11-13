@@ -1,7 +1,8 @@
 CHANGELOG
 =========
 v.3.4.0
-* Support rejecting unsolicited SAMLResponses. 
+* Support rejecting unsolicited SAMLResponses.
+* Support stric destination matching.
 * Reject SAMLResponse if requestID was provided to the validotr but the InResponseTo attributeof the SAMLResponse is missing
 * Check destination against the getSelfURLNoQuery as well on LogoutRequest and LogoutResponse as we do on Response
 * Improve getSelfRoutedURLNoQuery method
@@ -40,6 +41,16 @@ v.3.1.0
 v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
 * xmlseclibs now is not part of the toolkit and need to be installed from original source
+
+v.2.18.0
+* Support rejecting unsolicited SAMLResponses.
+* Support stric destination matching.
+* Reject SAMLResponse if requestID was provided to the validotr but the InResponseTo attributeof the SAMLResponse is missing
+* Check destination against the getSelfURLNoQuery as well on LogoutRequest and LogoutResponse as we do on Response
+* Improve getSelfRoutedURLNoQuery method
+* Only add responseUrl to the settings if ResponseLocation present in the IdPMetadataParser
+* Remove use of $_GET on static method validateBinarySign
+* Fix error message when Assertion and NameId are both encrypted (not supported)
 
 v.2.17.1
 * Update xmlseclibs to 3.0.4

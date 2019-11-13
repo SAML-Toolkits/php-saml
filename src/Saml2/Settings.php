@@ -378,6 +378,11 @@ class Settings
             $this->_security['relaxDestinationValidation'] = false;
         }
 
+        // Strict Destination match validation
+        if (!isset($this->_security['destinationStrictlyMatches'])) {
+            $this->_security['destinationStrictlyMatches'] = false;
+        }
+
         // InResponseTo
         if (!isset($this->_security['rejectUnsolicitedResponsesWithInResponseTo'])) {
             $this->_security['rejectUnsolicitedResponsesWithInResponseTo'] = false;

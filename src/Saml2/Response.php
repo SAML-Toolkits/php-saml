@@ -278,10 +278,11 @@ class Response
                             );
                         }
                     } else {
-                        if (strpos($destination, $currentURL) !== 0) {
+                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
+                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
                             $currentURLNoRouted = Utils::getSelfURLNoQuery();
-
-                            if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
+                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
                                 throw new ValidationError(
                                     "The response was received at $currentURL instead of $destination",
                                     ValidationError::WRONG_DESTINATION
@@ -463,7 +464,7 @@ class Response
 
     /**
      * @return string|null the ID of the assertion in the Response
-     * 
+     *
      * @throws ValidationError
      */
     public function getAssertionId()

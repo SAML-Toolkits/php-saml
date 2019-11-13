@@ -85,6 +85,12 @@ $advancedSettings = array(
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
 
+        // If true, Destination URL should strictly match to the address to
+        // which the response has been sent.
+        // Notice that if 'relaxDestinationValidation' is true an empty Destintation
+        // will be accepted.
+        'destinationStrictlyMatches' => false,
+
         // If true, SAMLResponses with an InResponseTo value will be rejectd if not
         // AuthNRequest ID provided to the validation method.
         'rejectUnsolicitedResponsesWithInResponseTo' => false,

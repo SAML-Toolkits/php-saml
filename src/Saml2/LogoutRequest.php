@@ -104,7 +104,7 @@ class LogoutRequest
                 $nameIdFormat = Constants::NAMEID_ENTITY;
             }
 
-            /* From saml-core-2.0-os 8.3.6, when the entity Format is used: 
+            /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
             if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_ENTITY) {
@@ -278,7 +278,7 @@ LOGOUTREQUEST;
      * @param string|null        $key     The SP key
      *
      * @return string Name ID Value
-     * 
+     *
      * @throws Error
      * @throws Exception
      * @throws ValidationError
@@ -295,7 +295,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return string|null $issuer The Issuer
-     * 
+     *
      * @throws Exception
      */
     public static function getIssuer($request)
@@ -324,7 +324,7 @@ LOGOUTREQUEST;
      * @param string|DOMDocument $request Logout Request Message
      *
      * @return array The SessionIndex value
-     * 
+     *
      * @throws Exception
      */
     public static function getSessionIndexes($request)
@@ -350,7 +350,7 @@ LOGOUTREQUEST;
      * @param bool $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *
      * @return bool If the Logout Request is or not valid
-     * 
+     *
      * @throws Exception
      * @throws ValidationError
      */
@@ -393,14 +393,24 @@ LOGOUTREQUEST;
                 // Check destination
                 if ($dom->documentElement->hasAttribute('Destination')) {
                     $destination = $dom->documentElement->getAttribute('Destination');
-                    if (!empty($destination) && strpos($destination, $currentURL) !== 0) {
-                        $currentURLNoRouted = Utils::getSelfURLNoQuery();
-
-                        if (strpos($destination, $currentURLNoRouted) !== 0) {
+                    if (empty($destination)) {
+                        if (!$security['relaxDestinationValidation']) {
                             throw new ValidationError(
-                                "The LogoutRequest was received at $currentURL instead of $destination",
-                                ValidationError::WRONG_DESTINATION
+                                "The LogoutRequest has an empty Destination value",
+                                ValidationError::EMPTY_DESTINATION
                             );
+                        }
+                    } else {
+                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
+                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
+                            $currentURLNoRouted = Utils::getSelfURLNoQuery();
+                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
+                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
+                                throw new ValidationError(
+                                    "The LogoutRequest was received at $currentURL instead of $destination",
+                                    ValidationError::WRONG_DESTINATION
+                                );
+                            }
                         }
                     }
                 }
