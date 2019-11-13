@@ -249,10 +249,12 @@ class OneLogin_Saml2_Response
                             );
                         }
                     } else {
-                        if (strpos($destination, $currentURL) !== 0) {
+                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
+                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
                             $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
 
-                            if (strpos($destination, $currentURLNoRouted) !== 0) {
+                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
                                 throw new OneLogin_Saml2_ValidationError(
                                     "The response was received at $currentURL instead of $destination",
                                     OneLogin_Saml2_ValidationError::WRONG_DESTINATION

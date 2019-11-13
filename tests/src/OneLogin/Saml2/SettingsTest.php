@@ -933,6 +933,8 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('requestedAuthnContext', $security);
         $this->assertArrayHasKey('wantXMLValidation', $security);
         $this->assertArrayHasKey('wantNameId', $security);
+        $this->assertArrayHasKey('relaxDestinationValidation', $security);
+        $this->assertArrayHasKey('destinationStrictlyMatches', $security);
     }
 
     /**
