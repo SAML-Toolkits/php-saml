@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+v.2.18.0
+* Support rejecting unsolicited SAMLResponses.
+* Reject SAMLResponse if requestID was provided to the validotr but the InResponseTo attributeof the SAMLResponse is missing
+* Check destination against the getSelfURLNoQuery as well on LogoutRequest and LogoutResponse as we do on Response
+* Improve getSelfRoutedURLNoQuery method
+* Only add responseUrl to the settings if ResponseLocation present in the IdPMetadataParser
+* Remove use of $_GET on static method validateBinarySign
+* Fix error message when Assertion and NameId are both encrypted (not supported)
+
 v.2.17.1
 * Update xmlseclibs to 3.0.4
 * Remove Comparison atribute from RequestedAuthnContext when setting has empty value
