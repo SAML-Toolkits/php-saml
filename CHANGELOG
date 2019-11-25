@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v.2.18.1
+* Add setSchemasPath to Auth class and fix backward compatibility
+
 v.2.18.0
 * Support rejecting unsolicited SAMLResponses.
 * Support stric destination matching.
