@@ -229,7 +229,7 @@ class OneLogin_Saml2_Settings
         if (isset($this->_paths['schemas'])) {
             return $this->_paths['schemas'];
         }
-        return $this->_paths['lib'].'schemas/';
+        return __DIR__ . '/schemas/';
     }
 
     /**
