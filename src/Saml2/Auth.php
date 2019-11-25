@@ -207,6 +207,17 @@ class Auth
     }
 
     /**
+     * Set schemas path
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function setSchemasPath($path)
+    {
+        $this->_paths['schemas'] = $path;
+    }
+
+    /**
      * Process the SAML Response sent by the IdP.
      *
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
