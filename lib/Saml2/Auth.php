@@ -524,6 +524,23 @@ class OneLogin_Saml2_Auth
             $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
+
+        /** Allow assertion to have embedded signature, depending on IDP settings */
+        if (isset($security['authnRequestsEmbeddedSigned']) && $security['authnRequestsEmbeddedSigned']) {
+            $key = $this->_settings->getSPkey();
+            $cert = $this->_settings->getSPcert();
+
+            $security = $this->_settings->getSecurityData();
+            $signatureAlgorithm = $security['signatureAlgorithm'];
+            $digestAlgorithm = $security['digestAlgorithm']; 
+
+            $authNRequestXML = $authnRequest->getXML();
+            $signedAuthNRequestXML = OneLogin_Saml2_Utils::addSign($authNRequestXML, $key, $cert, $signatureAlgorithm, $digestAlgorithm);
+            $encodedAuthNRequest = base64_encode(gzdeflate($signedAuthNRequestXML));
+            
+            $samlRequest = $encodedAuthNRequest;
+            $parameters['SAMLRequest'] = $samlRequest;
+        }
         return $this->redirectTo($this->getSSOurl(), $parameters, $stay);
     }
 
