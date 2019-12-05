@@ -966,11 +966,12 @@ class OneLogin_Saml2_Utils
      */
     public static function deleteLocalSession()
     {
-        session_unset();
 
         if (OneLogin_Saml2_Utils::isSessionStarted()) {
             session_destroy();
         }
+
+        unset($_SESSION);
     }
 
     /**
