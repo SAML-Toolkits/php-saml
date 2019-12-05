@@ -370,10 +370,10 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     public function testisHTTPS()
     {
         $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
-        
+
         $_SERVER['HTTPS'] = 'on';
         $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
-    
+
         unset($_SERVER['HTTPS']);
         $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
         $_SERVER['HTTP_HOST'] = 'example.com:443';
@@ -482,7 +482,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
         $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
         $expectedUrl2 = 'http://anothersp.example.com:81/example2/route.php?x=test';
-        
+
         $this->assertEquals('http', OneLogin_Saml2_Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', OneLogin_Saml2_Utils::getSelfHost());
         $this->assertEquals('81', OneLogin_Saml2_Utils::getSelfPort());
@@ -957,7 +957,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $this->assertTrue($_SESSION['samltest']);
 
             OneLogin_Saml2_Utils::deleteLocalSession();
-            $this->assertFalse(isset($_SESSION));
+            $this->assertEmpty($_SESSION);
             $this->assertFalse(isset($_SESSION['samltest']));
 
             $prev = error_reporting(0);
@@ -966,7 +966,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
             $_SESSION['samltest'] = true;
             OneLogin_Saml2_Utils::deleteLocalSession();
-            $this->assertFalse(isset($_SESSION));
+            $this->assertEmpty($_SESSION);
             $this->assertFalse(isset($_SESSION['samltest']));
         }
     }
