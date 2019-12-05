@@ -971,7 +971,7 @@ class OneLogin_Saml2_Utils
             session_destroy();
         }
 
-        unset($_SESSION);
+        $_SESSION = [];
     }
 
     /**
