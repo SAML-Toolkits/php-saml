@@ -968,10 +968,9 @@ class OneLogin_Saml2_Utils
     {
 
         if (OneLogin_Saml2_Utils::isSessionStarted()) {
+            session_unset();
             session_destroy();
         }
-
-        $_SESSION = [];
     }
 
     /**
