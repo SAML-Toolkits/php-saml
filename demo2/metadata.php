@@ -6,8 +6,6 @@
  * or expose it on a URL so your IdP can check it periodically.
  */
 
-error_reporting(E_ALL);
-
 require_once '../_toolkit_loader.php';
 
 header('Content-Type: text/xml');

@@ -325,6 +325,36 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
+    * Case: Using x509certMulti
+    *
+    * @covers OneLogin_Saml2_LogoutResponse::isValid
+    */
+    public function testIsValidSignUsingX509certMulti()
+    {
+        $_GET = array (
+            'SAMLResponse' => 'fZHbasJAEIZfJey9ZrNZc1gSodRSBKtQxYveyGQz1kCyu2Q24OM3jS21UHo3p++f4Z+CoGud2th3O/hXJGcNYXDtWkNqapVs6I2yQA0pAx2S8lrtH142Ssy5cr31VtuW3SH/E0CEvW+sYcF6VbLTIktFLMWZgxQR8DSP85wDB4GJGMOqShYVaoBUsOCIPY1kyUahEScacG3Ig/FjiUdyxuOZ4IcoUVGq4vSNBSsk3xjwE3Xx3qkwJD+cz3NtuxBN7WxjPN1F1NLcXdwob77tONiS7bZPm93zenvCqopxgVJmuU50jREsZF4noKWAOuNZJbNznnBky+LTDDVd2S+/dje1m+MVOtfidEER3g8Vt2fsPfiBfmePtsbgCO2A/9tL07TaD1ojEQuXtw0/ouFfD19+AA==',
+            'RelayState' => 'http://stuff.com/endpoints/endpoints/index.php',
+            'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+            'Signature' => 'OV9c4R0COSjN69fAKCpV7Uj/yx6/KFxvbluVCzdK3UuortpNMpgHFF2wYNlMSG9GcYGk6p3I8nB7Z+1TQchMWZOlO/StjAqgtZhtpiwPcWryNuq8vm/6hnJ3zMDhHTS7F8KG4qkCXmJ9sQD3Y31UNcuygBwIbNakvhDT5Qo9Nsw='
+        );
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings6.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $encodedResponse = $_GET['SAMLResponse'];
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $settings->setBaseURL("http://stuff.com/endpoints/endpoints/");
+        $_SERVER['REQUEST_URI'] = "/endpoints/endpoints/sls.php";
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $_GET['SAMLResponse']);
+        $valid = $logoutResponse->isValid();
+        unset($_SERVER['REQUEST_URI']);
+        OneLogin_Saml2_Utils::setBaseURL(null);
+        $this->assertTrue($valid);
+    }
+
+    /**
+    * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     *
     * @covers OneLogin_Saml2_LogoutResponse::isValid
     */
@@ -407,7 +437,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         //Test that we can choose not to compress the request payload.
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        
+
         //Compression is currently turned on in settings.
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
@@ -418,7 +448,7 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         //Test that we can choose not to compress the request payload.
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
-        
+
         //Compression is currently turned on in settings.
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, $message);
@@ -426,5 +456,67 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $decoded = base64_decode($payload);
         $decompressed = gzinflate($decoded);
         $this->assertRegExp('#^<samlp:LogoutResponse#', $decompressed);
+    }
+
+    /**
+     * Tests that we can get the request XML directly without
+     * going through intermediate steps
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::getXML()
+     */
+    public function testGetXML()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings);
+        $logoutResponse->build('jhgvsadja');
+        $xml = $logoutResponse->getXML();
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml);
+
+        $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
+        $xml2 = $processedLogoutResponse->getXML();
+        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml2);
+    }
+
+    /**
+     * Tests that we can get the ID of the LogoutResponse
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     */
+    public function testGetID()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings);
+        $logoutResponse->build('jhgvsadja');
+
+        $xml = $logoutResponse->getXML();
+        $id1 = $logoutResponse->getID();
+        $this->assertNotNull($id1);
+
+        $processedLogoutResponse = new OneLogin_Saml2_LogoutResponse($settings, base64_encode($xml));
+        $id2 = $processedLogoutResponse->getID();
+        $this->assertEquals($id1, $id2);
+    }
+
+    /**
+     * Tests that the LogoutRequest throws an exception
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getID()
+     *
+     * @expectedException OneLogin_Saml2_Error
+     * @expectedExceptionMessage LogoutResponse could not be processed
+     */
+    public function testGetIDException()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, '<garbage>');
     }
 }
