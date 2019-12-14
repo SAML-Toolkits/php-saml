@@ -1,8 +1,8 @@
 {
-    "name": "onelogin/php-saml",
+    "name": "grovolearning/php-saml",
     "description": "OneLogin PHP SAML Toolkit",
-    "license": "MIT",
-    "homepage": "https://developers.onelogin.com/saml/php",
+    "license": "Proprietary",
+    "homepage": "https://github.com/GrovoLearning/php-saml",
     "keywords": ["saml", "saml2", "onelogin"],
     "minimum-stability": "stable",
     "autoload": {
