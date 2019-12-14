@@ -11,5 +11,4 @@
 /certs/metadata.crt
 /tests/build
 /vendor
-/composer.lock
 /.idea
