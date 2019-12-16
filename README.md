@@ -1326,7 +1326,7 @@ Main class of OneLogin PHP Toolkit
  * `getNameId` - Returns the nameID
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
  * `getSSOurl` - Gets the SSO url.
@@ -1364,7 +1364,7 @@ SAML 2 Authentication Response class
  * `getNameId` - Gets the NameID provided by the SAML response from the IdP.
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionNotOnOrAfter` - Gets the SessionNotOnOrAfter from the
    AuthnStatement
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
