@@ -330,17 +330,11 @@ class Utils
 		printf('<html lang="en">
 			<head><title>samlPost</title></head>
 			<body>
-				<form name="samlPost" action="%s" method="post" enctype="application/x-www-form-urlencoded">
-					%s
-				</form>
-				<script>
-					document.samlPost.submit();
-				</script>
+				<form name="samlPost" action="%s" method="post" enctype="application/x-www-form-urlencoded">%s</form>
+				<script>document.samlPost.submit();</script>
 			</body>
-		</html>',
-			$url,
-			$inputs
-		);
+		</html>', $url, $inputs);
+
 		exit;
 	}
 
