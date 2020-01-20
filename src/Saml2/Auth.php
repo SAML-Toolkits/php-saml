@@ -559,6 +559,11 @@ class Auth
             $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
+
+	    if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
+		    return Utils::post($this->getSSOurl(), $parameters, $stay);
+	    }
+
         return $this->redirectTo($this->getSSOurl(), $parameters, $stay);
     }
 
@@ -628,6 +633,17 @@ class Auth
         $idpData = $this->_settings->getIdPData();
         return $idpData['singleSignOnService']['url'];
     }
+
+	/**
+	 * Gets the SSO binding.
+	 *
+	 * @return string The binding of the Single Sign On Service
+	 */
+	public function getSSOBinding()
+	{
+		$idpData = $this->_settings->getIdPData();
+		return $idpData['singleSignOnService']['binding'];
+	}
 
     /**
      * Gets the SLO url.
