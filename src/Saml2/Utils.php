@@ -335,7 +335,6 @@ class Utils
 			</body>
 		</html>', $url, $inputs);
 
-		exit;
 	}
 
     /**

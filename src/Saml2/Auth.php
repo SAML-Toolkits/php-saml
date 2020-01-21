@@ -565,7 +565,8 @@ class Auth
         }
 
 	    if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
-		    return Utils::post($this->getSSOurl(), $parameters, $stay);
+		    Utils::post($this->getSSOurl(), $parameters);
+		    exit;
 	    }
 
         return $this->redirectTo($this->getSSOurl(), $parameters, $stay);
