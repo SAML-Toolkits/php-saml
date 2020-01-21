@@ -544,7 +544,11 @@ class Auth
         $this->_lastRequest = $authnRequest->getXML();
         $this->_lastRequestID = $authnRequest->getId();
 
-        $samlRequest = $authnRequest->getRequest();
+        $deflate = null;
+        if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
+            $deflate = false;
+        }
+        $samlRequest = $authnRequest->getRequest($deflate);
         $parameters['SAMLRequest'] = $samlRequest;
 
         if (!empty($returnTo)) {
