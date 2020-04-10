@@ -788,20 +788,16 @@ class OneLogin_Saml2_Response
             }
 
             $attributeKeyName = $attributeKeyNode->nodeValue;
-
-            if (in_array($attributeKeyName, array_keys($attributes))) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated ".$keyName,
-                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
-                );
-            }
-
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
                 if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
+            }
+
+            if (in_array($attributeKeyName, array_keys($attributes))) {
+                $attributeValues = array_merge($attributes[$attributeKeyName], $attributeValues);
             }
 
             $attributes[$attributeKeyName] = $attributeValues;
