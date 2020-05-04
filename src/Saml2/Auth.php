@@ -558,10 +558,24 @@ class Auth
         }
 
         $security = $this->_settings->getSecurityData();
-        if (isset($security['authnRequestsSigned']) && $security['authnRequestsSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
-            $parameters['SigAlg'] = $security['signatureAlgorithm'];
-            $parameters['Signature'] = $signature;
+		if ($this->authnRequestsSigned()) {
+			switch ($this->getSSOBinding()) {
+				case Constants::BINDING_HTTP_REDIRECT:
+					$signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'],
+					$security['signatureAlgorithm']);
+					$parameters['SigAlg'] = $security['signatureAlgorithm'];
+					$parameters['Signature'] = $signature;
+					break;
+
+				case Constants::BINDING_HTTP_POST:
+					$parameters['SAMLRequest'] = $this->buildEmbeddedSignature($authnRequest->getXML(), $security['signatureAlgorithm']);
+					break;
+
+				default:
+					throw new Error(sprintf('Signing of AuthnRequests is unsupported for this binding (%s)', $this->getSSOBinding()), Error::UNSUPPORTED_SETTINGS_OBJECT);
+					break;
+
+			}
         }
 
 	    if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
@@ -571,6 +585,14 @@ class Auth
 
         return $this->redirectTo($this->getSSOurl(), $parameters, $stay);
     }
+
+	/**
+	 * @return bool
+	 */
+	protected function authnRequestsSigned() {
+		$security = $this->_settings->getSecurityData();
+		return isset($security['authnRequestsSigned']) && $security['authnRequestsSigned'];
+	}
 
     /**
      * Initiates the SLO process.
@@ -785,6 +807,28 @@ class Auth
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
+
+	/**
+	 * @param string $samlMessage
+	 * @param string $signAlgorithm
+	 * @param bool $encode - Whether to base64 encode the signed message
+	 * @return string The signed message
+	 * @throws Error
+	 */
+	private function buildEmbeddedSignature($samlMessage, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $encode = true) {
+		$key = $this->_settings->getSPkey();
+		if (empty($key)) {
+			throw new Error("Trying to embed signature in the SAML Request but can't load the SP private key", Error::PRIVATE_KEY_NOT_FOUND);
+		}
+
+		$signedSamlMessage = Utils::addSign($samlMessage, $key, $this->_settings->getSPcert(), $signAlgorithm);
+
+		if ($encode) {
+			return base64_encode($signedSamlMessage);
+		}
+
+		return $signedSamlMessage;
+	}
 
     /**
      * @return string The ID of the last message processed
