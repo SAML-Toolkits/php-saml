@@ -86,7 +86,7 @@ $settings = array(
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  Onelogin Toolkit supports for this endpoint the
-            // HTTP-Redirect binding only
+            // HTTP-Redirect and HTTP-POST bindings
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
         // SLO endpoint info of the IdP.
