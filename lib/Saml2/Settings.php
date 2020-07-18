@@ -564,7 +564,7 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'idp_slo_response_url_invalid';
             }
 
-            if (isset($settings['security']) && !empty(array_filter($array["security"]))) {
+            if (isset($settings['security']) && !empty(array_filter($settings["security"]))) {
                 $security = $settings['security'];
 
                 $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
