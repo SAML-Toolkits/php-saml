@@ -1328,13 +1328,17 @@ class Utils
      * @param string             $cert            The public
      * @param string             $signAlgorithm   Signature algorithm method
      * @param string             $digestAlgorithm Digest algorithm method
+     * @param array|null         $options       options for xmlseclibs
      *
      * @return string
      *
      * @throws Exception
      */
-    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $digestAlgorithm = XMLSecurityDSig::SHA256)
+    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1, $options = null)
     {
+        if (is_null($options)) {
+            $options =  array('id_name' => 'ID');
+        }
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
         } else {
@@ -1360,7 +1364,7 @@ class Utils
             array($rootNode),
             $digestAlgorithm,
             array('http://www.w3.org/2000/09/xmldsig#enveloped-signature', XMLSecurityDSig::EXC_C14N),
-            array('id_name' => 'ID')
+            $options
         );
 
         $objXMLSecDSig->sign($objKey);
