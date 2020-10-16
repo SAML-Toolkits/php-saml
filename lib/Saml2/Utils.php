@@ -1391,7 +1391,7 @@ class OneLogin_Saml2_Utils
      * Validates a signature (Message or Assertion).
      *
      * @param string|DomNode $xml            The element we should validate
-     * @param string|null    $cert           The pubic cert
+     * @param string|null    $cert           The public cert
      * @param string|null    $fingerprint    The fingerprint of the public cert
      * @param string|null    $fingerprintalg The algorithm used to get the fingerprint
      * @param string|null    $xpath          The xpath of the signed element
