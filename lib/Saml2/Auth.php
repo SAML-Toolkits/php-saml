@@ -509,7 +509,12 @@ class OneLogin_Saml2_Auth
         $this->_lastRequest = $authnRequest->getXML();
         $this->_lastRequestID = $authnRequest->getId();
 
-        $samlRequest = $authnRequest->getRequest();
+        $deflate = null;
+        if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
+            $deflate = false;
+        }
+        $samlRequest = $authnRequest->getRequest($deflate);
+
         $parameters['SAMLRequest'] = $samlRequest;
 
         if (!empty($returnTo)) {
@@ -520,9 +525,27 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['authnRequestsSigned']) && $security['authnRequestsSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
-            $parameters['SigAlg'] = $security['signatureAlgorithm'];
-            $parameters['Signature'] = $signature;
+
+            switch ($this->getSSOBinding()) {
+                case OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT:
+                    $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
+                    $parameters['SigAlg'] = $security['signatureAlgorithm'];
+                    $parameters['Signature'] = $signature;
+                    break;
+
+                case OneLogin_Saml2_Constants::BINDING_HTTP_POST:
+                    $parameters['SAMLRequest'] = $this->buildEmbeddedSignature($authnRequest->getXML(), $security['signatureAlgorithm']);
+                    break;
+
+                default:
+                    throw new OneLogin_Saml2_Error(sprintf('Signing of AuthnRequests is unsupported for this binding (%s)', $this->getSSOBinding()), OneLogin_Saml2_Error::UNSUPPORTED_SETTINGS_OBJECT);
+
+            }
+        }
+
+        if ($this->getSSOBinding() === OneLogin_Saml2_Constants::BINDING_HTTP_POST) {
+            OneLogin_Saml2_Utils::post($this->getSSOurl(), $parameters);
+            exit;
         }
         return $this->redirectTo($this->getSSOurl(), $parameters, $stay);
     }
@@ -594,6 +617,17 @@ class OneLogin_Saml2_Auth
     {
         $idpData = $this->_settings->getIdPData();
         return $idpData['singleSignOnService']['url'];
+    }
+
+    /**
+     * Gets the SSO binding.
+     *
+     * @return string The binding of the Single Sign On Service
+     */
+    public function getSSOBinding()
+    {
+        $idpData = $this->_settings->getIdPData();
+        return $idpData['singleSignOnService']['binding'];
     }
 
     /**
@@ -711,6 +745,29 @@ class OneLogin_Saml2_Auth
         }
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
+    }
+
+    /**
+     * @param string $samlMessage
+     * @param string $signAlgorithm
+     * @param bool $encode - Whether to base64 encode the signed message
+     * @return string The signed message
+     * @throws OneLogin_Saml2_Error
+     */
+    private function buildEmbeddedSignature($samlMessage, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $encode = true)
+    {
+        $key = $this->_settings->getSPkey();
+        if (empty($key)) {
+            throw new OneLogin_Saml2_Error("Trying to embed signature in the SAML Request but can't load the SP private key", OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND);
+        }
+
+        $signedSamlMessage = OneLogin_Saml2_Utils::addSign($samlMessage, $key, $this->_settings->getSPcert(), $signAlgorithm);
+
+        if ($encode) {
+            return base64_encode($signedSamlMessage);
+        }
+
+        return $signedSamlMessage;
     }
 
     /**
