@@ -510,7 +510,7 @@ class OneLogin_Saml2_Auth
         $this->_lastRequestID = $authnRequest->getId();
 
         $deflate = null;
-        if ($this->getSSOBinding() === Constants::BINDING_HTTP_POST) {
+        if ($this->getSSOBinding() === OneLogin_Saml2_Constants::BINDING_HTTP_POST) {
             $deflate = false;
         }
         $samlRequest = $authnRequest->getRequest($deflate);
@@ -538,8 +538,11 @@ class OneLogin_Saml2_Auth
                     break;
 
                 default:
-                    throw new OneLogin_Saml2_Error(sprintf('Signing of AuthnRequests is unsupported for this binding (%s)', $this->getSSOBinding()), OneLogin_Saml2_Error::UNSUPPORTED_SETTINGS_OBJECT);
-
+                    throw new OneLogin_Saml2_Error(sprintf(
+                        'Signing of AuthnRequests is unsupported for this binding (%s)',
+                        $this->getSSOBinding()),
+                        OneLogin_Saml2_Error::UNSUPPORTED_SETTINGS_OBJECT
+                    );
             }
         }
 
@@ -627,7 +630,11 @@ class OneLogin_Saml2_Auth
     public function getSSOBinding()
     {
         $idpData = $this->_settings->getIdPData();
-        return $idpData['singleSignOnService']['binding'];
+        if (isset($idpData['singleSignOnService']['binding'])) {
+            return $idpData['singleSignOnService']['binding'];
+        }
+
+        return OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT;
     }
 
     /**
@@ -754,14 +761,22 @@ class OneLogin_Saml2_Auth
      * @return string The signed message
      * @throws OneLogin_Saml2_Error
      */
-    private function buildEmbeddedSignature($samlMessage, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $encode = true)
+    private function buildEmbeddedSignature(string $samlMessage, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $encode = true)
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
-            throw new OneLogin_Saml2_Error("Trying to embed signature in the SAML Request but can't load the SP private key", OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND);
+            throw new OneLogin_Saml2_Error(
+                "Trying to embed signature in the SAML Request but can't load the SP private key",
+                OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
+            );
         }
 
-        $signedSamlMessage = OneLogin_Saml2_Utils::addSign($samlMessage, $key, $this->_settings->getSPcert(), $signAlgorithm);
+        $signedSamlMessage = OneLogin_Saml2_Utils::addSign(
+            $samlMessage,
+            $key,
+            $this->_settings->getSPcert(),
+            $signAlgorithm
+        );
 
         if ($encode) {
             return base64_encode($signedSamlMessage);

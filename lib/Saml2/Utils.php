@@ -293,6 +293,58 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * Executes a post to the provided url.
+     *
+     * @param string $url        The target url
+     * @param array  $parameters Extra parameters to be passed as part of the url
+     *
+     * @throws OneLogin_Saml2_Error
+     */
+    public static function post(string $url, array $parameters = [])
+    {
+        assert(is_string($url));
+
+        if (strpos($url, '/') === 0) {
+            $url = self::getSelfURLhost() . $url;
+        }
+
+        /**
+         * Verify that the URL matches the regex for the protocol.
+         * By default this will check for http and https
+         */
+        $wrongProtocol = !preg_match(self::$_protocolRegex, $url);
+        $url = filter_var($url, FILTER_VALIDATE_URL);
+        if ($wrongProtocol || empty($url)) {
+            throw new OneLogin_Saml2_Error(
+                'Post to invalid URL: ' . $url,
+                OneLogin_Saml2_Error::REDIRECT_INVALID_URL
+            );
+        }
+
+        $inputs = '';
+        foreach ($parameters as $name => $value) {
+            if ($value === null) {
+                $inputs .= sprintf('<input type="hidden" name="%s" value="">', $name);
+            } else if (is_array($value)) {
+                foreach ($value as $val) {
+                    $inputs .= sprintf('<input type="hidden" name="%s[]" value="%s">', $name, $val);
+                }
+            } else {
+                $inputs .= sprintf('<input type="hidden" name="%s" value="%s">', $name, $value);
+            }
+        }
+
+        printf('<html lang="en">
+			<head><title>samlPost</title></head>
+			<body>
+				<form name="samlPost" action="%s" method="post" enctype="application/x-www-form-urlencoded">%s</form>
+				<script>document.samlPost.submit();</script>
+			</body>
+		</html>', $url, $inputs);
+
+    }
+
+    /**
      * Executes a redirection to the provided url (or return the target url).
      *
      * @param string       $url        The target url
