@@ -399,6 +399,10 @@ class OneLogin_Saml2_Settings
             $this->_security['relaxDestinationValidation'] = false;
         }
 
+        // Allow duplicated Attribute Names
+        if (!isset($this->_security['allowRepeatAttributeName'])) {
+            $this->_security['allowRepeatAttributeName'] = false;
+        }
 
         // Strict Destination match validation
         if (!isset($this->_security['destinationStrictlyMatches'])) {

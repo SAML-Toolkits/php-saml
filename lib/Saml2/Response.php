@@ -779,6 +779,9 @@ class OneLogin_Saml2_Response
 
         $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
 
+        $security = $this->_settings->getSecurityData();
+        $allowRepeatAttributeName = $security['allowRepeatAttributeName'];
+
         /** @var $entry DOMNode */
         foreach ($entries as $entry) {
             $attributeKeyNode = $entry->attributes->getNamedItem($keyName);
@@ -790,10 +793,12 @@ class OneLogin_Saml2_Response
             $attributeKeyName = $attributeKeyNode->nodeValue;
 
             if (in_array($attributeKeyName, array_keys($attributes))) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Found an Attribute element with duplicated ".$keyName,
-                    OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
-                );
+                if (!$allowRepeatAttributeName) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "Found an Attribute element with duplicated ".$keyName,
+                        OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
+                    );
+                }
             }
 
             $attributeValues = array();
@@ -804,7 +809,11 @@ class OneLogin_Saml2_Response
                 }
             }
 
-            $attributes[$attributeKeyName] = $attributeValues;
+            if (in_array($attributeKeyName, array_keys($attributes))) {
+                $attributes[$attributeKeyName] = array_merge($attributes[$attributeKeyName], $attributeValues);
+            } else {
+                $attributes[$attributeKeyName] = $attributeValues;
+            }
         }
         return $attributes;
     }

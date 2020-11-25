@@ -622,6 +622,14 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         } catch (OneLogin_Saml2_ValidationError $e) {
             $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
         }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['allowRepeatAttributeName'] = true;
+        $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
+        $response5 = new OneLogin_Saml2_Response($settings2, $xml4);
+        $attrs = $response5->getAttributes();
+        $this->assertEquals([0 => "test", 1 => "test2"], $attrs['uid']);
     }
 
     /**

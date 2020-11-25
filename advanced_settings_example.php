@@ -85,6 +85,10 @@ $advancedSettings = array (
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
 
+        // If true, the toolkit will not raised an error when the Statement Element
+        // contain atribute elements with name duplicated
+        'allowRepeatAttributeName' => false,
+
         // If true, Destination URL should strictly match to the address to
         // which the response has been sent.
         // Notice that if 'relaxDestinationValidation' is true an empty Destintation
