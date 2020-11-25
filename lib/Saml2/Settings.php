@@ -159,7 +159,7 @@ class OneLogin_Saml2_Settings
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',
-            'lib' => $basePath.'lib/Saml2/',
+            'lib' => __DIR__ . '/',
             'extlib' => $basePath.'extlib/'
         );
 
