@@ -164,7 +164,7 @@ class Settings
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',
-            'lib' => $basePath.'src/Saml2/'
+            'lib' => __DIR__ . '/',
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
