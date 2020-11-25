@@ -397,6 +397,11 @@ class Settings
             $this->_security['destinationStrictlyMatches'] = false;
         }
 
+        // Allow duplicated Attribute Names
+        if (!isset($this->_security['allowRepeatAttributeName'])) {
+            $this->_security['allowRepeatAttributeName'] = false;
+        }
+
         // InResponseTo
         if (!isset($this->_security['rejectUnsolicitedResponsesWithInResponseTo'])) {
             $this->_security['rejectUnsolicitedResponsesWithInResponseTo'] = false;

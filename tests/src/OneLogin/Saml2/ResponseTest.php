@@ -631,6 +631,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         } catch (ValidationError $e) {
             $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
         }
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['allowRepeatAttributeName'] = true;
+        $settings2 = new Settings($settingsInfo);
+        $response5 = new Response($settings2, $xml4);
+        $attrs = $response5->getAttributes();
+        $this->assertEquals([0 => "test", 1 => "test2"], $attrs['uid']);
     }
 
     /**

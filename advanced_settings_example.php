@@ -91,6 +91,10 @@ $advancedSettings = array(
         // will be accepted.
         'destinationStrictlyMatches' => false,
 
+        // If true, the toolkit will not raised an error when the Statement Element
+        // contain atribute elements with name duplicated
+        'allowRepeatAttributeName' => false,
+
         // If true, SAMLResponses with an InResponseTo value will be rejectd if not
         // AuthNRequest ID provided to the validation method.
         'rejectUnsolicitedResponsesWithInResponseTo' => false,
