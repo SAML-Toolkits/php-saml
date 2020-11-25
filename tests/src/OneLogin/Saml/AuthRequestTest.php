@@ -15,6 +15,8 @@ class OneLogin_Saml_AuthRequestTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml_Settings;
         $settings->idpSingleSignOnUrl = 'http://stuff.com';
         $settings->spReturnUrl = 'http://sp.stuff.com';
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+        $settings->idpPublicCertificate = $cert;
         $this->_settings = $settings;
     }
 

@@ -53,6 +53,8 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settingsObj = new OneLogin_Saml_Settings;
         $settingsObj->idpSingleSignOnUrl = 'http://stuff.com';
         $settingsObj->spReturnUrl = 'http://sp.stuff.com';
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+        $settingsObj->idpPublicCertificate = $cert;
 
         $settings = new OneLogin_Saml2_Settings($settingsObj);
 

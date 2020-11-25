@@ -564,19 +564,19 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'idp_slo_response_url_invalid';
             }
 
-            if (isset($settings['security'])) {
-                $security = $settings['security'];
+            $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
+            $existsMultiX509Sign = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['signing']) && !empty($idp['x509certMulti']['signing']);
+            $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
 
-                $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
-                $existsMultiX509Sign = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['signing']) && !empty($idp['x509certMulti']['signing']);
+            if (!($existsX509 || $existsFingerprint || $existsMultiX509Sign)
+            ) {
+                $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
+            }
+
+            if (isset($settings['security'])) {
                 $existsMultiX509Enc = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['encryption']) && !empty($idp['x509certMulti']['encryption']);
 
-                $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
-                if (!($existsX509 || $existsFingerprint || $existsMultiX509Sign)
-                ) {
-                    $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
-                }
-                if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
+                if ((isset($settings['security']['nameIdEncrypted']) && $settings['security']['nameIdEncrypted'] == true)
                     && !($existsX509 || $existsMultiX509Enc)
                 ) {
                     $errors[] = 'idp_cert_not_found_and_required';
