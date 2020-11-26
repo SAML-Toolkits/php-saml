@@ -39,7 +39,6 @@ class OneLogin_Saml2_AuthnRequest
         $this->_settings = $settings;
 
         $spData = $this->_settings->getSPData();
-        $idpData = $this->_settings->getIdPData();
         $security = $this->_settings->getSecurityData();
 
         $id = OneLogin_Saml2_Utils::generateUniqueID();
@@ -134,6 +133,7 @@ REQUESTEDAUTHN;
 
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
         $acsUrl = htmlspecialchars($spData['assertionConsumerService']['url'], ENT_QUOTES);
+        $destination = $this->_settings->getIdPSSOUrl();
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -142,7 +142,7 @@ REQUESTEDAUTHN;
     Version="2.0"
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
-    Destination="{$idpData['singleSignOnService']['url']}"
+    Destination="{$destination}"
     ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
     AssertionConsumerServiceURL="{$acsUrl}">
     <saml:Issuer>{$spEntityId}</saml:Issuer>{$subjectStr}{$nameIdPolicyStr}{$requestedAuthnStr}
