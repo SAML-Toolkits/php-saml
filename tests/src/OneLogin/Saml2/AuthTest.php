@@ -95,7 +95,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the getSLOResponseUrl method of the Auth class
      *
-     * @covers OneLogin\Saml2\Auth::getSLOurl
+     * @covers OneLogin\Saml2\Auth::getSLOResponseUrl
      */
     public function testGetSLOResponseUrl()
     {

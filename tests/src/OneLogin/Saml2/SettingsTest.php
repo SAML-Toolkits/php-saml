@@ -404,6 +404,66 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+    * Tests the getIdPSSOurl method of the Settings class
+    *
+    * @covers OneLogin\Saml2\Settings::getIdPSSOurl
+    */
+    public function testGetIdPSSOurl()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+
+        $ssoUrl = "http://idp.example.com/SSOService.php";
+        $this->assertEquals($settings->getIdPSSOUrl(), $ssoUrl);
+    }
+
+    /**
+    * Tests the getIdPSLOurl method of the Settings class
+    *
+    * @covers OneLogin\Saml2\Settings::getIdPSLOurl
+    */
+    public function testGetIdPSLOurl()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+
+        $sloUrl = "http://idp.example.com/SingleLogoutService.php";
+        $this->assertEquals($settings->getIdPSLOUrl(), $sloUrl);
+
+        include $settingsDir.'settings2.php';
+        $settings2 = new Settings($settingsInfo);
+
+        $sloUrl = "http://idp.example.com/SingleLogoutService.php";
+        $this->assertEquals($settings2->getIdPSLOUrl(), $sloUrl);
+    }
+
+    /**
+     * Tests the getIdPSLOResponseUrl method of the Settings class
+     *
+     * @covers OneLogin\Saml2\Settings::getIdPSLOResponseUrl
+     */
+    public function testGetIdPSLOResponseUrl()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+
+        $sloUrl = "http://idp.example.com/SingleLogoutServiceResponse.php";
+        $this->assertEquals($settings->getIdPSLOResponseUrl(), $sloUrl);
+
+        include $settingsDir.'settings2.php';
+        $settings2 = new Settings($settingsInfo);
+
+        $sloUrl = "http://idp.example.com/SingleLogoutService.php";
+        $this->assertEquals($settings2->getIdPSLOUrl(), $sloUrl);
+    }
+
+    /**
      * Tests the getSPMetadata method of the Settings
      * Case unsigned metadata
      *
