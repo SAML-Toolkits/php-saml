@@ -472,7 +472,7 @@ $advancedSettings = array(
         // Set to false and no AuthContext will be sent in the AuthNRequest.
         // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
         // Set an array with the possible auth context values: array('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
-        'requestedAuthnContext' => true,
+        'requestedAuthnContext' => false,
 
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
@@ -1206,7 +1206,7 @@ Main class of OneLogin PHP Toolkit
  * `getNameId` - Returns the nameID
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
  * `getSSOurl` - Gets the SSO url.
@@ -1244,7 +1244,7 @@ SAML 2 Authentication Response class
  * `getNameId` - Gets the NameID provided by the SAML response from the IdP.
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionNotOnOrAfter` - Gets the SessionNotOnOrAfter from the
    AuthnStatement
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.

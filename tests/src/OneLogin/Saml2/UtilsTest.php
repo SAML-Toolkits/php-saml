@@ -370,10 +370,10 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     public function testisHTTPS()
     {
         $this->assertFalse(Utils::isHTTPS());
-        
+
         $_SERVER['HTTPS'] = 'on';
         $this->assertTrue(Utils::isHTTPS());
-    
+
         unset($_SERVER['HTTPS']);
         $this->assertFalse(Utils::isHTTPS());
         $_SERVER['HTTP_HOST'] = 'example.com:443';
@@ -497,7 +497,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
         $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
         $expectedUrl2 = 'http://anothersp.example.com:81/example2/route.php?x=test';
-        
+
         $this->assertEquals('http', Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', Utils::getSelfHost());
         $this->assertEquals('81', Utils::getSelfPort());
@@ -933,7 +933,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertTrue($_SESSION['samltest']);
 
             Utils::deleteLocalSession();
-            $this->assertFalse(isset($_SESSION));
+            $this->assertEmpty($_SESSION);
             $this->assertFalse(isset($_SESSION['samltest']));
 
             $prev = error_reporting(0);
@@ -942,7 +942,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
             $_SESSION['samltest'] = true;
             Utils::deleteLocalSession();
-            $this->assertFalse(isset($_SESSION));
+            $this->assertEmpty($_SESSION);
             $this->assertFalse(isset($_SESSION['samltest']));
         }
     }

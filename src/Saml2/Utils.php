@@ -964,12 +964,12 @@ class Utils
      */
     public static function deleteLocalSession()
     {
-
         if (Utils::isSessionStarted()) {
+            session_unset();
             session_destroy();
+        } else {
+            $_SESSION = array();
         }
-
-        unset($_SESSION);
     }
 
     /**
@@ -1390,7 +1390,7 @@ class Utils
      * Validates a signature (Message or Assertion).
      *
      * @param string|\DomNode   $xml            The element we should validate
-     * @param string|null       $cert           The pubic cert
+     * @param string|null       $cert           The public cert
      * @param string|null       $fingerprint    The fingerprint of the public cert
      * @param string|null       $fingerprintalg The algorithm used to get the fingerprint
      * @param string|null       $xpath          The xpath of the signed element
