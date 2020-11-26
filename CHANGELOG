@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v.2.19.0
+* [#412](https://github.com/onelogin/php-saml/pull/412) Empty instead of unset the $_SESSION variable
+* [#433](https://github.com/onelogin/php-saml/issues/443) Fix Incorrect Destination in LogoutResponse when using responseUrl #443
+* Add support for SMARTCARD_PKI and RSA_TOKEN Auth Contexts
+* Support Statements with Attribute elements with the same name enabling the allowRepeatAttributeName setting
+* Get lib path dinamically
+* Check for x509Cert of the IdP when loading settings, even if the security index was not provided
+
 v.2.18.1
 * Add setSchemasPath to Auth class and fix backward compatibility
 
