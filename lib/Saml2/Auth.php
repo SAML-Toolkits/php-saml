@@ -586,43 +586,33 @@ class OneLogin_Saml2_Auth
     }
 
     /**
-     * Gets the SSO url.
+     * Gets the IdP SSO url.
      *
-     * @return string The url of the Single Sign On Service
+     * @return string The url of the IdP Single Sign On Service
      */
     public function getSSOurl()
     {
-        $idpData = $this->_settings->getIdPData();
-        return $idpData['singleSignOnService']['url'];
+        return $this->_settings->getIdPSSOUrl();
     }
 
     /**
-     * Gets the SLO url.
+     * Gets the IdP SLO url.
      *
-     * @return string|null The url of the Single Logout Service
+     * @return string|null The url of the IdP Single Logout Service
      */
     public function getSLOurl()
     {
-        $url = null;
-        $idpData = $this->_settings->getIdPData();
-        if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['url'])) {
-            $url = $idpData['singleLogoutService']['url'];
-        }
-        return $url;
+        return $this->_settings->getIdPSLOUrl();
     }
 
     /**
-     * Gets the SLO response url.
+     * Gets the IdP SLO response url.
      *
-     * @return string|null The response url of the Single Logout Service
+     * @return string|null The response url of the IdP Single Logout Service
      */
     public function getSLOResponseUrl()
     {
-        $idpData = $this->_settings->getIdPData();
-        if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['responseUrl'])) {
-            return $idpData['singleLogoutService']['responseUrl'];
-        }
-        return $this->getSLOurl();
+        return $this->_settings->getIdPSLOResponseUrl();
     }
 
     /**

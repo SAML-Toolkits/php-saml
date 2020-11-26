@@ -82,7 +82,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     /**
      * Tests the getSLOResponseUrl method of the OneLogin_Saml2_Auth class
      *
-     * @covers OneLogin_Saml2_Auth::getSLOurl
+     * @covers OneLogin_Saml2_Auth::getSLOResponseUrl
      */
     public function testGetSLOResponseUrl()
     {

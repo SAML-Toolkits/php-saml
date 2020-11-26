@@ -839,6 +839,47 @@ class OneLogin_Saml2_Settings
     }
 
     /**
+     * Gets the IdP SSO url.
+     *
+     * @return string|null The url of the IdP Single Sign On Service
+     */
+    public function getIdPSSOUrl()
+    {
+        $ssoUrl = null;
+        if (isset($this->_idp['singleSignOnService']) && isset($this->_idp['singleSignOnService']['url'])) {
+            $ssoUrl = $this->_idp['singleSignOnService']['url'];
+        }
+        return $ssoUrl;
+    }
+
+    /**
+     * Gets the IdP SLO url.
+     *
+     * @return string|null The request url of the IdP Single Logout Service
+     */
+    public function getIdPSLOUrl()
+    {
+        $sloUrl = null;
+        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['url'])) {
+            $sloUrl = $this->_idp['singleLogoutService']['url'];
+        }
+        return $sloUrl;
+    }
+
+    /**
+     * Gets the IdP SLO response url.
+     *
+     * @return string|null The response url of the IdP Single Logout Service
+     */
+    public function getIdPSLOResponseUrl()
+    {
+        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['responseUrl'])) {
+            return $this->_idp['singleLogoutService']['responseUrl'];
+        }
+        return $this->getIdPSLOUrl();
+    }
+
+    /**
      * Gets the SP metadata. The XML representation.
      *
      * @param bool $alwaysPublishEncryptionCert When 'true', the returned metadata
