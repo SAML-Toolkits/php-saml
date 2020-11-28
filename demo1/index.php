@@ -31,6 +31,8 @@ if (isset($_GET['sso'])) {
     $nameId = null;
     $sessionIndex = null;
     $nameIdFormat = null;
+    $samlNameIdNameQualifier = null;
+    $samlNameIdSPNameQualifier = null;
 
     if (isset($_SESSION['samlNameId'])) {
         $nameId = $_SESSION['samlNameId'];
