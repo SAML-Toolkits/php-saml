@@ -16,11 +16,11 @@
     },
     "require": {
         "php": ">=5.4 <8.0",
-        "robrichards/xmlseclibs": ">=3.1.1"
+        "robrichards/xmlseclibs": ">=3.1.1",
+        "phpunit/phpunit": "<7.5.18"
     },
     "require-dev": {
         "php-coveralls/php-coveralls": "^1.0.2 || ^2.0",
-        "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5 || ^7.1",
         "sebastian/phpcpd": "^2.0 || ^3.0 || ^4.0",
         "phploc/phploc": "^2.1 || ^3.0 || ^4.0",
         "pdepend/pdepend": "^2.5.0",
