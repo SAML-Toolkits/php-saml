@@ -15,7 +15,7 @@
         "source": "https://github.com/onelogin/php-saml/"
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "robrichards/xmlseclibs": ">=3.1.1",
         "phpunit/phpunit": "7.5.17 || ^9.5"
     },
