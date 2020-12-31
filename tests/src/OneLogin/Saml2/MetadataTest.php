@@ -37,21 +37,21 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEmpty($metadata);
 
-        $this->assertContains('<md:SPSSODescriptor', $metadata);
-        $this->assertContains('entityID="http://stuff.com/endpoints/metadata.php"', $metadata);
-        $this->assertContains('AuthnRequestsSigned="false"', $metadata);
-        $this->assertContains('WantAssertionsSigned="false"', $metadata);
+        $this->assertStringContainsString('<md:SPSSODescriptor', $metadata);
+        $this->assertStringContainsString('entityID="http://stuff.com/endpoints/metadata.php"', $metadata);
+        $this->assertStringContainsString('AuthnRequestsSigned="false"', $metadata);
+        $this->assertStringContainsString('WantAssertionsSigned="false"', $metadata);
 
-        $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"', $metadata);
-        $this->assertContains('Location="http://stuff.com/endpoints/endpoints/acs.php"', $metadata);
-        $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata);
-        $this->assertContains('Location="http://stuff.com/endpoints/endpoints/sls.php"', $metadata);
+        $this->assertStringContainsString('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"', $metadata);
+        $this->assertStringContainsString('Location="http://stuff.com/endpoints/endpoints/acs.php"', $metadata);
+        $this->assertStringContainsString('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata);
+        $this->assertStringContainsString('Location="http://stuff.com/endpoints/endpoints/sls.php"', $metadata);
 
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
+        $this->assertStringContainsString('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $metadata);
 
-        $this->assertContains('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', $metadata);
-        $this->assertContains('<md:ContactPerson contactType="technical">', $metadata);
-        $this->assertContains('<md:GivenName>technical_name</md:GivenName>', $metadata);
+        $this->assertStringContainsString('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', $metadata);
+        $this->assertStringContainsString('<md:ContactPerson contactType="technical">', $metadata);
+        $this->assertStringContainsString('<md:GivenName>technical_name</md:GivenName>', $metadata);
 
         $security['authnRequestsSigned'] = true;
         $security['wantAssertionsSigned'] = true;
@@ -61,11 +61,11 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEmpty($metadata2);
 
-        $this->assertContains('AuthnRequestsSigned="true"', $metadata2);
-        $this->assertContains('WantAssertionsSigned="true"', $metadata2);
+        $this->assertStringContainsString('AuthnRequestsSigned="true"', $metadata2);
+        $this->assertStringContainsString('WantAssertionsSigned="true"', $metadata2);
 
-        $this->assertNotContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata2);
-        $this->assertNotContains(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata2);
+        $this->assertStringNotContainsString('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata2);
+        $this->assertStringNotContainsString(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata2);
     }
 
     /**
@@ -85,10 +85,10 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $metadata = Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned'], null, null, $contacts, $organization);
 
-        $this->assertContains('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
-        $this->assertContains('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
-        $this->assertContains('<md:RequestedAttribute Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
-        $this->assertContains('<md:RequestedAttribute Name="LastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
+        $this->assertStringContainsString('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
+        $this->assertStringContainsString('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
+        $this->assertStringContainsString('<md:RequestedAttribute Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
+        $this->assertStringContainsString('<md:RequestedAttribute Name="LastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />', $metadata);
 
         $result = Utils::validateXML($metadata, 'saml-schema-metadata-2.0.xsd');
         $this->assertInstanceOf('DOMDocument', $result);
@@ -111,11 +111,11 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $metadata = Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned'], null, null, $contacts, $organization);
 
-        $this->assertContains('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
-        $this->assertContains('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
-        $this->assertContains('<md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="uid" isRequired="true" />', $metadata);
-        $this->assertContains('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">userType</saml:AttributeValue>', $metadata);
-        $this->assertContains('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">admin</saml:AttributeValue>', $metadata);
+        $this->assertStringContainsString('<md:ServiceName xml:lang="en">Service Name</md:ServiceName>', $metadata);
+        $this->assertStringContainsString('<md:ServiceDescription xml:lang="en">Service Description</md:ServiceDescription>', $metadata);
+        $this->assertStringContainsString('<md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="uid" isRequired="true" />', $metadata);
+        $this->assertStringContainsString('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">userType</saml:AttributeValue>', $metadata);
+        $this->assertStringContainsString('<saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">admin</saml:AttributeValue>', $metadata);
 
         $result = Utils::validateXML($metadata, 'saml-schema-metadata-2.0.xsd');
         $this->assertInstanceOf('DOMDocument', $result);
@@ -145,28 +145,28 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $signedMetadata = Metadata::signMetadata($metadata, $key, $cert);
 
-        $this->assertContains('<md:SPSSODescriptor', $signedMetadata);
-        $this->assertContains('entityID="http://stuff.com/endpoints/metadata.php"', $signedMetadata);
-        $this->assertContains('AuthnRequestsSigned="false"', $signedMetadata);
-        $this->assertContains('WantAssertionsSigned="false"', $signedMetadata);
+        $this->assertStringContainsString('<md:SPSSODescriptor', $signedMetadata);
+        $this->assertStringContainsString('entityID="http://stuff.com/endpoints/metadata.php"', $signedMetadata);
+        $this->assertStringContainsString('AuthnRequestsSigned="false"', $signedMetadata);
+        $this->assertStringContainsString('WantAssertionsSigned="false"', $signedMetadata);
 
-        $this->assertContains('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"', $signedMetadata);
-        $this->assertContains('Location="http://stuff.com/endpoints/endpoints/acs.php"', $signedMetadata);
-        $this->assertContains('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $signedMetadata);
-        $this->assertContains(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $signedMetadata);
+        $this->assertStringContainsString('<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"', $signedMetadata);
+        $this->assertStringContainsString('Location="http://stuff.com/endpoints/endpoints/acs.php"', $signedMetadata);
+        $this->assertStringContainsString('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $signedMetadata);
+        $this->assertStringContainsString(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $signedMetadata);
 
-        $this->assertContains('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $signedMetadata);
+        $this->assertStringContainsString('<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>', $signedMetadata);
 
-        $this->assertContains('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $signedMetadata);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
-        $this->assertContains('<ds:Reference', $signedMetadata);
-        $this->assertContains('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $signedMetadata);
+        $this->assertStringContainsString('<ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:Reference', $signedMetadata);
+        $this->assertStringContainsString('<ds:KeyInfo><ds:X509Data><ds:X509Certificate>', $signedMetadata);
 
         try {
             $signedMetadata2 = Metadata::signMetadata('', $key, $cert);
             $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertContains('Empty string supplied as input', $e->getMessage());
+        } catch (\Error $e) {
+            $this->assertStringContainsString('Argument #1 ($source) must not be empty', $e->getMessage());
         }
     }
 
@@ -192,8 +192,8 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $signedMetadata = Metadata::signMetadata($metadata, $key, $cert);
 
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', $signedMetadata);
     }
 
     /**
@@ -218,8 +218,8 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $signedMetadata = Metadata::signMetadata($metadata, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
 
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $signedMetadata);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $signedMetadata);
     }
 
     /**
@@ -237,32 +237,32 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $metadata = Metadata::builder($spData);
 
-        $this->assertNotContains('<md:KeyDescriptor use="signing"', $metadata);
-        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadata);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="signing"', $metadata);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="encryption"', $metadata);
 
         $certPath = $settings->getCertPath();
         $cert = file_get_contents($certPath.'sp.crt');
 
         $metadataWithDescriptors = Metadata::addX509KeyDescriptors($metadata, $cert);
 
-        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
-        $this->assertContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+        $this->assertStringContainsString('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertStringContainsString('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
 
         $metadataWithDescriptors = Metadata::addX509KeyDescriptors($metadata, $cert, false);
 
-        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
-        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+        $this->assertStringContainsString('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
 
         $metadataWithDescriptors = Metadata::addX509KeyDescriptors($metadata, $cert, 'foobar');
 
-        $this->assertContains('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
-        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
+        $this->assertStringContainsString('<md:KeyDescriptor use="signing"', $metadataWithDescriptors);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="encryption"', $metadataWithDescriptors);
 
         try {
             $signedMetadata2 = Metadata::addX509KeyDescriptors('', $cert);
             $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertContains('Error parsing metadata', $e->getMessage());
+        } catch (\Error $e) {
+            $this->assertStringContainsString('Argument #1 ($source) must not be empty', $e->getMessage());
         }
 
         libxml_use_internal_errors(true);
@@ -271,7 +271,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
             $metadataWithDescriptors = Metadata::addX509KeyDescriptors($unparsedMetadata, $cert);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Error parsing metadata', $e->getMessage());
+            $this->assertStringContainsString('Error parsing metadata', $e->getMessage());
         }
     }
 
@@ -291,8 +291,8 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $metadata = Metadata::builder($spData);
 
-        $this->assertNotContains('<md:KeyDescriptor use="signing"', $metadata);
-        $this->assertNotContains('<md:KeyDescriptor use="encryption"', $metadata);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="signing"', $metadata);
+        $this->assertStringNotContainsString('<md:KeyDescriptor use="encryption"', $metadata);
 
         $certPath = $settings->getCertPath();
         $cert = file_get_contents($certPath.'sp.crt');

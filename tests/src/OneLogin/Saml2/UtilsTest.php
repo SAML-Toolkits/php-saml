@@ -154,40 +154,40 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
 
         $cert = $settingsInfo['idp']['x509cert'];
-        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $cert);
-        $this->assertNotContains('-----END CERTIFICATE-----', $cert);
+        $this->assertStringNotContainsString('-----BEGIN CERTIFICATE-----', $cert);
+        $this->assertStringNotContainsString('-----END CERTIFICATE-----', $cert);
         $this->assertEquals(strlen($cert), 860);
 
         $formatedCert1 = Utils::formatCert($cert);
-        $this->assertContains('-----BEGIN CERTIFICATE-----', $formatedCert1);
-        $this->assertContains('-----END CERTIFICATE-----', $formatedCert1);
+        $this->assertStringContainsString('-----BEGIN CERTIFICATE-----', $formatedCert1);
+        $this->assertStringContainsString('-----END CERTIFICATE-----', $formatedCert1);
 
         $formatedCert2 = Utils::formatCert($cert, true);
         $this->assertEquals($formatedCert1, $formatedCert2);
 
 
         $formatedCert3 = Utils::formatCert($cert, false);
-        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $formatedCert3);
-        $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert3);
+        $this->assertStringNotContainsString('-----BEGIN CERTIFICATE-----', $formatedCert3);
+        $this->assertStringNotContainsString('-----END CERTIFICATE-----', $formatedCert3);
         $this->assertEquals(strlen($cert), 860);
 
 
         $cert2 = $settingsInfo['sp']['x509cert'];
-        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $cert);
-        $this->assertNotContains('-----END CERTIFICATE-----', $cert);
+        $this->assertStringNotContainsString('-----BEGIN CERTIFICATE-----', $cert);
+        $this->assertStringNotContainsString('-----END CERTIFICATE-----', $cert);
         $this->assertEquals(strlen($cert), 860);
 
         $formatedCert4 = Utils::formatCert($cert);
-        $this->assertContains('-----BEGIN CERTIFICATE-----', $formatedCert4);
-        $this->assertContains('-----END CERTIFICATE-----', $formatedCert4);
+        $this->assertStringContainsString('-----BEGIN CERTIFICATE-----', $formatedCert4);
+        $this->assertStringContainsString('-----END CERTIFICATE-----', $formatedCert4);
 
         $formatedCert5 = Utils::formatCert($cert, true);
         $this->assertEquals($formatedCert4, $formatedCert5);
 
 
         $formatedCert6 = Utils::formatCert($cert, false);
-        $this->assertNotContains('-----BEGIN CERTIFICATE-----', $formatedCert6);
-        $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert6);
+        $this->assertStringNotContainsString('-----BEGIN CERTIFICATE-----', $formatedCert6);
+        $this->assertStringNotContainsString('-----END CERTIFICATE-----', $formatedCert6);
         $this->assertEquals(strlen($cert2), 860);
 
     }
@@ -206,13 +206,13 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         $key = $settingsInfo['sp']['privateKey'];
 
-        $this->assertNotContains('-----BEGIN RSA PRIVATE KEY-----', $key);
-        $this->assertNotContains('-----END RSA PRIVATE KEY-----', $key);
+        $this->assertStringNotContainsString('-----BEGIN RSA PRIVATE KEY-----', $key);
+        $this->assertStringNotContainsString('-----END RSA PRIVATE KEY-----', $key);
         $this->assertEquals(strlen($key), 816);
 
         $formatedKey1 = Utils::formatPrivateKey($key);
-        $this->assertContains('-----BEGIN RSA PRIVATE KEY-----', $formatedKey1);
-        $this->assertContains('-----END RSA PRIVATE KEY-----', $formatedKey1);
+        $this->assertStringContainsString('-----BEGIN RSA PRIVATE KEY-----', $formatedKey1);
+        $this->assertStringContainsString('-----END RSA PRIVATE KEY-----', $formatedKey1);
 
         $formatedKey2 = Utils::formatPrivateKey($key, true);
         $this->assertEquals($formatedKey1, $formatedKey2);
@@ -220,8 +220,8 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         $formatedKey3 = Utils::formatPrivateKey($key, false);
 
-        $this->assertNotContains('-----BEGIN RSA PRIVATE KEY-----', $formatedKey3);
-        $this->assertNotContains('-----END RSA PRIVATE KEY-----', $formatedKey3);
+        $this->assertStringNotContainsString('-----BEGIN RSA PRIVATE KEY-----', $formatedKey3);
+        $this->assertStringNotContainsString('-----END RSA PRIVATE KEY-----', $formatedKey3);
         $this->assertEquals(strlen($key), 816);
     }
 
@@ -252,7 +252,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $targetUrl4 = Utils::redirect($url4, array(), true);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Redirect to invalid URL', $e->getMessage());
+            $this->assertStringContainsString('Redirect to invalid URL', $e->getMessage());
         }
 
         // Review parameter prefix
@@ -693,7 +693,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $parsedDuration3 = Utils::parseDuration($invalidDuration);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Invalid ISO 8601 duration', $e->getMessage());
+            $this->assertStringContainsString('Invalid ISO 8601 duration', $e->getMessage());
         }
 
         $newDuration = 'P1Y1M';
@@ -720,7 +720,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             Utils::parseSAML2Time('invalidSAMLTime');
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Invalid SAML2 timestamp passed', $e->getMessage());
+            $this->assertStringContainsString('Invalid SAML2 timestamp passed', $e->getMessage());
         }
 
         // Now test if toolkit supports miliseconds
@@ -743,7 +743,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             Utils::parseTime2SAML('invalidtime');
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Failed to parse time string', $e->getMessage());
+            $this->assertStringContainsString('Failed to parse time string', $e->getMessage());
         }
     }
 
@@ -852,14 +852,14 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         );
 
         $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
-        $this->assertContains($nameidExpectedEnc, $nameIdEnc);
+        $this->assertStringContainsString($nameidExpectedEnc, $nameIdEnc);
     }
 
     /**
-    * Tests the generateNameId method of the Utils
-    *
-    * @covers OneLogin\Saml2\Utils::generateNameId
-    */
+     * Tests the generateNameId method of the Utils
+     *
+     * @covers OneLogin\Saml2\Utils::generateNameId
+     */
     public function testGenerateNameIdWithoutFormat()
     {
         $nameIdValue = 'ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde';
@@ -910,7 +910,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         );
 
         $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
-        $this->assertContains($nameidExpectedEnc, $nameIdEnc);
+        $this->assertStringContainsString($nameidExpectedEnc, $nameIdEnc);
     }
 
     /**
@@ -1058,7 +1058,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $res = Utils::decryptElement($encryptedNameIDNodes->item(0), $seckey);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Algorithm mismatch between input key and key in message', $e->getMessage());
+            $this->assertStringContainsString('Algorithm mismatch between input key and key in message', $e->getMessage());
         }
 
         $key2 = file_get_contents(TEST_ROOT . '/data/misc/sp2.key');
@@ -1075,7 +1075,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $res = Utils::decryptElement($encryptedData, $seckey3);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Algorithm mismatch between input key and key used to encrypt  the symmetric key for the message', $e->getMessage());
+            $this->assertStringContainsString('Algorithm mismatch between input key and key used to encrypt  the symmetric key for the message', $e->getMessage());
         }
 
         $xmlNameIdEnc2 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_nameID_without_EncMethod.xml.base64'));
@@ -1087,7 +1087,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $res = Utils::decryptElement($encryptedData2, $seckey);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Unable to locate algorithm for this Encrypted Key', $e->getMessage());
+            $this->assertStringContainsString('Unable to locate algorithm for this Encrypted Key', $e->getMessage());
         }
 
         $xmlNameIdEnc3 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_nameID_without_keyinfo.xml.base64'));
@@ -1099,7 +1099,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $res = Utils::decryptElement($encryptedData3, $seckey);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Algorithm mismatch between input key and key in message', $e->getMessage());
+            $this->assertStringContainsString('Algorithm mismatch between input key and key in message', $e->getMessage());
         }
     }
 
@@ -1119,54 +1119,54 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         $xmlAuthn = base64_decode(file_get_contents(TEST_ROOT . '/data/requests/authn_request.xml.base64'));
         $xmlAuthnSigned = Utils::addSign($xmlAuthn, $key, $cert);
-        $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlAuthnSigned);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', $xmlAuthnSigned);
+        $this->assertStringContainsString('<ds:SignatureValue>', $xmlAuthnSigned);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlAuthnSigned);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>', $xmlAuthnSigned);
         $res = new DOMDocument();
         $res->loadXML($xmlAuthnSigned);
         $dsSignature = $res->firstChild->firstChild->nextSibling->nextSibling;
-        $this->assertContains('ds:Signature', $dsSignature->tagName);
+        $this->assertStringContainsString('ds:Signature', $dsSignature->tagName);
 
         $dom = new DOMDocument();
         $dom->loadXML($xmlAuthn);
         $xmlAuthnSigned2 = Utils::addSign($dom, $key, $cert, XMLSecurityKey::RSA_SHA384, XMLSecurityDSig::SHA512);
-        $this->assertContains('<ds:SignatureValue>', $xmlAuthnSigned2);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>', $xmlAuthnSigned2);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlAuthnSigned2);
+        $this->assertStringContainsString('<ds:SignatureValue>', $xmlAuthnSigned2);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>', $xmlAuthnSigned2);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlAuthnSigned2);
         $res2 = new DOMDocument();
         $res2->loadXML($xmlAuthnSigned2);
         $dsSignature2 = $res2->firstChild->firstChild->nextSibling->nextSibling;
-        $this->assertContains('ds:Signature', $dsSignature2->tagName);
+        $this->assertStringContainsString('ds:Signature', $dsSignature2->tagName);
 
         $xmlLogoutReq = base64_decode(file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64'));
         $xmlLogoutReqSigned = Utils::addSign($xmlLogoutReq, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
-        $this->assertContains('<ds:SignatureValue>', $xmlLogoutReqSigned);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutReqSigned);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutReqSigned);
+        $this->assertStringContainsString('<ds:SignatureValue>', $xmlLogoutReqSigned);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutReqSigned);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutReqSigned);
         $res3 = new DOMDocument();
         $res3->loadXML($xmlLogoutReqSigned);
         $dsSignature3 = $res3->firstChild->firstChild->nextSibling->nextSibling;
-        $this->assertContains('ds:Signature', $dsSignature3->tagName);
+        $this->assertStringContainsString('ds:Signature', $dsSignature3->tagName);
 
         $xmlLogoutRes = base64_decode(file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64'));
         $xmlLogoutResSigned = Utils::addSign($xmlLogoutRes, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
-        $this->assertContains('<ds:SignatureValue>', $xmlLogoutResSigned);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutResSigned);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutResSigned);
+        $this->assertStringContainsString('<ds:SignatureValue>', $xmlLogoutResSigned);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlLogoutResSigned);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlLogoutResSigned);
         $res4 = new DOMDocument();
         $res4->loadXML($xmlLogoutResSigned);
         $dsSignature4 = $res4->firstChild->firstChild->nextSibling->nextSibling;
-        $this->assertContains('ds:Signature', $dsSignature4->tagName);
+        $this->assertStringContainsString('ds:Signature', $dsSignature4->tagName);
 
         $xmlMetadata = file_get_contents(TEST_ROOT . '/data/metadata/metadata_settings1.xml');
         $xmlMetadataSigned = Utils::addSign($xmlMetadata, $key, $cert, XMLSecurityKey::RSA_SHA256, XMLSecurityDSig::SHA512);
-        $this->assertContains('<ds:SignatureValue>', $xmlMetadataSigned);
-        $this->assertContains('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlMetadataSigned);
-        $this->assertContains('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlMetadataSigned);
+        $this->assertStringContainsString('<ds:SignatureValue>', $xmlMetadataSigned);
+        $this->assertStringContainsString('<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>', $xmlMetadataSigned);
+        $this->assertStringContainsString('<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>', $xmlMetadataSigned);
         $res5 = new DOMDocument();
         $res5->loadXML($xmlMetadataSigned);
         $dsSignature5 = $res5->firstChild->firstChild;
-        $this->assertContains('ds:Signature', $dsSignature5->tagName);
+        $this->assertStringContainsString('ds:Signature', $dsSignature5->tagName);
     }
 
     /**
@@ -1213,7 +1213,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertFalse(Utils::validateSign($dom, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Reference validation failed', $e->getMessage());
+            $this->assertStringContainsString('Reference validation failed', $e->getMessage());
         }
 
         $dom2 = new DOMDocument();
@@ -1229,7 +1229,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertTrue(Utils::validateSign($assertElem2, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Reference validation failed', $e->getMessage());
+            $this->assertStringContainsString('Reference validation failed', $e->getMessage());
         }
 
         $invalidFingerprint = 'afe71c34ef740bc87434be13a2263d31271da1f9';
@@ -1240,7 +1240,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertFalse(Utils::validateSign($noSigned, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Cannot locate Signature Node', $e->getMessage());
+            $this->assertStringContainsString('Cannot locate Signature Node', $e->getMessage());
         }
 
         $noKey = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/no_key.xml.base64'));
@@ -1248,7 +1248,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertFalse(Utils::validateSign($noKey, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('We have no idea about the key', $e->getMessage());
+            $this->assertStringContainsString('We have no idea about the key', $e->getMessage());
         }
 
         $signatureWrapping = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/invalids/signature_wrapping_attack.xml.base64'));
@@ -1256,7 +1256,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertFalse(Utils::validateSign($signatureWrapping, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Reference validation failed', $e->getMessage());
+            $this->assertStringContainsString('Reference validation failed', $e->getMessage());
         }
     }
 }

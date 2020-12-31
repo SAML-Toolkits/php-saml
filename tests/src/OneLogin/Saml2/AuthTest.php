@@ -24,7 +24,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     /**
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function setUp() : void
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -116,7 +116,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processResponse();
             $this->fail('Error was not raised');
         } catch (Error $e) {
-            $this->assertContains('SAML Response not found', $e->getMessage());
+            $this->assertStringContainsString('SAML Response not found', $e->getMessage());
         }
 
         $this->assertEquals($this->_auth->getErrors(), array('invalid_binding'));
@@ -349,7 +349,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $auth4->processResponse();
             $this->fail('OneLogin\Saml2\ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
+            $this->assertStringContainsString('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
         }
         $response5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/duplicated_attributes.xml.base64');
         $_POST['SAMLResponse'] = $response5;
@@ -358,7 +358,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $auth5->processResponse();
             $this->fail('OneLogin\Saml2\ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
+            $this->assertStringContainsString('Found an Attribute element with duplicated Name', $e->getMessage());
         }
     }
 
@@ -383,7 +383,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
 
@@ -413,7 +413,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
 
@@ -433,7 +433,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processSLO(true);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-            $this->assertContains('SAML LogoutRequest/LogoutResponse not found', $e->getMessage());
+            $this->assertStringContainsString('SAML LogoutRequest/LogoutResponse not found', $e->getMessage());
         }
 
         $this->assertEquals($this->_auth->getErrors(), array('invalid_binding'));
@@ -633,7 +633,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEmpty($this->_auth->getErrors());
         $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertStringContainsString($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -648,7 +648,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEmpty($this->_auth->getErrors());
         $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertStringContainsString($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);
     }
@@ -711,13 +711,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processSLO(false);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
+            $this->assertStringContainsString($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -732,13 +732,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processSLO(true);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
+            $this->assertStringContainsString($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -785,13 +785,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processSLO(false, null, false, $callback);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];;;
-            $this->assertContains($sloResponseUrl, $targetUrl);
+            $this->assertStringContainsString($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
@@ -835,13 +835,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->_auth->processSLO(false);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
+            $this->assertStringContainsString($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
@@ -883,13 +883,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $auth->processSLO(false);
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
+            $this->assertStringContainsString($sloResponseUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertArrayHasKey('SigAlg', $parsedQuery);
@@ -916,13 +916,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], Utils::getSelfRoutedURLNoQuery());
@@ -948,13 +948,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
@@ -982,13 +982,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
@@ -1024,13 +1024,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertArrayHasKey('SigAlg', $parsedQuery);
@@ -1065,13 +1065,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $encodedRequest = $parsedQuery['SAMLRequest'];
             $decoded = base64_decode($encodedRequest);
@@ -1087,13 +1087,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace2 = $e->getTrace();
             $targetUrl2 = getUrlFromRedirect($trace2);
             $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
             $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertStringContainsString($ssoUrl2, $targetUrl2);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
             $encodedRequest2 = $parsedQuery2['SAMLRequest'];
             $decoded2 = base64_decode($encodedRequest2);
@@ -1108,18 +1108,18 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace3 = $e->getTrace();
             $targetUrl3 = getUrlFromRedirect($trace3);
             $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
             $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertStringContainsString($ssoUrl3, $targetUrl3);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
             $encodedRequest3 = $parsedQuery3['SAMLRequest'];
             $decoded3 = base64_decode($encodedRequest3);
             $request3 = gzinflate($decoded3);
-            $this->assertContains('ForceAuthn="true"', $request3);
+            $this->assertStringContainsString('ForceAuthn="true"', $request3);
         }
 
     }
@@ -1149,13 +1149,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $encodedRequest = $parsedQuery['SAMLRequest'];
             $decoded = base64_decode($encodedRequest);
@@ -1170,13 +1170,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace2 = $e->getTrace();
             $targetUrl2 = getUrlFromRedirect($trace2);
             $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
             $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertStringContainsString($ssoUrl2, $targetUrl2);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
             $encodedRequest2 = $parsedQuery2['SAMLRequest'];
             $decoded2 = base64_decode($encodedRequest2);
@@ -1191,18 +1191,18 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace3 = $e->getTrace();
             $targetUrl3 = getUrlFromRedirect($trace3);
             $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
             $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertStringContainsString($ssoUrl3, $targetUrl3);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
             $encodedRequest3 = $parsedQuery3['SAMLRequest'];
             $decoded3 = base64_decode($encodedRequest3);
             $request3 = gzinflate($decoded3);
-            $this->assertContains('IsPassive="true"', $request3);
+            $this->assertStringContainsString('IsPassive="true"', $request3);
         }
     }
 
@@ -1229,13 +1229,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $encodedRequest = $parsedQuery['SAMLRequest'];
             $decoded = base64_decode($encodedRequest);
@@ -1250,18 +1250,18 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace2 = $e->getTrace();
             $targetUrl2 = getUrlFromRedirect($trace2);
             $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
             $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertStringContainsString($ssoUrl2, $targetUrl2);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
             $encodedRequest2 = $parsedQuery2['SAMLRequest'];
             $decoded2 = base64_decode($encodedRequest2);
             $request2 = gzinflate($decoded2);
-            $this->assertContains('<samlp:NameIDPolicy', $request2);
+            $this->assertStringContainsString('<samlp:NameIDPolicy', $request2);
         }
 
         try {
@@ -1271,28 +1271,28 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace3 = $e->getTrace();
             $targetUrl3 = getUrlFromRedirect($trace3);
             $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
             $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertStringContainsString($ssoUrl3, $targetUrl3);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
             $encodedRequest3 = $parsedQuery3['SAMLRequest'];
             $decoded3 = base64_decode($encodedRequest3);
             $request3 = gzinflate($decoded3);
-            $this->assertContains('<samlp:NameIDPolicy', $request3);
+            $this->assertStringContainsString('<samlp:NameIDPolicy', $request3);
         }
     }
 
     /**
-    * Tests the login method of the Auth class
-    * Case Login with no parameters. A AuthN Request is built with and without Subject
-    *
-    * @covers OneLogin\Saml2\Auth::login
-    * @runInSeparateProcess
-    */
+     * Tests the login method of the Auth class
+     * Case Login with no parameters. A AuthN Request is built with and without Subject
+     *
+     * @covers OneLogin\Saml2\Auth::login
+     * @runInSeparateProcess
+     */
     public function testLoginSubject()
     {
         $settingsDir = TEST_ROOT .'/settings/';
@@ -1306,13 +1306,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
+            $this->assertStringContainsString($ssoUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $encodedRequest = $parsedQuery['SAMLRequest'];
             $decoded = base64_decode($encodedRequest);
@@ -1327,20 +1327,20 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace2 = $e->getTrace();
             $targetUrl2 = getUrlFromRedirect($trace2);
             $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
             $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
+            $this->assertStringContainsString($ssoUrl2, $targetUrl2);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
             $encodedRequest2 = $parsedQuery2['SAMLRequest'];
             $decoded2 = base64_decode($encodedRequest2);
             $request2 = gzinflate($decoded2);
-            $this->assertContains('<saml:Subject', $request2);
-            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
-            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
+            $this->assertStringContainsString('<saml:Subject', $request2);
+            $this->assertStringContainsString('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
+            $this->assertStringContainsString('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
         }
 
         try {
@@ -1352,20 +1352,20 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace3 = $e->getTrace();
             $targetUrl3 = getUrlFromRedirect($trace3);
             $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
             $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
+            $this->assertStringContainsString($ssoUrl3, $targetUrl3);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
             $encodedRequest3 = $parsedQuery3['SAMLRequest'];
             $decoded3 = base64_decode($encodedRequest3);
             $request3 = gzinflate($decoded3);
-            $this->assertContains('<saml:Subject', $request3);
-            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', $request3);
-            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
+            $this->assertStringContainsString('<saml:Subject', $request3);
+            $this->assertStringContainsString('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', $request3);
+            $this->assertStringContainsString('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
         }
     }
 
@@ -1386,13 +1386,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], Utils::getSelfRoutedURLNoQuery());
@@ -1418,13 +1418,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
@@ -1452,13 +1452,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertEquals($parsedQuery['RelayState'], $relayState);
@@ -1490,13 +1490,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
         }
     }
@@ -1523,13 +1523,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
 
             $logoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
@@ -1564,13 +1564,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             // Do not ever get here
             $this->assertFalse(true);
         } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
+            $this->assertStringContainsString('Cannot modify header information', $e->getMessage());
             $trace = $e->getTrace();
             $targetUrl = getUrlFromRedirect($trace);
             $parsedQuery = getParamsFromUrl($targetUrl);
 
             $sloUrl = $settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
+            $this->assertStringContainsString($sloUrl, $targetUrl);
             $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
             $this->assertArrayHasKey('RelayState', $parsedQuery);
             $this->assertArrayHasKey('SigAlg', $parsedQuery);
@@ -1600,7 +1600,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $auth->logout($returnTo);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-            $this->assertContains('The IdP does not support Single Log Out', $e->getMessage());
+            $this->assertStringContainsString('The IdP does not support Single Log Out', $e->getMessage());
         }
     }
 
@@ -1632,7 +1632,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $auth->setStrict('a');
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertContains('Invalid value passed to setStrict()', $e->getMessage());
+            $this->assertStringContainsString('Invalid value passed to setStrict()', $e->getMessage());
         }
     }
 
