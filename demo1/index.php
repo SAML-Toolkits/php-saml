@@ -73,6 +73,9 @@ if (isset($_GET['sso'])) {
 
     if (!empty($errors)) {
         echo '<p>',implode(', ', $errors),'</p>';
+        if ($auth->getSettings()->isDebugActive()) {
+            echo '<p>'.$auth->getLastErrorReason().'</p>';
+        }
     }
 
     if (!$auth->isAuthenticated()) {
@@ -103,6 +106,9 @@ if (isset($_GET['sso'])) {
         echo '<p>Sucessfully logged out</p>';
     } else {
         echo '<p>', implode(', ', $errors), '</p>';
+        if ($auth->getSettings()->isDebugActive()) {
+            echo '<p>'.$auth->getLastErrorReason().'</p>';
+        }
     }
 }
 
