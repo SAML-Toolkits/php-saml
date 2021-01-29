@@ -430,6 +430,11 @@ class Settings
             $this->_security['digestAlgorithm'] = XMLSecurityDSig::SHA256;
         }
 
+        // EncryptionAlgorithm
+        if (!isset($this->_security['encryption_algorithm'])) {
+            $this->_security['encryption_algorithm'] = XMLSecurityKey::AES128_CBC;
+        }
+
         if (!isset($this->_security['lowercaseUrlencoding'])) {
             $this->_security['lowercaseUrlencoding'] = false;
         }
