@@ -2,10 +2,11 @@
 
 namespace OneLogin\Saml2\Tests;
 
+use OneLogin\Saml2\Error;
+use OneLogin\Saml2\Utils;
+use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\LogoutResponse;
-use OneLogin\Saml2\Settings;
-use OneLogin\Saml2\Utils;
 
 use DomDocument;
 
@@ -19,7 +20,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function setUp() : void
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -37,7 +38,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
         $response = new LogoutResponse($this->_settings, $message);
-        $this->assertRegExp('#<samlp:LogoutResponse#', $response->document->saveXML());
+        $this->assertMatchesRegularExpression('#<samlp:LogoutResponse#', $response->document->saveXML());
     }
 
     /**
@@ -55,13 +56,13 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $logoutUrl = Utils::redirect('http://idp.example.com/SingleLogoutService.php', $parameters, true);
 
-        $this->assertRegExp('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=#', $logoutUrl);
+        $this->assertMatchesRegularExpression('#^http://idp\.example\.com\/SingleLogoutService\.php\?SAMLResponse=#', $logoutUrl);
         parse_str(parse_url($logoutUrl, PHP_URL_QUERY), $exploded);
         // parse_url already urldecode de params so is not required.
         $payload = $exploded['SAMLResponse'];
         $decoded = base64_decode($payload);
         $inflated = gzinflate($decoded);
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $inflated);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $inflated);
     }
 
     /**
@@ -172,7 +173,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($response2->isValid());
 
         $this->assertFalse($response2->isValid($requestId));
-        $this->assertContains('The InResponseTo of the Logout Response:', $response2->getError());
+        $this->assertStringContainsString('The InResponseTo of the Logout Response:', $response2->getError());
     }
 
     /**
@@ -267,7 +268,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutResponse was received at', $response2->getError());
+        $this->assertStringContainsString('The LogoutResponse was received at', $response2->getError());
     }
 
     /**
@@ -293,7 +294,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('Invalid issuer in the Logout Response', $response2->getError());
+        $this->assertStringContainsString('Invalid issuer in the Logout Response', $response2->getError());
 
         $this->_settings->setStrict(false);
         $oldSignature = $_GET['Signature'];
@@ -407,7 +408,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutResponse was received at', $response2->getError());
+        $this->assertStringContainsString('The LogoutResponse was received at', $response2->getError());
 
         $plainMessage = gzinflate(base64_decode($message));
         $currentURL = Utils::getSelfURLNoQuery();
@@ -439,7 +440,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $payload = $logoutResponse->getResponse();
         $decoded = base64_decode($payload);
         $decompressed = gzinflate($decoded);
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $decompressed);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $decompressed);
 
     }
 
@@ -463,7 +464,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse();
         $decoded = base64_decode($payload);
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $decoded);
     }
 
     /**
@@ -486,7 +487,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(false);
         $decoded = base64_decode($payload);
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $decoded);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $decoded);
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
@@ -496,7 +497,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $payload = $logoutResponse->getResponse(true);
         $decoded = base64_decode($payload);
         $decompressed = gzinflate($decoded);
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $decompressed);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $decompressed);
     }
 
     /**
@@ -514,11 +515,11 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $logoutResponse = new LogoutResponse($settings);
         $logoutResponse->build('jhgvsadja');
         $xml = $logoutResponse->getXML();
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $xml);
 
         $processedLogoutResponse = new LogoutResponse($settings, base64_encode($xml));
         $xml2 = $processedLogoutResponse->getXML();
-        $this->assertRegExp('#^<samlp:LogoutResponse#', $xml2);
+        $this->assertMatchesRegularExpression('#^<samlp:LogoutResponse#', $xml2);
     }
 
     /**
@@ -548,12 +549,12 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Tests that the LogoutRequest throws an exception
      *
      * @covers OneLogin\Saml2\LogoutRequest::getID()
-     *
-     * @expectedException OneLogin\Saml2\Error
-     * @expectedExceptionMessage LogoutResponse could not be processed
      */
     public function testGetIDException()
     {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('LogoutRequest could not be processed');
+
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
         $settings = new Settings($settingsInfo);
