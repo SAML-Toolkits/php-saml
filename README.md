@@ -1,4 +1,4 @@
-# OneLogin's SAML PHP Toolkit Compatible with PHP 5.X & 7.X
+# OneLogin's SAML PHP Toolkit Compatible with PHP 7.X & 8.X
 
 [![Build Status](https://api.travis-ci.org/onelogin/php-saml.png?branch=master)](http://travis-ci.org/onelogin/php-saml) [![Coverage Status](https://coveralls.io/repos/onelogin/php-saml/badge.png)](https://coveralls.io/r/onelogin/php-saml) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
 
@@ -10,15 +10,7 @@ and supported by OneLogin Inc.
 Warning
 -------
 
-Version 3.4.0 introduces the 'rejectUnsolicitedResponsesWithInResponseTo' setting parameter, by default disabled, that will allow invalidate unsolicited SAMLResponse. This version as well will reject SAMLResponse if requestId was provided to the validator but the SAMLResponse does not contain a InResponseTo attribute. And an additional setting parameter 'destinationStrictlyMatches', by default disabled, that will force that the Destination URL should strictly match to the address that process the SAMLResponse.
-
-Version 3.3.1 updates xmlseclibs to 3.0.4 (CVE-2019-3465), but php-saml was not directly affected since it implements additional checks that prevent to exploit that vulnerability.
-
-Version 3.3.0 sets strict mode active by default
-
-Update php-saml to 3.1.0, this version includes a security patch related to XEE attacks.
-
-This version is compatible with PHP 7.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
+This version is compatible with PHP >7.1 and 8.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
 
 Security Guidelines
 -------------------
@@ -132,7 +124,9 @@ Your settings are at risk of being deleted when updating packages using `compose
 Compatibility
 -------------
 
-This 3.X.X supports PHP 7.X. but can be used with PHP >=5.4 as well  (5.6.24+ recommended for security reasons).
+This 4.X.X supports PHP >7.1 .
+
+It is not compatible with PHP5.6 or PHP7.0.
 
 Namespaces
 ----------
