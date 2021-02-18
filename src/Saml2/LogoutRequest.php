@@ -122,7 +122,8 @@ class LogoutRequest
                 $nameIdSPNameQualifier,
                 $nameIdFormat,
                 $cert,
-                $nameIdNameQualifier
+                $nameIdNameQualifier,
+                $security['encryption_algorithm']
             );
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
