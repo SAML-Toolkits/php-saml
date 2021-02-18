@@ -10,7 +10,7 @@ and supported by OneLogin Inc.
 Warning
 -------
 
-This version is compatible with PHP >7.1 and 8.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
+This version is compatible with PHP >=7.3 and 8.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
 
 Security Guidelines
 -------------------
@@ -124,7 +124,7 @@ Your settings are at risk of being deleted when updating packages using `compose
 Compatibility
 -------------
 
-This 4.X.X supports PHP >7.1 .
+This 4.X.X supports PHP >=7.3 .
 
 It is not compatible with PHP5.6 or PHP7.0.
 

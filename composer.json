@@ -15,9 +15,9 @@
         "source": "https://github.com/onelogin/php-saml/"
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.3",
         "robrichards/xmlseclibs": ">=3.1.1",
-        "phpunit/phpunit": "^7.5.20 || ^9.5"
+        "phpunit/phpunit": "^9.5"
     },
     "require-dev": {
         "php-coveralls/php-coveralls": "^2.0",
@@ -25,6 +25,13 @@
         "phploc/phploc": "^4.0 || ^5.0 || ^6.0 || ^7.0",
         "pdepend/pdepend": "^2.8.0",
         "squizlabs/php_codesniffer": "^3.5.8"
+    },
+    "config": {
+        "platform": {
+            "php": "7.3.0"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
     },
     "suggest": {
         "ext-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
