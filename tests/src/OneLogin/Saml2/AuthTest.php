@@ -375,8 +375,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     {
         $relayState = 'http://sp.example.com';
         $_REQUEST['RelayState'] = $relayState;
-        $targetUrl = $this->_auth->redirectTo("", [],
-            true);
+        $targetUrl = $this->_auth->redirectTo("", [], true);
         $this->assertEquals($targetUrl, $relayState);
     }
 
