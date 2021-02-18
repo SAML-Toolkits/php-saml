@@ -1056,13 +1056,13 @@ class Utils
      * @param string|null $format SP Format
      * @param string|null $cert   IdP Public cert to encrypt the nameID
      * @param string|null $nq     IdP Name Qualifier
-     * @param string|null $enc_alg Encryption algorithm
+     * @param string|null $encAlg Encryption algorithm
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      *
      * @throws Exception
      */
-    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null, $enc_alg = XMLSecurityKey::AES128_CBC)
+    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null, $encAlg = XMLSecurityKey::AES128_CBC)
     {
 
         $doc = new DOMDocument();
@@ -1082,7 +1082,7 @@ class Utils
         $doc->appendChild($nameId);
 
         if (!empty($cert)) {
-            if ($enc_alg == XMLSecurityKey::AES128_CBC) {
+            if ($encAlg == XMLSecurityKey::AES128_CBC) {
                 $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
             } else {
                 $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
@@ -1093,7 +1093,7 @@ class Utils
             $enc->setNode($nameId);
             $enc->type = XMLSecEnc::Element;
 
-            $symmetricKey = new XMLSecurityKey($enc_alg);
+            $symmetricKey = new XMLSecurityKey($encAlg);
             $symmetricKey->generateSessionKey();
             $enc->encryptKey($seckey, $symmetricKey);
 
