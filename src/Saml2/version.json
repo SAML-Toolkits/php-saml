@@ -1,7 +1,7 @@
 {
     "php-saml": {
-        "version": "3.6.0-dev",
-        "released": "03/12/2020"
+        "version": "3.6.0",
+        "released": "19/02/2021"
     }
 }
 
