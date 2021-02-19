@@ -855,10 +855,10 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertContains($nameidExpectedEnc, $nameIdEnc);
 
         // Check AES128_GCM support
-        if (in_array("aes-128-gcm", openssl_get_cipher_methods())) {
+        if (version_compare(phpversion(), '7.1.0', '>=') && in_array("aes-128-gcm", openssl_get_cipher_methods())) {
             $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>';
 
-       	    $nameIdEnc = Utils::generateNameId(
+            $nameIdEnc = Utils::generateNameId(
                 $nameIdValue,
                 $entityId,
                 $nameIDFormat,
