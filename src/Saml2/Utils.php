@@ -654,7 +654,7 @@ class Utils
 
         $pos = strpos($selfRoutedURLNoQuery, "?");
         if ($pos !== false) {
-            $selfRoutedURLNoQuery = substr($selfRoutedURLNoQuery, 0, $pos-1);
+            $selfRoutedURLNoQuery = substr($selfRoutedURLNoQuery, 0, $pos);
         }
 
         return $selfRoutedURLNoQuery;
