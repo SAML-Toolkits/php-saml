@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v3.6.1
+* [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
+
 v3.6.0
 * Add AES128_GCM encryption on generateNameId method. New setting parameter encryption_algorithm. If you set a encryption method different than AES128_CBC then the algorithm RSA_OAEP_MGF1P will be used as well instead RSA_1_5
 * PHP 8.0 support
