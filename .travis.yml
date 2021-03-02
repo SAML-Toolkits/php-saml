@@ -11,6 +11,7 @@ before_install:
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - export XDEBUG_MODE=coverage
 
 script:
   - vendor/bin/phpunit
