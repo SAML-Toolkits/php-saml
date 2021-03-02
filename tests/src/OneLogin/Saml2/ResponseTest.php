@@ -629,7 +629,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $settings2 = new OneLogin_Saml2_Settings($settingsInfo);
         $response5 = new OneLogin_Saml2_Response($settings2, $xml4);
         $attrs = $response5->getAttributes();
-        $this->assertEquals([0 => "test", 1 => "test2"], $attrs['uid']);
+        $this->assertEquals(array(0 => "test", 1 => "test2"), $attrs['uid']);
     }
 
     /**
