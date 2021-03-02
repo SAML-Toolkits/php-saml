@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v.2.19.1
+* [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
+
 v.2.19.0
 * [#412](https://github.com/onelogin/php-saml/pull/412) Empty instead of unset the $_SESSION variable
 * [#433](https://github.com/onelogin/php-saml/issues/443) Fix Incorrect Destination in LogoutResponse when using responseUrl #443
