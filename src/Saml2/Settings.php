@@ -612,12 +612,7 @@ class Settings
                 $errors[] = 'sp_entityId_not_found';
             }
 
-            if (!isset($sp['assertionConsumerService'])
-                || !isset($sp['assertionConsumerService']['url'])
-                || empty($sp['assertionConsumerService']['url'])
-            ) {
-                $errors[] = 'sp_acs_not_found';
-            } else if (!filter_var($sp['assertionConsumerService']['url'], FILTER_VALIDATE_URL)) {
+            if (!empty($sp['assertionConsumerService']['url']) && !filter_var($sp['assertionConsumerService']['url'], FILTER_VALIDATE_URL)) {
                 $errors[] = 'sp_acs_url_invalid';
             }
 
