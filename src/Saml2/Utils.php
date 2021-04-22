@@ -87,7 +87,11 @@ class Utils
             $oldEntityLoader = libxml_disable_entity_loader(true);
         }
 
-        $res = $dom->loadXML($xml);
+        try {
+            $res = $dom->loadXML($xml);
+        } catch (\Exception $e) {
+            return false;
+        }
 
         if (PHP_VERSION_ID < 80000) {
             libxml_disable_entity_loader($oldEntityLoader);
