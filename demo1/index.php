@@ -41,16 +41,16 @@ if (isset($_GET['sso'])) {
         $nameIdFormat = $_SESSION['samlNameIdFormat'];
     }
     if (isset($_SESSION['samlNameIdNameQualifier'])) {
-        $nameIdNameQualifier = $_SESSION['samlNameIdNameQualifier'];
+        $samlNameIdNameQualifier = $_SESSION['samlNameIdNameQualifier'];
     }
     if (isset($_SESSION['samlNameIdSPNameQualifier'])) {
-        $nameIdSPNameQualifier = $_SESSION['samlNameIdSPNameQualifier'];
+        $samlNameIdSPNameQualifier = $_SESSION['samlNameIdSPNameQualifier'];
     }
     if (isset($_SESSION['samlSessionIndex'])) {
         $sessionIndex = $_SESSION['samlSessionIndex'];
     }
 
-    $auth->logout($returnTo, $parameters, $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
+    $auth->logout($returnTo, $parameters, $nameId, $sessionIndex, false, $nameIdFormat, $samlNameIdNameQualifier, $samlNameIdSPNameQualifier);
 
     # If LogoutRequest ID need to be saved in order to later validate it, do instead
     # $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
