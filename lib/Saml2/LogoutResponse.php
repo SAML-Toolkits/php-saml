@@ -240,7 +240,7 @@ class OneLogin_Saml2_LogoutResponse
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
-        $destination = $this->_settings->getIdPSLOResponseUrl();
+        $destination = htmlspecialchars($this->_settings->getIdPSLOResponseUrl(), ENT_QUOTES);
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
