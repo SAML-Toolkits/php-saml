@@ -279,7 +279,7 @@ class Auth
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
         if (isset($_GET['SAMLResponse'])) {
-            $logoutResponse = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+            $logoutResponse = $this->buildLogoutResponse($this->_settings, $_GET['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
@@ -315,7 +315,7 @@ class Auth
                 }
                 $inResponseTo = $logoutRequest->id;
                 $this->_lastMessageId = $logoutRequest->id;
-                $responseBuilder = new LogoutResponse($this->_settings);
+                $responseBuilder = $this->buildLogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
                 $this->_lastResponse = $responseBuilder->getXML();
 
@@ -670,7 +670,7 @@ class Auth
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
+    public function buildAuthnRequest(Settings $settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
     {
         return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
     }
@@ -686,9 +686,24 @@ class Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      * @param string|null $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
      */
-    public function buildLogoutRequest(\OneLogin\Saml2\Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    public function buildLogoutRequest(Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         return new LogoutRequest($settings, $request, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
+    }
+
+    /**
+     * Constructs a Logout Response object (Initialize params from settings and if provided
+     * load the Logout Response.
+     *
+     * @param Settings    $settings Settings.
+     * @param string|null $response An UUEncoded SAML Logout response from the IdP.
+     *
+     * @throws Error
+     * @throws Exception
+     */
+    public function buildLogoutResponse(Settings $settings, $response = null)
+    {
+        return new LogoutResponse($settings, $response);
     }
 
     /**
