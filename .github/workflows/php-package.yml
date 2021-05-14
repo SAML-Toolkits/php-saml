@@ -11,38 +11,47 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-version: [5.3, 5.4, 5.5, 5.6]
-steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        php-version: ${{ matrix.php-versions }}
-        extensions: mbstring, intl, mcrypt, xml
-        tools: composer:v2
-        ini-values: post_max_size=256M, max_execution_time=180
-        coverage: xdebug
+        operating-system: ['ubuntu-latest']
+        php-versions: [5.3, 5.4, 5.5, 5.6]
+    steps:
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, intl, mcrypt, xml
+          tools: composer:v2
+          ini-values: post_max_size=256M, max_execution_time=180
+          coverage: xdebug
 
-    - name: Validate composer.json and composer.lock
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
         run: composer validate
 
-    - name: Install Composer dependencies
-        composer self-update
-        composer install --prefer-source --no-interaction
+      - name: Install Composer dependencies
+        run: |
+          composer self-update
+          composer install --prefer-source --no-interaction
 
-    - name: Syntax check PHP
-        php vendor/bin/phpcpd --exclude tests --exclude vendor .
-        php vendor/bin/phploc . --exclude vendor
-        php vendor/bin/phploc lib/.
-        mkdir -p tests/build/dependences
-        php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
+      - name: Syntax check PHP
+        run: |
+          php vendor/bin/phpcpd --exclude tests --exclude vendor .
+          php vendor/bin/phploc . --exclude vendor
+          php vendor/bin/phploc lib/.
+          mkdir -p tests/build/dependences
+          php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
         
-    - name: PHP Code Sniffer
-        php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
+      - name: PHP Code Sniffer
+        run: php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
     
-    - name: Run unit tests
-        vendor/bin/phpunit
+      - name: Run unit tests
+        run: vendor/bin/phpunit --verbose --debug
