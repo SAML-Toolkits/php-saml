@@ -1,0 +1,48 @@
+# This workflow will install PHP dependencies, run tests and lint with a variety of PHP versions
+# For more information see: https://github.com/marketplace/actions/setup-php-action
+
+name: php-saml package
+
+on:
+  push:
+    branches: [ master, 2.* ]
+  pull_request:
+    branches: [ master, 2.* ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        php-version: [5.3, 5.4, 5.5, 5.6]
+steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, intl, mcrypt, xml
+        tools: composer:v2
+        ini-values: post_max_size=256M, max_execution_time=180
+        coverage: xdebug
+
+    - name: Validate composer.json and composer.lock
+        run: composer validate
+
+    - name: Install Composer dependencies
+        composer self-update
+        composer install --prefer-source --no-interaction
+
+    - name: Syntax check PHP
+        php vendor/bin/phpcpd --exclude tests --exclude vendor .
+        php vendor/bin/phploc . --exclude vendor
+        php vendor/bin/phploc lib/.
+        mkdir -p tests/build/dependences
+        php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
+        
+    - name: PHP Code Sniffer
+        php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
+    
+    - name: Run unit tests
+        vendor/bin/phpunit
