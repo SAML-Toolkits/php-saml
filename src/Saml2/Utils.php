@@ -308,7 +308,7 @@ class Utils
      *
      * @throws Error
      */
-    public static function redirect($url, array $parameters = array(), $stay = false): ResponseInterface
+    public static function redirect($url, array $parameters = array(), $stay = false)
     {
         if ($stay !== false) {
             trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);

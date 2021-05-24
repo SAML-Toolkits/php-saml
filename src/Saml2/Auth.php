@@ -275,7 +275,7 @@ class Auth
      *
      * @throws Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false): ResponseInterface
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false)
     {
         if ($stay !== false) {
             trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
@@ -359,7 +359,7 @@ class Auth
      *
      * @return string|ResponseInterface
      */
-    public function redirectTo($url = '', array $parameters = array(), $stay = false): ResponseInterface
+    public function redirectTo($url = '', array $parameters = array(), $stay = false)
     {
         if ($stay !== false) {
             trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
@@ -545,7 +545,7 @@ class Auth
      *
      * @throws Error
      */
-    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, $nameIdValueReq = null): ResponseInterface
+    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, $nameIdValueReq = null)
     {
         if ($stay !== false) {
             trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
@@ -589,7 +589,7 @@ class Auth
      *
      * @throws Error
      */
-    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null): ResponseInterface
+    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
     {
         if ($stay !== false) {
             trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
@@ -686,7 +686,7 @@ class Auth
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null): ResponseInterface
+    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
     {
         return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
     }
