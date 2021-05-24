@@ -15,6 +15,7 @@
 
 namespace OneLogin\Saml2;
 
+use Psr\Http\Message\ResponseInterface;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecEnc;
@@ -303,12 +304,15 @@ class Utils
      * @param array  $parameters Extra parameters to be passed as part of the url
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
-     * @return string|null $url
+     * @return string|ResponseInterface $url
      *
      * @throws Error
      */
-    public static function redirect($url, array $parameters = array(), $stay = false)
+    public static function redirect($url, array $parameters = array(), $stay = false): ResponseInterface
     {
+        if ($stay !== false) {
+            trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
+        }
         assert(is_string($url));
 
         if (substr($url, 0, 1) === '/') {
@@ -360,10 +364,7 @@ class Utils
             return $url;
         }
 
-        header('Pragma: no-cache');
-        header('Cache-Control: no-cache, must-revalidate');
-        header('Location: ' . $url);
-        exit();
+        return new \GuzzleHttp\Psr7\Response(302, ['location' => [(string) $url]]);
     }
 
      /**

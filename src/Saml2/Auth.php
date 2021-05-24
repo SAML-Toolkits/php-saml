@@ -15,6 +15,7 @@
 
 namespace OneLogin\Saml2;
 
+use Psr\Http\Message\ResponseInterface;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 use Exception;
@@ -270,12 +271,16 @@ class Auth
      * @param callable    $cbDeleteSession              Callback to be executed to delete session
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
-     * @return string|null
+     * @return string|ResponseInterface
      *
      * @throws Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false): ResponseInterface
     {
+        if ($stay !== false) {
+            trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
+        }
+
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
         if (isset($_GET['SAMLResponse'])) {
@@ -352,10 +357,13 @@ class Auth
      * @param array  $parameters Extra parameters to be passed as part of the url
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
-     * @return string|null
+     * @return string|ResponseInterface
      */
-    public function redirectTo($url = '', array $parameters = array(), $stay = false)
+    public function redirectTo($url = '', array $parameters = array(), $stay = false): ResponseInterface
     {
+        if ($stay !== false) {
+            trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
+        }
         assert(is_string($url));
 
         if (empty($url) && isset($_REQUEST['RelayState'])) {
@@ -533,12 +541,16 @@ class Auth
      * @param bool        $setNameIdPolicy When true the AuthNRequest will set a nameIdPolicy element
      * @param string      $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
-     * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @return string|ResponseInterface
      *
      * @throws Error
      */
-    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, $nameIdValueReq = null)
+    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, $nameIdValueReq = null): ResponseInterface
     {
+        if ($stay !== false) {
+            trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
+        }
+
         $authnRequest = $this->buildAuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
 
         $this->_lastRequest = $authnRequest->getXML();
@@ -573,12 +585,16 @@ class Auth
      * @param string|null $nameIdFormat        The NameID Format will be set in the LogoutRequest.
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
-     * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @return string|ResponseInterface If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
      *
      * @throws Error
      */
-    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null): ResponseInterface
     {
+        if ($stay !== false) {
+            trigger_error('stay is deprecated and will be removed in a future release', E_USER_NOTICE);
+        }
+
         $sloUrl = $this->getSLOurl();
         if (empty($sloUrl)) {
             throw new Error(
@@ -670,7 +686,7 @@ class Auth
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
+    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null): ResponseInterface
     {
         return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
     }
