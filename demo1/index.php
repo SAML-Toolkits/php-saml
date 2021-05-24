@@ -15,21 +15,25 @@ require_once 'settings.php';
 
 $auth = new Auth($settingsInfo);
 
-if (isset($_GET['sso'])) {
-    $auth->login();
+/** @var \GuzzleHttp\Psr7\ServerRequest $request */
+$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
 
+if (isset($request->getQueryParams()['sso'])) {
+    return $auth->login();
     # If AuthNRequest ID need to be saved in order to later validate it, do instead
     # $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
     # $_SESSION['AuthNRequestID'] = $auth->getLastRequestID();
-    # header('Pragma: no-cache');
-    # header('Cache-Control: no-cache, must-revalidate');
-    # header('Location: ' . $ssoBuiltUrl);
-    # exit();
+    # return new \GuzzleHttp\Psr7\Response(302, [
+    #   'Pragma' => 'no-cache',
+    #   'Cache-Control' => 'no-cache, must-revalidate',
+    #   'location' => [(string) $ssoBuiltUrl]
+    #]);
 
-} else if (isset($_GET['sso2'])) {
+
+} else if (isset($request->getQueryParams()['sso2'])) {
     $returnTo = $spBaseUrl.'/demo1/attrs.php';
-    $auth->login($returnTo);
-} else if (isset($_GET['slo'])) {
+    return $auth->login($returnTo);
+} else if (isset($request->getQueryParams()['slo'])) {
     $returnTo = null;
     $paramters = array();
     $nameId = null;
@@ -54,7 +58,7 @@ if (isset($_GET['sso'])) {
         $sessionIndex = $_SESSION['samlSessionIndex'];
     }
 
-    $auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
+    return $auth->logout($returnTo, $paramters, $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 
     # If LogoutRequest ID need to be saved in order to later validate it, do instead
     # $sloBuiltUrl = $auth->logout(null, $paramters, $nameId, $sessionIndex, true);
@@ -64,7 +68,7 @@ if (isset($_GET['sso'])) {
     # header('Location: ' . $sloBuiltUrl);
     # exit();
 
-} else if (isset($_GET['acs'])) {
+} else if (isset($request->getQueryParams()['acs'])) {
     if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
         $requestID = $_SESSION['AuthNRequestID'];
     } else {
@@ -76,15 +80,15 @@ if (isset($_GET['sso'])) {
     $errors = $auth->getErrors();
 
     if (!empty($errors)) {
-        echo '<p>' . implode(', ', $errors) . '</p>';
+        $html = '<p>' . implode(', ', $errors) . '</p>';
         if ($auth->getSettings()->isDebugActive()) {
-            echo '<p>'.$auth->getLastErrorReason().'</p>';
+            $html .= '<p>'.$auth->getLastErrorReason().'</p>';
         }
+        return new \GuzzleHttp\Psr7\Response(500, [], $html);
     }
 
     if (!$auth->isAuthenticated()) {
-        echo '<p>Not authenticated</p>';
-        exit();
+        return new \GuzzleHttp\Psr7\Response(401, [], '<p>Not authenticated</p>');
     }
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
@@ -95,10 +99,11 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
 
     unset($_SESSION['AuthNRequestID']);
-    if (isset($_POST['RelayState']) && Utils::getSelfURL() != $_POST['RelayState']) {
-        $auth->redirectTo($_POST['RelayState']);
+    $relayState = $request->getParsedBody()['RelayState'] ?? null;
+    if ($relayState !== null && Utils::getSelfURL() !== $relayState) {
+        return $auth->redirectTo($relayState);
     }
-} else if (isset($_GET['sls'])) {
+} else if (isset($request->getQueryParams()['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
         $requestID = $_SESSION['LogoutRequestID'];
     } else {
@@ -108,11 +113,11 @@ if (isset($_GET['sso'])) {
     $auth->processSLO(false, $requestID);
     $errors = $auth->getErrors();
     if (empty($errors)) {
-        echo '<p>Sucessfully logged out</p>';
+        $html = '<p>Sucessfully logged out</p>';
     } else {
-        echo '<p>' . implode(', ', $errors) . '</p>';
+        $html = '<p>' . implode(', ', $errors) . '</p>';
         if ($auth->getSettings()->isDebugActive()) {
-            echo '<p>'.$auth->getLastErrorReason().'</p>';
+            $html .= '<p>'.$auth->getLastErrorReason().'</p>';
         }
     }
 }
@@ -120,22 +125,24 @@ if (isset($_GET['sso'])) {
 if (isset($_SESSION['samlUserdata'])) {
     if (!empty($_SESSION['samlUserdata'])) {
         $attributes = $_SESSION['samlUserdata'];
-        echo 'You have the following attributes:<br>';
-        echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+        $html .= 'You have the following attributes:<br>';
+        $html .= '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
         foreach ($attributes as $attributeName => $attributeValues) {
-            echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+            $html .= '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
             foreach ($attributeValues as $attributeValue) {
-                echo '<li>' . htmlentities($attributeValue) . '</li>';
+                $html .= '<li>' . htmlentities($attributeValue) . '</li>';
             }
-            echo '</ul></td></tr>';
+            $html .= '</ul></td></tr>';
         }
-        echo '</tbody></table>';
+        $html .= '</tbody></table>';
     } else {
-        echo "<p>You don't have any attribute</p>";
+        $html .= "<p>You don't have any attribute</p>";
     }
 
-    echo '<p><a href="?slo" >Logout</a></p>';
+    $html .= '<p><a href="?slo" >Logout</a></p>';
 } else {
-    echo '<p><a href="?sso" >Login</a></p>';
-    echo '<p><a href="?sso2" >Login and access to attrs.php page</a></p>';
+    $html .= '<p><a href="?sso" >Login</a></p>';
+    $html .= '<p><a href="?sso2" >Login and access to attrs.php page</a></p>';
 }
+
+return new \GuzzleHttp\Psr7\Response(200, [], $html);

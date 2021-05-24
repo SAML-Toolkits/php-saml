@@ -14,6 +14,9 @@ use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 
+/** @var \GuzzleHttp\Psr7\ServerRequest $request */
+$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+
 $samlSettings = new Settings();
 
 $idpData = $samlSettings->getIdPData();
@@ -33,6 +36,4 @@ $samlRequest = $logoutRequest->getRequest();
 
 $parameters = array('SAMLRequest' => $samlRequest);
 
-$url = Utils::redirect($sloUrl, $parameters, true);
-
-header("Location: $url");
+return Utils::redirect($sloUrl, $parameters);

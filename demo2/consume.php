@@ -12,31 +12,36 @@ require_once dirname(__DIR__).'/_toolkit_loader.php';
 use OneLogin\Saml2\Response;
 use OneLogin\Saml2\Settings;
 
+/** @var \GuzzleHttp\Psr7\ServerRequest $request */
+$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+$html = '';
+
 try {
-    if (isset($_POST['SAMLResponse'])) {
+    if (isset($request->getParsedBody()['SAMLResponse'])) {
         $samlSettings = new Settings();
-        $samlResponse = new Response($samlSettings, $_POST['SAMLResponse']);
+        $samlResponse = new Response($samlSettings, $request->getParsedBody()['SAMLResponse']);
         if ($samlResponse->isValid()) {
-            echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+            $html .= 'You are: ' . $samlResponse->getNameId() . '<br>';
             $attributes = $samlResponse->getAttributes();
             if (!empty($attributes)) {
-                echo 'You have the following attributes:<br>';
-                echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+                $html .= 'You have the following attributes:<br>';
+                $html .= '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
                 foreach ($attributes as $attributeName => $attributeValues) {
-                    echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+                    $html .= '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
                     foreach ($attributeValues as $attributeValue) {
-                        echo '<li>' . htmlentities($attributeValue) . '</li>';
+                        $html .= '<li>' . htmlentities($attributeValue) . '</li>';
                     }
-                    echo '</ul></td></tr>';
+                    $html .= '</ul></td></tr>';
                 }
-                echo '</tbody></table>';
+                $html .= '</tbody></table>';
             }
         } else {
-            echo 'Invalid SAML Response';
+            $html .= 'Invalid SAML Response';
         }
     } else {
-        echo 'No SAML Response found in POST.';
+        $html .= 'No SAML Response found in POST.';
     }
+    return new \GuzzleHttp\Psr7\Response(200, [], 'Invalid SAML Response: ' . $html);
 } catch (Exception $e) {
-    echo 'Invalid SAML Response: ' . $e->getMessage();
+    return new \GuzzleHttp\Psr7\Response(400, [], 'Invalid SAML Response: ' . $e->getMessage());
 }

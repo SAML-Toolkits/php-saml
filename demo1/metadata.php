@@ -19,8 +19,7 @@ try {
     $metadata = $settings->getSPMetadata();
     $errors = $settings->validateMetadata($metadata);
     if (empty($errors)) {
-        header('Content-Type: text/xml');
-        echo $metadata;
+	    return new \GuzzleHttp\Psr7\Response(500, ['Content-Type', 'text/xml'], $metadata);
     } else {
         throw new Error(
             'Invalid SP metadata: '.implode(', ', $errors),
@@ -28,5 +27,5 @@ try {
         );
     }
 } catch (Exception $e) {
-    echo $e->getMessage();
+	return new \GuzzleHttp\Psr7\Response(500, [], $e->getMessage());
 }

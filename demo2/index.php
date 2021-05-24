@@ -16,6 +16,9 @@ use OneLogin\Saml2\AuthnRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 
+/** @var \GuzzleHttp\Psr7\ServerRequest $request */
+$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+
 if (!isset($_SESSION['samlUserdata'])) {
     $settings = new Settings();
     $authRequest = new AuthnRequest($settings);
@@ -26,27 +29,28 @@ if (!isset($_SESSION['samlUserdata'])) {
 
     $idpData = $settings->getIdPData();
     $ssoUrl = $idpData['singleSignOnService']['url'];
-    $url = Utils::redirect($ssoUrl, $parameters, true);
-
-    header("Location: $url");
+    return Utils::redirect($ssoUrl, $parameters);
 } else {
+    $html = '';
     if (!empty($_SESSION['samlUserdata'])) {
         $attributes = $_SESSION['samlUserdata'];
-        echo 'You have the following attributes:<br>';
-        echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+        $html .= 'You have the following attributes:<br>';
+        $html .= '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
         foreach ($attributes as $attributeName => $attributeValues) {
-            echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+            $html .= '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
             foreach ($attributeValues as $attributeValue) {
-                echo '<li>' . htmlentities($attributeValue) . '</li>';
+                $html .= '<li>' . htmlentities($attributeValue) . '</li>';
             }
-            echo '</ul></td></tr>';
+            $html .= '</ul></td></tr>';
         }
-        echo '</tbody></table>';
+        $html .= '</tbody></table>';
         if (!empty($_SESSION['IdPSessionIndex'])) {
-            echo '<p>The SessionIndex of the IdP is: '.$_SESSION['IdPSessionIndex'].'</p>';
+            $html .= '<p>The SessionIndex of the IdP is: '.$_SESSION['IdPSessionIndex'].'</p>';
         }
     } else {
-        echo "<p>You don't have any attribute</p>";
+        $html .= "<p>You don't have any attribute</p>";
     }
-    echo '<p><a href="slo.php">Logout</a></p>';
+    $html .= '<p><a href="slo.php">Logout</a></p>';
+
+    return new \GuzzleHttp\Psr7\Response(200, [], $html);
 }

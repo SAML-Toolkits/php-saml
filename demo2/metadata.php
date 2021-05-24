@@ -11,10 +11,9 @@ require_once dirname(__DIR__).'/_toolkit_loader.php';
 use OneLogin\Saml2\Metadata;
 use OneLogin\Saml2\Settings;
 
-header('Content-Type: text/xml');
-
 $samlSettings = new Settings();
 $sp = $samlSettings->getSPData();
 
 $samlMetadata = Metadata::builder($sp);
-echo $samlMetadata;
+
+return new \GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'text/xml'], $samlMetadata);
