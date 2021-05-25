@@ -10,6 +10,10 @@ class OneLogin_Saml2_IdPMetadataParser
     /**
      * Get IdP Metadata Info from URL
      *
+     * This class does not validate in any way the URL that is introduced,
+     * make sure to validate it properly before use it in the parseRemoteXML
+     * method in order to avoid security issues like SSRF attacks.
+     *
      * @param string $url                   URL where the IdP metadata is published
      * @param string $entityId              Entity Id of the desired IdP, if no
      *                                      entity Id is provided and the XML
@@ -27,6 +31,9 @@ class OneLogin_Saml2_IdPMetadataParser
 
         try {
             $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
+            curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS  | CURLPROTO_HTTP);
+            curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
