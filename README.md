@@ -1390,6 +1390,9 @@ Auxiliary class that contains several methods to retrieve and process IdP metada
  * `parseXML` - Get IdP Metadata Info from XML.
  * `injectIntoSettings` - Inject metadata info into php-saml settings array.
 
+The class does not validate in any way the URL that is introduced on methods like parseRemoteXML in order to retrieve the remove XML. Usually is the same administrator that handles the Service Provider the ones that set the URL that should belong to a trusted third-party IdP.
+But there are other scenarios, like a SAAS app where the administrator of the app delegates on other administrators. In such case, extra protection should be taken in order to validate such URL inputs and avoid attacks like SSRF.
+
 
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where
