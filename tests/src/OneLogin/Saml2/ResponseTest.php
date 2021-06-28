@@ -184,7 +184,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $nameId10 = $response10->getNameId();
             $this->fail('OneLogin_Saml2_ValidationError was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertContains('The SPNameQualifier value mismatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new OneLogin_Saml2_Response($settings, $xml6);
@@ -395,7 +395,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
             $nameIdData10 = $response10->getNameIdData();
             $this->fail('OneLogin_Saml2_ValidationError was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertContains('The SPNameQualifier value mismatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new OneLogin_Saml2_Response($settings, $xml6);
