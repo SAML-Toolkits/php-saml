@@ -624,7 +624,7 @@ class OneLogin_Saml2_Response
                         $spEntityId = $spData['entityId'];
                         if ($spEntityId != $nameId->getAttribute($attr)) {
                             throw new OneLogin_Saml2_ValidationError(
-                                "The SPNameQualifier value mistmatch the SP entityID value.",
+                                "The SPNameQualifier value mismatch the SP entityID value.",
                                 OneLogin_Saml2_ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
                             );
                         }
