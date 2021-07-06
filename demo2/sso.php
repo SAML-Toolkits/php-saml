@@ -18,8 +18,8 @@ use OneLogin\Saml2\Utils;
 $auth = new OneLogin\Saml2\Auth();
 
 if (!isset($_SESSION['samlUserdata'])) {
-    $auth->login();
+    return $auth->login();
 } else {
     $indexUrl = str_replace('/sso.php', '/index.php', Utils::getSelfURLNoQuery());
-    Utils::redirect($indexUrl);
+    return Utils::redirect($indexUrl);
 }
