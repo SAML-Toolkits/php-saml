@@ -713,7 +713,7 @@ This code will provide the XML metadata file of our SP, based on the info that w
 <?php
 
 define("TOOLKIT_PATH", '/var/www/php-saml/');
-require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php';
+require_once dirname(TOOLKIT_PATH.'/_toolkit_loader.php');
 
 try {
     $auth = new OneLogin_Saml2_Auth();
