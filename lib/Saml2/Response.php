@@ -792,7 +792,7 @@ class OneLogin_Saml2_Response
 
             $attributeKeyName = $attributeKeyNode->nodeValue;
 
-            if (in_array($attributeKeyName, array_keys($attributes))) {
+            if (in_array($attributeKeyName, array_keys($attributes), true)) {
                 if (!$allowRepeatAttributeName) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Found an Attribute element with duplicated ".$keyName,
@@ -809,7 +809,7 @@ class OneLogin_Saml2_Response
                 }
             }
 
-            if (in_array($attributeKeyName, array_keys($attributes))) {
+            if (in_array($attributeKeyName, array_keys($attributes), true)) {
                 $attributes[$attributeKeyName] = array_merge($attributes[$attributeKeyName], $attributeValues);
             } else {
                 $attributes[$attributeKeyName] = $attributeValues;
