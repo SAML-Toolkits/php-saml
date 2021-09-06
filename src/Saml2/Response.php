@@ -814,7 +814,7 @@ class Response
                 continue;
             }
             $attributeKeyName = $attributeKeyNode->nodeValue;
-            if (in_array($attributeKeyName, array_keys($attributes))) {
+            if (in_array($attributeKeyName, array_keys($attributes), true)) {
                 if (!$allowRepeatAttributeName) {
                     throw new ValidationError(
                         "Found an Attribute element with duplicated ".$keyName,
@@ -830,7 +830,7 @@ class Response
                 }
             }
 
-            if (in_array($attributeKeyName, array_keys($attributes))) {
+            if (in_array($attributeKeyName, array_keys($attributes), true)) {
                 $attributes[$attributeKeyName] = array_merge($attributes[$attributeKeyName], $attributeValues);
             } else {
                 $attributes[$attributeKeyName] = $attributeValues;
