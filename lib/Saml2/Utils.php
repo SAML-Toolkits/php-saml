@@ -88,9 +88,7 @@ class OneLogin_Saml2_Utils
             throw new Exception('Detected use of ENTITY in XML, disabled to prevent XXE/XEE attacks');
         }
 
-        $oldEntityLoader = libxml_disable_entity_loader(true);
         $res = $dom->loadXML($xml);
-        libxml_disable_entity_loader($oldEntityLoader);
 
         if (!$res) {
             return false;
@@ -131,9 +129,7 @@ class OneLogin_Saml2_Utils
         }
 
         $schemaFile = __DIR__.'/schemas/' . $schema;
-        $oldEntityLoader = libxml_disable_entity_loader(false);
         $res = $dom->schemaValidate($schemaFile);
-        libxml_disable_entity_loader($oldEntityLoader);
         if (!$res) {
             $xmlErrors = libxml_get_errors();
             syslog(LOG_INFO, 'Error validating the metadata: '.var_export($xmlErrors, true));
