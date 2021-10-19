@@ -38,5 +38,5 @@ try {
         echo 'No SAML Response found in POST.';
     }
 } catch (Exception $e) {
-    echo 'Invalid SAML Response: ' . $e->getMessage();
+    echo htmlentities('Invalid SAML Response: ' . $e->getMessage());
 }
