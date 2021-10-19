@@ -76,9 +76,9 @@ if (isset($_GET['sso'])) {
     $errors = $auth->getErrors();
 
     if (!empty($errors)) {
-        echo '<p>' . implode(', ', $errors) . '</p>';
+        echo '<p>' . htmlentities(implode(', ', $errors)) . '</p>';
         if ($auth->getSettings()->isDebugActive()) {
-            echo '<p>'.$auth->getLastErrorReason().'</p>';
+            echo '<p>'.htmlentities($auth->getLastErrorReason()).'</p>';
         }
     }
 
@@ -96,6 +96,9 @@ if (isset($_GET['sso'])) {
 
     unset($_SESSION['AuthNRequestID']);
     if (isset($_POST['RelayState']) && Utils::getSelfURL() != $_POST['RelayState']) {
+        // To avoid 'Open Redirect' attacks, before execute the
+        // redirection confirm the value of $_POST['RelayState']
+        // is a trusted URL.
         $auth->redirectTo($_POST['RelayState']);
     }
 } else if (isset($_GET['sls'])) {
@@ -110,9 +113,9 @@ if (isset($_GET['sso'])) {
     if (empty($errors)) {
         echo '<p>Sucessfully logged out</p>';
     } else {
-        echo '<p>' . implode(', ', $errors) . '</p>';
+        echo '<p>' . htmlentities(implode(', ', $errors)) . '</p>';
         if ($auth->getSettings()->isDebugActive()) {
-            echo '<p>'.$auth->getLastErrorReason().'</p>';
+            echo '<p>'.htmlentities($auth->getLastErrorReason()).'</p>';
         }
     }
 }
