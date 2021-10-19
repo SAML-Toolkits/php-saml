@@ -14,7 +14,7 @@ try {
         $samlSettings = new OneLogin_Saml2_Settings();
         $samlResponse = new OneLogin_Saml2_Response($samlSettings, $_POST['SAMLResponse']);
         if ($samlResponse->isValid()) {
-            echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+            echo 'You are: ' . htmlentities($samlResponse->getNameId()) . '<br>';
             $attributes = $samlResponse->getAttributes();
             if (!empty($attributes)) {
                 echo 'You have the following attributes:<br>';
@@ -35,5 +35,5 @@ try {
         echo 'No SAML Response found in POST.';
     }
 } catch (Exception $e) {
-    echo 'Invalid SAML Response: ' . $e->getMessage();
+    echo 'Invalid SAML Response: ' . htmlentities($e->getMessage());
 }

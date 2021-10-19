@@ -16,5 +16,5 @@ $errors = $auth->getErrors();
 if (empty($errors)) {
     echo 'Sucessfully logged out';
 } else {
-    echo implode(', ', $errors);
+    echo htmlentities(implode(', ', $errors));
 }
