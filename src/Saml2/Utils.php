@@ -743,7 +743,7 @@ class Utils
      */
     public static function generateUniqueID()
     {
-        return 'ONELOGIN_' . sha1(uniqid((string)mt_rand(), true));
+        return 'ONELOGIN_' . sha1(random_bytes(20));
     }
 
     /**
