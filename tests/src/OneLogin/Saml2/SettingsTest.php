@@ -1164,4 +1164,17 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
         $this->assertTrue($settings3->isDebugActive());
     }
+    /**
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings::checkSettings
+     */
+    public function testSpValidateOnlyIsTrue()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo,true);
+        $this->assertEmpty($settings->getErrors());
+    }
 }

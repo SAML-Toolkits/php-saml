@@ -144,12 +144,13 @@ class OneLogin_Saml2_Auth
      * Initializes the SP SAML instance.
      *
      * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
+     * @param bool $spValidationOnly if you only as an SP , you should set it to false if not you should set it to true
      *
      * @throws OneLogin_Saml2_Error
      */
-    public function __construct($oldSettings = null)
+    public function __construct($oldSettings = null , $spValidationOnly = true)
     {
-        $this->_settings = new OneLogin_Saml2_Settings($oldSettings);
+        $this->_settings = new OneLogin_Saml2_Settings($oldSettings, $spValidationOnly);
     }
 
     /**
