@@ -1165,7 +1165,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($settings3->isDebugActive());
     }
     /**
-     * Tests the checkSettings method of the OneLogin_Saml2_Settings
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings when SpValidateOnly is false and IdP is not defined
      *
      * @covers OneLogin_Saml2_Settings::checkSettings
      */
@@ -1174,7 +1174,25 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
         unset($settingsInfo['idp']);
-        $settings = new OneLogin_Saml2_Settings($settingsInfo,true);
+        $settings = new OneLogin_Saml2_Settings($settingsInfo, true);
         $this->assertEmpty($settings->getErrors());
+    }
+
+    /**
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings when SpValidateOnly is false and IdP is not defined
+     *
+     * @covers OneLogin_Saml2_Settings::checkSettings
+     */
+    public function testSpValidateOnlyIsFalse()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+        try {
+            $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        }catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+        $this->assertEmpty($settings);
     }
 }

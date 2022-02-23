@@ -148,7 +148,7 @@ class OneLogin_Saml2_Auth
      *
      * @throws OneLogin_Saml2_Error
      */
-    public function __construct($oldSettings = null , $spValidationOnly = true)
+    public function __construct($oldSettings = null , $spValidationOnly = false)
     {
         $this->_settings = new OneLogin_Saml2_Settings($oldSettings, $spValidationOnly);
     }
