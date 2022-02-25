@@ -1193,6 +1193,5 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         }catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('idp_not_found', $e->getMessage());
         }
-        $this->assertEmpty($settings);
     }
 }
