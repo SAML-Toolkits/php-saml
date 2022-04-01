@@ -48,28 +48,28 @@ class Auth
     /**
      * NameID
      *
-     * @var string
+     * @var string|null
      */
     private $_nameid;
 
     /**
      * NameID Format
      *
-     * @var string
+     * @var string|null
      */
     private $_nameidFormat;
 
     /**
      * NameID NameQualifier
      *
-     * @var string
+     * @var string|null
      */
     private $_nameidNameQualifier;
 
     /**
      * NameID SP NameQualifier
      *
-     * @var string
+     * @var string|null
      */
     private $_nameidSPNameQualifier;
 
@@ -399,7 +399,7 @@ class Auth
     /**
      * Returns the nameID
      *
-     * @return string  The nameID of the assertion
+     * @return string|null  The nameID of the assertion
      */
     public function getNameId()
     {
@@ -409,7 +409,7 @@ class Auth
     /**
      * Returns the nameID Format
      *
-     * @return string  The nameID Format of the assertion
+     * @return string|null  The nameID Format of the assertion
      */
     public function getNameIdFormat()
     {
@@ -419,7 +419,7 @@ class Auth
     /**
      * Returns the nameID NameQualifier
      *
-     * @return string  The nameID NameQualifier of the assertion
+     * @return string|null  The nameID NameQualifier of the assertion
      */
     public function getNameIdNameQualifier()
     {
@@ -429,7 +429,7 @@ class Auth
     /**
      * Returns the nameID SP NameQualifier
      *
-     * @return string  The nameID SP NameQualifier of the assertion
+     * @return string|null  The nameID SP NameQualifier of the assertion
      */
     public function getNameIdSPNameQualifier()
     {
