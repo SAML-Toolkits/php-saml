@@ -221,6 +221,10 @@ class Utils
      */
     public static function formatCert($cert, $heads = true)
     {
+        if (is_null($cert)) {
+          return;
+        }
+
         $x509cert = str_replace(array("\x0D", "\r", "\n"), "", $cert);
         if (!empty($x509cert)) {
             $x509cert = str_replace('-----BEGIN CERTIFICATE-----', "", $x509cert);
@@ -245,6 +249,10 @@ class Utils
      */
     public static function formatPrivateKey($key, $heads = true)
     {
+        if (is_null($key)) {
+          return;
+        }
+
         $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
         if (!empty($key)) {
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
@@ -319,7 +327,12 @@ class Utils
          * Verify that the URL matches the regex for the protocol.
          * By default this will check for http and https
          */
-        $wrongProtocol = !preg_match(self::$_protocolRegex, $url);
+        if (isset(self::$_protocolRegex)) {
+            $protocol = $_protocolRegex;
+        } else {
+            $protocol = "";
+        }
+        $wrongProtocol = !preg_match($protocol, $url);
         $url = filter_var($url, FILTER_VALIDATE_URL);
         if ($wrongProtocol || empty($url)) {
             throw new Error(
@@ -773,6 +786,10 @@ class Utils
      */
     public static function parseSAML2Time($time)
     {
+        if (empty($time)) {
+          return null;
+        }
+
         $matches = array();
 
         /* We use a very strict regex to parse the timestamp. */
@@ -1010,7 +1027,10 @@ class Utils
                 if (strncmp($curData, '-----END CERTIFICATE', 20) == 0) {
                     break;
                 }
-                $data .= trim($curData);
+                if (isset($curData)) {
+                    $curData = trim($curData);
+                }
+                $data .= $curData;
             }
         }
 
@@ -1043,6 +1063,9 @@ class Utils
      */
     public static function formatFingerPrint($fingerprint)
     {
+        if (is_null($fingerprint)) {
+            return;
+        }
         $formatedFingerprint = str_replace(':', '', $fingerprint);
         $formatedFingerprint = strtolower($formatedFingerprint);
         return $formatedFingerprint;
