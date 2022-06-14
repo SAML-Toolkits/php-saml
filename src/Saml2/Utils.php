@@ -328,7 +328,7 @@ class Utils
          * By default this will check for http and https
          */
         if (isset(self::$_protocolRegex)) {
-            $protocol = $_protocolRegex;
+            $protocol = self::$_protocolRegex;
         } else {
             $protocol = "";
         }
