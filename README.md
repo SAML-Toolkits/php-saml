@@ -541,7 +541,7 @@ $advancedSettings = array (
         // Set to false and no AuthContext will be sent in the AuthNRequest.
         // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
         // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
-        'requestedAuthnContext' => false,
+        'requestedAuthnContext' => true,
 
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
@@ -572,7 +572,7 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384'
         //    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
         // Notice that sha1 is a deprecated algorithm and should not be used
-        'signatureAlgorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
+        'signatureAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
 
         // Algorithm that the toolkit will use on digest process. Options:
         //    'http://www.w3.org/2000/09/xmldsig#sha1'
@@ -580,7 +580,7 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmldsig-more#sha384'
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
         // Notice that sha1 is a deprecated algorithm and should not be used
-        'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+        'digestAlgorithm' => 'http://www.w3.org/2000/09/xmldsig#sha1',
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
