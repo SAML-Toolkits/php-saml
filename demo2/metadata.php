@@ -10,8 +10,8 @@ require_once '../_toolkit_loader.php';
 
 header('Content-Type: text/xml');
 
-$samlSettings = new OneLogin_Saml2_Settings();
+$samlSettings = new OneLogin\Saml2\Settings();
 $sp = $samlSettings->getSPData();
 
-$samlMetadata = OneLogin_Saml2_Metadata::builder($sp);
+$samlMetadata = OneLogin\Saml2\Metadata::builder($sp);
 echo $samlMetadata;

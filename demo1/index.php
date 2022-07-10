@@ -9,7 +9,7 @@ require_once dirname(__DIR__).'/_toolkit_loader.php';
 
 require_once 'settings.php';
 
-$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$auth = new OneLogin\Saml2\Auth($settingsInfo);
 
 if (isset($_GET['sso'])) {
     $auth->login();
@@ -90,7 +90,7 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlNameIdSPNameQualifier'] = $auth->getNameIdSPNameQualifier();
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
-    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+    if (isset($_POST['RelayState']) && OneLogin\Saml2\Utils::getSelfURL() != $_POST['RelayState']) {
         // To avoid 'Open Redirect' attacks, before execute the 
         // redirection confirm the value of $_POST['RelayState'] is a // trusted URL.
         $auth->redirectTo($_POST['RelayState']);
