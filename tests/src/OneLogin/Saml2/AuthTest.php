@@ -1578,4 +1578,35 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $this->_auth->processSLO(false, null, false, null, true);
         $this->assertEquals('_f9ee61bd9dbf63606faa9ae3b10548d5b3656fb859', $this->_auth->getLastMessageId());
     }
+
+    /**
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings when SpValidateOnly is false and IdP is not defined
+     *
+     * @covers OneLogin_Saml2_Settings::checkSettings
+     */
+    public function testSpValidateOnlyIsTrue()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings2.php';
+        unset($settingsInfo['idp']);
+        $settings = new Settings($settingsInfo, true);
+        $this->assertEmpty($settings->getErrors());
+    }
+
+    /**
+     * Tests the checkSettings method of the OneLogin_Saml2_Settings when SpValidateOnly is false and IdP is not defined
+     *
+     * @covers OneLogin_Saml2_Settings::checkSettings
+     */
+    public function testSpValidateOnlyIsFalse()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings2.php';
+        unset($settingsInfo['idp']);
+        try {
+            $settings = new Settings($settingsInfo);
+        } catch (Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+    }
 }
