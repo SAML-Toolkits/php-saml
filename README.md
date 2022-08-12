@@ -2,6 +2,8 @@
 
 [![Build Status](https://api.travis-ci.org/onelogin/php-saml.png?branch=master)](http://travis-ci.org/onelogin/php-saml) [![Coverage Status](https://coveralls.io/repos/onelogin/php-saml/badge.png)](https://coveralls.io/r/onelogin/php-saml) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
 
+## **Notice:** This project is currently not under active development, please see [#531](https://github.com/onelogin/php-saml/issues/531) for more information.
+
 Add SAML support to your PHP software using this library.
 Forget those complicated libraries and use this open source library provided
 and supported by OneLogin Inc.
