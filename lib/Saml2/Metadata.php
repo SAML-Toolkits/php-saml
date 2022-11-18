@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Metadata lib of OneLogin PHP Toolkit
+ * Metadata lib of PHP Toolkit
  *
  */
 

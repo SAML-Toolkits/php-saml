@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Configuration of the OneLogin PHP Toolkit
+ * Configuration of the PHP Toolkit
  *
  */
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Main class of OneLogin's PHP Toolkit
+ * Main class of PHP Toolkit
  *
  */
 class OneLogin_Saml2_Auth
@@ -759,7 +759,7 @@ class OneLogin_Saml2_Auth
                 $response = $this->_lastResponse->saveXML();
             }
         }
-        
+
         return $response;
     }
 }

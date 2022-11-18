@@ -3,7 +3,7 @@ The example requires that SP and IdP are well configured before test it.
 SP setup
 --------
 
-The Onelogin's PHP Toolkit allows you to provide the settings info in 2 ways:
+The PHP Toolkit allows you to provide the settings info in 2 ways:
  * Use a settings.php file that we should locate at the base folder of the
    toolkit.
  * Use an array with the setting data.
@@ -59,7 +59,7 @@ How it works
     endpoint). The SLS endpoint (index.php?sls)of the SP process the Logout
     Response and if is valid, close the user session of the local app. Notice
     that the SLO Workflow starts and ends at the SP.
-   
+
     5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP
     side, the logout process is initiated at the idP, sends a Logout Request to the SP (SLS endpoint, index.php?sls). The SLS endpoint of the SP
     process the Logout Request and if is valid, close the session of the user

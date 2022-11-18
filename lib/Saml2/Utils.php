@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Utils of OneLogin PHP Toolkit
+ * Utils of PHP Toolkit
  *
  * Defines several often used methods
  */

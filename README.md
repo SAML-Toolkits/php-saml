@@ -1,12 +1,8 @@
-# OneLogin's SAML PHP Toolkit
+# SAML PHP Toolkit
 
 [![Build Status](https://api.travis-ci.org/onelogin/php-saml.png?branch=master)](http://travis-ci.org/onelogin/php-saml) [![Coverage Status](https://coveralls.io/repos/onelogin/php-saml/badge.png)](https://coveralls.io/r/onelogin/php-saml) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
 
-## **Notice:** This project is currently not under active development, please see [#531](https://github.com/onelogin/php-saml/issues/531) for more information.
-
 Add SAML support to your PHP software using this library.
-Forget those complicated libraries and use this open source library provided
-and supported by OneLogin Inc.
 
 
 **The 3.X branch is compatible with PHP > 7.1, so if you are using that PHP version, use it and not the 2.X or the master branch**
@@ -22,7 +18,7 @@ Version 2.17.0 sets strict mode active by default
 
 Update php-saml to 2.15.0, this version includes a security patch related to XEE attacks
 
-php-saml is not affected by [201803-01](https://simplesamlphp.org/security/201803-01) 
+php-saml is not affected by [201803-01](https://simplesamlphp.org/security/201803-01)
 
 Update php-saml to 2.10.4, this version includes a security patch related to
 [signature validations on LogoutRequests/LogoutResponses](https://github.com/onelogin/php-saml/commit/949359f5cad5e1d085c4e5447d9aa8f49a6e82a1)
@@ -35,7 +31,7 @@ php-saml < v2.10.0 is vulnerable and allows signature wrapping!
 Security Guidelines
 -------------------
 
-If you believe you have discovered a security vulnerability in this toolkit, please report it at https://www.onelogin.com/security with a description. We follow responsible disclosure guidelines, and will work with you to quickly find a resolution.
+If you believe you have discovered a security vulnerability in this toolkit, please report it as an issue
 
 
 Why add SAML support to my software?
@@ -65,7 +61,7 @@ since 2002, but lately it is becoming popular due its advantages:
 General description
 -------------------
 
-OneLogin's SAML PHP toolkit let you build a SP (Service Provider) over
+SAML PHP toolkit let you build a SP (Service Provider) over
 your PHP application and connect it to any IdP (Identity Provider).
 
 Supports:
@@ -86,7 +82,7 @@ Key features:
  * **Easy to use** - Programmer will be allowed to code high-level and
    low-level programming, 2 easy to use APIs are available.
  * **Tested** - Thoroughly tested.
- * **Popular** - OneLogin's customers use it. Many PHP SAML plugins uses it.
+ * **Popular** - customers use it. Many PHP SAML plugins uses it.
 
 Integrate your PHP toolkit at OneLogin using this guide: [https://developers.onelogin.com/page/saml-toolkit-for-php](https://developers.onelogin.com/page/saml-toolkit-for-php)
 
@@ -356,7 +352,7 @@ $settings = array (
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
-            // message. OneLogin Toolkit supports this endpoint for the
+            // message. SAML Toolkit supports this endpoint for the
             // HTTP-POST binding only.
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         ),
@@ -382,7 +378,7 @@ $settings = array (
             // URL Location where the <Response> from the IdP will be returned
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
-            // message. OneLogin Toolkit supports the HTTP-Redirect binding
+            // message. SAML Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
@@ -415,7 +411,7 @@ $settings = array (
             // will be sent.
             'url' => '',
             // SAML protocol binding to be used when returning the <Response>
-            // message. OneLogin Toolkit supports the HTTP-Redirect binding
+            // message. SAML Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
@@ -425,9 +421,9 @@ $settings = array (
             'url' => '',
             // URL location of the IdP where the SP will send the SLO Response (ResponseLocation)
             // if not set, url for the SLO Request will be used
-            'responseUrl' => '',            
+            'responseUrl' => '',
             // SAML protocol binding to be used when returning the <Response>
-            // message. OneLogin Toolkit supports the HTTP-Redirect binding
+            // message. SAML Toolkit supports the HTTP-Redirect binding
             // only for this endpoint.
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
@@ -824,7 +820,7 @@ $_SESSION['samlNameidSPNameQualifier'] = $auth->getNameIdSPNameQualifier();
 $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
 
 if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-    // To avoid 'Open Redirect' attacks, before execute the 
+    // To avoid 'Open Redirect' attacks, before execute the
     // redirection confirm the value of $_POST['RelayState'] is a // trusted URL.
     $auth->redirectTo($_POST['RelayState']);
 }
@@ -1164,7 +1160,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
 
     $_SESSION['samlUserdata'] = $auth->getAttributes(); // Retrieves user data
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-        // To avoid 'Open Redirect' attacks, before execute the 
+        // To avoid 'Open Redirect' attacks, before execute the
         // redirection confirm the value of $_POST['RelayState'] is a // trusted URL.
         $auth->redirectTo($_POST['RelayState']);  // Redirect if there is a
     }                                             // relayState set
@@ -1219,9 +1215,9 @@ $needsAuth = empty($_SESSION['samlUserdata']);
 
 if ($needsAuth) {
     // put SAML settings into an array to avoid placing files in the
-    // composer vendor/ directories 
+    // composer vendor/ directories
     $samlsettings = array(/*...config goes here...*/);
-    
+
     $auth = new \OneLogin\Saml2\Auth($samlsettings);
 
     if (!empty($_REQUEST['SAMLResponse']) && !empty($_REQUEST['RelayState'])) {
@@ -1351,7 +1347,7 @@ Lets describe now the classes and methods of the SAML2 library.
 
 ##### OneLogin_Saml2_Auth - Auth.php #####
 
-Main class of OneLogin PHP Toolkit
+Main class of PHP Toolkit
 
  * `OneLogin_Saml2_Auth` - Initializes the SP SAML instance
  * `login` - Initiates the SSO process.
@@ -1448,7 +1444,7 @@ SAML 2 Logout Response class
 
 ##### OneLogin_Saml2_Settings - `Settings.php` #####
 
-Configuration of the OneLogin PHP Toolkit
+Configuration of the PHP Toolkit
 
  * `OneLogin_Saml2_Settings` -  Initializes the settings: Sets the paths of
    the different folders and Loads settings info from settings file or
@@ -1562,7 +1558,7 @@ Demos require that SP and IdP are well configured before test it.
 
 ### SP setup ###
 
-The Onelogin's PHP Toolkit allows you to provide the settings info in two ways:
+The PHP Toolkit allows you to provide the settings info in two ways:
 
  * Use a `settings.php` file that we should locate at the base folder of the
    toolkit.
@@ -1637,7 +1633,7 @@ must be done.
 
 ### SP setup ###
 
-The Onelogin's PHP Toolkit allows you to provide the settings info in two ways:
+The PHP Toolkit allows you to provide the settings info in two ways:
 
  * Use a `settings.php` file that we should locate at the base folder of the
    toolkit.

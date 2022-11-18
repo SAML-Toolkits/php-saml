@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IdP Metadata Parser of OneLogin PHP Toolkit
+ * IdP Metadata Parser of PHP Toolkit
  *
  */
 
