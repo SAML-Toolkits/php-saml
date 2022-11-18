@@ -1,7 +1,7 @@
 <?php
- 
+
 /**
- * Constants of OneLogin PHP Toolkit
+ * Constants of PHP Toolkit
  *
  * Defines all required constants
  */

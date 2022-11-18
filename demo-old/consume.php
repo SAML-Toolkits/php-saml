@@ -27,7 +27,7 @@ try {
                 echo '</ul></td></tr>';
             }
             echo '</tbody></table><br><br>';
-            echo "The v.1 of the Onelogin's PHP SAML Tookit does not support SLO.";
+            echo "The v.1 of the PHP SAML Tookit does not support SLO.";
         }
     } else {
         echo 'Invalid SAML response.';

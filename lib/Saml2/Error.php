@@ -1,7 +1,7 @@
 <?php
- 
+
 /**
- * Error class of OneLogin PHP Toolkit
+ * Error class of PHP Toolkit
  *
  * Defines the Error class
  */
