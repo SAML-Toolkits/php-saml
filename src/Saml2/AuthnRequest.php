@@ -139,7 +139,7 @@ REQUESTEDAUTHN;
     Version="2.0"
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
-    Destination="{$idpData['singleSignOnService']['url']}"
+    Destination="{$idpData['singleSignOnService']['destination_url']}"
     ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
     AssertionConsumerServiceURL="{$acsUrl}">
     <saml:Issuer>{$spEntityId}</saml:Issuer>
