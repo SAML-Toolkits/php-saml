@@ -84,6 +84,7 @@ $settings = array(
         'singleSignOnService' => array(
             // URL Target of the IdP where the SP will send the Authentication Request Message
             'url' => '',
+            'destination_url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  Onelogin Toolkit supports for this endpoint the
             // HTTP-POST binding only
@@ -93,6 +94,7 @@ $settings = array(
         'singleLogoutService' => array(
             // URL Location of the IdP where the SP will send the SLO Request
             'url' => '',
+            'destination_url' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  Onelogin Toolkit supports for this endpoint the
             // HTTP-Redirect binding only
