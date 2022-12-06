@@ -135,7 +135,7 @@ class LogoutRequest
     ID="{$id}"
     Version="2.0"
     IssueInstant="{$issueInstant}"
-    Destination="{$idpData['singleLogoutService']['url']}">
+    Destination="{$idpData['singleLogoutService']['destination_url']}">
     <saml:Issuer>{$spEntityId}</saml:Issuer>
     {$nameIdObj}
     {$sessionIndexStr}
