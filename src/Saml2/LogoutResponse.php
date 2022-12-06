@@ -258,7 +258,7 @@ class LogoutResponse
                   ID="{$this->id}"
                   Version="2.0"
                   IssueInstant="{$issueInstant}"
-                  Destination="{$idpData['singleLogoutService']['url']}"
+                  Destination="{$idpData['singleLogoutService']['destination_url']}"
                   InResponseTo="{$inResponseTo}"
                   >
     <saml:Issuer>{$spEntityId}</saml:Issuer>
