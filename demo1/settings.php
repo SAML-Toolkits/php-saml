@@ -1,6 +1,6 @@
 <?php
 
-    $spBaseUrl = 'https://<your_domain>'; //or http://<your_domain>
+    $spBaseUrl = 'https://aoprototest-php.azurewebsites.net';
 
     $settingsInfo = array(
         'sp' => array(
@@ -14,7 +14,7 @@
             'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
         ),
         'idp' => array(
-            'entityId' => '',
+            'entityId' => 'https://samltoolkit.azurewebsites.net',
             'singleSignOnService' => array(
                 'url' => '',
             ),
