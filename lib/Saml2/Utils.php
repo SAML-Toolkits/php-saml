@@ -1546,7 +1546,7 @@ class OneLogin_Saml2_Utils
                     $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {
                     $ex = new OneLogin_Saml2_ValidationError(
-                        "Invalid signAlg in the recieved ".$strMessageType,
+                        "Invalid signAlg in the received ".$strMessageType,
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                     );
                     if (count($multiCerts) == 1) {
