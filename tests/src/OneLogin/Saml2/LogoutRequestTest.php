@@ -775,7 +775,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
         $_GET['SigAlg'] = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1';
 
         $this->assertFalse($logoutRequest5->isValid());
-        $this->assertEquals('Invalid signAlg in the recieved Logout Request', $logoutRequest5->getError());
+        $this->assertEquals('Invalid signAlg in the received Logout Request', $logoutRequest5->getError());
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';

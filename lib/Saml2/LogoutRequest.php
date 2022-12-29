@@ -321,7 +321,7 @@ LOGOUTREQUEST;
     }
 
     /**
-     * Checks if the Logout Request recieved is valid.
+     * Checks if the Logout Request received is valid.
      *
      * @param bool $retrieveParametersFromServer
      *
