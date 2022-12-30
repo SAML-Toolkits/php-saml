@@ -1583,7 +1583,7 @@ class Utils
                     $objKey = Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {
                     $ex = new ValidationError(
-                        "Invalid signAlg in the recieved ".$strMessageType,
+                        "Invalid signAlg in the received ".$strMessageType,
                         ValidationError::INVALID_SIGNATURE
                     );
                     if (count($multiCerts) == 1) {
