@@ -3,7 +3,7 @@ The example requires that SP and IdP are well configured before test it.
 SP setup
 --------
 
-The Onelogin's PHP Toolkit allows you to provide the settings info in 2 ways:
+The PHP Toolkit allows you to provide the settings info in 2 ways:
  * Use a settings.php file that we should locate at the base folder of the
    toolkit.
  * Use an array with the setting data.
