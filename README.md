@@ -1,8 +1,8 @@
-# SAML PHP Toolkit
+# SAML PHP Toolkit Compatible with PHP 5.X & 7.X
 
 [![Build Status][![php-saml 3.x package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=3.x-dev)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=3.x-dev) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
 
-Add SAML support to your PHP software using this library.
+Add SAML support to your PHP 5.X or 7.X software using this library.
 
 
 Warning
