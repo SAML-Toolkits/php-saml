@@ -1,6 +1,6 @@
 # SAML PHP Toolkit Compatible with PHP 5.X & 7.X
 
-[![Build Status][![php-saml 3.x package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=3.x-dev)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=3.x-dev) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
+[![php-saml 3.x-dev package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=3.x-dev)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=3.x-dev)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=3.x-dev) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=v3.1.0) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
 
 Add SAML support to your PHP 5.X or 7.X software using this library.
 
@@ -21,7 +21,7 @@ This version is compatible with PHP 7.X and does not include xmlseclibs (you wil
 Security Guidelines
 -------------------
 
-If you believe you have discovered a security vulnerability in this toolkit, please report it as an issue
+If you believe you have discovered a security vulnerability in this toolkit, please report it by mail to the maintainer: sixto.martin.garcia+security@gmail.com
 
 
 Why add SAML support to my software?
