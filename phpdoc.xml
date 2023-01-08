@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpdoc>
-    <title>OneLogin's SAML PHP Toolkit</title>
+    <title>SAML PHP Toolkit</title>
     <parser>
-      <default-package-name>OneLogin_SAML_Toolkit</default-package-name>
+      <default-package-name>PHP_SAML_Toolkit</default-package-name>
       <target>docs/Saml3</target>
     </parser>
     <extensions>
