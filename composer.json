@@ -2,17 +2,17 @@
     "name": "onelogin/php-saml",
     "description": "PHP SAML Toolkit",
     "license": "MIT",
-    "homepage": "https://developers.onelogin.com/saml/php",
-    "keywords": ["saml", "saml2", "onelogin"],
+    "homepage": "https://github.com/SAML-Toolkits/php-saml",
+    "keywords": ["saml", "saml2", "sso", "federation", "identity"],
     "autoload": {
         "psr-4": {
             "OneLogin\\": "src/"
         }
     },
     "support": {
-        "email": "sixto.garcia@onelogin.com",
-        "issues": "https://github.com/onelogin/php-saml/issues",
-        "source": "https://github.com/onelogin/php-saml/"
+        "email": "sixto.martin.garcia@gmail.com",
+        "issues": "https://github.com/onelogin/SAML-Toolkits/issues",
+        "source": "https://github.com/onelogin/SAML-Toolkits/"
     },
     "require": {
         "php": ">=5.4",

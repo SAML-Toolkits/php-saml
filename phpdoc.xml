@@ -2,7 +2,7 @@
 <phpdoc>
     <title>SAML PHP Toolkit</title>
     <parser>
-      <default-package-name>OneLogin_SAML_Toolkit</default-package-name>
+      <default-package-name>PHP_SAML_Toolkit</default-package-name>
       <target>docs/Saml3</target>
     </parser>
     <extensions>

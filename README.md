@@ -1232,7 +1232,7 @@ Lets describe now the classes and methods of the SAML2 library.
 
 ##### OneLogin\Saml2\Auth - Auth.php #####
 
-Main class of PHP Toolkit
+Main class of SAML PHP Toolkit
 
  * `Auth` - Initializes the SP SAML instance
  * `login` - Initiates the SSO process.
@@ -1329,7 +1329,7 @@ SAML 2 Logout Response class
 
 ##### OneLogin\Saml2\Settings - `Settings.php` #####
 
-Configuration of the PHP Toolkit
+Configuration of the SAML PHP Toolkit
 
  * `Settings` -  Initializes the settings: Sets the paths of
    the different folders and Loads settings info from settings file or
@@ -1442,7 +1442,7 @@ Demos require that SP and IdP are well configured before test it.
 
 ### SP setup ###
 
-The PHP Toolkit allows you to provide the settings info in two ways:
+The SAML PHP Toolkit allows you to provide the settings info in two ways:
 
  * Use a `settings.php` file that we should locate at the base folder of the
    toolkit.
@@ -1517,7 +1517,7 @@ must be done.
 
 ### SP setup ###
 
-The PHP Toolkit allows you to provide the settings info in two ways:
+The SAML PHP Toolkit allows you to provide the settings info in two ways:
 
  * Use a `settings.php` file that we should locate at the base folder of the
    toolkit.

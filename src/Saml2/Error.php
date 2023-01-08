@@ -2,12 +2,10 @@
 /**
  * This file is part of php-saml.
  *
- * Originally created by OneLogin Inc
- * Currently supported by IAM Digital Services S.L
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
+ * @package OneLogin
  * @author  Sixto Martin <sixto.martin.garcia@gmail.com>
  * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
  * @link    https://github.com/SAML-Toolkits/php-saml
@@ -18,7 +16,7 @@ namespace OneLogin\Saml2;
 use Exception;
 
 /**
- * Error class of PHP Toolkit
+ * Error class of SAML PHP Toolkit
  *
  * Defines the Error class
  */

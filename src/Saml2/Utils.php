@@ -2,12 +2,10 @@
 /**
  * This file is part of php-saml.
  *
- * Originally created by OneLogin Inc
- * Currently supported by IAM Digital Services S.L
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
+ * @package OneLogin
  * @author  Sixto Martin <sixto.martin.garcia@gmail.com>
  * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
  * @link    https://github.com/SAML-Toolkits/php-saml
@@ -27,7 +25,11 @@ use DOMXPath;
 use Exception;
 
 /**
+<<<<<<< HEAD
  * Utils of PHP Toolkit
+=======
+ * Utils of SAML PHP Toolkit
+>>>>>>> f338e1e... Remove references to onelogin support.
  *
  * Defines several often used methods
  */
