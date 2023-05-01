@@ -25,11 +25,7 @@ use DOMXPath;
 use Exception;
 
 /**
-<<<<<<< HEAD
- * Utils of PHP Toolkit
-=======
  * Utils of SAML PHP Toolkit
->>>>>>> f338e1e... Remove references to onelogin support.
  *
  * Defines several often used methods
  */
@@ -515,7 +511,7 @@ class Utils
         if (self::$_host) {
             $currentHost = self::$_host;
         } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
-            $currentHost = $_SERVER['HTTP_X_FORWARDED_HOST'];
+            $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0];
         } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
