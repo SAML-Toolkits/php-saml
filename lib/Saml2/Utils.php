@@ -701,15 +701,12 @@ class OneLogin_Saml2_Utils
     {
         $result = '';
         $baseURLPath = self::getBaseURLPath();
-        if (!empty($baseURLPath)) {
-            $result = $baseURLPath;
-            if (!empty($info)) {
-                $path = explode('/', $info);
-                $extractedInfo = array_pop($path);
-                if (!empty($extractedInfo)) {
-                    $result .= $extractedInfo;
-                }
+        if (!empty($baseURLPath) && !empty($info)) {
+            $path = explode('/', $info);
+            if (count($path) > 1) {
+                $info = implode(array_filter($path),'/');
             }
+            $result .= $baseURLPath . $info;
         }
         return $result;
     }
