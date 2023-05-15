@@ -494,7 +494,9 @@ class OneLogin_Saml2_Utils
         if (self::$_host) {
             $currentHost = self::$_host;
         } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
-            $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0];
+            $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
+            $values = array_values($currentHost);
+            $currentHost = array_shift($values);
         } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
