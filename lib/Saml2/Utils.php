@@ -704,10 +704,11 @@ class OneLogin_Saml2_Utils
         if (!empty($baseURLPath) && !empty($info)) {
             $path = explode('/', $info);
             if (count($path) > 1) {
-                $info = implode(array_filter($path),'/');
+                $info = implode(array_filter($path), '/');
             }
             $result .= $baseURLPath . $info;
         }
+
         return $result;
     }
 
