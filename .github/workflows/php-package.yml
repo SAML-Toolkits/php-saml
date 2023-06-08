@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
-        php-versions: [7.3, 7.4, 8.0, 8.1]
+        php-versions: [7.3, 7.4, 8.0, 8.1, 8.2]
     steps:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
