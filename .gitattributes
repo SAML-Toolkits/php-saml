@@ -4,6 +4,7 @@
 /.travis.yml export-ignore
 /demo-old export-ignore
 /demo2 export-ignore
+/docs export-ignore
 /endpoints export-ignore
 /locale export-ignore
 /tests export-ignore
