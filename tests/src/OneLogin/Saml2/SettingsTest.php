@@ -831,8 +831,9 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         try {
             $errors = $settings->validateMetadata($metadata);
             $this->fail('Exception was not raised');
-        } catch (\Error $e) {
-            $this->assertStringContainsString('Argument #1 ($source) must not be empty', $e->getMessage());
+        } catch (\Error | \Exception $e) {
+            $expectedErrors = array('DOMDocument::loadXML(): Argument #1 ($source) must not be empty', 'DOMDocument::loadXML(): Empty string supplied as input');
+            $this->assertTrue(in_array($e->getMessage(), $expectedErrors));
         }
 
         $metadata = '<no xml>';
