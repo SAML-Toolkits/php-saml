@@ -482,7 +482,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        
+
         $settings = new Settings($settingsInfo);
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(false);
@@ -491,7 +491,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
-        
+
         $settings = new Settings($settingsInfo);
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(true);
@@ -539,7 +539,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $xml = $logoutResponse->getXML();
         $id1 = $logoutResponse->getID();
         $this->assertNotNull($id1);
-    
+
         $processedLogoutResponse = new LogoutResponse($settings, base64_encode($xml));
         $id2 = $processedLogoutResponse->getID();
         $this->assertEquals($id1, $id2);
@@ -548,12 +548,12 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests that the LogoutRequest throws an exception
      *
-     * @covers OneLogin\Saml2\LogoutRequest::getID()
+     * @covers OneLogin\Saml2\LogoutResponse::getID()
      */
     public function testGetIDException()
     {
         $this->expectException(Error::class);
-        $this->expectExceptionMessage('LogoutRequest could not be processed');
+        $this->expectExceptionMessage('LogoutResponse could not be processed');
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';

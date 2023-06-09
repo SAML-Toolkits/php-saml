@@ -364,7 +364,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-
+        $settingsInfo['security']['signMetadata'] = array();
         $settingsInfo['security']['signMetadata']['keyFileName'] = 'metadata.key';
         $settingsInfo['organization'] = array(
             'en-US' => array(

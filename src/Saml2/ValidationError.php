@@ -90,8 +90,12 @@ class ValidationError extends Exception
         if (!isset($args)) {
             $args = array();
         }
-        $params = array_merge(array($msg), $args);
-        $message = call_user_func_array('sprintf', $params);
+        if (!empty($args)) {
+            $params = array_merge(array($msg), $args);
+            $message = call_user_func_array('sprintf', $params);
+        } else {
+            $message = $msg;
+        }
 
         parent::__construct($message, $code);
     }

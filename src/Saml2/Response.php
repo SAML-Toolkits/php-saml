@@ -296,12 +296,9 @@ class Response
                 // Check audience
                 $validAudiences = $this->getAudiences();
                 if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences, true)) {
+                    $validAudiencesStr = implode(',', $validAudiences);
                     throw new ValidationError(
-                        sprintf(
-                            "Invalid audience for this Response (expected '%s', got '%s')",
-                            $spEntityId,
-                            implode(',', $validAudiences)
-                        ),
+                        "Invalid audience for this Response (expected '".$spEntityId."', got '".$validAudiencesStr."')",
                         ValidationError::WRONG_AUDIENCE
                     );
                 }
@@ -313,7 +310,7 @@ class Response
                         $trimmedIssuer = trim($issuer);
                         if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
                             throw new ValidationError(
-                                "Invalid issuer in the Assertion/Response (expected '$idPEntityId', got '$trimmedIssuer')",
+                                "Invalid issuer in the Assertion/Response (expected '".$idPEntityId."', got '".$trimmedIssuer."')",
                                 ValidationError::WRONG_ISSUER
                             );
                         }
@@ -1216,13 +1213,19 @@ class Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
+     * @param bool $escape Apply or not htmlentities to the message.
+     *
      * @return null|string Error reason
      */
-    public function getError()
+    public function getError($escape = true)
     {
         $errorMsg = null;
         if (isset($this->_error)) {
-            $errorMsg = htmlentities($this->_error->getMessage());
+            if ($escape) {
+                $errorMsg = htmlentities($this->_error->getMessage());
+            } else {
+                $errorMsg = $this->_error->getMessage();
+            }
         }
         return $errorMsg;
     }

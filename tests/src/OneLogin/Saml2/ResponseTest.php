@@ -1097,14 +1097,19 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
      * Case Invalid Response, Invalid Audience
      *
      * @covers OneLogin\Saml2\Response::isValid
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testIsInValidAudience()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_audience.xml.base64');
 
         $plainMessage = base64_decode($xml);
+        Utils::setBaseURL('http://stuff.com/endpoints/');
         $currentURL = Utils::getSelfURLNoQuery();
-        $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/acs.php', $currentURL, $plainMessage);
+
+        $plainMessage = str_replace('http://stuff.com/endpoints/acs.php', $currentURL, $plainMessage);
         $message = base64_encode($plainMessage);
 
         $response = new Response($this->_settings, $message);
@@ -1115,7 +1120,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response2 = new Response($this->_settings, $message);
 
         $this->assertFalse($response2->isValid());
-        $this->assertSame('Invalid audience for this Response (expected \'http://stuff.com/endpoints/metadata.php\', got \'http://invalid.audience.com\')', $response2->getError());
+        $this->assertEquals("Invalid audience for this Response (expected 'http://stuff.com/endpoints/metadata.php', got 'http://invalid.audience.com')", $response2->getError(false));
     }
 
     /**
@@ -1152,12 +1157,12 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response3 = new Response($this->_settings, $message);
 
         $this->assertFalse($response3->isValid());
-        $this->assertEquals('Invalid issuer in the Assertion/Response (expected \'http://idp.example.com/\', got \'http://invalid.issuer.example.com/\')', $response3->getError());
+        $this->assertEquals("Invalid issuer in the Assertion/Response (expected 'http://idp.example.com/', got 'http://invalid.issuer.example.com/')", $response3->getError(false));
 
         $response4 = new Response($this->_settings, $message2);
 
         $this->assertFalse($response4->isValid());
-        $this->assertEquals('Invalid issuer in the Assertion/Response (expected \'http://idp.example.com/\', got \'http://invalid.isser.example.com/\')', $response4->getError());
+        $this->assertEquals("Invalid issuer in the Assertion/Response (expected 'http://idp.example.com/', got 'http://invalid.isser.example.com/')", $response4->getError(false));
     }
 
     /**
@@ -1534,7 +1539,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($settings, $xml);
 
         $this->assertFalse($response->isValid());
-        $this->assertEquals('openssl_x509_read(): supplied parameter cannot be coerced into an X509 certificate!', $response->getError());
+        $possibleErrors = [
+          "openssl_x509_read(): supplied parameter cannot be coerced into an X509 certificate!",
+          "openssl_x509_read(): X.509 Certificate cannot be retrieved"
+        ];
+        $this->assertTrue(in_array($response->getError(), $possibleErrors));
     }
 
     /**
