@@ -193,10 +193,17 @@ class Utils
             throw new Exception('Illegal argument targetNode. It has no parentNode.');
         }
         $clonedNode = $targetNode->ownerDocument->importNode($sourceNode, false);
+        $ns = $clonedNode->prefix;
         if ($recurse) {
             $resultNode = $targetNode->appendChild($clonedNode);
         } else {
             $resultNode = $targetNode->parentNode->insertBefore($clonedNode, $targetNode);
+        }
+        // PHP 8.x can change the NS to that of the parent when
+        // adding a child node. This puts it back because we are
+        // merging as is and should not be changed
+        if ($resultNode->prefix !== $ns) {
+            $resultNode->prefix = $ns;
         }
         if ($sourceNode->childNodes !== null) {
             foreach ($sourceNode->childNodes as $child) {
