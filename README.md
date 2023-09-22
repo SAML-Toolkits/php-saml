@@ -1268,48 +1268,6 @@ Get the ID of the last processed message/assertion with the `getLastMessageId/ge
 
 Described below are the main classes and methods that can be invoked.
 
-#### The Old Saml library ####
-
-Lets start describing the classes and methods of the SAML library, an evolution
-of the old v.1 toolkit that is provided to keep the backward compability.
-Most of them use classes and methods of the new SAML2 library.
-
-##### OneLogin_Saml_AuthRequest - `AuthRequest.php` #####
-
-Has the protected attribute `$auth`, an `OneLogin_Saml2_Auth` object.
-
-* `OneLogin_Saml_AuthRequest` - Constructs `OneLogin_Saml2_Auth`,
-  initializing the SP SAML instance.
-* `getRedirectUrl($returnTo)` - Obtains the SSO URL containing the AuthRequest
-  message deflated.
-
-
-##### OneLogin_Saml_Response - `Response.php` #####
-
-* `OneLogin_Saml_Response` - Constructor that process the SAML Response,
-  Internally initializes an SP SAML instance and an `OneLogin_Saml2_Response`.
-* `get_saml_attributes` - Retrieves an Array with the logged user data.
-
-
-##### OneLogin_Saml_Settings - `Settings.php` #####
-
-A simple class used to build the Setting object used in the v1.0 of the toolkit.
-
-##### OneLogin_Saml_Metadata - `Metadata.php` #####
-
-* `OneLogin_Saml_Metadata` - Constructor that build the Metadata XML info based
-  on the settings of the SP
-* `getXml` - An XML with the metadata info of the SP
-
-
-##### OneLogin_Saml_XmlSec - `XmlSec.php` #####
-
-Auxiliary class that contains methods to validate the SAML Response:
-`validateNumAssertions`, `validateTimestamps`, `isValid` (which
-uses the other two previous methods and also validate the signature of
-SAML Response).
-
-
 #### Saml2 library ####
 
 Lets describe now the classes and methods of the SAML2 library.
