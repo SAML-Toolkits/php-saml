@@ -136,25 +136,6 @@ and settings file stored at `vendor/onelogin/php-saml`.
 
 Your settings are at risk of being deleted when updating packages using `composer update` or similar commands. So it is **highly** recommended that instead of using settings files, you pass the settings as an array directly to the constructor (explained later in this document). If you do not use this approach your settings are at risk of being deleted when updating packages using `composer update` or similar commands.
 
-Compatibility
--------------
-
-This 2.0 version has a new library. The toolkit is still compatible.
-
-The old code that you used in order to add SAML support will continue working
-with minor changes. You only need to load the files of the `lib/Saml` folder.
-(notice that the `compatibility.php` file do that).
-
-The old-demo folder contains code from an old app that uses the old version of
-the toolkit (v.1). Take a look.
-
-Sometimes the names of the classes of the old code could be a bit different
-and if that is your case you must change them for `OneLogin_Saml_Settings`,
-`OneLogin_Saml_Response`, `OneLogin_Saml_AuthRequest` or `OneLogin_Saml_Metadata`.
-
-We recommend that you migrate the old code to the new one to be able to use
-the new features that the new library Saml2 carries.
-
 
 Namespaces
 ----------
@@ -248,10 +229,6 @@ handle the sign and the encryption of xml elements.
 #### `lib/` ####
 
 This folder contains the heart of the toolkit, the libraries:
-
- * `Saml` folder contains a modified version of the toolkit v.1 and allows the
-   old code to keep working. (This library is provided to maintain
-   backward compatibility).
  * `Saml2` folder contains the new version of the classes and methods that
    are described in a later section.
 
@@ -290,8 +267,6 @@ and support multiple languages.
   advanced_settings.php file which contains extra configuration info related to
   the security, the contact person, and the organization associated to the SP.
 * `_toolkit_loader.php` - This file load the toolkit libraries (The SAML2 lib).
-* `compatibility` - Import that file to make compatible your old code with the
-  new toolkit (loads the SAML library).
 
 
 #### Miscellaneous ####
@@ -300,8 +275,6 @@ and support multiple languages.
 * `demo1/` - Contains an example of a simple PHP app with SAML support.
   Read the `Readme.txt` inside for more info.
 * `demo2/` - Contains another example.
-* `demo-old/` - Contains an example that uses the code of the older version of the
-  the toolkit to demonstrate the backwards compatibility.
 
 
 ### How it works ###
@@ -666,10 +639,6 @@ require_once(TOOLKIT_PATH . '_toolkit_loader.php');
 
 After that line we will be able to use the classes (and their methods) of the
 toolkit (because the external and the Saml2 libraries files are loaded).
-
-If you wrote the code of your SAML app for the version 1 of the PHP-SAML toolkit
-you will need to load the `compatibility.php`, file which loads the SAML library files,
-in addition to the the `_toolkit_loader.php`.
 
 That SAML library uses the new classes and methods of the latest version of the
 toolkits but maintain the old classes, methods, and workflow of the old process
@@ -1701,44 +1670,3 @@ demo1, only changes the targets.
     to the IdP (to the SLS endpoint of the IdP).The IdP receives the Logout
     Response, process it and close the session at of the IdP. Notice that the
     SLO Workflow starts and ends at the IdP.
-
-
-## Demo Old ##
-
-### SP setup ###
-
-This demo uses the old style of the version 1 of the toolkit.
-An object of the class `OneLogin_Saml_Settings` must be provided to the
-constructor of the `AuthRequest`.
-
-You will find an `example_settings.php` file at the demo-old's folder that
-could be used as a template for your `settings.php` file.
-
-In that template, SAML settings are divided into two parts, the application
-specific (`const_assertion_consumer_service_url`, `const_issuer`,
-`const_name_identifier_format`) and the user/account specific
-`idp_sso_target_url`, `x509certificate`). You'll need to add your own code here
-to identify the user or user origin (e.g. by `subdomain`, `ip_address` etc.).
-
-
-### IdP setup ###
-
-Once the SP is configured, the metadata of the SP is published at the
-`metadata.php` file. After that, configure the IdP based on that information.
-
-
-### How it works ###
-
-At the `metadata.php` view is published the metadata of the SP.
-
-The `index.php` file acts as an initiater for the SAML conversation if it should
-should be initiated by the application. This is called Service Provider
-Initiated SAML. The service provider creates a SAML Authentication Request and
-sends it to the identity provider (IdP).
-
-The `consume.php` is the ACS endpoint. Receives the SAML assertion. After Response
-validation, the userdata and the nameID will be available, using `getNameId()` or
-`getAttributes()` we obtain them.
-
-Since the version 1 of the php toolkit does not support SLO we don't show how
-handle SLO in this demo-old.

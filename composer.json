@@ -7,7 +7,6 @@
     "autoload": {
         "classmap": [
             "extlib/xmlseclibs",
-            "lib/Saml",
             "lib/Saml2"
         ]
     },
