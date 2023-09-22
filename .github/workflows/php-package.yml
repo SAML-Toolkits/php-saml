@@ -5,9 +5,9 @@ name: php-saml 4.x package
 
 on:
   push:
-    branches: [ 4.* ]
+    branches: [ 4.*, test_openssl]
   pull_request:
-    branches: [ 4.* ]
+    branches: [ 4.*, test_openssl]
 
 jobs:
   test:
