@@ -53,7 +53,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $dom = new DOMDocument();
 
         $attackXXE = '<?xml version="1.0" encoding="ISO-8859-1"?>
-                      <!DOCTYPE foo [  
+                      <!DOCTYPE foo [
                       <!ELEMENT foo ANY >
                       <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
         try {
