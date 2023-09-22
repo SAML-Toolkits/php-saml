@@ -712,10 +712,10 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         $this->_settings->setStrict(false);
         $_GET = array (
-            'SAMLRequest' => 'lVLBitswEP0Vo7tjeWzJtki8LIRCYLvbNksPewmyPc6K2pJqyXQ/v1LSQlroQi/DMJr33rwZbZ2cJysezNms/gt+X9H55G2etBOXlx1ZFy2MdMoJLWd0wvfieP/xQcCGCrsYb3ozkRvI+wjpHC5eGU2Sw35HTg3lA8hqZFwWFcMKsStpxbEsxoLXeQN9OdY1VAgk+YqLC8gdCUQB7tyKB+281D6UaF6mtEiBPudcABcMXkiyD26Ulv6CevXeOpFlVvlunb5ttEmV3ZjlnGn8YTRO5qx0NuBs8kzpAd829tXeucmR5NH4J/203I8el6gFRUqbFPJnyEV51Wq30by4TLW0/9ZyarYTxt4sBsjUYLMZvRykl1Fxm90SXVkfwx4P++T4KSafVzmpUcVJ/sfSrQZJPphllv79W8WKGtLx0ir8IrVTqD1pT2MH3QAMSs4KTvui71jeFFiwirOmprwPkYW063+5uRq4urHiiC4e8hCX3J5wqAEGaPpw9XB5JmkBdeDqSlkz6CmUXdl0Qae5kv2F/1384wu3PwE=',
+            'SAMLRequest' => 'lVLBitswEP0Vo7tjWbJkSyReFkIhsN1tm6WHvQTZHmdFbUmVZLqfXzlpIS10oZdhGM17b96MtkHNk5MP9myX+AW+LxBi9jZPJsjLyw4t3kirgg7SqBmCjL083n98kGSDpfM22t5O6AbyPkKFAD5qa1B22O/QSWA+EFWPjCtaM6gBugrXHCo6Ut6UgvTV2DSkBoKyr+BDQu5QIkrwEBY4mBCViamEyyrHNCf4ueSScMnIC8r2yY02Kl5QrzG6IIvC6dgt07eNsbl2G+vPhYEf1sBkz9oUA8y2LLQZ4G3jXt1dmALKHm18Mk/+fozgk5YQNMciJ+UzKWV11Wq3q3l5mcq3/9YKenYTrL3FGkihB1fMENWgoloVt8Ut0ZX1Me3xsM+On9bk86ImPep1kv+xdKuBsg/Wzyq+f6u1ood8vLTK6JUJGkxE7WnsSDcQRirOKMc97TtWCgqU1ZyJBvM+RZbSrv/l5mrg6sbJI4T1kId1ye0JhoaQgYg+XT1dnilMSZO4uko1jPSYVF0luqQjrmR/4X8X//jC7U8=',
             'RelayState' => '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
-            'Signature' => 'XCwCyI5cs7WhiJlB5ktSlWxSBxv+6q2xT3c8L7dLV6NQG9LHWhN7gf8qNsahSXfCzA0Ey9dp5BQ0EdRvAk2DIzKmJY6e3hvAIEp1zglHNjzkgcQmZCcrkK9Czi2Y1WkjOwR/WgUTUWsGJAVqVvlRZuS3zk3nxMrLH6f7toyvuJc='
+            'Signature' => 'j/qDRTzgQw3cMDkkSkBOShqxi3t9qJxYnrADqwAECnJ3Y+iYgT33C0l/Vy3+ooQkFRyObYJqg9o7iIcMdgV6CXxpa6itVIUAI2VJewsMjzvJ4OdpePeSx7+/umVPKCfMvffsELlqo/UgxsyRZh8NMLej0ojCB7bUfIMKsiU7e0c='
         );
 
         $request = gzinflate(base64_decode($_GET['SAMLRequest']));
@@ -811,11 +811,11 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     */
     public function testIsValidSignUsingX509certMulti()
     {
-        $_GET = array (
-            'SAMLRequest' => 'fZJNa+MwEIb/itHdiTz6sC0SQyEsBPoB27KHXoIsj7cGW3IlGfLzV7G7kN1DL2KYmeedmRcdgp7GWT26326JP/FzwRCz6zTaoNbKkSzeKqfDEJTVEwYVjXp9eHpUsKNq9i4640Zyh3xP6BDQx8FZkp1PR3KpqexAl72QmpUCS8SW01IiZz2TVVGD4X1VQYlAsl/oQyKPJAklPIQFzzZEbWNK0YLnlOVA3wqpQCoB7yQ7pWsGq+NKfcQ4q/0+xKXvd8ZNe7Td7AYbw10UxrCbP2aSPbv4Yl/8Qx/R3+SB5bTOoXiDQvFNvjnc7lXrIr75kh+6eYdXPc0jrkMO+/umjXhOtpxP2Q/nJx2/9+uWGbq8X1tV9NqGAW0kzaVvoe1AAJeCSWqYaUVRM2SilKKuqDTpFSlszdcK29RthVm9YriZebYdXpsLdhVAB7VJzif3haYMqqTVcl0JMBR4y+s2zak3sf/4v8l/vlHzBw==',
+        $_GET = array(
+            'SAMLRequest' => 'fZJNa+MwEIb/ivHdiTyyZEskhkJYCPQDtmUPvQRZHm8NtqRKMuTnr2J3IbuHXsQwM887My86BDVPTj7a33aJP/FzwRCz6zyZINfKMV+8kVaFMUijZgwyavn68PQoYUek8zZabaf8DvmeUCGgj6M1eXY+HfOLILwHVQ+MK1ozrBG7itQcKzpQ3pQCdDU0DdQIefYLfUjkMU9CCQ9hwbMJUZmYUqSsCkILIG8ll8Alg/c8O6VrRqPiSn3E6OR+H+IyDDtt5z2a3tnRxHAXhSns3IfLs2cbX8yLfxgi+iQvBC2IKKB8g1JWm3x7uN0r10V8+yU/9m6HVzW7Cdchh/1900Y8J1vOp+yH9bOK3/t1y4x9MaytMnplwogm5u1l6KDrgUHFGeVEU92xUlCkrOZMNITr9LIUdvprhW3qtoKTrxhuZp5Nj9f2gn0D0IPQyfnkPlOEQpO0uko1DDSBqqtEl+aITew//m/yn2/U/gE=',
             'RelayState' => '_1037fbc88ec82ce8e770b2bed1119747bb812a07e6',
             'SigAlg' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
-            'Signature' => 'Ouxo9BV6zmq4yrgamT9EbSKy/UmvSxGS8z26lIMgKOEP4LFR/N23RftdANmo4HafrzSfA0YTXwhKDqbOByS0j+Ql8OdQOes7vGioSjo5qq/Bi+5i6jXwQfphnfcHAQiJL4gYVIifkhhHRWpvYeiysF1Y9J02me0izwazFmoRXr4='
+            'Signature' => 'L2YrP7Ngms1ew8va4drALt9bjK4ZInIS8V6W3HUSlvW/Hw2VD93vy1jPdDBsrRt8cLIuAkkHatemiq1bbgWyrGqlbX5VA/klRYJvHVowfUh2vuf8s17bdFWUOlsTWXxKaA2lJl93MnzJQsZrfVeCqJrcTsSFlYYbcqr/g5Kdcgg='
         );
 
         $settingsDir = TEST_ROOT .'/settings/';
