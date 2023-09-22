@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ['ubuntu-latest']
+        operating-system: ['ubuntu-20.04', 'ubuntu-22.04','macos-11', 'macos-12', 'windows-2022']
         php-versions: [7.3, 7.4, 8.0, 8.1, 8.2]
     steps:
       - name: Setup PHP, with composer and extensions
