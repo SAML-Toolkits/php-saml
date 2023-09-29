@@ -74,7 +74,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
     {
         $settings = new Settings();
 
-        $this->assertEquals(ONELOGIN_CUSTOMPATH.'certs/', $settings->getCertPath());
+        $this->assertEquals(realpath(ONELOGIN_CUSTOMPATH.'certs/'), $settings->getCertPath());
     }
 
     /**
@@ -87,7 +87,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings();
         $base = $settings->getBasePath();
 
-        $this->assertEquals($base.'src/Saml2/', $settings->getLibPath());
+        $this->assertEquals(realpath($base.'src/Saml2/'), $settings->getLibPath());
     }
 
     /**
@@ -100,7 +100,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings();
         $base = $settings->getBasePath();
 
-        $this->assertEquals($base.'src/Saml2/schemas/', $settings->getSchemasPath());
+        $this->assertEquals(realpath($base.'src/Saml2/schemas/'), $settings->getSchemasPath());
 
     }
 
@@ -114,7 +114,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings();
         $base = $settings->getBasePath();
 
-        $this->assertEquals($base.'src/Saml2/schemas/', $settings->getSchemasPath());
+        $this->assertEquals(realpath($base.'src/Saml2/schemas/'), $settings->getSchemasPath());
 
         $settings->setSchemasPath('custompath/');
         $this->assertEquals('custompath/', $settings->getSchemasPath());

@@ -159,15 +159,15 @@ class Settings
     {
         $basePath = dirname(dirname(__DIR__)) . '/';
         $this->_paths = array(
-            'base' => $basePath,
-            'config' => $basePath,
-            'cert' => $basePath.'certs/',
+            'base' => realpath($basePath),
+            'config' => realpath($basePath),
+            'cert' => realpath($basePath.'certs/)',
             'lib' => __DIR__ . '/',
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
-            $this->_paths['config'] = ONELOGIN_CUSTOMPATH;
-            $this->_paths['cert'] = ONELOGIN_CUSTOMPATH . 'certs/';
+            $this->_paths['config'] = realpath(ONELOGIN_CUSTOMPATH);
+            $this->_paths['cert'] = realpath(ONELOGIN_CUSTOMPATH . 'certs/');
         }
     }
 
