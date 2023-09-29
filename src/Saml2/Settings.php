@@ -159,15 +159,15 @@ class Settings
     {
         $basePath = dirname(dirname(__DIR__)) . '/';
         $this->_paths = array(
-            'base' => realpath($basePath),
-            'config' => realpath($basePath),
-            'cert' => realpath($basePath.'certs/)',
+            'base' => $basePath,
+            'config' => $basePath,
+            'cert' => $basePath.'certs/',
             'lib' => __DIR__ . '/',
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
-            $this->_paths['config'] = realpath(ONELOGIN_CUSTOMPATH);
-            $this->_paths['cert'] = realpath(ONELOGIN_CUSTOMPATH . 'certs/');
+            $this->_paths['config'] = ONELOGIN_CUSTOMPATH;
+            $this->_paths['cert'] = ONELOGIN_CUSTOMPATH . 'certs/';
         }
     }
 
@@ -178,7 +178,7 @@ class Settings
      */
     public function getBasePath()
     {
-        return $this->_paths['base'];
+        return realpath($this->_paths['base']);
     }
 
     /**
@@ -188,7 +188,7 @@ class Settings
      */
     public function getCertPath()
     {
-        return $this->_paths['cert'];
+        return realpath($this->_paths['cert']);
     }
 
     /**
@@ -198,7 +198,7 @@ class Settings
      */
     public function getConfigPath()
     {
-        return $this->_paths['config'];
+        return realpath($this->_paths['config']);
     }
 
     /**
@@ -208,7 +208,7 @@ class Settings
      */
     public function getLibPath()
     {
-        return $this->_paths['lib'];
+        return realpath($this->_paths['lib']);
     }
 
     /**
@@ -219,9 +219,9 @@ class Settings
     public function getSchemasPath()
     {
         if (isset($this->_paths['schemas'])) {
-            return $this->_paths['schemas'];
+            return realpath($this->_paths['schemas']);
         }
-        return __DIR__ . '/schemas/';
+        return realpath(__DIR__ . '/schemas/');
     }
 
     /**
