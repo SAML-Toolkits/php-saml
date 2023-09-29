@@ -8,6 +8,7 @@ use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
 
 use DOMDocument;
+use Exception;
 
 /**
  * Unit tests for Response messages
@@ -773,11 +774,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
 
         $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_3.xml.base64');
-        $response = new Response($settings, $xml);
-
-        $valid = $response->isValid();
-
-        $this->assertFalse($valid);
+        try {
+            $response = new Response($settings, $xml);
+            $valid = $response->isValid();
+            $this->assertFalse($valid);
+            $this->assertEquals('Found an invalid Signed Element. SAML Response rejected', $response->getError());
+        } catch (Exception $e) {
+            $this->assertEquals('DOMDocument::loadXML(): Namespace prefix saml on Assertion is not defined in Entity, line: 1', $e->getMessage());
+        }
     }
 
     /**
