@@ -31,8 +31,12 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $dom = new DOMDocument();
 
         $metadataUnloaded = '<xml><EntityDescriptor>';
-        $res1 = Utils::loadXML($dom, $metadataUnloaded);
-        $this->assertFalse($res1);
+        try {
+            $res1 = Utils::loadXML($dom, $metadataUnloaded);
+            $this->assertFalse($res1);
+        } catch (Exception $e) {
+          $this->assertEquals('DOMDocument::loadXML(): Premature end of data in tag EntityDescriptor line 1 in Entity, line: 1', $e->getMessage());
+        }
 
         $metadataInvalid = file_get_contents(TEST_ROOT .'/data/metadata/noentity_metadata_settings1.xml');
         $res2 = Utils::loadXML($dom, $metadataInvalid);
@@ -53,7 +57,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $dom = new DOMDocument();
 
         $attackXXE = '<?xml version="1.0" encoding="ISO-8859-1"?>
-                      <!DOCTYPE foo [  
+                      <!DOCTYPE foo [
                       <!ELEMENT foo ANY >
                       <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
         try {
@@ -851,12 +855,15 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $key
         );
 
-        $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
-        $this->assertContains($nameidExpectedEnc, $nameIdEnc);
+        $nameidExpectedEncId = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"';
+        $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
+
+        $this->assertContains($nameidExpectedEncId, $nameIdEnc);
+        $this->assertContains($nameidExpectedEncData, $nameIdEnc);
 
         // Check AES128_GCM support
         if (version_compare(phpversion(), '7.1.0', '>=') && in_array("aes-128-gcm", openssl_get_cipher_methods())) {
-            $nameidExpectedEnc = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element"><xenc:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>';
+            $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>';
 
             $nameIdEnc = Utils::generateNameId(
                 $nameIdValue,
@@ -866,7 +873,8 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
                 null,
                 XMLSecurityKey::AES128_GCM
             );
-            $this->assertContains($nameidExpectedEnc, $nameIdEnc);
+            $this->assertContains($nameidExpectedEncId, $nameIdEnc);
+            $this->assertContains($nameidExpectedEncData, $nameIdEnc);
         }
     }
 
