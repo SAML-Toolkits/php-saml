@@ -46,9 +46,14 @@ jobs:
           php vendor/bin/phploc src/.
           mkdir -p tests/build/dependences
           php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  src/.
- 
+
       - name: PHP Code Sniffer
         run: php vendor/bin/phpcs --standard=tests/ZendModStandard src/Saml2 demo1 demo2 endpoints tests/src
-    
+
       - name: Run unit tests
         run: vendor/bin/phpunit --verbose --debug
+
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: php vendor/bin/php-coveralls --coverage_clover=tests/build/logs/clover.xml -v
