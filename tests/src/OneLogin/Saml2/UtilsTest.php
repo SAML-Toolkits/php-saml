@@ -43,8 +43,12 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $dom = new DOMDocument();
 
         $metadataUnloaded = '<xml><EntityDescriptor>';
-        $res1 = OneLogin_Saml2_Utils::loadXML($dom, $metadataUnloaded);
-        $this->assertFalse($res1);
+        try {
+            $res1 = OneLogin_Saml2_Utils::loadXML($dom, $metadataUnloaded);
+            $this->assertFalse($res1);
+        } catch (Exception $e) {
+          $this->assertEquals('DOMDocument::loadXML(): Premature end of data in tag EntityDescriptor line 1 in Entity, line: 1', $e->getMessage());
+        }
 
         $metadataInvalid = file_get_contents(TEST_ROOT .'/data/metadata/noentity_metadata_settings1.xml');
         $res2 = OneLogin_Saml2_Utils::loadXML($dom, $metadataInvalid);
