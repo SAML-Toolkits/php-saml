@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>SAML PHP Toolkit</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">SAML PHP Toolkit</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">44</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-382456599"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-382456599" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Auth.html">OneLogin_Saml2_Auth</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_AuthnRequest.html">OneLogin_Saml2_AuthnRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Constants.html">OneLogin_Saml2_Constants</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Error.html">OneLogin_Saml2_Error</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_IdPMetadataParser.html">OneLogin_Saml2_IdPMetadataParser</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutRequest.html">OneLogin_Saml2_LogoutRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutResponse.html">OneLogin_Saml2_LogoutResponse</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Metadata.html">OneLogin_Saml2_Metadata</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Response.html">OneLogin_Saml2_Response</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Settings.html">OneLogin_Saml2_Settings</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Utils.html">OneLogin_Saml2_Utils</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_ValidationError.html">OneLogin_Saml2_ValidationError</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>OneLogin_Saml2_ValidationError</h1>
+                    <p><em>This class implements another custom Exception handler,
+related to exceptions that happens during validation process.</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#method___construct" class="">__construct()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_UNSUPPORTED_SAML_VERSION" class="">UNSUPPORTED_SAML_VERSION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_MISSING_ID" class="">MISSING_ID</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_NUMBER_OF_ASSERTIONS" class="">WRONG_NUMBER_OF_ASSERTIONS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_MISSING_STATUS" class="">MISSING_STATUS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_MISSING_STATUS_CODE" class="">MISSING_STATUS_CODE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_STATUS_CODE_IS_NOT_SUCCESS" class="">STATUS_CODE_IS_NOT_SUCCESS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_SIGNED_ELEMENT" class="">WRONG_SIGNED_ELEMENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ID_NOT_FOUND_IN_SIGNED_ELEMENT" class="">ID_NOT_FOUND_IN_SIGNED_ELEMENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_DUPLICATED_ID_IN_SIGNED_ELEMENTS" class="">DUPLICATED_ID_IN_SIGNED_ELEMENTS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_INVALID_SIGNED_ELEMENT" class="">INVALID_SIGNED_ELEMENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS" class="">DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_UNEXPECTED_SIGNED_ELEMENTS" class="">UNEXPECTED_SIGNED_ELEMENTS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE" class="">WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION" class="">WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_INVALID_XML_FORMAT" class="">INVALID_XML_FORMAT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_INRESPONSETO" class="">WRONG_INRESPONSETO</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_ENCRYPTED_ASSERTION" class="">NO_ENCRYPTED_ASSERTION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_ENCRYPTED_NAMEID" class="">NO_ENCRYPTED_NAMEID</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_MISSING_CONDITIONS" class="">MISSING_CONDITIONS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ASSERTION_TOO_EARLY" class="">ASSERTION_TOO_EARLY</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ASSERTION_EXPIRED" class="">ASSERTION_EXPIRED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_NUMBER_OF_AUTHSTATEMENTS" class="">WRONG_NUMBER_OF_AUTHSTATEMENTS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_ATTRIBUTESTATEMENT" class="">NO_ATTRIBUTESTATEMENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ENCRYPTED_ATTRIBUTES" class="">ENCRYPTED_ATTRIBUTES</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_DESTINATION" class="">WRONG_DESTINATION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_EMPTY_DESTINATION" class="">EMPTY_DESTINATION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_AUDIENCE" class="">WRONG_AUDIENCE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ISSUER_MULTIPLE_IN_RESPONSE" class="">ISSUER_MULTIPLE_IN_RESPONSE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_ISSUER_NOT_FOUND_IN_ASSERTION" class="">ISSUER_NOT_FOUND_IN_ASSERTION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_ISSUER" class="">WRONG_ISSUER</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_SESSION_EXPIRED" class="">SESSION_EXPIRED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_SUBJECTCONFIRMATION" class="">WRONG_SUBJECTCONFIRMATION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_SIGNED_MESSAGE" class="">NO_SIGNED_MESSAGE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_SIGNED_ASSERTION" class="">NO_SIGNED_ASSERTION</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_SIGNATURE_FOUND" class="">NO_SIGNATURE_FOUND</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA" class="">KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_CHILDREN_NODE_NOT_FOUND_IN_KEYINFO" class="">CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_UNSUPPORTED_RETRIEVAL_METHOD" class="">UNSUPPORTED_RETRIEVAL_METHOD</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NO_NAMEID" class="">NO_NAMEID</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_EMPTY_NAMEID" class="">EMPTY_NAMEID</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_SP_NAME_QUALIFIER_NAME_MISMATCH" class="">SP_NAME_QUALIFIER_NAME_MISMATCH</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_DUPLICATED_ATTRIBUTE_NAME_FOUND" class="">DUPLICATED_ATTRIBUTE_NAME_FOUND</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_INVALID_SIGNATURE" class="">INVALID_SIGNATURE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_WRONG_NUMBER_OF_SIGNATURES" class="">WRONG_NUMBER_OF_SIGNATURES</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_RESPONSE_EXPIRED" class="">RESPONSE_EXPIRED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_UNEXPECTED_REFERENCE" class="">UNEXPECTED_REFERENCE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_NOT_SUPPORTED" class="">NOT_SUPPORTED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_KEY_ALGORITHM_ERROR" class="">KEY_ALGORITHM_ERROR</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_ValidationError.html#constant_MISSING_ENCRYPTED_ELEMENT" class="">MISSING_ENCRYPTED_ELEMENT</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Error.html"><div class="path-wrapper">Error.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper">\Exception</div>
+                                                                                                    <div class="namespace-wrapper">\OneLogin_Saml2_ValidationError</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_UNSUPPORTED_SAML_VERSION" name="constant_UNSUPPORTED_SAML_VERSION" class="anchor"></a>
+            <article id="constant_UNSUPPORTED_SAML_VERSION" class="constant">
+                <h3 class="">UNSUPPORTED_SAML_VERSION</h3>
+                <pre class="signature">UNSUPPORTED_SAML_VERSION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MISSING_ID" name="constant_MISSING_ID" class="anchor"></a>
+            <article id="constant_MISSING_ID" class="constant">
+                <h3 class="">MISSING_ID</h3>
+                <pre class="signature">MISSING_ID</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_NUMBER_OF_ASSERTIONS" name="constant_WRONG_NUMBER_OF_ASSERTIONS" class="anchor"></a>
+            <article id="constant_WRONG_NUMBER_OF_ASSERTIONS" class="constant">
+                <h3 class="">WRONG_NUMBER_OF_ASSERTIONS</h3>
+                <pre class="signature">WRONG_NUMBER_OF_ASSERTIONS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MISSING_STATUS" name="constant_MISSING_STATUS" class="anchor"></a>
+            <article id="constant_MISSING_STATUS" class="constant">
+                <h3 class="">MISSING_STATUS</h3>
+                <pre class="signature">MISSING_STATUS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MISSING_STATUS_CODE" name="constant_MISSING_STATUS_CODE" class="anchor"></a>
+            <article id="constant_MISSING_STATUS_CODE" class="constant">
+                <h3 class="">MISSING_STATUS_CODE</h3>
+                <pre class="signature">MISSING_STATUS_CODE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_CODE_IS_NOT_SUCCESS" name="constant_STATUS_CODE_IS_NOT_SUCCESS" class="anchor"></a>
+            <article id="constant_STATUS_CODE_IS_NOT_SUCCESS" class="constant">
+                <h3 class="">STATUS_CODE_IS_NOT_SUCCESS</h3>
+                <pre class="signature">STATUS_CODE_IS_NOT_SUCCESS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_SIGNED_ELEMENT" name="constant_WRONG_SIGNED_ELEMENT" class="anchor"></a>
+            <article id="constant_WRONG_SIGNED_ELEMENT" class="constant">
+                <h3 class="">WRONG_SIGNED_ELEMENT</h3>
+                <pre class="signature">WRONG_SIGNED_ELEMENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ID_NOT_FOUND_IN_SIGNED_ELEMENT" name="constant_ID_NOT_FOUND_IN_SIGNED_ELEMENT" class="anchor"></a>
+            <article id="constant_ID_NOT_FOUND_IN_SIGNED_ELEMENT" class="constant">
+                <h3 class="">ID_NOT_FOUND_IN_SIGNED_ELEMENT</h3>
+                <pre class="signature">ID_NOT_FOUND_IN_SIGNED_ELEMENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_DUPLICATED_ID_IN_SIGNED_ELEMENTS" name="constant_DUPLICATED_ID_IN_SIGNED_ELEMENTS" class="anchor"></a>
+            <article id="constant_DUPLICATED_ID_IN_SIGNED_ELEMENTS" class="constant">
+                <h3 class="">DUPLICATED_ID_IN_SIGNED_ELEMENTS</h3>
+                <pre class="signature">DUPLICATED_ID_IN_SIGNED_ELEMENTS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_INVALID_SIGNED_ELEMENT" name="constant_INVALID_SIGNED_ELEMENT" class="anchor"></a>
+            <article id="constant_INVALID_SIGNED_ELEMENT" class="constant">
+                <h3 class="">INVALID_SIGNED_ELEMENT</h3>
+                <pre class="signature">INVALID_SIGNED_ELEMENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS" name="constant_DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS" class="anchor"></a>
+            <article id="constant_DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS" class="constant">
+                <h3 class="">DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</h3>
+                <pre class="signature">DUPLICATED_REFERENCE_IN_SIGNED_ELEMENTS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_UNEXPECTED_SIGNED_ELEMENTS" name="constant_UNEXPECTED_SIGNED_ELEMENTS" class="anchor"></a>
+            <article id="constant_UNEXPECTED_SIGNED_ELEMENTS" class="constant">
+                <h3 class="">UNEXPECTED_SIGNED_ELEMENTS</h3>
+                <pre class="signature">UNEXPECTED_SIGNED_ELEMENTS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE" name="constant_WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE" class="anchor"></a>
+            <article id="constant_WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE" class="constant">
+                <h3 class="">WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</h3>
+                <pre class="signature">WRONG_NUMBER_OF_SIGNATURES_IN_RESPONSE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION" name="constant_WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION" class="anchor"></a>
+            <article id="constant_WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION" class="constant">
+                <h3 class="">WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</h3>
+                <pre class="signature">WRONG_NUMBER_OF_SIGNATURES_IN_ASSERTION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_INVALID_XML_FORMAT" name="constant_INVALID_XML_FORMAT" class="anchor"></a>
+            <article id="constant_INVALID_XML_FORMAT" class="constant">
+                <h3 class="">INVALID_XML_FORMAT</h3>
+                <pre class="signature">INVALID_XML_FORMAT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_INRESPONSETO" name="constant_WRONG_INRESPONSETO" class="anchor"></a>
+            <article id="constant_WRONG_INRESPONSETO" class="constant">
+                <h3 class="">WRONG_INRESPONSETO</h3>
+                <pre class="signature">WRONG_INRESPONSETO</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_ENCRYPTED_ASSERTION" name="constant_NO_ENCRYPTED_ASSERTION" class="anchor"></a>
+            <article id="constant_NO_ENCRYPTED_ASSERTION" class="constant">
+                <h3 class="">NO_ENCRYPTED_ASSERTION</h3>
+                <pre class="signature">NO_ENCRYPTED_ASSERTION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_ENCRYPTED_NAMEID" name="constant_NO_ENCRYPTED_NAMEID" class="anchor"></a>
+            <article id="constant_NO_ENCRYPTED_NAMEID" class="constant">
+                <h3 class="">NO_ENCRYPTED_NAMEID</h3>
+                <pre class="signature">NO_ENCRYPTED_NAMEID</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MISSING_CONDITIONS" name="constant_MISSING_CONDITIONS" class="anchor"></a>
+            <article id="constant_MISSING_CONDITIONS" class="constant">
+                <h3 class="">MISSING_CONDITIONS</h3>
+                <pre class="signature">MISSING_CONDITIONS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ASSERTION_TOO_EARLY" name="constant_ASSERTION_TOO_EARLY" class="anchor"></a>
+            <article id="constant_ASSERTION_TOO_EARLY" class="constant">
+                <h3 class="">ASSERTION_TOO_EARLY</h3>
+                <pre class="signature">ASSERTION_TOO_EARLY</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ASSERTION_EXPIRED" name="constant_ASSERTION_EXPIRED" class="anchor"></a>
+            <article id="constant_ASSERTION_EXPIRED" class="constant">
+                <h3 class="">ASSERTION_EXPIRED</h3>
+                <pre class="signature">ASSERTION_EXPIRED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_NUMBER_OF_AUTHSTATEMENTS" name="constant_WRONG_NUMBER_OF_AUTHSTATEMENTS" class="anchor"></a>
+            <article id="constant_WRONG_NUMBER_OF_AUTHSTATEMENTS" class="constant">
+                <h3 class="">WRONG_NUMBER_OF_AUTHSTATEMENTS</h3>
+                <pre class="signature">WRONG_NUMBER_OF_AUTHSTATEMENTS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_ATTRIBUTESTATEMENT" name="constant_NO_ATTRIBUTESTATEMENT" class="anchor"></a>
+            <article id="constant_NO_ATTRIBUTESTATEMENT" class="constant">
+                <h3 class="">NO_ATTRIBUTESTATEMENT</h3>
+                <pre class="signature">NO_ATTRIBUTESTATEMENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ENCRYPTED_ATTRIBUTES" name="constant_ENCRYPTED_ATTRIBUTES" class="anchor"></a>
+            <article id="constant_ENCRYPTED_ATTRIBUTES" class="constant">
+                <h3 class="">ENCRYPTED_ATTRIBUTES</h3>
+                <pre class="signature">ENCRYPTED_ATTRIBUTES</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_DESTINATION" name="constant_WRONG_DESTINATION" class="anchor"></a>
+            <article id="constant_WRONG_DESTINATION" class="constant">
+                <h3 class="">WRONG_DESTINATION</h3>
+                <pre class="signature">WRONG_DESTINATION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_EMPTY_DESTINATION" name="constant_EMPTY_DESTINATION" class="anchor"></a>
+            <article id="constant_EMPTY_DESTINATION" class="constant">
+                <h3 class="">EMPTY_DESTINATION</h3>
+                <pre class="signature">EMPTY_DESTINATION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_AUDIENCE" name="constant_WRONG_AUDIENCE" class="anchor"></a>
+            <article id="constant_WRONG_AUDIENCE" class="constant">
+                <h3 class="">WRONG_AUDIENCE</h3>
+                <pre class="signature">WRONG_AUDIENCE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ISSUER_MULTIPLE_IN_RESPONSE" name="constant_ISSUER_MULTIPLE_IN_RESPONSE" class="anchor"></a>
+            <article id="constant_ISSUER_MULTIPLE_IN_RESPONSE" class="constant">
+                <h3 class="">ISSUER_MULTIPLE_IN_RESPONSE</h3>
+                <pre class="signature">ISSUER_MULTIPLE_IN_RESPONSE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ISSUER_NOT_FOUND_IN_ASSERTION" name="constant_ISSUER_NOT_FOUND_IN_ASSERTION" class="anchor"></a>
+            <article id="constant_ISSUER_NOT_FOUND_IN_ASSERTION" class="constant">
+                <h3 class="">ISSUER_NOT_FOUND_IN_ASSERTION</h3>
+                <pre class="signature">ISSUER_NOT_FOUND_IN_ASSERTION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_ISSUER" name="constant_WRONG_ISSUER" class="anchor"></a>
+            <article id="constant_WRONG_ISSUER" class="constant">
+                <h3 class="">WRONG_ISSUER</h3>
+                <pre class="signature">WRONG_ISSUER</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_SESSION_EXPIRED" name="constant_SESSION_EXPIRED" class="anchor"></a>
+            <article id="constant_SESSION_EXPIRED" class="constant">
+                <h3 class="">SESSION_EXPIRED</h3>
+                <pre class="signature">SESSION_EXPIRED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_SUBJECTCONFIRMATION" name="constant_WRONG_SUBJECTCONFIRMATION" class="anchor"></a>
+            <article id="constant_WRONG_SUBJECTCONFIRMATION" class="constant">
+                <h3 class="">WRONG_SUBJECTCONFIRMATION</h3>
+                <pre class="signature">WRONG_SUBJECTCONFIRMATION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_SIGNED_MESSAGE" name="constant_NO_SIGNED_MESSAGE" class="anchor"></a>
+            <article id="constant_NO_SIGNED_MESSAGE" class="constant">
+                <h3 class="">NO_SIGNED_MESSAGE</h3>
+                <pre class="signature">NO_SIGNED_MESSAGE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_SIGNED_ASSERTION" name="constant_NO_SIGNED_ASSERTION" class="anchor"></a>
+            <article id="constant_NO_SIGNED_ASSERTION" class="constant">
+                <h3 class="">NO_SIGNED_ASSERTION</h3>
+                <pre class="signature">NO_SIGNED_ASSERTION</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_SIGNATURE_FOUND" name="constant_NO_SIGNATURE_FOUND" class="anchor"></a>
+            <article id="constant_NO_SIGNATURE_FOUND" class="constant">
+                <h3 class="">NO_SIGNATURE_FOUND</h3>
+                <pre class="signature">NO_SIGNATURE_FOUND</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA" name="constant_KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA" class="anchor"></a>
+            <article id="constant_KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA" class="constant">
+                <h3 class="">KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</h3>
+                <pre class="signature">KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_CHILDREN_NODE_NOT_FOUND_IN_KEYINFO" name="constant_CHILDREN_NODE_NOT_FOUND_IN_KEYINFO" class="anchor"></a>
+            <article id="constant_CHILDREN_NODE_NOT_FOUND_IN_KEYINFO" class="constant">
+                <h3 class="">CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</h3>
+                <pre class="signature">CHILDREN_NODE_NOT_FOUND_IN_KEYINFO</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_UNSUPPORTED_RETRIEVAL_METHOD" name="constant_UNSUPPORTED_RETRIEVAL_METHOD" class="anchor"></a>
+            <article id="constant_UNSUPPORTED_RETRIEVAL_METHOD" class="constant">
+                <h3 class="">UNSUPPORTED_RETRIEVAL_METHOD</h3>
+                <pre class="signature">UNSUPPORTED_RETRIEVAL_METHOD</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NO_NAMEID" name="constant_NO_NAMEID" class="anchor"></a>
+            <article id="constant_NO_NAMEID" class="constant">
+                <h3 class="">NO_NAMEID</h3>
+                <pre class="signature">NO_NAMEID</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_EMPTY_NAMEID" name="constant_EMPTY_NAMEID" class="anchor"></a>
+            <article id="constant_EMPTY_NAMEID" class="constant">
+                <h3 class="">EMPTY_NAMEID</h3>
+                <pre class="signature">EMPTY_NAMEID</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_SP_NAME_QUALIFIER_NAME_MISMATCH" name="constant_SP_NAME_QUALIFIER_NAME_MISMATCH" class="anchor"></a>
+            <article id="constant_SP_NAME_QUALIFIER_NAME_MISMATCH" class="constant">
+                <h3 class="">SP_NAME_QUALIFIER_NAME_MISMATCH</h3>
+                <pre class="signature">SP_NAME_QUALIFIER_NAME_MISMATCH</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_DUPLICATED_ATTRIBUTE_NAME_FOUND" name="constant_DUPLICATED_ATTRIBUTE_NAME_FOUND" class="anchor"></a>
+            <article id="constant_DUPLICATED_ATTRIBUTE_NAME_FOUND" class="constant">
+                <h3 class="">DUPLICATED_ATTRIBUTE_NAME_FOUND</h3>
+                <pre class="signature">DUPLICATED_ATTRIBUTE_NAME_FOUND</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_INVALID_SIGNATURE" name="constant_INVALID_SIGNATURE" class="anchor"></a>
+            <article id="constant_INVALID_SIGNATURE" class="constant">
+                <h3 class="">INVALID_SIGNATURE</h3>
+                <pre class="signature">INVALID_SIGNATURE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_WRONG_NUMBER_OF_SIGNATURES" name="constant_WRONG_NUMBER_OF_SIGNATURES" class="anchor"></a>
+            <article id="constant_WRONG_NUMBER_OF_SIGNATURES" class="constant">
+                <h3 class="">WRONG_NUMBER_OF_SIGNATURES</h3>
+                <pre class="signature">WRONG_NUMBER_OF_SIGNATURES</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_RESPONSE_EXPIRED" name="constant_RESPONSE_EXPIRED" class="anchor"></a>
+            <article id="constant_RESPONSE_EXPIRED" class="constant">
+                <h3 class="">RESPONSE_EXPIRED</h3>
+                <pre class="signature">RESPONSE_EXPIRED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_UNEXPECTED_REFERENCE" name="constant_UNEXPECTED_REFERENCE" class="anchor"></a>
+            <article id="constant_UNEXPECTED_REFERENCE" class="constant">
+                <h3 class="">UNEXPECTED_REFERENCE</h3>
+                <pre class="signature">UNEXPECTED_REFERENCE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NOT_SUPPORTED" name="constant_NOT_SUPPORTED" class="anchor"></a>
+            <article id="constant_NOT_SUPPORTED" class="constant">
+                <h3 class="">NOT_SUPPORTED</h3>
+                <pre class="signature">NOT_SUPPORTED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_KEY_ALGORITHM_ERROR" name="constant_KEY_ALGORITHM_ERROR" class="anchor"></a>
+            <article id="constant_KEY_ALGORITHM_ERROR" class="constant">
+                <h3 class="">KEY_ALGORITHM_ERROR</h3>
+                <pre class="signature">KEY_ALGORITHM_ERROR</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MISSING_ENCRYPTED_ELEMENT" name="constant_MISSING_ENCRYPTED_ELEMENT" class="anchor"></a>
+            <article id="constant_MISSING_ENCRYPTED_ELEMENT" class="constant">
+                <h3 class="">MISSING_ENCRYPTED_ELEMENT</h3>
+                <pre class="signature">MISSING_ENCRYPTED_ELEMENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                        
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(string  <span class="argument">$msg</span>, integer  <span class="argument">$code</span>, array|null  <span class="argument">$args = null</span>) </pre>
+                <p><em>Constructor</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$msg </td>
+                                <td><p>Describes the error.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$code </td>
+                                <td><p>The code error (defined in the error class).</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$args </td>
+                                <td><p>Arguments used in the message that describes the error.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Error.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Error.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 30th, 2023 at 01:16.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

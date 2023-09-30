@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>SAML PHP Toolkit</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">SAML PHP Toolkit</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">44</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-51664243"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-51664243" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Auth.html">OneLogin_Saml2_Auth</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_AuthnRequest.html">OneLogin_Saml2_AuthnRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Constants.html">OneLogin_Saml2_Constants</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Error.html">OneLogin_Saml2_Error</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_IdPMetadataParser.html">OneLogin_Saml2_IdPMetadataParser</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutRequest.html">OneLogin_Saml2_LogoutRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutResponse.html">OneLogin_Saml2_LogoutResponse</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Metadata.html">OneLogin_Saml2_Metadata</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Response.html">OneLogin_Saml2_Response</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Settings.html">OneLogin_Saml2_Settings</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Utils.html">OneLogin_Saml2_Utils</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_ValidationError.html">OneLogin_Saml2_ValidationError</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>OneLogin_Saml2_Utils</h1>
+                    <p><em>Utils of PHP Toolkit</em></p>
+                    <p>Defines several often used methods</p>
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_t" class="">t()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_loadXML" class="">loadXML()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_validateXML" class="">validateXML()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_treeCopyReplace" class="">treeCopyReplace()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_formatCert" class="">formatCert()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_formatPrivateKey" class="">formatPrivateKey()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getStringBetween" class="">getStringBetween()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_redirect" class="">redirect()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setProtocolRegex" class="">setProtocolRegex()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setBaseURL" class="">setBaseURL()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setProxyVars" class="">setProxyVars()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getProxyVars" class="">getProxyVars()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfURLhost" class="">getSelfURLhost()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setSelfHost" class="">setSelfHost()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setBaseURLPath" class="">setBaseURLPath()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getBaseURLPath" class="">getBaseURLPath()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setSelfPort" class="">setSelfPort()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_setSelfProtocol" class="">setSelfProtocol()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfProtocol" class="">getSelfProtocol()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfHost" class="">getSelfHost()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfPort" class="">getSelfPort()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_isHTTPS" class="">isHTTPS()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfURLNoQuery" class="">getSelfURLNoQuery()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfRoutedURLNoQuery" class="">getSelfRoutedURLNoQuery()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_strLreplace" class="">strLreplace()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getSelfURL" class="">getSelfURL()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_extractOriginalQueryParam" class="">extractOriginalQueryParam()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_generateUniqueID" class="">generateUniqueID()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_parseTime2SAML" class="">parseTime2SAML()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_parseSAML2Time" class="">parseSAML2Time()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_parseDuration" class="">parseDuration()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getExpireTime" class="">getExpireTime()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_query" class="">query()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_isSessionStarted" class="">isSessionStarted()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_deleteLocalSession" class="">deleteLocalSession()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_calculateX509Fingerprint" class="">calculateX509Fingerprint()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_formatFingerPrint" class="">formatFingerPrint()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_generateNameId" class="">generateNameId()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getStatus" class="">getStatus()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_decryptElement" class="">decryptElement()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_castKey" class="">castKey()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_isSupportedSigningAlgorithm" class="">isSupportedSigningAlgorithm()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_addSign" class="">addSign()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_validateSign" class="">validateSign()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_validateBinarySign" class="">validateBinarySign()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#constant_RESPONSE_SIGNATURE_XPATH" class="">RESPONSE_SIGNATURE_XPATH</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#constant_ASSERTION_SIGNATURE_XPATH" class="">ASSERTION_SIGNATURE_XPATH</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_getRawHost" class="">getRawHost()</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#method_buildWithBaseURLPath" class="">buildWithBaseURLPath()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__proxyVars" class="">$_proxyVars</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__host" class="">$_host</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__protocol" class="">$_protocol</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__port" class="">$_port</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__baseurlpath" class="">$_baseurlpath</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Utils.html#property__protocolRegex" class="">$_protocolRegex</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Utils.html"><div class="path-wrapper">Utils.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\OneLogin_Saml2_Utils</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_RESPONSE_SIGNATURE_XPATH" name="constant_RESPONSE_SIGNATURE_XPATH" class="anchor"></a>
+            <article id="constant_RESPONSE_SIGNATURE_XPATH" class="constant">
+                <h3 class="">RESPONSE_SIGNATURE_XPATH</h3>
+                <pre class="signature">RESPONSE_SIGNATURE_XPATH</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ASSERTION_SIGNATURE_XPATH" name="constant_ASSERTION_SIGNATURE_XPATH" class="anchor"></a>
+            <article id="constant_ASSERTION_SIGNATURE_XPATH" class="constant">
+                <h3 class="">ASSERTION_SIGNATURE_XPATH</h3>
+                <pre class="signature">ASSERTION_SIGNATURE_XPATH</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__proxyVars" name="property__proxyVars" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_proxyVars</h3>
+                <pre class="signature">$_proxyVars : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; Control if the `Forwarded-For-*` headers are used                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__host" name="property__host" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_host</h3>
+                <pre class="signature">$_host : string|null</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string|null
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__protocol" name="property__protocol" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_protocol</h3>
+                <pre class="signature">$_protocol : string|null</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string|null
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__port" name="property__port" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_port</h3>
+                <pre class="signature">$_port : integer|null</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer|null
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__baseurlpath" name="property__baseurlpath" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_baseurlpath</h3>
+                <pre class="signature">$_baseurlpath : string|null</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string|null
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__protocolRegex" name="property__protocolRegex" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_protocolRegex</h3>
+                <pre class="signature">$_protocolRegex : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_t" name="method_t" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">t()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">t(string  <span class="argument">$msg</span>, array|null  <span class="argument">$args = array()</span>) : string</pre>
+                <p><em>Translates any string. Accepts args</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$msg </td>
+                                <td><p>Message to be translated</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$args </td>
+                                <td><p>Arguments</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$translatedMsg  Translated text</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_loadXML" name="method_loadXML" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">loadXML()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">loadXML(\DOMDocument  <span class="argument">$dom</span>, string  <span class="argument">$xml</span>) : \DOMDocument|false</pre>
+                <p><em>This function load an XML string in a save way.</em></p>
+                <p>Prevent XEE/XXE Attacks</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\DOMDocument</td>
+                                <td>$dom </td>
+                                <td><p>The document where load the xml.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$xml </td>
+                                <td><p>The XML string to be loaded.</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \DOMDocument|false
+                                            &mdash; <p>$dom The result of load the XML at the DomDocument</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateXML" name="method_validateXML" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateXML()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateXML(string|\DOMDocument  <span class="argument">$xml</span>, string  <span class="argument">$schema</span>, boolean  <span class="argument">$debug = false</span>, string  <span class="argument">$schemaPath = null</span>) : string|\DOMDocument</pre>
+                <p><em>This function attempts to validate an XML string against the specified schema.</em></p>
+                <p>It will parse the string into a DOM document and validate this document against the schema.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string|\DOMDocument</td>
+                                <td>$xml </td>
+                                <td><p>The XML string or document which should be validated.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$schema </td>
+                                <td><p>The schema filename which should be used.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$debug </td>
+                                <td><p>To disable/enable the debug mode</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$schemaPath </td>
+                                <td><p>Change schema path</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    string|\DOMDocument
+                                            &mdash; <p>$dom  string that explains the problem or the DOMDocument</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_treeCopyReplace" name="method_treeCopyReplace" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">treeCopyReplace()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">treeCopyReplace(\DomNode  <span class="argument">$targetNode</span>, \DomNode  <span class="argument">$sourceNode</span>, boolean  <span class="argument">$recurse = false</span>) : \DOMNode</pre>
+                <p><em>Import a node tree into a target document
+Copy it before a reference node as a sibling
+and at the end of the copy remove
+the reference node in the target document
+As it were &#039;replacing&#039; it
+Leaving nested default namespaces alone
+(Standard importNode with deep copy
+ mangles nested default namespaces)</em></p>
+                <p>The reference node must not be a DomDocument
+It CAN be the top element of a document
+Returns the copied node in the target document</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\DomNode</td>
+                                <td>$targetNode </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\DomNode</td>
+                                <td>$sourceNode </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$recurse </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \DOMNode
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_formatCert" name="method_formatCert" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">formatCert()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">formatCert(string  <span class="argument">$cert</span>, boolean  <span class="argument">$heads = true</span>) : string</pre>
+                <p><em>Returns a x509 cert (adding header &amp; footer if required).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$cert </td>
+                                <td><p>A x509 unformated cert</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$heads </td>
+                                <td><p>True if we want to include head and footer</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$x509 Formatted cert</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_formatPrivateKey" name="method_formatPrivateKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">formatPrivateKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">formatPrivateKey(string  <span class="argument">$key</span>, boolean  <span class="argument">$heads = true</span>) : string</pre>
+                <p><em>Returns a private key (adding header &amp; footer if required).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$key </td>
+                                <td><p>A private key</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$heads </td>
+                                <td><p>True if we want to include head and footer</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$rsaKey Formatted private key</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getStringBetween" name="method_getStringBetween" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getStringBetween()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getStringBetween(string  <span class="argument">$str</span>, string  <span class="argument">$start</span>, string  <span class="argument">$end</span>) : string</pre>
+                <p><em>Extracts a substring between 2 marks</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$str </td>
+                                <td><p>The target string</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$start </td>
+                                <td><p>The initial mark</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$end </td>
+                                <td><p>The end mark</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>A substring or an empty string if is not able to find the marks
+or if there is no string between the marks</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_redirect" name="method_redirect" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">redirect()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">redirect(string  <span class="argument">$url</span>, array  <span class="argument">$parameters = array()</span>, boolean  <span class="argument">$stay = false</span>) : string|null</pre>
+                <p><em>Executes a redirection to the provided url (or return the target url).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url </td>
+                                <td><p>The target url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$parameters </td>
+                                <td><p>Extra parameters to be passed as part of the url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$stay </td>
+                                <td><p>True if we want to stay (returns the url string) False to redirect</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\OneLogin_Saml2_Error</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    string|null
+                                            &mdash; <p>$url</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setProtocolRegex" name="method_setProtocolRegex" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setProtocolRegex()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setProtocolRegex(  <span class="argument">$protocolRegex</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$protocolRegex </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            var
+                        </th>
+                        <td>
+                                                                                            <p>string</p>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setBaseURL" name="method_setBaseURL" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setBaseURL()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setBaseURL(  <span class="argument">$baseurl</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$baseurl </td>
+                                <td><p>string The base url to be used when constructing URLs</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setProxyVars" name="method_setProxyVars" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setProxyVars()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setProxyVars(  <span class="argument">$proxyVars</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$proxyVars </td>
+                                <td><p>bool Whether to use <code>X-Forwarded-*</code> headers to determine port/domain/protocol</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getProxyVars" name="method_getProxyVars" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getProxyVars()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getProxyVars() </pre>
+                <p><em>return bool</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfURLhost" name="method_getSelfURLhost" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfURLhost()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfURLhost() : string</pre>
+                <p><em>Returns the protocol + the current host + the port (if different than
+common ports).</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$url</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setSelfHost" name="method_setSelfHost" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setSelfHost()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setSelfHost(  <span class="argument">$host</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$host </td>
+                                <td><p>string The host to use when constructing URLs</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setBaseURLPath" name="method_setBaseURLPath" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setBaseURLPath()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setBaseURLPath(  <span class="argument">$baseurlpath</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$baseurlpath </td>
+                                <td><p>string The baseurl path to use when constructing URLs</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getBaseURLPath" name="method_getBaseURLPath" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getBaseURLPath()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getBaseURLPath() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>The baseurlpath to be used when constructing URLs</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setSelfPort" name="method_setSelfPort" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setSelfPort()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setSelfPort(  <span class="argument">$port</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$port </td>
+                                <td><p>int The port number to use when constructing URLs</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setSelfProtocol" name="method_setSelfProtocol" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setSelfProtocol()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setSelfProtocol(  <span class="argument">$protocol</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$protocol </td>
+                                <td><p>string The protocol to identify as using, usually http or https</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfProtocol" name="method_getSelfProtocol" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfProtocol()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfProtocol() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>http|https</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfHost" name="method_getSelfHost" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfHost()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfHost() : string</pre>
+                <p><em>Returns the current host.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$currentHost The current host</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfPort" name="method_getSelfPort" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfPort()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfPort() : null|string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    null|string
+                                            &mdash; <p>The port number used for the request</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_isHTTPS" name="method_isHTTPS" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">isHTTPS()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">isHTTPS() : boolean</pre>
+                <p><em>Checks if https or http.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                            &mdash; <p>$isHttps False if https is not active</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfURLNoQuery" name="method_getSelfURLNoQuery" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfURLNoQuery()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfURLNoQuery() : string</pre>
+                <p><em>Returns the URL of the current host + current view.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfRoutedURLNoQuery" name="method_getSelfRoutedURLNoQuery" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfRoutedURLNoQuery()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfRoutedURLNoQuery() : string</pre>
+                <p><em>Returns the routed URL of the current host + current view.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_strLreplace" name="method_strLreplace" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">strLreplace()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">strLreplace(  <span class="argument">$search</span>,   <span class="argument">$replace</span>,   <span class="argument">$subject</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$search </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$replace </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$subject </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSelfURL" name="method_getSelfURL" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSelfURL()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSelfURL() : string</pre>
+                <p><em>Returns the URL of the current host + current view + query.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_extractOriginalQueryParam" name="method_extractOriginalQueryParam" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">extractOriginalQueryParam()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">extractOriginalQueryParam(string  <span class="argument">$name</span>) : string</pre>
+                <p><em>Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$name </td>
+                                <td><p>The param to-be extracted</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_generateUniqueID" name="method_generateUniqueID" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">generateUniqueID()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">generateUniqueID() : string</pre>
+                <p><em>Generates an unique string (used for example as ID for assertions).</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>A unique string</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseTime2SAML" name="method_parseTime2SAML" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parseTime2SAML()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseTime2SAML(string|integer  <span class="argument">$time</span>) : string</pre>
+                <p><em>Converts a UNIX timestamp to SAML2 timestamp on the form
+yyyy-mm-ddThh:mm:ss(\.s+)?Z.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string|integer</td>
+                                <td>$time </td>
+                                <td><p>The time we should convert (DateTime).</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$timestamp SAML2 timestamp.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseSAML2Time" name="method_parseSAML2Time" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parseSAML2Time()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseSAML2Time(string  <span class="argument">$time</span>) : integer</pre>
+                <p><em>Converts a SAML2 timestamp on the form yyyy-mm-ddThh:mm:ss(\.s+)?Z
+to a UNIX timestamp. The sub-second part is ignored.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$time </td>
+                                <td><p>The time we should convert (SAML Timestamp).</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    integer
+                                            &mdash; <p>$timestamp  Converted to a unix timestamp.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseDuration" name="method_parseDuration" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parseDuration()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseDuration(string  <span class="argument">$duration</span>, integer|null  <span class="argument">$timestamp = null</span>) : integer</pre>
+                <p><em>Interprets a ISO8601 duration value relative to a given timestamp.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$duration </td>
+                                <td><p>The duration, as a string.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer|null</td>
+                                <td>$timestamp </td>
+                                <td><p>The unix timestamp we should apply the
+duration to. Optional, default to the
+current time.</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    integer
+                                            &mdash; <p>The new timestamp, after the duration is applied.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getExpireTime" name="method_getExpireTime" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getExpireTime()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getExpireTime(string|null  <span class="argument">$cacheDuration = null</span>, string|integer|null  <span class="argument">$validUntil = null</span>) : integer|null</pre>
+                <p><em>Compares 2 dates and returns the earliest.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$cacheDuration </td>
+                                <td><p>The duration, as a string.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|integer|null</td>
+                                <td>$validUntil </td>
+                                <td><p>The valid until date, as a string or as a timestamp</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    integer|null
+                                            &mdash; <p>$expireTime  The expiration time.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_query" name="method_query" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">query()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">query(\DOMDocument  <span class="argument">$dom</span>, string  <span class="argument">$query</span>, \DomElement|null  <span class="argument">$context = null</span>) : \DOMNodeList</pre>
+                <p><em>Extracts nodes from the DOMDocument.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\DOMDocument</td>
+                                <td>$dom </td>
+                                <td><p>The DOMDocument</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$query </td>
+                                <td><p>Xpath Expresion</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\DomElement|null</td>
+                                <td>$context </td>
+                                <td><p>Context Node (DomElement)</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \DOMNodeList
+                                            &mdash; <p>The queried nodes</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_isSessionStarted" name="method_isSessionStarted" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">isSessionStarted()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">isSessionStarted() : boolean</pre>
+                <p><em>Checks if the session is started or not.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                            &mdash; <p>true if the sessíon is started</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_deleteLocalSession" name="method_deleteLocalSession" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">deleteLocalSession()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">deleteLocalSession() </pre>
+                <p><em>Deletes the local session.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_calculateX509Fingerprint" name="method_calculateX509Fingerprint" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">calculateX509Fingerprint()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">calculateX509Fingerprint(string  <span class="argument">$x509cert</span>, string  <span class="argument">$alg = &#039;sha1&#039;</span>) : null|string</pre>
+                <p><em>Calculates the fingerprint of a x509cert.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$x509cert </td>
+                                <td><p>x509 cert</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$alg </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    null|string
+                                            &mdash; <p>Formatted fingerprint</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_formatFingerPrint" name="method_formatFingerPrint" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">formatFingerPrint()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">formatFingerPrint(string  <span class="argument">$fingerprint</span>) : string</pre>
+                <p><em>Formates a fingerprint.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$fingerprint </td>
+                                <td><p>fingerprint</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>Formatted fingerprint</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_generateNameId" name="method_generateNameId" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">generateNameId()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">generateNameId(string  <span class="argument">$value</span>, string  <span class="argument">$spnq</span>, string|null  <span class="argument">$format = null</span>, string|null  <span class="argument">$cert = null</span>, string|null  <span class="argument">$nq = null</span>) : string</pre>
+                <p><em>Generates a nameID.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$value </td>
+                                <td><p>fingerprint</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$spnq </td>
+                                <td><p>SP Name Qualifier</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$format </td>
+                                <td><p>SP Format</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$cert </td>
+                                <td><p>IdP Public cert to encrypt the nameID</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$nq </td>
+                                <td><p>IdP Name Qualifier</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$nameIDElement DOMElement | XMLSec nameID</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getStatus" name="method_getStatus" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getStatus()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getStatus(\DOMDocument  <span class="argument">$dom</span>) : array</pre>
+                <p><em>Gets Status from a Response.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\DOMDocument</td>
+                                <td>$dom </td>
+                                <td><p>The Response as XML</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\OneLogin_Saml2_ValidationError</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>$status The Status, an array with the code and a message.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_decryptElement" name="method_decryptElement" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">decryptElement()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">decryptElement(\DOMElement  <span class="argument">$encryptedData</span>, \XMLSecurityKey  <span class="argument">$inputKey</span>, boolean  <span class="argument">$formatOutput = true</span>) : \DOMElement</pre>
+                <p><em>Decrypts an encrypted element.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\DOMElement</td>
+                                <td>$encryptedData </td>
+                                <td><p>The encrypted data.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\XMLSecurityKey</td>
+                                <td>$inputKey </td>
+                                <td><p>The decryption key.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$formatOutput </td>
+                                <td><p>Format or not the output.</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\OneLogin_Saml2_ValidationError</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \DOMElement
+                                            &mdash; <p>The decrypted element.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_castKey" name="method_castKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">castKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">castKey(\XMLSecurityKey  <span class="argument">$key</span>, string  <span class="argument">$algorithm</span>, string  <span class="argument">$type = &#039;public&#039;</span>) : \XMLSecurityKey</pre>
+                <p><em>Converts a XMLSecurityKey to the correct algorithm.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\XMLSecurityKey</td>
+                                <td>$key </td>
+                                <td><p>The key.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$algorithm </td>
+                                <td><p>The desired algorithm.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$type </td>
+                                <td><p>Public or private key, defaults to public.</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \XMLSecurityKey
+                                            &mdash; <p>The new key.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_isSupportedSigningAlgorithm" name="method_isSupportedSigningAlgorithm" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">isSupportedSigningAlgorithm()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">isSupportedSigningAlgorithm(  <span class="argument">$algorithm</span>) : boolean</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$algorithm </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_addSign" name="method_addSign" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">addSign()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">addSign(string|\DomDocument  <span class="argument">$xml</span>, string  <span class="argument">$key</span>, string  <span class="argument">$cert</span>, string  <span class="argument">$signAlgorithm = \XMLSecurityKey::RSA_SHA1</span>, string  <span class="argument">$digestAlgorithm = \XMLSecurityDSig::SHA1</span>) : string</pre>
+                <p><em>Adds signature key and senders certificate to an element (Message or Assertion).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string|\DomDocument</td>
+                                <td>$xml </td>
+                                <td><p>The element we should sign</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$key </td>
+                                <td><p>The private key</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$cert </td>
+                                <td><p>The public</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$signAlgorithm </td>
+                                <td><p>Signature algorithm method</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$digestAlgorithm </td>
+                                <td><p>Digest algorithm method</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateSign" name="method_validateSign" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateSign()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateSign(string|\DomNode  <span class="argument">$xml</span>, string|null  <span class="argument">$cert = null</span>, string|null  <span class="argument">$fingerprint = null</span>, string|null  <span class="argument">$fingerprintalg = &#039;sha1&#039;</span>, string|null  <span class="argument">$xpath = null</span>, array|null  <span class="argument">$multiCerts = null</span>) : boolean</pre>
+                <p><em>Validates a signature (Message or Assertion).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string|\DomNode</td>
+                                <td>$xml </td>
+                                <td><p>The element we should validate</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$cert </td>
+                                <td><p>The public cert</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$fingerprint </td>
+                                <td><p>The fingerprint of the public cert</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$fingerprintalg </td>
+                                <td><p>The algorithm used to get the fingerprint</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$xpath </td>
+                                <td><p>The xpath of the signed element</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$multiCerts </td>
+                                <td><p>Multiple public certs</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateBinarySign" name="method_validateBinarySign" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateBinarySign()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateBinarySign(string  <span class="argument">$messageType</span>, array  <span class="argument">$getData</span>, array  <span class="argument">$idpData</span>, boolean  <span class="argument">$retrieveParametersFromServer = false</span>) : boolean</pre>
+                <p><em>Validates a binary signature</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$messageType </td>
+                                <td><p>Type of SAML Message</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$getData </td>
+                                <td><p>HTTP GET array</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$idpData </td>
+                                <td><p>IdP setting data</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$retrieveParametersFromServer </td>
+                                <td><p>Indicates where to get the values in order to validate the Sign, from getData or from $_SERVER</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRawHost" name="method_getRawHost" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">getRawHost()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRawHost() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>The raw host name</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_buildWithBaseURLPath" name="method_buildWithBaseURLPath" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">buildWithBaseURLPath()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">buildWithBaseURLPath(  <span class="argument">$info</span>) : string</pre>
+                <p><em>Returns the part of the URL with the BaseURLPath.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$info </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Utils.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Utils.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 30th, 2023 at 01:16.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

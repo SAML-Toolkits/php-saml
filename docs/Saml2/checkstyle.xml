@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<checkstyle version="1.3.0">
+  <file name="Settings.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+    <error line="20" severity="error" message="No summary for property $_baseurl" source="phpDocumentor.file.PPC:ERR-50007"/>
+  </file>
+  <file name="IdPMetadataParser.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+  <file name="LogoutResponse.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+    <error line="296" severity="error" message="No summary for method getId()" source="phpDocumentor.file.PPC:ERR-50008"/>
+  </file>
+  <file name="Constants.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+  <file name="LogoutRequest.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+  <file name="Error.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+  <file name="Utils.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+    <error line="369" severity="error" message="Argument $protocolRegex is missing from the Docblock of setProtocolRegex" source="phpDocumentor.file.PPC:ERR-50015"/>
+    <error line="369" severity="error" message="No summary for method setProtocolRegex()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="379" severity="error" message="No summary for method setBaseURL()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="419" severity="error" message="No summary for method setProxyVars()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="462" severity="error" message="No summary for method setSelfHost()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="470" severity="error" message="No summary for method setBaseURLPath()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="484" severity="error" message="No summary for method getBaseURLPath()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="492" severity="error" message="No summary for method getRawHost()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="517" severity="error" message="No summary for method setSelfPort()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="525" severity="error" message="No summary for method setSelfProtocol()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="533" severity="error" message="No summary for method getSelfProtocol()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="568" severity="error" message="No summary for method getSelfPort()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="659" severity="error" message="Argument $search is missing from the Docblock of strLreplace" source="phpDocumentor.file.PPC:ERR-50015"/>
+    <error line="659" severity="error" message="Argument $replace is missing from the Docblock of strLreplace" source="phpDocumentor.file.PPC:ERR-50015"/>
+    <error line="659" severity="error" message="Argument $subject is missing from the Docblock of strLreplace" source="phpDocumentor.file.PPC:ERR-50015"/>
+    <error line="659" severity="error" message="No summary for method strLreplace()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="1312" severity="error" message="No summary for method isSupportedSigningAlgorithm()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="23" severity="error" message="No summary for property $_host" source="phpDocumentor.file.PPC:ERR-50007"/>
+    <error line="28" severity="error" message="No summary for property $_protocol" source="phpDocumentor.file.PPC:ERR-50007"/>
+    <error line="33" severity="error" message="No summary for property $_port" source="phpDocumentor.file.PPC:ERR-50007"/>
+    <error line="38" severity="error" message="No summary for property $_baseurlpath" source="phpDocumentor.file.PPC:ERR-50007"/>
+    <error line="43" severity="error" message="No summary for property $_protocolRegex" source="phpDocumentor.file.PPC:ERR-50007"/>
+  </file>
+  <file name="Auth.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+    <error line="546" severity="error" message="Argument $nameIdSPNameQualifier is missing from the Docblock of logout" source="phpDocumentor.file.PPC:ERR-50015"/>
+    <error line="546" severity="error" message="Name of argument $nameIdSPNameQualifier does not match with the DocBlock's name $nameIdNameQualifier in logout()" source="phpDocumentor.file.PPC:ERR-50014"/>
+    <error line="710" severity="error" message="No summary for method getLastMessageId()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="718" severity="error" message="No summary for method getLastAssertionId()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="728" severity="error" message="No summary for method getLastAssertionNotOnOrAfter()" source="phpDocumentor.file.PPC:ERR-50008"/>
+  </file>
+  <file name="Response.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+    <error line="428" severity="error" message="No summary for method getId()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="442" severity="error" message="No summary for method getAssertionId()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="459" severity="error" message="No summary for method getAssertionNotOnOrAfter()" source="phpDocumentor.file.PPC:ERR-50008"/>
+    <error line="776" severity="error" message="No summary for method _getAttributesByKeyName()" source="phpDocumentor.file.PPC:ERR-50008"/>
+  </file>
+  <file name="AuthnRequest.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+  <file name="Metadata.php">
+    <error line="0" severity="error" message="No summary was found for this file" source="phpDocumentor.file.PPC:ERR-50000"/>
+  </file>
+</checkstyle>

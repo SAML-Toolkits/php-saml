@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>SAML PHP Toolkit</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">SAML PHP Toolkit</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">44</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-875393716"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-875393716" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Auth.html">OneLogin_Saml2_Auth</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_AuthnRequest.html">OneLogin_Saml2_AuthnRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Constants.html">OneLogin_Saml2_Constants</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Error.html">OneLogin_Saml2_Error</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_IdPMetadataParser.html">OneLogin_Saml2_IdPMetadataParser</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutRequest.html">OneLogin_Saml2_LogoutRequest</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_LogoutResponse.html">OneLogin_Saml2_LogoutResponse</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Metadata.html">OneLogin_Saml2_Metadata</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Response.html">OneLogin_Saml2_Response</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Settings.html">OneLogin_Saml2_Settings</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_Utils.html">OneLogin_Saml2_Utils</a></li>
+                                                    <li class="class"><a href="../classes/OneLogin_Saml2_ValidationError.html">OneLogin_Saml2_ValidationError</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>OneLogin_Saml2_Constants</h1>
+                    <p><em>Constants of PHP Toolkit</em></p>
+                    <p>Defines all required constants</p>
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <em>No public methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_ALLOWED_CLOCK_DRIFT" class="">ALLOWED_CLOCK_DRIFT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_EMAIL_ADDRESS" class="">NAMEID_EMAIL_ADDRESS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_X509_SUBJECT_NAME" class="">NAMEID_X509_SUBJECT_NAME</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME" class="">NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_UNSPECIFIED" class="">NAMEID_UNSPECIFIED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_KERBEROS" class="">NAMEID_KERBEROS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_ENTITY" class="">NAMEID_ENTITY</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_TRANSIENT" class="">NAMEID_TRANSIENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_PERSISTENT" class="">NAMEID_PERSISTENT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NAMEID_ENCRYPTED" class="">NAMEID_ENCRYPTED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_ATTRNAME_FORMAT_UNSPECIFIED" class="">ATTRNAME_FORMAT_UNSPECIFIED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_ATTRNAME_FORMAT_URI" class="">ATTRNAME_FORMAT_URI</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_ATTRNAME_FORMAT_BASIC" class="">ATTRNAME_FORMAT_BASIC</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_SAML" class="">NS_SAML</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_SAMLP" class="">NS_SAMLP</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_SOAP" class="">NS_SOAP</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_MD" class="">NS_MD</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_XS" class="">NS_XS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_XSI" class="">NS_XSI</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_XENC" class="">NS_XENC</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_NS_DS" class="">NS_DS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_BINDING_HTTP_POST" class="">BINDING_HTTP_POST</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_BINDING_HTTP_REDIRECT" class="">BINDING_HTTP_REDIRECT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_BINDING_HTTP_ARTIFACT" class="">BINDING_HTTP_ARTIFACT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_BINDING_SOAP" class="">BINDING_SOAP</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_BINDING_DEFLATE" class="">BINDING_DEFLATE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_UNSPECIFIED" class="">AC_UNSPECIFIED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_PASSWORD" class="">AC_PASSWORD</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_PASSWORD_PROTECTED" class="">AC_PASSWORD_PROTECTED</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_X509" class="">AC_X509</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_SMARTCARD" class="">AC_SMARTCARD</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_SMARTCARD_PKI" class="">AC_SMARTCARD_PKI</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_KERBEROS" class="">AC_KERBEROS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_WINDOWS" class="">AC_WINDOWS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_TLS" class="">AC_TLS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_AC_RSATOKEN" class="">AC_RSATOKEN</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_CM_BEARER" class="">CM_BEARER</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_CM_HOLDER_KEY" class="">CM_HOLDER_KEY</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_CM_SENDER_VOUCHES" class="">CM_SENDER_VOUCHES</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_SUCCESS" class="">STATUS_SUCCESS</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_REQUESTER" class="">STATUS_REQUESTER</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_RESPONDER" class="">STATUS_RESPONDER</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_VERSION_MISMATCH" class="">STATUS_VERSION_MISMATCH</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_NO_PASSIVE" class="">STATUS_NO_PASSIVE</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_PARTIAL_LOGOUT" class="">STATUS_PARTIAL_LOGOUT</a><br />
+                                                                    <a href="../classes/OneLogin_Saml2_Constants.html#constant_STATUS_PROXY_COUNT_EXCEEDED" class="">STATUS_PROXY_COUNT_EXCEEDED</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Constants.html"><div class="path-wrapper">Constants.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\OneLogin_Saml2_Constants</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ALLOWED_CLOCK_DRIFT" name="constant_ALLOWED_CLOCK_DRIFT" class="anchor"></a>
+            <article id="constant_ALLOWED_CLOCK_DRIFT" class="constant">
+                <h3 class="">ALLOWED_CLOCK_DRIFT</h3>
+                <pre class="signature">ALLOWED_CLOCK_DRIFT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_EMAIL_ADDRESS" name="constant_NAMEID_EMAIL_ADDRESS" class="anchor"></a>
+            <article id="constant_NAMEID_EMAIL_ADDRESS" class="constant">
+                <h3 class="">NAMEID_EMAIL_ADDRESS</h3>
+                <pre class="signature">NAMEID_EMAIL_ADDRESS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_X509_SUBJECT_NAME" name="constant_NAMEID_X509_SUBJECT_NAME" class="anchor"></a>
+            <article id="constant_NAMEID_X509_SUBJECT_NAME" class="constant">
+                <h3 class="">NAMEID_X509_SUBJECT_NAME</h3>
+                <pre class="signature">NAMEID_X509_SUBJECT_NAME</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME" name="constant_NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME" class="anchor"></a>
+            <article id="constant_NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME" class="constant">
+                <h3 class="">NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME</h3>
+                <pre class="signature">NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_UNSPECIFIED" name="constant_NAMEID_UNSPECIFIED" class="anchor"></a>
+            <article id="constant_NAMEID_UNSPECIFIED" class="constant">
+                <h3 class="">NAMEID_UNSPECIFIED</h3>
+                <pre class="signature">NAMEID_UNSPECIFIED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_KERBEROS" name="constant_NAMEID_KERBEROS" class="anchor"></a>
+            <article id="constant_NAMEID_KERBEROS" class="constant">
+                <h3 class="">NAMEID_KERBEROS</h3>
+                <pre class="signature">NAMEID_KERBEROS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_ENTITY" name="constant_NAMEID_ENTITY" class="anchor"></a>
+            <article id="constant_NAMEID_ENTITY" class="constant">
+                <h3 class="">NAMEID_ENTITY</h3>
+                <pre class="signature">NAMEID_ENTITY</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_TRANSIENT" name="constant_NAMEID_TRANSIENT" class="anchor"></a>
+            <article id="constant_NAMEID_TRANSIENT" class="constant">
+                <h3 class="">NAMEID_TRANSIENT</h3>
+                <pre class="signature">NAMEID_TRANSIENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_PERSISTENT" name="constant_NAMEID_PERSISTENT" class="anchor"></a>
+            <article id="constant_NAMEID_PERSISTENT" class="constant">
+                <h3 class="">NAMEID_PERSISTENT</h3>
+                <pre class="signature">NAMEID_PERSISTENT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NAMEID_ENCRYPTED" name="constant_NAMEID_ENCRYPTED" class="anchor"></a>
+            <article id="constant_NAMEID_ENCRYPTED" class="constant">
+                <h3 class="">NAMEID_ENCRYPTED</h3>
+                <pre class="signature">NAMEID_ENCRYPTED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ATTRNAME_FORMAT_UNSPECIFIED" name="constant_ATTRNAME_FORMAT_UNSPECIFIED" class="anchor"></a>
+            <article id="constant_ATTRNAME_FORMAT_UNSPECIFIED" class="constant">
+                <h3 class="">ATTRNAME_FORMAT_UNSPECIFIED</h3>
+                <pre class="signature">ATTRNAME_FORMAT_UNSPECIFIED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ATTRNAME_FORMAT_URI" name="constant_ATTRNAME_FORMAT_URI" class="anchor"></a>
+            <article id="constant_ATTRNAME_FORMAT_URI" class="constant">
+                <h3 class="">ATTRNAME_FORMAT_URI</h3>
+                <pre class="signature">ATTRNAME_FORMAT_URI</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_ATTRNAME_FORMAT_BASIC" name="constant_ATTRNAME_FORMAT_BASIC" class="anchor"></a>
+            <article id="constant_ATTRNAME_FORMAT_BASIC" class="constant">
+                <h3 class="">ATTRNAME_FORMAT_BASIC</h3>
+                <pre class="signature">ATTRNAME_FORMAT_BASIC</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_SAML" name="constant_NS_SAML" class="anchor"></a>
+            <article id="constant_NS_SAML" class="constant">
+                <h3 class="">NS_SAML</h3>
+                <pre class="signature">NS_SAML</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_SAMLP" name="constant_NS_SAMLP" class="anchor"></a>
+            <article id="constant_NS_SAMLP" class="constant">
+                <h3 class="">NS_SAMLP</h3>
+                <pre class="signature">NS_SAMLP</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_SOAP" name="constant_NS_SOAP" class="anchor"></a>
+            <article id="constant_NS_SOAP" class="constant">
+                <h3 class="">NS_SOAP</h3>
+                <pre class="signature">NS_SOAP</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_MD" name="constant_NS_MD" class="anchor"></a>
+            <article id="constant_NS_MD" class="constant">
+                <h3 class="">NS_MD</h3>
+                <pre class="signature">NS_MD</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_XS" name="constant_NS_XS" class="anchor"></a>
+            <article id="constant_NS_XS" class="constant">
+                <h3 class="">NS_XS</h3>
+                <pre class="signature">NS_XS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_XSI" name="constant_NS_XSI" class="anchor"></a>
+            <article id="constant_NS_XSI" class="constant">
+                <h3 class="">NS_XSI</h3>
+                <pre class="signature">NS_XSI</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_XENC" name="constant_NS_XENC" class="anchor"></a>
+            <article id="constant_NS_XENC" class="constant">
+                <h3 class="">NS_XENC</h3>
+                <pre class="signature">NS_XENC</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_NS_DS" name="constant_NS_DS" class="anchor"></a>
+            <article id="constant_NS_DS" class="constant">
+                <h3 class="">NS_DS</h3>
+                <pre class="signature">NS_DS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_BINDING_HTTP_POST" name="constant_BINDING_HTTP_POST" class="anchor"></a>
+            <article id="constant_BINDING_HTTP_POST" class="constant">
+                <h3 class="">BINDING_HTTP_POST</h3>
+                <pre class="signature">BINDING_HTTP_POST</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_BINDING_HTTP_REDIRECT" name="constant_BINDING_HTTP_REDIRECT" class="anchor"></a>
+            <article id="constant_BINDING_HTTP_REDIRECT" class="constant">
+                <h3 class="">BINDING_HTTP_REDIRECT</h3>
+                <pre class="signature">BINDING_HTTP_REDIRECT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_BINDING_HTTP_ARTIFACT" name="constant_BINDING_HTTP_ARTIFACT" class="anchor"></a>
+            <article id="constant_BINDING_HTTP_ARTIFACT" class="constant">
+                <h3 class="">BINDING_HTTP_ARTIFACT</h3>
+                <pre class="signature">BINDING_HTTP_ARTIFACT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_BINDING_SOAP" name="constant_BINDING_SOAP" class="anchor"></a>
+            <article id="constant_BINDING_SOAP" class="constant">
+                <h3 class="">BINDING_SOAP</h3>
+                <pre class="signature">BINDING_SOAP</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_BINDING_DEFLATE" name="constant_BINDING_DEFLATE" class="anchor"></a>
+            <article id="constant_BINDING_DEFLATE" class="constant">
+                <h3 class="">BINDING_DEFLATE</h3>
+                <pre class="signature">BINDING_DEFLATE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_UNSPECIFIED" name="constant_AC_UNSPECIFIED" class="anchor"></a>
+            <article id="constant_AC_UNSPECIFIED" class="constant">
+                <h3 class="">AC_UNSPECIFIED</h3>
+                <pre class="signature">AC_UNSPECIFIED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_PASSWORD" name="constant_AC_PASSWORD" class="anchor"></a>
+            <article id="constant_AC_PASSWORD" class="constant">
+                <h3 class="">AC_PASSWORD</h3>
+                <pre class="signature">AC_PASSWORD</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_PASSWORD_PROTECTED" name="constant_AC_PASSWORD_PROTECTED" class="anchor"></a>
+            <article id="constant_AC_PASSWORD_PROTECTED" class="constant">
+                <h3 class="">AC_PASSWORD_PROTECTED</h3>
+                <pre class="signature">AC_PASSWORD_PROTECTED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_X509" name="constant_AC_X509" class="anchor"></a>
+            <article id="constant_AC_X509" class="constant">
+                <h3 class="">AC_X509</h3>
+                <pre class="signature">AC_X509</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_SMARTCARD" name="constant_AC_SMARTCARD" class="anchor"></a>
+            <article id="constant_AC_SMARTCARD" class="constant">
+                <h3 class="">AC_SMARTCARD</h3>
+                <pre class="signature">AC_SMARTCARD</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_SMARTCARD_PKI" name="constant_AC_SMARTCARD_PKI" class="anchor"></a>
+            <article id="constant_AC_SMARTCARD_PKI" class="constant">
+                <h3 class="">AC_SMARTCARD_PKI</h3>
+                <pre class="signature">AC_SMARTCARD_PKI</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_KERBEROS" name="constant_AC_KERBEROS" class="anchor"></a>
+            <article id="constant_AC_KERBEROS" class="constant">
+                <h3 class="">AC_KERBEROS</h3>
+                <pre class="signature">AC_KERBEROS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_WINDOWS" name="constant_AC_WINDOWS" class="anchor"></a>
+            <article id="constant_AC_WINDOWS" class="constant">
+                <h3 class="">AC_WINDOWS</h3>
+                <pre class="signature">AC_WINDOWS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_TLS" name="constant_AC_TLS" class="anchor"></a>
+            <article id="constant_AC_TLS" class="constant">
+                <h3 class="">AC_TLS</h3>
+                <pre class="signature">AC_TLS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_AC_RSATOKEN" name="constant_AC_RSATOKEN" class="anchor"></a>
+            <article id="constant_AC_RSATOKEN" class="constant">
+                <h3 class="">AC_RSATOKEN</h3>
+                <pre class="signature">AC_RSATOKEN</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_CM_BEARER" name="constant_CM_BEARER" class="anchor"></a>
+            <article id="constant_CM_BEARER" class="constant">
+                <h3 class="">CM_BEARER</h3>
+                <pre class="signature">CM_BEARER</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_CM_HOLDER_KEY" name="constant_CM_HOLDER_KEY" class="anchor"></a>
+            <article id="constant_CM_HOLDER_KEY" class="constant">
+                <h3 class="">CM_HOLDER_KEY</h3>
+                <pre class="signature">CM_HOLDER_KEY</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_CM_SENDER_VOUCHES" name="constant_CM_SENDER_VOUCHES" class="anchor"></a>
+            <article id="constant_CM_SENDER_VOUCHES" class="constant">
+                <h3 class="">CM_SENDER_VOUCHES</h3>
+                <pre class="signature">CM_SENDER_VOUCHES</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_SUCCESS" name="constant_STATUS_SUCCESS" class="anchor"></a>
+            <article id="constant_STATUS_SUCCESS" class="constant">
+                <h3 class="">STATUS_SUCCESS</h3>
+                <pre class="signature">STATUS_SUCCESS</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_REQUESTER" name="constant_STATUS_REQUESTER" class="anchor"></a>
+            <article id="constant_STATUS_REQUESTER" class="constant">
+                <h3 class="">STATUS_REQUESTER</h3>
+                <pre class="signature">STATUS_REQUESTER</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_RESPONDER" name="constant_STATUS_RESPONDER" class="anchor"></a>
+            <article id="constant_STATUS_RESPONDER" class="constant">
+                <h3 class="">STATUS_RESPONDER</h3>
+                <pre class="signature">STATUS_RESPONDER</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_VERSION_MISMATCH" name="constant_STATUS_VERSION_MISMATCH" class="anchor"></a>
+            <article id="constant_STATUS_VERSION_MISMATCH" class="constant">
+                <h3 class="">STATUS_VERSION_MISMATCH</h3>
+                <pre class="signature">STATUS_VERSION_MISMATCH</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_NO_PASSIVE" name="constant_STATUS_NO_PASSIVE" class="anchor"></a>
+            <article id="constant_STATUS_NO_PASSIVE" class="constant">
+                <h3 class="">STATUS_NO_PASSIVE</h3>
+                <pre class="signature">STATUS_NO_PASSIVE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_PARTIAL_LOGOUT" name="constant_STATUS_PARTIAL_LOGOUT" class="anchor"></a>
+            <article id="constant_STATUS_PARTIAL_LOGOUT" class="constant">
+                <h3 class="">STATUS_PARTIAL_LOGOUT</h3>
+                <pre class="signature">STATUS_PARTIAL_LOGOUT</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_STATUS_PROXY_COUNT_EXCEEDED" name="constant_STATUS_PROXY_COUNT_EXCEEDED" class="anchor"></a>
+            <article id="constant_STATUS_PROXY_COUNT_EXCEEDED" class="constant">
+                <h3 class="">STATUS_PROXY_COUNT_EXCEEDED</h3>
+                <pre class="signature">STATUS_PROXY_COUNT_EXCEEDED</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                        
+                                </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Constants.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Constants.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 30th, 2023 at 01:16.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
