@@ -38,10 +38,11 @@ class Metadata
      * @param array         $contacts      Contacts info
      * @param array         $organization  Organization ingo
      * @param array         $attributes
+     * @param bool          $ignoreValidUntil exclude the validUntil tag from metadata
      *
      * @return string SAML Metadata XML
      */
-    public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
+    public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array(), $ignoreValidUntil = false)
     {
 
         if (!isset($validUntil)) {
@@ -173,7 +174,12 @@ METADATA_TEMPLATE;
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     validUntil="{$validUntilTime}"
+METADATA_TEMPLATE;
+	$metadata = $metadata . "\n";
+        if ( $ignoreValidUntil === false ){
+	    $metadata = $metadata . "                     validUntil=\"{$validUntilTime}\"\n";
+	}
+	$metadata = $metadata . <<<METADATA_TEMPLATE
                      cacheDuration="PT{$cacheDuration}S"
                      entityID="{$spEntityId}">
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
