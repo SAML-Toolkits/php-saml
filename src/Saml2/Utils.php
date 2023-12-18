@@ -214,24 +214,23 @@ class Utils
     /**
      * Returns a x509 cert (adding header & footer if required).
      *
-     * @param string $cert  A x509 unformated cert
-     * @param bool   $heads True if we want to include head and footer
+     * @param string $x509cert  A x509 unformated cert
+     * @param bool   $heads     True if we want to include head and footer
      *
      * @return string $x509 Formatted cert
      */
-    public static function formatCert($cert, $heads = true)
+    public static function formatCert($x509cert, $heads = true)
     {
-        $x509cert = str_replace(array("\x0D", "\r", "\n"), "", $cert);
-        if (!empty($x509cert)) {
-            $x509cert = str_replace('-----BEGIN CERTIFICATE-----', "", $x509cert);
-            $x509cert = str_replace('-----END CERTIFICATE-----', "", $x509cert);
-            $x509cert = str_replace(' ', '', $x509cert);
-
-            if ($heads) {
-                $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
-            }
-
+        if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
+            $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
+
+        $x509cert = strtr($x509cert, "\x0d\r\n ", '');
+
+        if ($heads && $x509cert !== '') {
+            $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
+        }
+
         return $x509cert;
     }
 
