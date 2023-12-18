@@ -194,6 +194,11 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertStringNotContainsString('-----END CERTIFICATE-----', $formatedCert6);
         $this->assertEquals(strlen($cert2), 860);
 
+        $cert = file_get_contents(TEST_ROOT.'/certs/with.comment.crt');
+        $formatedCert7 = Utils::formatCert($cert, true);
+        $this->assertStringContainsString('-----BEGIN CERTIFICATE-----', $formatedCert7);
+        $this->assertStringContainsString('-----END CERTIFICATE-----', $formatedCert7);
+        $this->assertStringNotContainsString('comments', $formatedCert7);
     }
 
     /**
