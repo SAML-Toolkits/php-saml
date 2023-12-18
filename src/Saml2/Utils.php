@@ -225,7 +225,7 @@ class Utils
             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
 
-        $x509cert = strtr($x509cert, "\x0d\r\n ", '');
+        $x509cert = str_replace(["\x0d", "\r", "\n", " "], '', $x509cert);
 
         if ($heads && $x509cert !== '') {
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
