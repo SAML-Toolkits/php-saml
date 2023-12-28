@@ -95,7 +95,6 @@ Installation
  * `openssl`. Install the openssl library. It handles x509 certificates.
  * `mcrypt`. Install that library and its php driver if you're going to handle
    encrypted data (`nameID`, `assertions`).
- * `gettext`. Install that library and its php driver. It handles translations.
  * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
 
 Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
