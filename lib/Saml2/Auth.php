@@ -143,7 +143,7 @@ class OneLogin_Saml2_Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
+     * @param array|null $oldSettings
      * @param bool $spValidationOnly if you only as an SP , you should set it to false if not you should set it to true
      *
      * @throws OneLogin_Saml2_Error

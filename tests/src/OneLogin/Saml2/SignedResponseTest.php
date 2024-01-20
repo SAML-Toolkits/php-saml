@@ -2,7 +2,7 @@
 /**
  * Unit tests for Response messages signed
  */
-class OneLogin_Saml_SignedResponseTest extends PHPUnit_Framework_TestCase
+class OneLogin_Saml2_SignedResponseTest extends PHPUnit_Framework_TestCase
 {
     private $_settings;
 

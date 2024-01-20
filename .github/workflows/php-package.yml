@@ -51,7 +51,7 @@ jobs:
           php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  lib/.
         
       - name: PHP Code Sniffer
-        run: php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 demo-old endpoints tests/src
+        run: php vendor/bin/phpcs --standard=tests/ZendModStandard lib/Saml2 demo1 demo2 endpoints tests/src
     
       - name: Run unit tests
         run: vendor/bin/phpunit --verbose --debug
