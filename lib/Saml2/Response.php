@@ -610,6 +610,10 @@ class OneLogin_Saml2_Response
             }
         } else {
             if ($this->_settings->isStrict() && empty($nameId->nodeValue)) {
+                $security = $this->_settings->getSecurityData();
+                if (!$security['wantNameId']) {
+                    return $nameIdData;
+                }
                 throw new OneLogin_Saml2_ValidationError(
                     "An empty NameID value found",
                     OneLogin_Saml2_ValidationError::EMPTY_NAMEID
