@@ -705,12 +705,12 @@ class OneLogin_Saml2_Utils
         $baseURLPath = self::getBaseURLPath();
         if (!empty($baseURLPath)) {
             $result = $baseURLPath;
-            if (!empty($info)) {
-                $path = explode('/', $info);
-                $extractedInfo = array_pop($path);
-                if (!empty($extractedInfo)) {
-                    $result .= $extractedInfo;
-                }
+            // Remove base path from the path info.
+            $extractedInfo = str_replace($baseURLPath, '', $info);
+            // Remove starting and ending slash.
+            $extractedInfo = trim($extractedInfo, '/');
+            if (!empty($extractedInfo)) {
+                $result .= $extractedInfo;
             }
         }
         return $result;
