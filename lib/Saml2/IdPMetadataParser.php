@@ -25,7 +25,7 @@ class OneLogin_Saml2_IdPMetadataParser
      *
      * @return array metadata info in php-saml settings format
      */
-    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT)
+    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $validatePeer = false)
     {
         $metadataInfo = array();
 
@@ -37,7 +37,7 @@ class OneLogin_Saml2_IdPMetadataParser
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $validatePeer);
             curl_setopt($ch, CURLOPT_FAILONERROR, 1);
 
             $xml = curl_exec($ch);
