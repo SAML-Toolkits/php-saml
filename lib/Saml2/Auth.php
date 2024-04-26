@@ -246,6 +246,7 @@ class OneLogin_Saml2_Auth
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws OneLogin_Saml2_Error
      */
@@ -498,6 +499,7 @@ class OneLogin_Saml2_Auth
      * @param string $nameIdValueReq Indicates to the IdP the subject that should be authenticated
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws OneLogin_Saml2_Error
      */
@@ -540,6 +542,7 @@ class OneLogin_Saml2_Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws OneLogin_Saml2_Error
      */

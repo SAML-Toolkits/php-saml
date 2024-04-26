@@ -300,6 +300,7 @@ class OneLogin_Saml2_Utils
      * @param bool         $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null $url
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws OneLogin_Saml2_Error
      */
