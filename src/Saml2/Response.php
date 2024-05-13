@@ -631,8 +631,8 @@ class Response
 
         $nameIdData = array();
 
+        $security = $this->_settings->getSecurityData();
         if (!isset($nameId)) {
-            $security = $this->_settings->getSecurityData();
             if ($security['wantNameId']) {
                 throw new ValidationError(
                     "NameID not found in the assertion of the Response",
@@ -640,7 +640,7 @@ class Response
                 );
             }
         } else {
-            if ($this->_settings->isStrict() && empty($nameId->nodeValue)) {
+            if ($this->_settings->isStrict() && $security['wantNameId'] && empty($nameId->nodeValue)) {
                 throw new ValidationError(
                     "An empty NameID value found",
                     ValidationError::EMPTY_NAMEID

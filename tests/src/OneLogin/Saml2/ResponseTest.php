@@ -415,6 +415,71 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         } catch (ValidationError $e) {
             $this->assertStringContainsString('An empty NameID value found', $e->getMessage());
         }
+
+        $xml7 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_value_nameid.xml.base64');
+        $response11 = new Response($this->_settings, $xml7);
+        $nameIdData12 = $response11->getNameIdData();
+        $expectedNameIdData10 = array(
+            'Value' => "",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+        );
+        $this->assertEquals($expectedNameIdData10, $nameIdData12);
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new Settings($settingsInfo);
+        $response12 = new Response($settings, $xml7);
+
+        try {
+            $nameIdData13 = $response12->getNameIdData();
+            $this->fail('ValidationError was not raised');
+        } catch (ValidationError $e) {
+            $this->assertStringContainsString('An empty NameID value found', $e->getMessage());
+        }
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new Settings($settingsInfo);
+        $response13 = new Response($settings, $xml7);
+
+        $nameIdData14 = $response13->getNameIdData();
+
+        $expectedNameIdData11 = array(
+            'Value' => "",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+        );
+        $this->assertEquals($expectedNameIdData11, $nameIdData14);
+
+        $settingsInfo['strict'] = false;
+        $settingsInfo['security']['wantNameId'] = true;
+
+        $settings = new Settings($settingsInfo);
+        $response14 = new Response($settings, $xml7);
+
+        $nameIdData15 = $response14->getNameIdData();
+
+        $expectedNameIdData12 = array(
+            'Value' => "",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+        );
+        $this->assertEquals($expectedNameIdData12, $nameIdData15);
+
+        $settingsInfo['security']['wantNameId'] = false;
+
+        $settings = new Settings($settingsInfo);
+        $response15 = new Response($settings, $xml7);
+
+        $nameIdData16 = $response15->getNameIdData();
+
+        $expectedNameIdData13 = array(
+            'Value' => "",
+            'Format' => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+        );
+        $this->assertEquals($expectedNameIdData13, $nameIdData16);
     }
 
     /**
@@ -643,7 +708,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests the getAttributesWithFriendlyName method of the OneLogin_Saml2_Response
+     * Tests the getAttributesWithFriendlyName method of the Response
      *
      * @covers OneLogin\Saml2\Response::getAttributesWithFriendlyName
      */
