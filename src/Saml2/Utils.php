@@ -310,6 +310,7 @@ class Utils
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null $url
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -916,6 +917,7 @@ class Utils
      * @param string|int|null $validUntil    The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
+     * @phpstan-return ($cacheDuration is true ? string : never)
      *
      * @throws Exception
      */
