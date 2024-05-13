@@ -165,7 +165,7 @@ class OneLogin_Saml2_Response
                 }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
-                
+
                 $responseInResponseTo = null;
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
@@ -357,7 +357,7 @@ class OneLogin_Saml2_Response
                         OneLogin_Saml2_ValidationError::NO_SIGNED_ASSERTION
                     );
                 }
-                
+
                 if ($security['wantMessagesSigned'] && !$hasSignedResponse) {
                     throw new OneLogin_Saml2_ValidationError(
                         "The Message of the Response is not signed and the SP requires it",
@@ -600,8 +600,8 @@ class OneLogin_Saml2_Response
 
         $nameIdData = array();
 
+        $security = $this->_settings->getSecurityData();
         if (!isset($nameId)) {
-            $security = $this->_settings->getSecurityData();
             if ($security['wantNameId']) {
                 throw new OneLogin_Saml2_ValidationError(
                     "NameID not found in the assertion of the Response",
@@ -609,7 +609,7 @@ class OneLogin_Saml2_Response
                 );
             }
         } else {
-            if ($this->_settings->isStrict() && empty($nameId->nodeValue)) {
+            if ($this->_settings->isStrict() && $security['wantNameId'] && empty($nameId->nodeValue)) {
                 throw new OneLogin_Saml2_ValidationError(
                     "An empty NameID value found",
                     OneLogin_Saml2_ValidationError::EMPTY_NAMEID
@@ -1129,7 +1129,7 @@ class OneLogin_Saml2_Response
                 $objKeyInfo->loadKey($pem, false, false);
             }
         }
-                
+
         if (empty($objKey->key)) {
             $objKey->loadKey($key);
         }
