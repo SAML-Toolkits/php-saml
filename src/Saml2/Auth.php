@@ -223,6 +223,7 @@ class Auth
      * Process the SAML Response sent by the IdP.
      *
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      * @throws ValidationError
@@ -273,6 +274,7 @@ class Auth
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -355,6 +357,7 @@ class Auth
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      */
     public function redirectTo($url = '', array $parameters = array(), $stay = false)
     {
@@ -536,6 +539,7 @@ class Auth
      * @param string      $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -576,6 +580,7 @@ class Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
