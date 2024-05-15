@@ -219,7 +219,7 @@ class Utils
      */
     public static function formatCert($x509cert, $heads = true)
     {
-        if (is_null($cert)) {
+        if (is_null($x509cert)) {
           return;
         }
 
