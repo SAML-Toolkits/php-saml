@@ -18,7 +18,7 @@ $auth->processResponse();
 $errors = $auth->getErrors();
 
 if (!empty($errors)) {
-    echo '<p>' . implode(', ', $errors) . '</p>';
+    echo '<p>' . htmlentities(implode(', ', $errors)) . '</p>';
     exit();
 }
 
@@ -47,7 +47,7 @@ if (!empty($attributes)) {
     }
     echo '</tbody></table>';
     if (!empty($_SESSION['IdPSessionIndex'])) {
-        echo '<p>The SessionIndex of the IdP is: '.$_SESSION['IdPSessionIndex'].'</p>';
+        echo '<p>The SessionIndex of the IdP is: '.htmlentities($_SESSION['IdPSessionIndex']).'</p>';
     }
 } else {
     echo _('Attributes not found');

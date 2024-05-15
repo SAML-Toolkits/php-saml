@@ -2,15 +2,13 @@
 /**
  * This file is part of php-saml.
  *
- * (c) OneLogin Inc
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @package OneLogin
- * @author  OneLogin Inc <saml-info@onelogin.com>
- * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
- * @link    https://github.com/onelogin/php-saml
+ * @author  Sixto Martin <sixto.martin.garcia@gmail.com>
+ * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
+ * @link    https://github.com/SAML-Toolkits/php-saml
  */
 
 namespace OneLogin\Saml2;
@@ -20,7 +18,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 use Exception;
 
 /**
- * Main class of OneLogin's PHP Toolkit
+ * Main class of SAML PHP Toolkit
  */
 class Auth
 {
@@ -168,13 +166,14 @@ class Auth
      * Initializes the SP SAML instance.
      *
      * @param array|null $settings Setting data
+     * @param bool $spValidationOnly if true, The library will only validate the SAML SP settings,
      *
      * @throws Exception
      * @throws Error
      */
-    public function __construct(array $settings = null)
+    public function __construct(array $settings = null, bool $spValidationOnly = false)
     {
-        $this->_settings = new Settings($settings);
+        $this->_settings = new Settings($settings, $spValidationOnly);
     }
 
     /**
@@ -221,6 +220,7 @@ class Auth
      * Process the SAML Response sent by the IdP.
      *
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      * @throws ValidationError
@@ -271,6 +271,7 @@ class Auth
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -353,6 +354,7 @@ class Auth
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      */
     public function redirectTo($url = '', array $parameters = array(), $stay = false)
     {
@@ -534,6 +536,7 @@ class Auth
      * @param string      $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -574,6 +577,7 @@ class Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */

@@ -165,8 +165,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         try {
             $signedMetadata2 = Metadata::signMetadata('', $key, $cert);
             $this->fail('Exception was not raised');
-        } catch (\Error $e) {
-            $this->assertStringContainsString('Argument #1 ($source) must not be empty', $e->getMessage());
+        } catch (\Error | \Exception $e) {
+            $expectedErrors = array('DOMDocument::loadXML(): Argument #1 ($source) must not be empty', 'DOMDocument::loadXML(): Empty string supplied as input');
+            $this->assertTrue(in_array($e->getMessage(), $expectedErrors));
         }
     }
 
@@ -261,8 +262,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         try {
             $signedMetadata2 = Metadata::addX509KeyDescriptors('', $cert);
             $this->fail('Exception was not raised');
-        } catch (\Error $e) {
-            $this->assertStringContainsString('Argument #1 ($source) must not be empty', $e->getMessage());
+        } catch (\Error | \Exception $e) {
+            $expectedErrors = array('DOMDocument::loadXML(): Argument #1 ($source) must not be empty', 'Error parsing metadata. DOMDocument::loadXML(): Empty string supplied as input');
+            $this->assertTrue(in_array($e->getMessage(), $expectedErrors));
         }
 
         libxml_use_internal_errors(true);

@@ -50,10 +50,12 @@ if (!function_exists('getParamsFromUrl')) {
     function getParamsFromUrl($url)
     {
         $parsedQuery = null;
-        $parsedUrl = parse_url($url);
-        if (isset($parsedUrl['query'])) {
-            $query = $parsedUrl['query'];
-            parse_str($query, $parsedQuery);
+        if (!is_null($url)) {
+            $parsedUrl = parse_url($url);
+            if (isset($parsedUrl['query'])) {
+                $query = $parsedUrl['query'];
+                parse_str($query, $parsedQuery);
+            }
         }
         return $parsedQuery;
     }

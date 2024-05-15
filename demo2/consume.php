@@ -17,7 +17,7 @@ try {
         $samlSettings = new Settings();
         $samlResponse = new Response($samlSettings, $_POST['SAMLResponse']);
         if ($samlResponse->isValid()) {
-            echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+            echo 'You are: ' . htmlentities($samlResponse->getNameId()) . '<br>';
             $attributes = $samlResponse->getAttributes();
             if (!empty($attributes)) {
                 echo 'You have the following attributes:<br>';
@@ -38,5 +38,5 @@ try {
         echo 'No SAML Response found in POST.';
     }
 } catch (Exception $e) {
-    echo 'Invalid SAML Response: ' . $e->getMessage();
+    echo htmlentities('Invalid SAML Response: ' . $e->getMessage());
 }

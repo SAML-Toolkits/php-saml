@@ -2,15 +2,13 @@
 /**
  * This file is part of php-saml.
  *
- * (c) OneLogin Inc
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @package OneLogin
- * @author  OneLogin Inc <saml-info@onelogin.com>
- * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
- * @link    https://github.com/onelogin/php-saml
+ * @author  Sixto Martin <sixto.martin.garcia@gmail.com>
+ * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
+ * @link    https://github.com/SAML-Toolkits/php-saml
  */
 
 namespace OneLogin\Saml2;
@@ -27,7 +25,7 @@ use DOMXPath;
 use Exception;
 
 /**
- * Utils of OneLogin PHP Toolkit
+ * Utils of SAML PHP Toolkit
  *
  * Defines several often used methods
  */
@@ -221,6 +219,10 @@ class Utils
      */
     public static function formatCert($x509cert, $heads = true)
     {
+        if (is_null($cert)) {
+          return;
+        }
+
         if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
@@ -244,6 +246,10 @@ class Utils
      */
     public static function formatPrivateKey($key, $heads = true)
     {
+        if (is_null($key)) {
+          return;
+        }
+
         $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
         if (!empty($key)) {
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
@@ -303,6 +309,7 @@ class Utils
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null $url
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -318,7 +325,12 @@ class Utils
          * Verify that the URL matches the regex for the protocol.
          * By default this will check for http and https
          */
-        $wrongProtocol = !preg_match(self::$_protocolRegex, $url);
+        if (isset(self::$_protocolRegex)) {
+            $protocol = self::$_protocolRegex;
+        } else {
+            $protocol = "";
+        }
+        $wrongProtocol = !preg_match($protocol, $url);
         $url = filter_var($url, FILTER_VALIDATE_URL);
         if ($wrongProtocol || empty($url)) {
             throw new Error(
@@ -499,7 +511,7 @@ class Utils
         if (self::$_host) {
             $currentHost = self::$_host;
         } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
-            $currentHost = $_SERVER['HTTP_X_FORWARDED_HOST'];
+            $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0];
         } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
@@ -742,7 +754,7 @@ class Utils
      */
     public static function generateUniqueID()
     {
-        return 'ONELOGIN_' . sha1(uniqid((string)mt_rand(), true));
+        return 'ONELOGIN_' . sha1(random_bytes(20));
     }
 
     /**
@@ -772,6 +784,10 @@ class Utils
      */
     public static function parseSAML2Time($time)
     {
+        if (empty($time)) {
+          return null;
+        }
+
         $matches = array();
 
         /* We use a very strict regex to parse the timestamp. */
@@ -900,6 +916,7 @@ class Utils
      * @param string|int|null $validUntil    The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
+     * @phpstan-return ($cacheDuration is true ? string : never)
      *
      * @throws Exception
      */
@@ -1009,7 +1026,10 @@ class Utils
                 if (strncmp($curData, '-----END CERTIFICATE', 20) == 0) {
                     break;
                 }
-                $data .= trim($curData);
+                if (isset($curData)) {
+                    $curData = trim($curData);
+                }
+                $data .= $curData;
             }
         }
 
@@ -1042,6 +1062,9 @@ class Utils
      */
     public static function formatFingerPrint($fingerprint)
     {
+        if (is_null($fingerprint)) {
+            return;
+        }
         $formatedFingerprint = str_replace(':', '', $fingerprint);
         $formatedFingerprint = strtolower($formatedFingerprint);
         return $formatedFingerprint;
@@ -1559,7 +1582,7 @@ class Utils
                     $objKey = Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {
                     $ex = new ValidationError(
-                        "Invalid signAlg in the recieved ".$strMessageType,
+                        "Invalid signAlg in the received ".$strMessageType,
                         ValidationError::INVALID_SIGNATURE
                     );
                     if (count($multiCerts) == 1) {
