@@ -780,7 +780,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_GET['RelayState'] = 'http://relaystate.com';
 
         $this->_auth->setStrict(true);
-        $targetUrl = $this->_auth->processSLO(false, null, null, null, true);
+        $targetUrl = $this->_auth->processSLO(false, null, false, null, true);
+
         $parsedQuery = getParamsFromUrl($targetUrl);
 
         $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
@@ -818,7 +819,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_GET['RelayState'] = 'http://relaystate.com';
 
         $auth->setStrict(true);
-        $targetUrl = $auth->processSLO(false, null, null, null, true);
+        $targetUrl = $auth->processSLO(false, null, false, null, true);
 
         $parsedQuery = getParamsFromUrl($targetUrl);
 
