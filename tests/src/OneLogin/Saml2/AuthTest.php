@@ -819,7 +819,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_GET['RelayState'] = 'http://relaystate.com';
 
         $auth->setStrict(true);
-        $targetUrl = $this->_auth->processSLO(false, null, false, null, true);
+        $targetUrl = $auth->processSLO(false, null, false, null, true);
 
         $parsedQuery = getParamsFromUrl($targetUrl);
 
@@ -1118,7 +1118,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $returnTo = 'http://example.com/returnto';
         $settingsInfo['sp']['NameIDFormat'] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
         $auth2 = new Auth($settingsInfo);
-        $targetUrl3 = $auth2->login($returnTo, [], false, false, true, false, "testuser@example.com");
+        $targetUrl3 = $auth2->login($returnTo, [], false, false, true);
         $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
         $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
