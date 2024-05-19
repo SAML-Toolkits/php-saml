@@ -180,7 +180,7 @@ validUntil="{$validUntilTime}"
                      cacheDuration="PT{$cacheDuration}S"
 TIME_TEMPLATE;
         }
-	    
+
         $spEntityId = htmlspecialchars($sp['entityId'], ENT_QUOTES);
         $acsUrl = htmlspecialchars($sp['assertionConsumerService']['url'], ENT_QUOTES);
         $metadata = <<<METADATA_TEMPLATE
