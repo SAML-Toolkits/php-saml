@@ -827,25 +827,20 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $plainMessage = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $plainMessage);
         $message = base64_encode(gzdeflate($plainMessage));
 
+        unset($_GET['SAMLResponse']);
         $_GET['SAMLRequest'] = $message;
         $_GET['RelayState'] = 'http://relaystate.com';
 
-        try {
-            $this->_auth->setStrict(true);
-            $this->_auth->processSLO(false);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $this->_auth->setStrict(true);
+        $targetUrl = $this->_auth->processSLO(false, null, false, null, true);
 
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
-        }
+        $parsedQuery = getParamsFromUrl($targetUrl);
+
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
     }
 
     /**
@@ -878,25 +873,19 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_GET['SAMLRequest'] = $message;
         $_GET['RelayState'] = 'http://relaystate.com';
 
-        try {
-            $auth->setStrict(true);
-            $auth->processSLO(false);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $auth->setStrict(true);
+        $targetUrl = $auth->processSLO(false, null, false, null, true);
 
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertArrayHasKey('SigAlg', $parsedQuery);
-            $this->assertArrayHasKey('Signature', $parsedQuery);
-            $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
-            $this->assertEquals(XMLSecurityKey::RSA_SHA1, $parsedQuery['SigAlg']);
-        }
+        $parsedQuery = getParamsFromUrl($targetUrl);
+
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertArrayHasKey('SigAlg', $parsedQuery);
+        $this->assertArrayHasKey('Signature', $parsedQuery);
+        $this->assertEquals('http://relaystate.com', $parsedQuery['RelayState']);
+        $this->assertEquals(XMLSecurityKey::RSA_SHA256, $parsedQuery['SigAlg']);
     }
 
     /**

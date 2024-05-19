@@ -34,8 +34,8 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         try {
             $res1 = Utils::loadXML($dom, $metadataUnloaded);
             $this->assertFalse($res1);
-        } catch (Exception $e) {
-          $this->assertEquals('DOMDocument::loadXML(): Premature end of data in tag EntityDescriptor line 1 in Entity, line: 1', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->assertEquals('DOMDocument::loadXML(): Premature end of data in tag EntityDescriptor line 1 in Entity, line: 1', $e->getMessage());
         }
 
         $metadataInvalid = file_get_contents(TEST_ROOT .'/data/metadata/noentity_metadata_settings1.xml');
@@ -194,6 +194,11 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert6);
         $this->assertEquals(strlen($cert2), 860);
 
+        $cert = file_get_contents(TEST_ROOT.'/certs/with.comment.crt');
+        $formatedCert7 = Utils::formatCert($cert, true);
+        $this->assertContains('-----BEGIN CERTIFICATE-----', $formatedCert7);
+        $this->assertContains('-----END CERTIFICATE-----', $formatedCert7);
+        $this->assertNotContains('comments', $formatedCert7);
     }
 
     /**
