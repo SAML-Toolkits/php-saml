@@ -46,7 +46,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         try {
             $res1 = OneLogin_Saml2_Utils::loadXML($dom, $metadataUnloaded);
             $this->assertFalse($res1);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
           $this->assertEquals('DOMDocument::loadXML(): Premature end of data in tag EntityDescriptor line 1 in Entity, line: 1', $e->getMessage());
         }
 
@@ -206,6 +206,11 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('-----END CERTIFICATE-----', $formatedCert6);
         $this->assertEquals(strlen($cert2), 860);
 
+        $cert = file_get_contents(TEST_ROOT.'/certs/with.comment.crt');
+        $formatedCert7 = OneLogin_Saml2_Utils::formatCert($cert, true);
+        $this->assertContains('-----BEGIN CERTIFICATE-----', $formatedCert7);
+        $this->assertContains('-----END CERTIFICATE-----', $formatedCert7);
+        $this->assertNotContains('comments', $formatedCert7);
     }
 
     /**
