@@ -52,6 +52,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<md:OrganizationName xml:lang="en-US">sp_test</md:OrganizationName>', $metadata);
         $this->assertStringContainsString('<md:ContactPerson contactType="technical">', $metadata);
         $this->assertStringContainsString('<md:GivenName>technical_name</md:GivenName>', $metadata);
+        $this->assertStringContainsString('validUntil', $metadata);
 
         $security['authnRequestsSigned'] = true;
         $security['wantAssertionsSigned'] = true;
@@ -66,6 +67,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringNotContainsString('<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"', $metadata2);
         $this->assertStringNotContainsString(' Location="http://stuff.com/endpoints/endpoints/sls.php"/>', $metadata2);
+
+        $metadata3 = Metadata::builder($spData, $security['authnRequestsSigned'], $security['wantAssertionsSigned'], null, null, $contacts, $organization, array(), true);
+        $this->assertStringNotContainsString('validUntil=', $metadata3);
     }
 
     /**
