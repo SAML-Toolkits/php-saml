@@ -488,9 +488,9 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedUrl, OneLogin_Saml2_Utils::getSelfURL());
 
         OneLogin_Saml2_Utils::setBaseURL("http://anothersp.example.com:81/example2/");
-        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
-        $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
-        $expectedUrl2 = 'http://anothersp.example.com:81/example2/route.php?x=test';
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php';
+        $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php';
+        $expectedUrl2 = 'http://anothersp.example.com:81/example2/example1/route.php?x=test';
 
         $this->assertEquals('http', OneLogin_Saml2_Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', OneLogin_Saml2_Utils::getSelfHost());
@@ -502,11 +502,17 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
 
         $_SERVER['PATH_INFO'] = '/test';
-        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php/test';
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php/test';
 
         $this->assertEquals($expectedUrlNQ2, OneLogin_Saml2_Utils::getSelfURLNoQuery());
         $this->assertEquals($expectedRoutedUrlNQ2, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
         $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
+
+        OneLogin_Saml2_Utils::setBaseURL("http://anothersp.example.com:81/example2");
+        $this->assertEquals($expectedUrlNQ2, OneLogin_Saml2_Utils::getSelfURLNoQuery());
+        $this->assertEquals($expectedRoutedUrlNQ2, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
+        $this->assertEquals('/example2/', OneLogin_Saml2_Utils::getBaseURLPath());
     }
 
     /**
