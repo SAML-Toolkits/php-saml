@@ -75,6 +75,35 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the use of the spValidationOnly at OneLogin_Saml2_Settings
+     *
+     * @covers OneLogin_Saml2_Settings
+     */
+    public function testSpValidateOnly()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo, true);
+        $this->assertEmpty($settings->getErrors());
+
+        try {
+            $settings2 = new OneLogin_Saml2_Settings($settingsInfo, false);
+            $this->fail('Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+
+        try {
+            $settings3 = new OneLogin_Saml2_Settings($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+    }
+
+    /**
     * Tests getCertPath method of the OneLogin_Saml2_Settings
     *
     * @covers OneLogin_Saml2_Settings::getBasePath

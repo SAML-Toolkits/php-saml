@@ -40,6 +40,35 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the use of the spValidationOnly at OneLogin_Saml2_Auth
+     *
+     * @covers OneLogin_Saml2_Auth
+     */
+    public function testSpValidateOnly()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+
+        $auth = new OneLogin_Saml2_Auth($settingsInfo, true);
+        $this->assertEmpty($auth->getErrors());
+
+        try {
+            $auth2 = new OneLogin_Saml2_Auth($settingsInfo, false);
+            $this->fail('Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+
+        try {
+            $auth3 = new OneLogin_Saml2_Auth($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+    }
+
+    /**
     * Tests the getLastRequestID method of the OneLogin_Saml2_Auth class
     *
     * @covers OneLogin_Saml2_Auth::getLastRequestID
