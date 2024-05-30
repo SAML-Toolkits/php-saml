@@ -5,7 +5,9 @@
 Add SAML support to your PHP software using this library.
 
 
-**The 3.X branch is compatible with PHP > 7.1, so if you are using that PHP version, use it and not the 2.X or the master branch**
+**The 3.X branch is compatible with PHP 7.0, PHP 7.1, PHP 7.2 , so if you are using that PHP version, use it and not the 2.X or the master branch**
+
+**The 4.X branch is compatible with PHP >= 7.3 and PHP 8.X**
 
 Warning
 -------
