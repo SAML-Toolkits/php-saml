@@ -18,11 +18,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 use Exception;
 
 /**
-<<<<<<< HEAD
- * Main class of PHP Toolkit
-=======
  * Main class of SAML PHP Toolkit
->>>>>>> f338e1e... Remove references to onelogin support.
  */
 class Auth
 {
@@ -169,14 +165,15 @@ class Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array|null $settings Setting data
+     * @param array|null $settings         Setting data
+     * @param bool       $spValidationOnly Validate or not the IdP data
      *
      * @throws Exception
      * @throws Error
      */
-    public function __construct(array $settings = null)
+    public function __construct(array $settings = null, $spValidationOnly = false)
     {
-        $this->_settings = new Settings($settings);
+        $this->_settings = new Settings($settings, $spValidationOnly);
     }
 
     /**

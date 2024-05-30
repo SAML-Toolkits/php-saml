@@ -52,6 +52,35 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the use of the spValidationOnly at OneLogin\Saml2\Settings
+     *
+     * @covers OneLogin\Saml2\Settings
+     */
+    public function testSpValidateOnly()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+
+        $settings = new Settings($settingsInfo, true);
+        $this->assertEmpty($settings->getErrors());
+
+        try {
+            $settings2 = new Settings($settingsInfo, false);
+            $this->fail('Error was not raised');
+        } catch (Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+
+        try {
+            $settings3 = new Settings($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (Error $e) {
+            $this->assertContains('idp_not_found', $e->getMessage());
+        }
+    }
+
+    /**
      * Tests the Settings Constructor.
      * Case load setting from file
      *
