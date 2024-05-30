@@ -199,7 +199,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId10 = $response10->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertStringContainsString('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertStringContainsString('The SPNameQualifier value mismatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new Response($settings, $xml6);
@@ -405,7 +405,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData10 = $response10->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertStringContainsString('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertStringContainsString('The SPNameQualifier value mismatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new Response($settings, $xml6);

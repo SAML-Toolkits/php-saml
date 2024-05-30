@@ -655,7 +655,7 @@ class Response
                         $spEntityId = $spData['entityId'];
                         if ($spEntityId != $nameId->getAttribute($attr)) {
                             throw new ValidationError(
-                                "The SPNameQualifier value mistmatch the SP entityID value.",
+                                "The SPNameQualifier value mismatch the SP entityID value.",
                                 ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
                             );
                         }
