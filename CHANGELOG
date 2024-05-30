@@ -1,5 +1,24 @@
 CHANGELOG
 =========
+
+
+v3.7.0
+* [#586](https://github.com/SAML-Toolkits/php-saml/pull/586) IdPMetadataParser::parseRemoteXML - Add argument for setting whether to validate peer SSL certificate
+* [#585](https://github.com/SAML-Toolkits/php-saml/pull/585) Declare conditional return types
+* Make Saml2\Auth can accept a param $spValidationOnly
+* [#577](https://github.com/SAML-Toolkits/php-saml/pull/577) Allow empty NameID value when no strict or wantNameId is false
+* [#570](https://github.com/SAML-Toolkits/php-saml/pull/570) Support X509 cert comments
+* [#569](https://github.com/SAML-Toolkits/php-saml/pull/569) Add parameter to exclude validUntil on SP Metadata XML
+* [#551](https://github.com/SAML-Toolkits/php-saml/pull/551) Fix compatibility with proxies that extends HTTP_X_FORWARDED_HOST
+* [#487](https://github.com/SAML-Toolkits/php-saml/issues/487) Enable strict check on in_array method
+* Make Saml2\Auth can accept a param $spValidationOnly
+* Fix typos on readme.
+* Add warning about Open Redirect and Reply attacks
+* Add warning about the use of IdpMetadataParser class. If Metadata URLs
+  are provided by 3rd parties, the URL inputs MUST be validated to avoid issues like SSRF
+* Fix test payloads
+* Remove references to OneLogin.
+
 v3.6.1
 * [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
 
@@ -58,7 +77,7 @@ v.3.1.1
 
 v.3.1.0
 * Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
-* Fix setting_example.php servicename parameter 
+* Fix setting_example.php servicename parameter
 
 v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
@@ -226,7 +245,7 @@ v.2.7.0
 * Fix PHP 7 error (used continue outside a loop/switch).
 * Fix bug on organization element of the SP metadata builder.
 * Fix typos on documentation. Fix ALOWED Misspell.
-* Be able to extract RequestID. Add RequestID validation on demo1. 
+* Be able to extract RequestID. Add RequestID validation on demo1.
 * Add $stay parameter to login, logout and processSLO method.
 
 v.2.6.1
