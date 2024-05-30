@@ -53,6 +53,35 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the use of the spValidationOnly at OneLogin\Saml2\Auth
+     *
+     * @covers OneLogin\Saml2\Auth
+     */
+    public function testSpValidateOnly()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings2.php';
+        unset($settingsInfo['idp']);
+
+        $auth = new Auth($settingsInfo, true);
+        $this->assertEmpty($auth->getErrors());
+
+        try {
+            $auth2 = new Auth($settingsInfo, false);
+            $this->fail('Error was not raised');
+        } catch (Error $e) {
+            $this->assertStringContainsString('idp_not_found', $e->getMessage());
+        }
+
+        try {
+            $auth3 = new Auth($settingsInfo);
+            $this->fail('Error was not raised');
+        } catch (Error $e) {
+            $this->assertStringContainsString('idp_not_found', $e->getMessage());
+        }
+    }
+
+    /**
      * Tests the getLastRequestID method of the Auth class
      *
      * @covers OneLogin\Saml2\Auth::getLastRequestID
