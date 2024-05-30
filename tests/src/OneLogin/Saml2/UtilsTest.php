@@ -503,9 +503,9 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedUrl, Utils::getSelfURL());
 
         Utils::setBaseURL("http://anothersp.example.com:81/example2/");
-        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
-        $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php';
-        $expectedUrl2 = 'http://anothersp.example.com:81/example2/route.php?x=test';
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php';
+        $expectedRoutedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php';
+        $expectedUrl2 = 'http://anothersp.example.com:81/example2/example1/route.php?x=test';
 
         $this->assertEquals('http', Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', Utils::getSelfHost());
@@ -517,7 +517,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedUrl2, Utils::getSelfURL());
 
         $_SERVER['PATH_INFO'] = '/test';
-        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/route.php/test';
+        $expectedUrlNQ2 = 'http://anothersp.example.com:81/example2/example1/route.php/test';
 
         $this->assertEquals($expectedUrlNQ2, Utils::getSelfURLNoQuery());
         $this->assertEquals($expectedRoutedUrlNQ2, Utils::getSelfRoutedURLNoQuery());
