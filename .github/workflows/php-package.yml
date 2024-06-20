@@ -5,9 +5,9 @@ name: php-saml package
 
 on:
   push:
-    branches: [ master, 2.* ]
+    branches: [ master, 3.*, 4.* ]
   pull_request:
-    branches: [ master, 2.* ]
+    branches: [ master, 3.*, 4.* ]
 
 jobs:
   test:
