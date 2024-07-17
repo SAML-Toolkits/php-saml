@@ -191,14 +191,14 @@ a trusted and expected URL.
 Read more about Open Redirect [CWE-601](https://cwe.mitre.org/data/definitions/601.html).
 
 
-### Avoiding Reply attacks ###
+### Avoiding Replay attacks ###
 
-A reply attack is basically try to reuse an intercepted valid SAML Message in order to impersonate a SAML action (SSO or SLO).
+A replay attack is basically try to reuse an intercepted valid SAML Message in order to impersonate a SAML action (SSO or SLO).
 
 SAML Messages have a limited timelife (NotBefore, NotOnOrAfter) that
 make harder this kind of attacks, but they are still possible.
 
-In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs alredy valdidated and processed. Those values only need
+In order to avoid them, the SP can keep a list of SAML Messages or Assertion IDs alredy validated and processed. Those values only need
 to be stored the amount of time of the SAML Message life time, so
 we don't need to store all processed message/assertion Ids, but the most recent ones.
 
