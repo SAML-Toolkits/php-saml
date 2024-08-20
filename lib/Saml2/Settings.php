@@ -672,7 +672,7 @@ class OneLogin_Saml2_Settings
                 if (!isset($contact['givenName']) || empty($contact['givenName'])
                     || !isset($contact['emailAddress']) || empty($contact['emailAddress'])
                 ) {
-                    $errors[] = 'contact_not_enought_data';
+                    $errors[] = 'contact_not_enough_data';
                     break;
                 }
             }
@@ -684,7 +684,7 @@ class OneLogin_Saml2_Settings
                     || !isset($organization['displayname']) || empty($organization['displayname'])
                     || !isset($organization['url']) || empty($organization['url'])
                 ) {
-                    $errors[] = 'organization_not_enought_data';
+                    $errors[] = 'organization_not_enough_data';
                     break;
                 }
             }
@@ -1040,7 +1040,7 @@ class OneLogin_Saml2_Settings
     }
 
     /**
-     * Formats the Multple IdP certs.
+     * Formats the Multiple IdP certs.
      */
     public function formatIdPCertMulti()
     {
