@@ -54,7 +54,7 @@ demo1, only changes the targets.
  3. We are logged in the app and the user attributes are showed.
     At this point, we can test the single log out functionality.
 
- 4. The single log out funcionality could be tested by 2 ways.
+ 4. The single log out functionality could be tested by 2 ways.
 
     4.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that
     we are redirected to the slo.php view and there a Logout Request is sent
@@ -69,7 +69,7 @@ demo1, only changes the targets.
     Request to the SP (SLS endpoint sls.php of the endpoint folder).
     The SLS endpoint of the SP process the Logout Request and if is valid,
     close the session of the user at the local app and sends a Logout Response
-    to the IdP (to the SLS endpoint of the IdP).The IdP recieves the Logout
+    to the IdP (to the SLS endpoint of the IdP).The IdP receives the Logout
     Response, process it and close the session at of the IdP. Notice that the
     SLO Workflow starts and ends at the IdP.
 
