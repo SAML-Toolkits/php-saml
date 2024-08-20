@@ -218,7 +218,7 @@ class OneLogin_Saml2_Response
                     );
                 }
 
-                // Validate Asserion timestamps
+                // Validate Assertion timestamps
                 $this->validateTimestamps();
 
                 // Validate AuthnStatement element exists and is unique
@@ -1068,7 +1068,7 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * Extracts nodes that match the query from the DOMDocument (Response Menssage)
+     * Extracts nodes that match the query from the DOMDocument (Response Message)
      *
      * @param string $query Xpath Expresion
      *
