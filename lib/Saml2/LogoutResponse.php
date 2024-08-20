@@ -213,7 +213,7 @@ class OneLogin_Saml2_LogoutResponse
     }
 
     /**
-     * Extracts a node from the DOMDocument (Logout Response Menssage)
+     * Extracts a node from the DOMDocument (Logout Response Message)
      *
      * @param string $query Xpath Expresion
      *
