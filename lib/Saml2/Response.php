@@ -983,9 +983,9 @@ class OneLogin_Saml2_Response
         $responseTag = '{'.OneLogin_Saml2_Constants::NS_SAMLP.'}Response';
         $assertionTag = '{'.OneLogin_Saml2_Constants::NS_SAML.'}Assertion';
 
-        $ocurrence = array_count_values($signedElements);
-        if ((in_array($responseTag, $signedElements) && $ocurrence[$responseTag] > 1) ||
-            (in_array($assertionTag, $signedElements) && $ocurrence[$assertionTag] > 1) ||
+        $occurrence = array_count_values($signedElements);
+        if ((in_array($responseTag, $signedElements) && $occurrence[$responseTag] > 1) ||
+            (in_array($assertionTag, $signedElements) && $occurrence[$assertionTag] > 1) ||
             !in_array($responseTag, $signedElements) && !in_array($assertionTag, $signedElements)
         ) {
             return false;
