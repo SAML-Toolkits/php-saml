@@ -476,7 +476,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
-    * Case Logout Response not sucess
+    * Case Logout Response not success
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     */
