@@ -1322,7 +1322,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
 /**
-    * Somtimes IdPs uses datetimes with miliseconds, this
+    * Sometimes IdPs uses datetimes with milliseconds, this
     * test is to verify that the toolkit supports them
     * @covers OneLogin_Saml2_Response::isValid
     */
