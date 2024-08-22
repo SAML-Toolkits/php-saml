@@ -705,7 +705,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $this->assertContains('Invalid SAML2 timestamp passed', $e->getMessage());
         }
 
-        // Now test if toolkit supports miliseconds
+        // Now test if toolkit supports milliseconds
         $SAMLTime2 = '2013-12-10T04:39:31.120Z';
         $this->assertEquals($time, OneLogin_Saml2_Utils::parseSAML2Time($SAMLTime2));
     }
