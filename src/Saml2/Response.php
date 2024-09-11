@@ -234,6 +234,7 @@ class Response
                     );
                 }
 
+                $this->encryptedNameId = $this->encryptedNameId || $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->length > 0;
                 if (!$this->encryptedNameId && $security['wantNameIdEncrypted']) {
                     throw new ValidationError(
                         "The NameID of the Response is not encrypted and the SP requires it",
