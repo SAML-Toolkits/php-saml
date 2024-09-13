@@ -1166,7 +1166,7 @@ class Response
         // check if the decrypted assertion contains an encryptedID
         $encryptedID = $decrypted->getElementsByTagName('EncryptedID')->item(0);
 
-        if($encryptedID) {
+        if ($encryptedID) {
             // decrypt the encryptedID
             $this->encryptedNameId = true;
             $this->decryptAssertion($encryptedID);
