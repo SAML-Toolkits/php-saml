@@ -600,7 +600,7 @@ $advancedSettings = array (
     ),
 
     // Organization information template, the info in en_US lang is
-    // v, add more if required.
+    // recommended, add more if required.
     'organization' => array (
         'en-US' => array(
             'name' => '',
