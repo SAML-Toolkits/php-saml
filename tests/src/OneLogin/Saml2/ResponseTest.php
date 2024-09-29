@@ -1353,7 +1353,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Somtimes IdPs uses datetimes with miliseconds, this
+     * Sometimes IdPs uses datetimes with milliseconds, this
      * test is to verify that the toolkit supports them
      *
      * @covers OneLogin\Saml2\Response::isValid

@@ -64,7 +64,7 @@ v3.5.0
 * [#433](https://github.com/onelogin/php-saml/issues/443) Fix Incorrect Destination in LogoutResponse when using responseUrl #443
 * Update xmlseclibs to 3.1.1
 * Add support for SMARTCARD_PKI and RSA_TOKEN Auth Contexts
-* Get lib path dinamically
+* Get lib path dynamically
 * Check for x509Cert of the IdP when loading settings, even if the security index was not provided
 * Support Statements with Attribute elements with the same name enabling the allowRepeatAttributeName setting
 
@@ -87,7 +87,7 @@ v.3.3.1
 
 v.3.3.0
 * Set true as the default value for strict setting
-* Relax comparision of false on SignMetadata
+* Relax comparison of false on SignMetadata
 * Fix CI
 
 v.3.2.1
@@ -203,7 +203,7 @@ v.2.12.0
 * [#263](https://github.com/onelogin/php-saml/issues/263) Fix incompatibility with ADFS on SLO. When on php saml settings NameID Format is set as unspecified but the SAMLResponse has no NameID Format, no NameID Format should be specified on LogoutRequest.
 
 v.2.11.0
-* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecesary files from Composer production downloads
+* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecessary files from Composer production downloads
 * [#226](https://github.com/onelogin/php-saml/pull/226) Add possibility to handle nameId NameQualifier attribute in SLO Request
 * Improve logout documentation on Readme.
 * Improve multi-certificate support
@@ -316,7 +316,7 @@ v.2.6.1
 -------
 * Fix bug on cacheDuration of the Metadata XML generated.
 * Make SPNameQualifier optional on the generateNameId method. Avoid the use of SPNameQualifier when generating the NameID on the LogoutRequest builder.
-* Allows the authn comparsion attribute to be set via config.
+* Allows the authn comparison attribute to be set via config.
 * Retrieve Session Timeout after processResponse with getSessionExpiration().
 * Improve readme readability.
 * Allow single log out to work for applications not leveraging php session_start. Added a callback parameter in order to close the session at processSLO.
@@ -334,8 +334,8 @@ v.2.6.0
 
 v.2.5.0
 -------
-* Do accesible the ID of the object Logout Request (id attribute).
-* Add note about the fact that PHP 5.3 is unssuported.
+* Do accessible the ID of the object Logout Request (id attribute).
+* Add note about the fact that PHP 5.3 is unsupported.
 * Add fingerprint algorithm support.
 * Add dependences to composer.
 
@@ -363,7 +363,7 @@ v.2.2.0
 -------
 * Fix bug with Encrypted nameID on LogoutRequest.
 * Fixed usability bug. SP will inform about AuthFail status after process a Response.
-* Added SessionIndex support on LogoutRequest, and know is accesible from the Auth class.
+* Added SessionIndex support on LogoutRequest, and know is accessible from the Auth class.
 * LogoutRequest and LogoutResponse classes now accept non deflated xml.
 * Improved the XML metadata/ Decrypted Assertion output. (prettyprint).
 * Fix bug in formatPrivateKey method, the key could be not RSA.

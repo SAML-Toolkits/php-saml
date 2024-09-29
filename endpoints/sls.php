@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  *  SP Single Logout Service Endpoint
  */
@@ -17,7 +17,7 @@ $auth->processSLO();
 $errors = $auth->getErrors();
 
 if (empty($errors)) {
-    echo 'Sucessfully logged out';
+    echo 'Successfully logged out';
 } else {
     echo htmlentities(implode(', ', $errors));
 }

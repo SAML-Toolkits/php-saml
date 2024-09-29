@@ -8,7 +8,7 @@ The Onelogin's PHP Toolkit allows you to provide the settings info in 2 ways:
    toolkit.
  * Use an array with the setting data.
 
-The first is the case of the demo2 app. The setting.php file and the 
+The first is the case of the demo2 app. The setting.php file and the
 setting_extended.php file should be defined at the base folder of the toolkit.
 Review the setting_example.php and the advanced_settings_example.php to
 learn how to build them.
@@ -44,17 +44,17 @@ demo1, only changes the targets.
     sent to the IdP automatically, (as RelayState is sent the origin url).
     We authenticate at the IdP and then a Response is sent to the SP, to the
     ACS endpoint, in this case acs.php of the endpoints folder.
- 
+
  2. The SAML Response is processed in the ACS, if the Response is not valid,
     the process stop here and a message is showed. Otherwise we are redirected
     to the RelayState view (sso.php or index.php). The sso.php detect if the
     user is logged and do a redirect to index.php, so we will be in the
     index.php at the end.
 
- 3. We are logged in the app and the user attributes are showed. 
+ 3. We are logged in the app and the user attributes are showed.
     At this point, we can test the single log out functionality.
 
- 4. The single log out funcionality could be tested by 2 ways.
+ 4. The single log out functionality could be tested by 2 ways.
 
     4.1 SLO Initiated by SP. Click on the "logout" link at the SP, after that
     we are redirected to the slo.php view and there a Logout Request is sent
@@ -63,14 +63,12 @@ demo1, only changes the targets.
     The SLS endpoint of the SP process the Logout Response and if is
     valid, close the user session of the local app. Notice that the SLO
     Workflow starts and ends at the SP.
-   
+
     5.2 SLO Initiated by IdP. In this case, the action takes place on the IdP
-    side, the logout process is initiated at the idP, sends a Logout 
+    side, the logout process is initiated at the idP, sends a Logout
     Request to the SP (SLS endpoint sls.php of the endpoint folder).
     The SLS endpoint of the SP process the Logout Request and if is valid,
     close the session of the user at the local app and sends a Logout Response
-    to the IdP (to the SLS endpoint of the IdP).The IdP recieves the Logout
+    to the IdP (to the SLS endpoint of the IdP).The IdP receives the Logout
     Response, process it and close the session at of the IdP. Notice that the
     SLO Workflow starts and ends at the IdP.
-
-

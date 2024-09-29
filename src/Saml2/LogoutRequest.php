@@ -155,7 +155,7 @@ LOGOUTREQUEST;
     }
 
     /**
-     * Returns the Logout Request defated, base64encoded, unsigned
+     * Returns the Logout Request deflated, base64encoded, unsigned
      *
      * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
      *

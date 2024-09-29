@@ -245,7 +245,7 @@ class Response
                     );
                 }
 
-                // Validate Asserion timestamps
+                // Validate Assertion timestamps
                 $this->validateTimestamps();
 
                 // Validate AuthnStatement element exists and is unique
@@ -1007,9 +1007,9 @@ class Response
         $responseTag = '{'.Constants::NS_SAMLP.'}Response';
         $assertionTag = '{'.Constants::NS_SAML.'}Assertion';
 
-        $ocurrence = array_count_values($signedElements);
-        if ((in_array($responseTag, $signedElements) && $ocurrence[$responseTag] > 1)
-            || (in_array($assertionTag, $signedElements) && $ocurrence[$assertionTag] > 1)
+        $occurrence = array_count_values($signedElements);
+        if ((in_array($responseTag, $signedElements) && $occurrence[$responseTag] > 1)
+            || (in_array($assertionTag, $signedElements) && $occurrence[$assertionTag] > 1)
             || !in_array($responseTag, $signedElements) && !in_array($assertionTag, $signedElements)
         ) {
             return false;
@@ -1092,7 +1092,7 @@ class Response
     }
 
     /**
-     * Extracts nodes that match the query from the DOMDocument (Response Menssage)
+     * Extracts nodes that match the query from the DOMDocument (Response Message)
      *
      * @param string $query Xpath Expression
      *
