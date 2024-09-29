@@ -1817,9 +1817,16 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
     public function testCanGetEncryptedNameIdInEncryptedAssertion()
     {
-        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion.xml.base64');
+        if (PHP_VERSION_ID >= 71000) { // PHP 7.1.0 is required to use AES GCM algorithms
+            $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion.xml.base64');
+            $response = new Response($this->_settings, $xml);
+            $this->assertTrue($response->isValid());
+            $this->assertSame('user@example.com', $response->getNameId());
+        }
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion2.xml.base64');
         $response = new Response($this->_settings, $xml);
         $this->assertTrue($response->isValid());
-        $this->assertSame('user@example.com', $response->getNameId());
+        $this->assertSame('492882615acf31c8096b627245d76ae53036c090', $response->getNameId());
     }
 }
