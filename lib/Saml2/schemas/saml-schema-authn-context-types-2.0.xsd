@@ -63,7 +63,7 @@
   <xs:element name="TechnicalProtection" type="TechnicalProtectionBaseType">
     <xs:annotation>
       <xs:documentation>
-        Refers to those characterstics that describe how the
+        Refers to those characteristics that describe how the
         'secret' (the knowledge or possession
         of which allows the Principal to authenticate to the
         Authentication Authority) is kept secure
@@ -429,7 +429,7 @@
     <xs:annotation>
       <xs:documentation>
         This element indicates that the Authenticator has been
-        transmitted using a transport mechnanism protected by an SSL or TLS
+        transmitted using a transport mechanism protected by an SSL or TLS
         session.
       </xs:documentation>
     </xs:annotation>

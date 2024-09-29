@@ -684,7 +684,7 @@ class OneLogin_Saml2_Settings
                     || !isset($organization['displayname']) || empty($organization['displayname'])
                     || !isset($organization['url']) || empty($organization['url'])
                 ) {
-                    $errors[] = 'organization_not_enought_data';
+                    $errors[] = 'organization_not_enough_data';
                     break;
                 }
             }

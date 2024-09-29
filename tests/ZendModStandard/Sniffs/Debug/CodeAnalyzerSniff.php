@@ -75,11 +75,11 @@ class ZendModStandard_Sniffs_Debug_CodeAnalyzerSniff implements PHP_CodeSniffer_
 
         // There is the possibility to pass "--ide" as an option to the analyzer.
         // This would result in an output format which would be easier to parse.
-        // The problem here is that no cleartext error messages are returnwd; only
+        // The problem here is that no cleartext error messages are returned; only
         // error-code-labels. So for a start we go for cleartext output.
         $exitCode = exec($cmd, $output, $retval);
 
-        // $exitCode is the last line of $output if no error occures, on error it
+        // $exitCode is the last line of $output if no error occurs, on error it
         // is numeric. Try to handle various error conditions and provide useful
         // error reporting.
         if (is_numeric($exitCode) === true && $exitCode > 0) {

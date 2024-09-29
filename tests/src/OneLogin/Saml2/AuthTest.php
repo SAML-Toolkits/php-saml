@@ -380,7 +380,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
     * (phpunit raises an exception when a redirect is executed, the
-    * exception is catched and we check that the targetURL is correct)
+    * exception is caught and we check that the targetURL is correct)
     * Case redirect without url parameter
     *
     * @covers OneLogin_Saml2_Auth::redirectTo
@@ -407,7 +407,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
     * (phpunit raises an exception when a redirect is executed, the
-    * exception is catched and we check that the targetURL is correct)
+    * exception is caught and we check that the targetURL is correct)
     * Case redirect with url parameter
     *
     * @covers OneLogin_Saml2_Auth::redirectTo
@@ -476,7 +476,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
-    * Case Logout Response not sucess
+    * Case Logout Response not success
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     */

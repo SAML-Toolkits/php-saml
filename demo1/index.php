@@ -105,7 +105,7 @@ if (isset($_GET['sso'])) {
     $auth->processSLO(false, $requestID);
     $errors = $auth->getErrors();
     if (empty($errors)) {
-        echo '<p>Sucessfully logged out</p>';
+        echo '<p>Successfully logged out</p>';
     } else {
         echo '<p>', htmlentities(implode(', ', $errors)), '</p>';
         if ($auth->getSettings()->isDebugActive()) {
