@@ -448,6 +448,9 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertNull(OneLogin_Saml2_Utils::getBaseURLPath());
 
+        OneLogin_Saml2_Utils::setBaseURLPath('/');
+        $this->assertEquals('/', OneLogin_Saml2_Utils::getBaseURLPath());
+
         OneLogin_Saml2_Utils::setBaseURLPath('sp');
         $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
 
@@ -459,6 +462,25 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         OneLogin_Saml2_Utils::setBaseURLPath('/sp/');
         $this->assertEquals('/sp/', OneLogin_Saml2_Utils::getBaseURLPath());
+    }
+
+    /**
+     * @covers OneLogin_Saml2_Utils::setBaseURLPath
+     */
+    public function testSetBaseURLPath2()
+    {
+        $_SERVER['HTTP_HOST'] = 'sp.example.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = null;
+        $_SERVER['QUERY_STRING'] = null;
+        $_SERVER['SCRIPT_NAME'] = '/';
+        unset($_SERVER['PATH_INFO']);
+
+        OneLogin_Saml2_Utils::setBaseURLPath('/');
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfURL());
+        $this->assertEquals('/', OneLogin_Saml2_Utils::getBaseURLPath());
     }
 
     /**
@@ -513,6 +535,16 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRoutedUrlNQ2, OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
         $this->assertEquals($expectedUrl2, OneLogin_Saml2_Utils::getSelfURL());
         $this->assertEquals('/example2/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        $_SERVER['PATH_INFO'] = null;
+        $_SERVER['REQUEST_URI'] = null;
+        $_SERVER['QUERY_STRING'] = null;
+        $_SERVER['SCRIPT_NAME'] = '/';
+        OneLogin_Saml2_Utils::setBaseURL("https://sp.example.com/");
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfURL());
+        $this->assertEquals('/', OneLogin_Saml2_Utils::getBaseURLPath());
     }
 
     /**
@@ -572,6 +604,13 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $_SERVER['REQUEST_URI'] = 'https://example.com/testing';
         $this->assertEquals($url.'/testing', OneLogin_Saml2_Utils::getSelfURL());
+
+        $_SERVER['REQUEST_URI'] = 'https://example.com/test/';
+        $this->assertEquals($url.'/test/', OneLogin_Saml2_Utils::getSelfURL());
+
+        $_SERVER['REQUEST_URI'] = 'https://example.com/';
+        $this->assertEquals($url.'/', OneLogin_Saml2_Utils::getSelfURL());
+
     }
 
     /**
