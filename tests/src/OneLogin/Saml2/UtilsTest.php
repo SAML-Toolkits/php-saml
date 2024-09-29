@@ -460,6 +460,9 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull(Utils::getBaseURLPath());
 
+        Utils::setBaseURLPath('/');
+        $this->assertEquals('/', Utils::getBaseURLPath());
+
         Utils::setBaseURLPath('sp');
         $this->assertEquals('/sp/', Utils::getBaseURLPath());
 
@@ -471,6 +474,24 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         Utils::setBaseURLPath('/sp/');
         $this->assertEquals('/sp/', Utils::getBaseURLPath());
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::setBaseURLPath
+     */
+    public function testSetBaseURLPath2()
+    {
+        $_SERVER['HTTP_HOST'] = 'sp.example.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = null;
+        $_SERVER['QUERY_STRING'] = null;
+        $_SERVER['SCRIPT_NAME'] = '/';
+        unset($_SERVER['PATH_INFO']);
+        Utils::setBaseURLPath('/');
+        $this->assertEquals("https://sp.example.com/", Utils::getSelfURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", Utils::getSelfRoutedURLNoQuery());
+        $this->assertEquals("https://sp.example.com/", Utils::getSelfURL());
+        $this->assertEquals('/', Utils::getBaseURLPath());
     }
 
     /**
