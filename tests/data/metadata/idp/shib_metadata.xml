@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!--
 ===============================================================
-= Federation metadata containing only localy managed entities.=
+= Federation metadata containing only locally managed entities.=
 ===============================================================
 
 TERMS OF USE:
@@ -8,7 +8,7 @@ Membership is limited to organisations who are members of RCTSaai and who meet t
 
 a) eduGAIN attribute Profile http://www.geant.net/service/eduGAIN/resources/Documents/GN3-11-012 eduGAIN_attribute_profile.docx
 
-b) eduGAIN Code of Conduct 
+b) eduGAIN Code of Conduct
 http://www.geant.net/uri/dataprotection-code-of-conduct/v1/Pages/default.aspx
 --><md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:idpdisc="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute" xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="rctsaaifedexport-20170422121722" Name="http://edugain.org/" validUntil="2017-04-22T12:17:22Z"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:SignedInfo>

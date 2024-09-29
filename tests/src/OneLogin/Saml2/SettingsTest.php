@@ -416,7 +416,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
             $this->fail('Error was not raised');
         } catch (Error $e) {
             $this->assertContains('sp_signMetadata_invalid', $e->getMessage());
-            $this->assertContains('organization_not_enought_data', $e->getMessage());
+            $this->assertContains('organization_not_enough_data', $e->getMessage());
             $this->assertContains('contact_type_invalid', $e->getMessage());
         }
 
@@ -427,7 +427,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
             $this->fail('Error was not raised');
         } catch (Error $e) {
             $this->assertContains('sp_signMetadata_invalid', $e->getMessage());
-            $this->assertContains('organization_not_enought_data', $e->getMessage());
+            $this->assertContains('organization_not_enough_data', $e->getMessage());
             $this->assertContains('contact_type_invalid', $e->getMessage());
         }
     }

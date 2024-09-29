@@ -394,7 +394,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the redirectTo method of the Auth class
      * (phpunit raises an exception when a redirect is executed, the
-     * exception is catched and we check that the targetURL is correct)
+     * exception is caught and we check that the targetURL is correct)
      * Case redirect without url parameter
      *
      * @covers OneLogin\Saml2\Auth::redirectTo
@@ -423,7 +423,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the redirectTo method of the Auth class
      * (phpunit raises an exception when a redirect is executed, the
-     * exception is catched and we check that the targetURL is correct)
+     * exception is caught and we check that the targetURL is correct)
      * Case redirect with url parameter
      *
      * @covers OneLogin\Saml2\Auth::redirectTo
@@ -494,7 +494,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the processSLO method of the Auth class
-     * Case Logout Response not sucess
+     * Case Logout Response not success
      *
      * @covers OneLogin\Saml2\Auth::processSLO
      */

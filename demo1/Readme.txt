@@ -45,7 +45,7 @@ How it works
     process, the index.php view.
 
     2.2 in the second link we access to (attrs.php) have the same process
-    described at 2.1 with the diference that as RelayState is set the attrs.php
+    described at 2.1 with the difference that as RelayState is set the attrs.php
 
 3. The SAML Response is processed in the ACS (index.php?acs), if the Response
    is not valid, the process stop here and a message is showed. Otherwise we
@@ -68,7 +68,7 @@ How it works
     Request to the SP (SLS endpoint, index.php?sls). The SLS endpoint of the SP
     process the Logout Request and if is valid, close the session of the user
     at the local app and send a Logout Response to the IdP (to the SLS endpoint
-    of the IdP). The IdP recieve the Logout Response, process it and close the
+    of the IdP). The IdP receive the Logout Response, process it and close the
     session at of the IdP. Notice that the SLO Workflow starts and ends at the IdP.
 
 Notice that all the SAML Requests and Responses are handler at a unique file,

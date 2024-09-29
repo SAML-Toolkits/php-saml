@@ -753,7 +753,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertContains('Invalid SAML2 timestamp passed', $e->getMessage());
         }
 
-        // Now test if toolkit supports miliseconds
+        // Now test if toolkit supports milliseconds
         $SAMLTime2 = '2013-12-10T04:39:31.120Z';
         $this->assertEquals($time, Utils::parseSAML2Time($SAMLTime2));
     }

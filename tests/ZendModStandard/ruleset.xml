@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="ZendModStandard">
- <description>A coding standard based on an early Zend Framework coding standard. Note that this standard is out of date. And removed the line lenght limitation</description>
+ <description>A coding standard based on an early Zend Framework coding standard. Note that this standard is out of date. And removed the line length limitation</description>
 
  <!-- Include some sniffs from all around the place -->
  <rule ref="Generic.Functions.FunctionCallArgumentSpacing"/>
