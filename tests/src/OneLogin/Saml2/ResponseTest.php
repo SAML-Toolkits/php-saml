@@ -1814,4 +1814,12 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($settings, $xml);
         $this->assertTrue($response->isValid());
     }
+
+    public function testCanGetEncryptedNameIdInEncryptedAssertion()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion.xml.base64');
+        $response = new Response($this->_settings, $xml);
+        $this->assertTrue($response->isValid());
+        $this->assertSame('user@example.com', $response->getNameId());
+    }
 }

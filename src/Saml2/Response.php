@@ -62,6 +62,13 @@ class Response
     public $encrypted = false;
 
     /**
+     * The response contains an encrypted nameId in the assertion.
+     *
+     * @var bool
+     */
+    public $encryptedNameId = false;
+
+    /**
      * After validation, if it fail this var has the cause of the problem
      *
      * @var Exception|null
@@ -227,14 +234,12 @@ class Response
                     );
                 }
 
-                if ($security['wantNameIdEncrypted']) {
-                    $encryptedIdNodes = $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData');
-                    if ($encryptedIdNodes->length != 1) {
-                        throw new ValidationError(
-                            "The NameID of the Response is not encrypted and the SP requires it",
-                            ValidationError::NO_ENCRYPTED_NAMEID
-                        );
-                    }
+                $this->encryptedNameId = $this->encryptedNameId || $this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->length > 0;
+                if (!$this->encryptedNameId && $security['wantNameIdEncrypted']) {
+                    throw new ValidationError(
+                        "The NameID of the Response is not encrypted and the SP requires it",
+                        ValidationError::NO_ENCRYPTED_NAMEID
+                    );
                 }
 
                 // Validate Conditions element exists
@@ -388,17 +393,6 @@ class Response
                     throw new ValidationError(
                         "The Message of the Response is not signed and the SP requires it",
                         ValidationError::NO_SIGNED_MESSAGE
-                    );
-                }
-            }
-
-            // Detect case not supported
-            if ($this->encrypted) {
-                $encryptedIDNodes = Utils::query($this->decryptedDocument, '/samlp:Response/saml:Assertion/saml:Subject/saml:EncryptedID');
-                if ($encryptedIDNodes->length > 0) {
-                    throw new ValidationError(
-                        'SAML Response that contains an encrypted Assertion with encrypted nameId is not supported.',
-                        ValidationError::NOT_SUPPORTED
                     );
                 }
             }
@@ -1163,6 +1157,16 @@ class Response
         if ($check === false) {
             throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
         }
+
+        // check if the decrypted assertion contains an encryptedID
+        $encryptedID = $decrypted->getElementsByTagName('EncryptedID')->item(0);
+
+        if ($encryptedID) {
+            // decrypt the encryptedID
+            $this->encryptedNameId = true;
+            $this->decryptAssertion($encryptedID);
+        }
+
         if ($encData->parentNode instanceof DOMDocument) {
             return $decrypted;
         } else {
