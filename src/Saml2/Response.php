@@ -610,9 +610,16 @@ class Response
         if ($encryptedIdDataEntries->length == 1) {
             $encryptedData = $encryptedIdDataEntries->item(0);
 
-            $key = $this->_settings->getSPkey();
+            $pem = $this->_settings->getSPkey();
+
+            if (empty($pem)) {
+                throw new Error(
+                    "No private key available, check settings",
+                    Error::PRIVATE_KEY_NOT_FOUND
+                );
+            }
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-            $seckey->loadKey($key);
+            $seckey->loadKey($pem);
 
             $nameId = Utils::decryptElement($encryptedData, $seckey);
 
@@ -1169,7 +1176,9 @@ class Response
         if ($encryptedID) {
             // decrypt the encryptedID
             $this->encryptedNameId = true;
-            $this->decryptAssertion($encryptedID);
+            $encryptedData = $encryptedID->getElementsByTagName('EncryptedData')->item(0);
+            $nameId = $this->decryptNameId($encryptedData, $pem);
+            Utils::treeCopyReplace($encryptedID, $nameId);
         }
 
         if ($encData->parentNode instanceof DOMDocument) {
@@ -1202,6 +1211,46 @@ class Response
             $dom = new DOMDocument();
             return Utils::loadXML($dom, $container->ownerDocument->saveXML());
         }
+    }
+
+    /**
+     * Decrypt EncryptedID element
+     *
+     * @param \DOMElement $encryptedData The encrypted data.
+     * @param string     $key            The private key
+     *
+     * @return \DOMElement  The decrypted element.
+     */
+    private function decryptNameId(\DOMElement $encryptedData, string $pem)
+    {
+        $objenc = new XMLSecEnc();
+        $encData = $objenc->locateEncryptedData($encryptedData);
+        $objenc->setNode($encData);
+        $objenc->type = $encData->getAttribute("Type");
+        if (!$objKey = $objenc->locateKey()) {
+            throw new ValidationError(
+                "Unknown algorithm",
+                ValidationError::KEY_ALGORITHM_ERROR
+            );
+        }
+
+        $key = null;
+        if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
+            if ($objKeyInfo->isEncrypted) {
+                $objencKey = $objKeyInfo->encryptedCtx;
+                $objKeyInfo->loadKey($pem, false, false);
+                $key = $objencKey->decryptKey($objKeyInfo);
+            } else {
+                // symmetric encryption key support
+                $objKeyInfo->loadKey($pem, false, false);
+            }
+        }
+
+        if (empty($objKey->key)) {
+            $objKey->loadKey($key);
+        }
+
+        return Utils::decryptElement($encryptedData, $objKey);
     }
 
     /**
