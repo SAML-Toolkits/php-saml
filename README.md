@@ -715,7 +715,7 @@ The login method can receive other six optional parameters:
 * `$parameters` - An array of parameters that will be added to the `GET` in the HTTP-Redirect.
 * `$forceAuthn` - When true the `AuthNRequest` will set the `ForceAuthn='true'`
 * `$isPassive` - When true the `AuthNRequest` will set the `Ispassive='true'`
-* `$strict` - True if we want to stay (returns the url string) False to redirect
+* `$stay` - True if we want to stay (returns the url string) False to redirect
 * `$setNameIdPolicy` - When true the AuthNRequest will set a nameIdPolicy element.
 * `$nameIdValueReq` - Indicates to the IdP the subject that should be authenticated.
 
