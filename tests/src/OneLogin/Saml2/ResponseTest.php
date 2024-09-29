@@ -1813,4 +1813,12 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response = new OneLogin_Saml2_Response($settings, $xml);
         $this->assertTrue($response->isValid());
     }
+
+    public function testCanGetEncryptedNameIdInEncryptedAssertion()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion2.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $response->getNameId());
+    }
 }
