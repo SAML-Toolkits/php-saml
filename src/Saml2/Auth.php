@@ -220,7 +220,6 @@ class Auth
      * Process the SAML Response sent by the IdP.
      *
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
-     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      * @throws ValidationError
