@@ -171,7 +171,7 @@ class Auth
      * @throws Exception
      * @throws Error
      */
-    public function __construct(array $settings = null, bool $spValidationOnly = false)
+    public function __construct(?array $settings = null, bool $spValidationOnly = false)
     {
         $this->_settings = new Settings($settings, $spValidationOnly);
     }
