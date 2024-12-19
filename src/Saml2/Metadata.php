@@ -172,7 +172,7 @@ METADATA_TEMPLATE;
 
         if ($ignoreValidUntil) {
             $timeStr = <<<TIME_TEMPLATE
-cacheDuration="PT{$cacheDuration}S";
+cacheDuration="PT{$cacheDuration}S"
 TIME_TEMPLATE;
         } else {
             $timeStr = <<<TIME_TEMPLATE
