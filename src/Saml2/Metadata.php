@@ -42,7 +42,7 @@ class Metadata
      *
      * @return string SAML Metadata XML
      */
-    public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array(), $ignoreValidUntil = false)
+    public static function builder($sp, $authnsign = false, $wsign = false, int|null $validUntil, int|null $cacheDuration, $contacts = array(), $organization = array(), $attributes = array(), $ignoreValidUntil = false)
     {
 
         if (!isset($validUntil)) {

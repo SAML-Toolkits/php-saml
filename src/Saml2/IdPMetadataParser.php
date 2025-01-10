@@ -28,19 +28,19 @@ class IdPMetadataParser
      * make sure to validate it properly before use it in the parseRemoteXML
      * method in order to avoid security issues like SSRF attacks.
      *
-     * @param string $url                 URL where the IdP metadata is published
-     * @param string $entityId            Entity Id of the desired IdP, if no
-     *                                    entity Id is provided and the XML
-     *                                    metadata contains more than one
-     *                                    IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
-     * @param string $desiredSSOBinding   Parse specific binding SSO endpoint
-     * @param string $desiredSLOBinding   Parse specific binding SLO endpoint
-     * @param bool   $validatePeer        Enable or disable validate peer SSL certificate
+     * @param string      $url                 URL where the IdP metadata is published
+     * @param string|null $entityId            Entity Id of the desired IdP, if no
+     *                                         entity Id is provided and the XML
+     *                                         metadata contains more than one
+     *                                         IDPSSODescriptor, the first is returned
+     * @param string|null $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
+     * @param string|null $desiredSSOBinding   Parse specific binding SSO endpoint
+     * @param string|null $desiredSLOBinding   Parse specific binding SLO endpoint
+     * @param bool        $validatePeer        Enable or disable validate peer SSL certificate
      *
      * @return array metadata info in php-saml settings format
      */
-    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT, $validatePeer = false)
+    public static function parseRemoteXML($url, string|null $entityId, string|null $desiredNameIdFormat, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT, $validatePeer = false)
     {
         $metadataInfo = array();
 
@@ -70,18 +70,18 @@ class IdPMetadataParser
     /**
      * Get IdP Metadata Info from File
      *
-     * @param string $filepath            File path
-     * @param string $entityId            Entity Id of the desired IdP, if no
-     *                                    entity Id is provided and the XML
-     *                                    metadata contains more than one
-     *                                    IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
-     * @param string $desiredSSOBinding   Parse specific binding SSO endpoint
-     * @param string $desiredSLOBinding   Parse specific binding SLO endpoint
+     * @param string      $filepath            File path
+     * @param string|null $entityId            Entity Id of the desired IdP, if no
+     *                                         entity Id is provided and the XML
+     *                                         metadata contains more than one
+     *                                         IDPSSODescriptor, the first is returned
+     * @param string|null $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
+     * @param string      $desiredSSOBinding   Parse specific binding SSO endpoint
+     * @param string      $desiredSLOBinding   Parse specific binding SLO endpoint
      *
      * @return array metadata info in php-saml settings format
      */
-    public static function parseFileXML($filepath, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT)
+    public static function parseFileXML($filepath, string|null $entityId, string|null $desiredNameIdFormat, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT)
     {
         $metadataInfo = array();
 
@@ -99,20 +99,20 @@ class IdPMetadataParser
     /**
      * Get IdP Metadata Info from URL
      *
-     * @param string $xml                 XML that contains IdP metadata
-     * @param string $entityId            Entity Id of the desired IdP, if no
-     *                                    entity Id is provided and the XML
-     *                                    metadata contains more than one
-     *                                    IDPSSODescriptor, the first is returned
-     * @param string $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
-     * @param string $desiredSSOBinding   Parse specific binding SSO endpoint
-     * @param string $desiredSLOBinding   Parse specific binding SLO endpoint
+     * @param string      $xml                 XML that contains IdP metadata
+     * @param string|null $entityId            Entity Id of the desired IdP, if no
+     *                                         entity Id is provided and the XML
+     *                                         metadata contains more than one
+     *                                         IDPSSODescriptor, the first is returned
+     * @param string|null $desiredNameIdFormat If available on IdP metadata, use that nameIdFormat
+     * @param string      $desiredSSOBinding   Parse specific binding SSO endpoint
+     * @param string      $desiredSLOBinding   Parse specific binding SLO endpoint
      *
      * @return array metadata info in php-saml settings format
      *
      * @throws Exception
      */
-    public static function parseXML($xml, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT)
+    public static function parseXML($xml, string|null $entityId, string|null $desiredNameIdFormat, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT)
     {
         $metadataInfo = array();
 

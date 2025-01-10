@@ -67,7 +67,7 @@ class LogoutResponse
      * @throws Error
      * @throws Exception
      */
-    public function __construct(\OneLogin\Saml2\Settings $settings, $response = null)
+    public function __construct(\OneLogin\Saml2\Settings $settings, string|null $response)
     {
         $this->_settings = $settings;
 
@@ -140,7 +140,7 @@ class LogoutResponse
      *
      * @throws ValidationError
      */
-    public function isValid($requestId = null, $retrieveParametersFromServer = false)
+    public function isValid(string|null $requestId, $retrieveParametersFromServer = false)
     {
         $this->_error = null;
         try {
@@ -286,7 +286,7 @@ LOGOUTRESPONSE;
      *
      * @return string Logout Response deflated and base64 encoded
      */
-    public function getResponse($deflate = null)
+    public function getResponse(bool|null $deflate)
     {
         $logoutResponse = $this->_logoutResponse;
 

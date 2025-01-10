@@ -171,7 +171,7 @@ class Auth
      * @throws Exception
      * @throws Error
      */
-    public function __construct(?array $settings = null, bool $spValidationOnly = false)
+    public function __construct(array|null $settings, bool $spValidationOnly = false)
     {
         $this->_settings = new Settings($settings, $spValidationOnly);
     }
@@ -224,7 +224,7 @@ class Auth
      * @throws Error
      * @throws ValidationError
      */
-    public function processResponse($requestId = null)
+    public function processResponse(string|null $requestId)
     {
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
@@ -274,7 +274,7 @@ class Auth
      *
      * @throws Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null, $stay = false)
+    public function processSLO($keepLocalSession = false, string|null $requestId, $retrieveParametersFromServer = false, callable|null $cbDeleteSession, $stay = false)
     {
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
@@ -539,7 +539,7 @@ class Auth
      *
      * @throws Error
      */
-    public function login($returnTo = null, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, $nameIdValueReq = null)
+    public function login(string|null $returnTo, array $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true, string|null $nameIdValueReq)
     {
         $authnRequest = $this->buildAuthnRequest($this->_settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
 
@@ -580,7 +580,7 @@ class Auth
      *
      * @throws Error
      */
-    public function logout($returnTo = null, array $parameters = array(), $nameId = null, $sessionIndex = null, $stay = false, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    public function logout(string|null $returnTo, array $parameters = array(), string|null $nameId, string|null $sessionIndex, $stay = false, string|null $nameIdFormat, string|null $nameIdNameQualifier, string|null $nameIdSPNameQualifier)
     {
         $sloUrl = $this->getSLOurl();
         if (empty($sloUrl)) {
@@ -673,7 +673,7 @@ class Auth
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest(Settings $settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
+    public function buildAuthnRequest(Settings $settings, $forceAuthn, $isPassive, $setNameIdPolicy, string|null $nameIdValueReq)
     {
         return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
     }
@@ -689,7 +689,7 @@ class Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      * @param string|null $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
      */
-    public function buildLogoutRequest(Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    public function buildLogoutRequest(Settings $settings, string|null $request, string|null $nameId, string|null $sessionIndex, string|null $nameIdFormat, string|null $nameIdNameQualifier, string|null $nameIdSPNameQualifier)
     {
         return new LogoutRequest($settings, $request, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
     }
@@ -704,7 +704,7 @@ class Auth
      * @throws Error
      * @throws Exception
      */
-    public function buildLogoutResponse(Settings $settings, $response = null)
+    public function buildLogoutResponse(Settings $settings, string|null $response)
     {
         return new LogoutResponse($settings, $response);
     }

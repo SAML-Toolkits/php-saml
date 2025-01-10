@@ -120,7 +120,7 @@ class Settings
      * @throws Error If any settings parameter is invalid
      * @throws Exception If Settings is incorrectly supplied
      */
-    public function __construct(?array $settings = null,bool $spValidationOnly = false)
+    public function __construct(array|null $settings,bool $spValidationOnly = false)
     {
         $this->_spValidationOnly = $spValidationOnly;
         $this->_loadPaths();
@@ -872,20 +872,20 @@ class Settings
     /**
      * Gets the SP metadata. The XML representation.
      *
-     * @param bool $alwaysPublishEncryptionCert When 'true', the returned
-     * metadata will always include an 'encryption' KeyDescriptor. Otherwise,
-     * the 'encryption' KeyDescriptor will only be included if
-     * $advancedSettings['security']['wantNameIdEncrypted'] or
-     * $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
-     * @param int|null      $validUntil    Metadata's valid time
-     * @param int|null      $cacheDuration Duration of the cache in seconds
-     * @param bool          $ignoreValidUntil exclude the validUntil tag from metadata
+     * @param bool      $alwaysPublishEncryptionCert   When 'true', the returned
+     *                                                 metadata will always include an 'encryption' KeyDescriptor. Otherwise,
+     *                                                 the 'encryption' KeyDescriptor will only be included if
+     *                                                 $advancedSettings['security']['wantNameIdEncrypted'] or
+     *                                                 $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
+     * @param int|null  $validUntil                    Metadata's valid time
+     * @param int|null  $cacheDuration                 Duration of the cache in seconds
+     * @param bool      $ignoreValidUntil              Exclude the validUntil tag from metadata
      *
      * @return string  SP metadata (xml)
      * @throws Exception
      * @throws Error
      */
-    public function getSPMetadata($alwaysPublishEncryptionCert = false, $validUntil = null, $cacheDuration = null, $ignoreValidUntil = false)
+    public function getSPMetadata($alwaysPublishEncryptionCert = false, int|null $validUntil, int|null $cacheDuration, $ignoreValidUntil = false)
     {
         $metadata = Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], $validUntil, $cacheDuration, $this->getContacts(), $this->getOrganization(), [], $ignoreValidUntil);
 

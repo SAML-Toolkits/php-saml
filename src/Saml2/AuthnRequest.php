@@ -48,7 +48,7 @@ class AuthnRequest
      * @param bool $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy
      * @param string $nameIdValueReq Indicates to the IdP the subject that should be authenticated
      */
-    public function __construct(\OneLogin\Saml2\Settings $settings, $forceAuthn = false, $isPassive = false, $setNameIdPolicy = true, $nameIdValueReq = null)
+    public function __construct(\OneLogin\Saml2\Settings $settings, $forceAuthn = false, $isPassive = false, $setNameIdPolicy = true, string|null nameIdValueReq)
     {
         $this->_settings = $settings;
 
@@ -174,7 +174,7 @@ AUTHNREQUEST;
      *
      * @return string
      */
-    public function getRequest($deflate = null)
+    public function getRequest(bool|null $deflate)
     {
         $subject = $this->_authnRequest;
 

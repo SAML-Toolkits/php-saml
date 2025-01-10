@@ -130,7 +130,7 @@ class Response
      * @throws Exception
      * @throws ValidationError
      */
-    public function isValid($requestId = null)
+    public function isValid(string|null $requestId)
     {
         $this->_error = null;
         try {

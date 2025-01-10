@@ -61,7 +61,7 @@ class LogoutRequest
      * @param string|null             $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      * @param string|null             $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
      */
-    public function __construct(\OneLogin\Saml2\Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    public function __construct(\OneLogin\Saml2\Settings $settings, string|null $request, string|null $nameId, string|null $sessionIndex, string|null $nameIdFormat, string|null $nameIdNameQualifier, string|null $nameIdSPNameQualifier)
     {
         $this->_settings = $settings;
 
@@ -161,7 +161,7 @@ LOGOUTREQUEST;
      *
      * @return string Deflated base64 encoded Logout Request
      */
-    public function getRequest($deflate = null)
+    public function getRequest(bool|null $deflate)
     {
         $subject = $this->_logoutRequest;
 
@@ -218,7 +218,7 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameIdData($request, $key = null)
+    public static function getNameIdData($request, string|null $key)
     {
         if ($request instanceof DOMDocument) {
             $dom = $request;
@@ -282,7 +282,7 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameId($request, $key = null)
+    public static function getNameId($request, string|null $key)
     {
         $nameId = self::getNameIdData($request, $key);
         return $nameId['Value'];

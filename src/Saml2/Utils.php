@@ -111,16 +111,16 @@ class Utils
      *
      * It will parse the string into a DOMDocument and validate this document against the schema.
      *
-     * @param string|DOMDocument $xml    The XML string or document which should be validated.
-     * @param string             $schema The schema filename which should be used.
-     * @param bool               $debug  To disable/enable the debug mode
-     * @param string             $schemaPath Change schema path
+     * @param string|DOMDocument $xml        The XML string or document which should be validated.
+     * @param string             $schema     The schema filename which should be used.
+     * @param bool               $debug      To disable/enable the debug mode
+     * @param string|null        $schemaPath Change schema path
      *
      * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
      *
      * @throws Exception
      */
-    public static function validateXML($xml, $schema, $debug = false, $schemaPath = null)
+    public static function validateXML($xml, $schema, $debug = false, string|null $schemaPath)
     {
         assert(is_string($xml) || $xml instanceof DOMDocument);
         assert(is_string($schema));
@@ -834,7 +834,7 @@ class Utils
      *
      * @throws Exception
      */
-    public static function parseDuration($duration, $timestamp = null)
+    public static function parseDuration($duration, int|null $timestamp)
     {
         assert(is_string($duration));
         assert(is_null($timestamp) || is_int($timestamp));
@@ -922,7 +922,7 @@ class Utils
      *
      * @throws Exception
      */
-    public static function getExpireTime($cacheDuration = null, $validUntil = null)
+    public static function getExpireTime(string|null $cacheDuration, string|int|null $validUntil)
     {
         $expireTime = null;
 
@@ -954,7 +954,7 @@ class Utils
      *
      * @return DOMNodeList The queried nodes
      */
-    public static function query(DOMDocument $dom, $query, ?DOMElement $context = null)
+    public static function query(DOMDocument $dom, $query, DOMElement|null $context)
     {
         $xpath = new DOMXPath($dom);
         $xpath->registerNamespace('samlp', Constants::NS_SAMLP);
@@ -1086,7 +1086,7 @@ class Utils
      *
      * @throws Exception
      */
-    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null, $encAlg = XMLSecurityKey::AES128_CBC)
+    public static function generateNameId($value, $spnq, string|null $format, string|null $cert, string|null $nq, $encAlg = XMLSecurityKey::AES128_CBC)
     {
 
         $doc = new DOMDocument();
@@ -1439,7 +1439,7 @@ class Utils
      *
      * @throws Exception
      */
-    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1', $xpath = null, $multiCerts = null)
+    public static function validateSign($xml, string|null $cert, string|null $fingerprint, $fingerprintalg = 'sha1', string|null $xpath, array|null $multiCerts)
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
