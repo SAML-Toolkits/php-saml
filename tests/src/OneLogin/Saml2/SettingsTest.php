@@ -271,7 +271,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($responsesIsInvalid);
     }
 
-    public function invalidCompressSettingsProvider()
+    static public function invalidCompressSettingsProvider()
     {
         return array(
             array(1),
@@ -539,7 +539,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectEncryptionKeyDescriptor ? 2 : 0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
     }
 
-    public function getSPMetadataWithX509CertNewDataProvider()
+    static public function getSPMetadataWithX509CertNewDataProvider()
     {
         return [
             'settings do not require encryption' => [
