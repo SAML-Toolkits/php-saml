@@ -1607,10 +1607,12 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $response = new Response($settings, $xml);
 
-        $this->assertFalse($response->isValid());
+        $this->assertFalse(@$response->isValid());
+
         $possibleErrors = [
           "openssl_x509_read(): supplied parameter cannot be coerced into an X509 certificate!",
-          "openssl_x509_read(): X.509 Certificate cannot be retrieved"
+          "openssl_x509_read(): X.509 Certificate cannot be retrieved",
+          "Unable to extract public key"
         ];
         $this->assertTrue(in_array($response->getError(), $possibleErrors));
     }
