@@ -95,7 +95,7 @@ $settings = array (
             'url' => '',
             // URL location of the IdP where the SP will send the SLO Response (ResponseLocation)
             // if not set, url for the SLO Request will be used
-            'responseUrl' => '',
+            // 'responseUrl' => '',
             // SAML protocol binding to be used when returning the <Response>
             // message.  SAML Toolkit supports for this endpoint the
             // HTTP-Redirect binding only
