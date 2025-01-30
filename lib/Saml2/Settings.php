@@ -543,26 +543,19 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'idp_entityId_not_found';
             }
 
-            if (!isset($idp['singleSignOnService'])
-                || !isset($idp['singleSignOnService']['url'])
-                || empty($idp['singleSignOnService']['url'])
-            ) {
+            if (!isset($idp['singleSignOnService']['url'])) {
                 $errors[] = 'idp_sso_not_found';
             } else if (!filter_var($idp['singleSignOnService']['url'], FILTER_VALIDATE_URL)) {
                 $errors[] = 'idp_sso_url_invalid';
             }
 
-            if (isset($idp['singleLogoutService'])
-                && isset($idp['singleLogoutService']['url'])
-                && !empty($idp['singleLogoutService']['url'])
+            if (isset($idp['singleLogoutService']['url'])
                 && !filter_var($idp['singleLogoutService']['url'], FILTER_VALIDATE_URL)
             ) {
                 $errors[] = 'idp_slo_url_invalid';
             }
 
-            if (isset($idp['singleLogoutService'])
-                && isset($idp['singleLogoutService']['responseUrl'])
-                && !empty($idp['singleLogoutService']['responseUrl'])
+            if (isset($idp['singleLogoutService']['responseUrl'])
                 && !filter_var($idp['singleLogoutService']['responseUrl'], FILTER_VALIDATE_URL)
             ) {
                 $errors[] = 'idp_slo_response_url_invalid';
