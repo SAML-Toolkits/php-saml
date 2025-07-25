@@ -795,7 +795,7 @@ class OneLogin_Saml2_Response
             if (in_array($attributeKeyName, array_keys($attributes), true)) {
                 if (!$allowRepeatAttributeName) {
                     throw new OneLogin_Saml2_ValidationError(
-                        "Found an Attribute element with duplicated ".$keyName,
+                        "Found an Attribute element with duplicated ".$attributeKeyName,
                         OneLogin_Saml2_ValidationError::DUPLICATED_ATTRIBUTE_NAME_FOUND
                     );
                 }
