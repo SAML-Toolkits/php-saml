@@ -573,8 +573,8 @@ class OneLogin_Saml2_Utils
         $portnumber = null;
         if (self::$_port) {
             $portnumber = self::$_port;
-        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
-            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+        } else if (self::getProxyVars() && self::determinePortFromProxyVars() !== null) {
+            $portnumber = self::determinePortFromProxyVars();
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         } else {
@@ -589,6 +589,23 @@ class OneLogin_Saml2_Utils
             }
         }
         return $portnumber;
+    }
+
+    /**
+     * @return null|string The port number inferred from the proxy variables (HTTP_X_FORWARDED_...)
+     */
+    private static function determinePortFromProxyVars()
+    {
+        if (isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+            return $_SERVER["HTTP_X_FORWARDED_PORT"];
+        } else if (isset($_SERVER["HTTP_X_FORWARDED_PROTO"])) {
+            if ($_SERVER["HTTP_X_FORWARDED_PROTO"] == 'https') {
+                return '443';
+            } elseif ($_SERVER["HTTP_X_FORWARDED_PROTO"] == 'http') {
+                return '80';
+            }
+        }
+        return null;
     }
 
     /**
