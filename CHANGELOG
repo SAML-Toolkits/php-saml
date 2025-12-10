@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v.2.21.2
+* Same as 2.21.1 but set the version updated, 2.21.1 was released with wrong version.json 2.20.0
+
+v.2.21.1
+* Fix xmlseclibs vulnerability [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
+
 v.2.21.0
 * [#619](https://github.com/SAML-Toolkits/php-saml/pull/619) Add Parameter checking on validateBinarySign, inspired on CVE-2025-27773
 * [#603](https://github.com/SAML-Toolkits/php-saml/issues/603) Fix typo in ignoreValidUntil that breaks metadata. Add parameter to exclude validUntil on Settings getSPMetadata
