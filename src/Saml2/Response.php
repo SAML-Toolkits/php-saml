@@ -13,7 +13,6 @@
 
 namespace OneLogin\Saml2;
 
-use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecEnc;
 
 use DOMDocument;
@@ -618,11 +617,43 @@ class Response
                     Error::PRIVATE_KEY_NOT_FOUND
                 );
             }
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
-            $seckey->loadKey($pem);
 
-            $nameId = Utils::decryptElement($encryptedData, $seckey);
+            $objenc = new XMLSecEnc();
+            $objenc->setNode($encryptedData);
+            $objenc->type = $encryptedData->getAttribute("Type");
+            if (!$objKey = $objenc->locateKey()) {
+                throw new ValidationError(
+                    "Unknown algorithm",
+                    ValidationError::KEY_ALGORITHM_ERROR
+                );
+            }
 
+            $key = null;
+            if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
+                if ($objKeyInfo->isEncrypted) {
+                    $objencKey = $objKeyInfo->encryptedCtx;
+                    $objKeyInfo->loadKey($pem);
+                    $key = $objencKey->decryptKey($objKeyInfo);
+                } else {
+                    // symmetric encryption key support
+                    $objKeyInfo->loadKey($pem);
+                }
+            }
+
+            if (empty($objKey->key)) {
+                $objKey->loadKey($key);
+            }
+
+            $decryptedXML = $objenc->decryptNode($objKey, false);
+            $decrypted = new DOMDocument();
+            $check = Utils::loadXML($decrypted, $decryptedXML);
+            if ($check === false) {
+                throw new Exception('Error: string from decrypted nameId could not be loaded into a XML document');
+            }
+
+            $nameId = $decrypted->documentElement;
+
+            Utils::treeCopyReplace($encryptedData->parentNode, $nameId);
         } else {
             $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
             if ($entries->length == 1) {
@@ -1170,16 +1201,6 @@ class Response
             throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
         }
 
-        // check if the decrypted assertion contains an encryptedID
-        $encryptedID = $decrypted->getElementsByTagName('EncryptedID')->item(0);
-
-        if ($encryptedID) {
-            // decrypt the encryptedID
-            $this->encryptedNameId = true;
-            $encryptedData = $encryptedID->getElementsByTagName('EncryptedData')->item(0);
-            $nameId = $this->decryptNameId($encryptedData, $pem);
-            Utils::treeCopyReplace($encryptedID, $nameId);
-        }
 
         if ($encData->parentNode instanceof DOMDocument) {
             return $decrypted;
@@ -1213,45 +1234,6 @@ class Response
         }
     }
 
-    /**
-     * Decrypt EncryptedID element
-     *
-     * @param \DOMElement $encryptedData The encrypted data.
-     * @param string     $key            The private key
-     *
-     * @return \DOMElement  The decrypted element.
-     */
-    private function decryptNameId(\DOMElement $encryptedData, string $pem)
-    {
-        $objenc = new XMLSecEnc();
-        $encData = $objenc->locateEncryptedData($encryptedData);
-        $objenc->setNode($encData);
-        $objenc->type = $encData->getAttribute("Type");
-        if (!$objKey = $objenc->locateKey()) {
-            throw new ValidationError(
-                "Unknown algorithm",
-                ValidationError::KEY_ALGORITHM_ERROR
-            );
-        }
-
-        $key = null;
-        if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
-            if ($objKeyInfo->isEncrypted) {
-                $objencKey = $objKeyInfo->encryptedCtx;
-                $objKeyInfo->loadKey($pem, false, false);
-                $key = $objencKey->decryptKey($objKeyInfo);
-            } else {
-                // symmetric encryption key support
-                $objKeyInfo->loadKey($pem, false, false);
-            }
-        }
-
-        if (empty($objKey->key)) {
-            $objKey->loadKey($key);
-        }
-
-        return Utils::decryptElement($encryptedData, $objKey);
-    }
 
     /**
      * After execute a validation process, if fails this method returns the cause
