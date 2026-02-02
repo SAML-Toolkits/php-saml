@@ -1223,10 +1223,14 @@ class Response
      */
     private function decryptNameId(\DOMElement $encryptedData, string $pem)
     {
+        // Decrypt the symmetric key and then use decryptNode() directly,
+        // following the same pattern as decryptAssertion().
+        // Passing the pre-decrypted symmetric key to Utils::decryptElement()
+        // caused an algorithm mismatch (e.g. aes256-gcm vs rsa-oaep-mgf1p)
+        // because decryptElement() attempts to decrypt the key a second time.
         $objenc = new XMLSecEnc();
-        $encData = $objenc->locateEncryptedData($encryptedData);
-        $objenc->setNode($encData);
-        $objenc->type = $encData->getAttribute("Type");
+        $objenc->setNode($encryptedData);
+        $objenc->type = $encryptedData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
             throw new ValidationError(
                 "Unknown algorithm",
@@ -1250,7 +1254,31 @@ class Response
             $objKey->loadKey($key);
         }
 
-        return Utils::decryptElement($encryptedData, $objKey);
+        $decrypted = $objenc->decryptNode($objKey, false);
+
+        $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"'
+            . ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            . $decrypted . '</root>';
+        $newDoc = new DOMDocument();
+        $newDoc->preserveWhiteSpace = false;
+        $newDoc->formatOutput = true;
+        $newDoc = Utils::loadXML($newDoc, $xml);
+        if (!$newDoc) {
+            throw new ValidationError(
+                'Failed to parse decrypted NameId XML.',
+                ValidationError::INVALID_XML_FORMAT
+            );
+        }
+
+        $decryptedElement = $newDoc->firstChild->firstChild;
+        if ($decryptedElement === null) {
+            throw new ValidationError(
+                'Missing decrypted NameId element.',
+                ValidationError::MISSING_ENCRYPTED_ELEMENT
+            );
+        }
+
+        return $decryptedElement;
     }
 
     /**
