@@ -278,8 +278,10 @@ class Auth
     {
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
-        if (isset($_GET['SAMLResponse'])) {
-            $logoutResponse = $this->buildLogoutResponse($this->_settings, $_GET['SAMLResponse']);
+        if (isset($_GET['SAMLResponse']) || isset($_POST['SAMLResponse'])) {
+            $logoutResponse = $this->buildLogoutResponse($this->_settings,
+                isset($_GET['SAMLResponse']) ?
+                    $_GET['SAMLResponse'] : $_POST['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
@@ -298,8 +300,10 @@ class Auth
                     }
                 }
             }
-        } else if (isset($_GET['SAMLRequest'])) {
-            $logoutRequest = $this->buildLogoutRequest($this->_settings, $_GET['SAMLRequest']);
+        } else if (isset($_GET['SAMLRequest']) || isset($_POST['SAMLRequest'])) {
+            $logoutRequest = $this->buildLogoutRequest($this->_settings,
+                isset($_GET['SAMLRequest']) ?
+                    $_GET['SAMLRequest'] : $_POST['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
@@ -322,8 +326,8 @@ class Auth
                 $logoutResponse = $responseBuilder->getResponse();
 
                 $parameters = array('SAMLResponse' => $logoutResponse);
-                if (isset($_GET['RelayState'])) {
-                    $parameters['RelayState'] = $_GET['RelayState'];
+                if (isset($_GET['RelayState']) || isset($_POST['RelayState'])) {
+                    $parameters['RelayState'] = isset($_GET['RelayState']) ? $_GET['RelayState'] : $_POST['RelayState'];
                 }
 
                 $security = $this->_settings->getSecurityData();
@@ -338,7 +342,7 @@ class Auth
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new Error(
-                'SAML LogoutRequest/LogoutResponse not found. Only supported HTTP_REDIRECT Binding',
+                'SAML LogoutRequest/LogoutResponse not found. Only HTTP_REDIRECT and HTTP_POST Bindings supported',
                 Error::SAML_LOGOUTMESSAGE_NOT_FOUND
             );
         }
