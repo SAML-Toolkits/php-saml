@@ -8,6 +8,8 @@ Add SAML support to your PHP 5.X or 7.X software using this library.
 Warning
 -------
 
+Version 3.8.2 updates xmlseclibs to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
+
 Version 3.8.1 updates xmlseclibs to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
 
 Version 3.4.0 introduces the 'rejectUnsolicitedResponsesWithInResponseTo' setting parameter, by default disabled, that will allow invalidate unsolicited SAMLResponse. This version as well will reject SAMLResponse if requestId was provided to the validator but the SAMLResponse does not contain a InResponseTo attribute. And an additional setting parameter 'destinationStrictlyMatches', by default disabled, that will force that the Destination URL should strictly match to the address that process the SAMLResponse.
