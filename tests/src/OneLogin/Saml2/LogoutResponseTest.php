@@ -17,9 +17,10 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
     private $_settings;
 
     /**
+     * @before
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function init()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -172,7 +173,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($response2->isValid());
 
         $this->assertFalse($response2->isValid($requestId));
-        $this->assertContains('The InResponseTo of the Logout Response:', $response2->getError());
+        $this->assertStringContainsString('The InResponseTo of the Logout Response:', $response2->getError());
     }
 
     /**
@@ -267,7 +268,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutResponse was received at', $response2->getError());
+        $this->assertStringContainsString('The LogoutResponse was received at', $response2->getError());
     }
 
     /**
@@ -293,7 +294,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('Invalid issuer in the Logout Response', $response2->getError());
+        $this->assertStringContainsString('Invalid issuer in the Logout Response', $response2->getError());
 
         $this->_settings->setStrict(false);
         $oldSignature = $_GET['Signature'];
@@ -407,7 +408,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $this->_settings->setStrict(true);
         $response2 = new LogoutResponse($this->_settings, $message);
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The LogoutResponse was received at', $response2->getError());
+        $this->assertStringContainsString('The LogoutResponse was received at', $response2->getError());
 
         $plainMessage = gzinflate(base64_decode($message));
         $currentURL = Utils::getSelfURLNoQuery();
@@ -481,7 +482,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
-        
+
         $settings = new Settings($settingsInfo);
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(false);
@@ -490,7 +491,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings2.php';
-        
+
         $settings = new Settings($settingsInfo);
         $logoutResponse = new LogoutResponse($settings, $message);
         $payload = $logoutResponse->getResponse(true);
@@ -538,7 +539,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
         $xml = $logoutResponse->getXML();
         $id1 = $logoutResponse->getID();
         $this->assertNotNull($id1);
-    
+
         $processedLogoutResponse = new LogoutResponse($settings, base64_encode($xml));
         $id2 = $processedLogoutResponse->getID();
         $this->assertEquals($id1, $id2);
@@ -548,15 +549,17 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
      * Tests that the LogoutRequest throws an exception
      *
      * @covers OneLogin\Saml2\LogoutRequest::getID()
-     *
-     * @expectedException OneLogin\Saml2\Error
-     * @expectedExceptionMessage LogoutResponse could not be processed
      */
     public function testGetIDException()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
         $settings = new Settings($settingsInfo);
+
+        // Expectation must be set before the object is instantiated
+        $this->expectException(\OneLogin\Saml2\Error::class);
+        $this->expectExceptionMessage('LogoutResponse could not be processed');
+
         $logoutResponse = new LogoutResponse($settings, '<garbage>');
     }
 }

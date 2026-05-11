@@ -13,9 +13,10 @@ class SignedResponseTest extends \PHPUnit\Framework\TestCase
     private $_settings;
 
     /**
+     * @before
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function init()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';

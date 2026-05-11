@@ -19,9 +19,10 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
     private $_settings;
 
     /**
+     * @before
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function init()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -111,7 +112,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp('#^<samlp:LogoutRequest#', $inflated);
 
         $sessionIndexes = LogoutRequest::getSessionIndexes($inflated);
-        $this->assertInternalType('array', $sessionIndexes);
+        $this->assertIsArray($sessionIndexes);
         $this->assertEquals(array($sessionIndex), $sessionIndexes);
     }
 
@@ -346,7 +347,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
             $nameIdData3 = LogoutRequest::getNameIdData($request2);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-            $this->assertContains('Key is required in order to decrypt the NameID', $e->getMessage());
+            $this->assertStringContainsString('Key is required in order to decrypt the NameID', $e->getMessage());
         }
 
         $key = $this->_settings->getSPkey();
@@ -365,30 +366,30 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
             $nameIdData3 = LogoutRequest::getNameIdData($invRequest);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the Logout Request', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the Logout Request', $e->getMessage());
         }
 
 
         $logoutRequest = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_PERSISTENT, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
         $logoutRequestStr = $logoutRequest->getXML();
-        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr);
-        $this->assertContains('Format="'.Constants::NAMEID_PERSISTENT, $logoutRequestStr);
-        $this->assertContains('NameQualifier="'.$this->_settings->getIdPData()['entityId'], $logoutRequestStr);
-        $this->assertContains('SPNameQualifier="'.$this->_settings->getSPData()['entityId'], $logoutRequestStr);
+        $this->assertStringContainsString('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr);
+        $this->assertStringContainsString('Format="'.Constants::NAMEID_PERSISTENT, $logoutRequestStr);
+        $this->assertStringContainsString('NameQualifier="'.$this->_settings->getIdPData()['entityId'], $logoutRequestStr);
+        $this->assertStringContainsString('SPNameQualifier="'.$this->_settings->getSPData()['entityId'], $logoutRequestStr);
 
         $logoutRequest2 = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_ENTITY, $this->_settings->getIdPData()['entityId'], $this->_settings->getSPData()['entityId']);
         $logoutRequestStr2 = $logoutRequest2->getXML();
-        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr2);
-        $this->assertContains('Format="'.Constants::NAMEID_ENTITY, $logoutRequestStr2);
-        $this->assertNotContains('NameQualifier', $logoutRequestStr2);
-        $this->assertNotContains('SPNameQualifier', $logoutRequestStr2);
+        $this->assertStringContainsString('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr2);
+        $this->assertStringContainsString('Format="'.Constants::NAMEID_ENTITY, $logoutRequestStr2);
+        $this->assertStringNotContainsString('NameQualifier', $logoutRequestStr2);
+        $this->assertStringNotContainsString('SPNameQualifier', $logoutRequestStr2);
 
         $logoutRequest3 = new LogoutRequest($this->_settings, null, "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c", null, Constants::NAMEID_UNSPECIFIED);
         $logoutRequestStr3 = $logoutRequest3->getXML();
-        $this->assertContains('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr3);
-        $this->assertNotContains('Format', $logoutRequestStr3);
-        $this->assertNotContains('NameQualifier', $logoutRequestStr3);
-        $this->assertNotContains('SPNameQualifier', $logoutRequestStr3);
+        $this->assertStringContainsString('ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c', $logoutRequestStr3);
+        $this->assertStringNotContainsString('Format', $logoutRequestStr3);
+        $this->assertStringNotContainsString('NameQualifier', $logoutRequestStr3);
+        $this->assertStringNotContainsString('SPNameQualifier', $logoutRequestStr3);
     }
 
     /**
@@ -408,7 +409,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
             $nameId2 = LogoutRequest::getNameId($request2);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-            $this->assertContains('Key is required in order to decrypt the NameID', $e->getMessage());
+            $this->assertStringContainsString('Key is required in order to decrypt the NameID', $e->getMessage());
         }
         $key = $this->_settings->getSPkey();
         $nameId3 = LogoutRequest::getNameId($request2, $key);
@@ -478,7 +479,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest2 = new LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest2->isValid());
-        $this->assertContains('The LogoutRequest was received at', $logoutRequest2->getError());
+        $this->assertStringContainsString('The LogoutRequest was received at', $logoutRequest2->getError());
     }
 
     /**
@@ -505,7 +506,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($logoutRequest2->isValid());
         $errorException = $logoutRequest2->getErrorException();
-        $this->assertContains('The LogoutRequest was received at', $errorException->getMessage());
+        $this->assertStringContainsString('The LogoutRequest was received at', $errorException->getMessage());
         $this->assertEquals($errorException->getMessage(), $logoutRequest2->getError());
     }
 
@@ -531,7 +532,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest2 = new LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest2->isValid());
-        $this->assertContains('Invalid issuer in the Logout Request', $logoutRequest2->getError());
+        $this->assertStringContainsString('Invalid issuer in the Logout Request', $logoutRequest2->getError());
     }
 
     /**
@@ -592,7 +593,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest2 = new LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest2->isValid());
-        $this->assertContains('The LogoutRequest was received at', $logoutRequest2->getError());
+        $this->assertStringContainsString('The LogoutRequest was received at', $logoutRequest2->getError());
     }
 
     /**
@@ -751,7 +752,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest2 = new LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest2->isValid());
-        $this->assertContains('The LogoutRequest was received at', $logoutRequest2->getError());
+        $this->assertStringContainsString('The LogoutRequest was received at', $logoutRequest2->getError());
 
         $this->_settings->setStrict(false);
         $oldSignature = $_GET['Signature'];
@@ -760,7 +761,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest3 = new LogoutRequest($this->_settings, $encodedRequest);
 
         $this->assertFalse($logoutRequest3->isValid());
-        $this->assertContains('Signature validation failed. Logout Request rejected', $logoutRequest3->getError());
+        $this->assertStringContainsString('Signature validation failed. Logout Request rejected', $logoutRequest3->getError());
 
         $_GET['Signature'] = $oldSignature;
         $oldSigAlg = $_GET['SigAlg'];
@@ -772,7 +773,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $_GET['RelayState'] = 'http://example.com/relaystate';
 
         $this->assertFalse($logoutRequest3->isValid());
-        $this->assertContains('Signature validation failed. Logout Request rejected', $logoutRequest3->getError());
+        $this->assertStringContainsString('Signature validation failed. Logout Request rejected', $logoutRequest3->getError());
 
         $this->_settings->setStrict(true);
 
@@ -823,7 +824,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest7 = new LogoutRequest($settings2, $encodedRequest2);
 
         $this->assertFalse($logoutRequest7->isValid());
-        $this->assertContains('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', $logoutRequest7->getError());
+        $this->assertStringContainsString('In order to validate the sign on the Logout Request, the x509cert of the IdP is required', $logoutRequest7->getError());
     }
 
     /**
@@ -899,20 +900,23 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests that the LogoutRequest throws an exception
-     *
-     * @covers OneLogin\Saml2\LogoutRequest::getID()
-     *
-     * @expectedException OneLogin\Saml2\Error
-     * @expectedExceptionMessage LogoutRequest could not be processed
-     */
-    public function testGetIDException()
-    {
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
-        $settings = new Settings($settingsInfo);
-        $logoutRequest = new LogoutRequest($settings);
-        $xml = $logoutRequest->getXML();
-        $id1 = LogoutRequest::getID($xml.'<garbage>');
-    }
+      * Tests that the LogoutRequest throws an exception
+      *
+      * @covers OneLogin\Saml2\LogoutRequest::getID()
+      */
+     public function testGetIDException()
+     {
+         $settingsDir = TEST_ROOT .'/settings/';
+         include $settingsDir.'settings1.php';
+         $settings = new Settings($settingsInfo);
+         $logoutRequest = new LogoutRequest($settings);
+         $xml = $logoutRequest->getXML();
+
+         // Set expectations before the failing action
+         $this->expectException(\OneLogin\Saml2\Error::class);
+         $this->expectExceptionMessage('LogoutRequest could not be processed');
+
+         // The action that triggers the exception
+         $id1 = LogoutRequest::getID($xml.'<garbage>');
+     }
 }
