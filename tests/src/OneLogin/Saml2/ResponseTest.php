@@ -19,9 +19,10 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     private $_settings;
 
     /**
+     * @before
      * Initializes the Test Suite
      */
-    public function setUp()
+    public function init()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -145,7 +146,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId4 = $response4->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -160,7 +161,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId5 = $response5->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsInfo['security']['wantNameId'] = false;
@@ -178,7 +179,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId7 = $response7->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');
@@ -199,7 +200,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId10 = $response10->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertStringContainsString('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new Response($settings, $xml6);
@@ -208,7 +209,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId11 = $response11->getNameId();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('An empty NameID value found', $e->getMessage());
+            $this->assertStringContainsString('An empty NameID value found', $e->getMessage());
         }
     }
 
@@ -238,7 +239,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId4 = $response4->getNameIdFormat();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
     }
 
@@ -264,7 +265,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId4 = $response4->getNameIdNameQualifier();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
     }
 
@@ -293,7 +294,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameId5 = $response5->getNameIdSPNameQualifier();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
     }
 
@@ -341,7 +342,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData4 = $response4->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -356,7 +357,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData5 = $response5->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $settingsInfo['security']['wantNameId'] = false;
@@ -374,7 +375,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData7 = $response7->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('NameID not found in the assertion of the Response', $e->getMessage());
+            $this->assertStringContainsString('NameID not found in the assertion of the Response', $e->getMessage());
         }
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/wrong_spnamequalifier.xml.base64');
@@ -405,7 +406,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData10 = $response10->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
+            $this->assertStringContainsString('The SPNameQualifier value mistmatch the SP entityID value.', $e->getMessage());
         }
 
         $response11 = new Response($settings, $xml6);
@@ -413,7 +414,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData11 = $response11->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('An empty NameID value found', $e->getMessage());
+            $this->assertStringContainsString('An empty NameID value found', $e->getMessage());
         }
 
         $xml7 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_value_nameid.xml.base64');
@@ -438,7 +439,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $nameIdData13 = $response12->getNameIdData();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('An empty NameID value found', $e->getMessage());
+            $this->assertStringContainsString('An empty NameID value found', $e->getMessage());
         }
 
         $settingsInfo['security']['wantNameId'] = false;
@@ -538,7 +539,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $response2->checkStatus();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('The status code of the Response was not Success, was Responder', $e->getMessage());
+            $this->assertStringContainsString('The status code of the Response was not Success, was Responder', $e->getMessage());
         }
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/status_code_responer_and_msg.xml.base64');
@@ -547,7 +548,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $response3->checkStatus();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('The status code of the Response was not Success, was Responder -> something_is_wrong', $e->getMessage());
+            $this->assertStringContainsString('The status code of the Response was not Success, was Responder -> something_is_wrong', $e->getMessage());
         }
     }
 
@@ -635,7 +636,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $issuers = $response5->getIssuers();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Issuer of the Assertion not found or multiple.', $e->getMessage());
+            $this->assertStringContainsString('Issuer of the Assertion not found or multiple.', $e->getMessage());
         }
     }
 
@@ -695,7 +696,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $attrs = $response4->getAttributes();
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Found an Attribute element with duplicated Name', $e->getMessage());
+            $this->assertStringContainsString('Found an Attribute element with duplicated Name', $e->getMessage());
         }
 
         $settingsDir = TEST_ROOT .'/settings/';
@@ -740,7 +741,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $attrs = $response4->getAttributesWithFriendlyName();
             $this->fail('OneLogin\Saml2\ValidationError was not raised');
         } catch (ValidationError $e) {
-            $this->assertContains('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
+            $this->assertStringContainsString('Found an Attribute element with duplicated FriendlyName', $e->getMessage());
         }
     }
 
@@ -1129,7 +1130,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response2 = new Response($this->_settings, $xml);
 
         $this->assertFalse($response2->isValid());
-        $this->assertContains('The response was received at', $response2->getError());
+        $this->assertStringContainsString('The response was received at', $response2->getError());
 
         // Empty Destination
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/invalids/empty_destination.xml.base64');
@@ -1153,7 +1154,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings2 = new Settings($settingsInfo);
         $response6 = new Response($settings2, $xml5);
         $this->assertFalse($response6->isValid());
-        $this->assertContains('The response was received at', $response6->getError());
+        $this->assertStringContainsString('The response was received at', $response6->getError());
         unset($settingsInfo['strict']);
         unset($settingsInfo['security']['destinationStrictlyMatches']);
         unset($_SERVER['HTTP_HOST']);
@@ -1398,11 +1399,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $response2 = new Response($this->_settings, $message);
         $response2->isValid($requestId);
-        $this->assertContains('The InResponseTo of the Response', $response2->getError());
+        $this->assertStringContainsString('The InResponseTo of the Response', $response2->getError());
 
         $validRequestId = '_57bcbf70-7b1f-012e-c821-782bcb13bb38';
         $response2->isValid($validRequestId);
-        $this->assertContains('No Signature found. SAML Response rejected', $response2->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response2->getError());
     }
 
     /**
@@ -1428,7 +1429,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response->isValid();
         $this->assertEquals('The Response has an InResponseTo attribute: '.$inResponseTo.' while no InResponseTo was expected', $response->getError());
         $response->isValid($inResponseTo);
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
     }
     /**
     * Tests the isValid method of the Response class
@@ -1454,7 +1455,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $inResponseTo = "_57bcbf70-7b1f-012e-c821-782bcb13bb38";
 
         $response->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $response->isValid($inResponseTo);
         $this->assertEquals('No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
@@ -1481,20 +1482,20 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $response = new Response($settings, $message);
         $response->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $settingsInfo['security']['wantAssertionsSigned'] = true;
         $settings2 = new Settings($settingsInfo);
         $response2 = new Response($settings2, $message);
         $response2->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response2->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response2->getError());
 
         $settingsInfo['strict'] = true;
         $settingsInfo['security']['wantAssertionsSigned'] = false;
         $settings3 = new Settings($settingsInfo);
         $response3 = new Response($settings3, $message);
         $response3->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response3->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response3->getError());
 
         $settingsInfo['security']['wantAssertionsSigned'] = true;
         $settings4 = new Settings($settingsInfo);
@@ -1510,20 +1511,20 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings5 = new Settings($settingsInfo);
         $response5 = new Response($settings5, $message);
         $response5->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response5->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response5->getError());
 
         $settingsInfo['security']['wantMessagesSigned'] = true;
         $settings6 = new Settings($settingsInfo);
         $response6 = new Response($settings6, $message);
         $response6->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response6->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response6->getError());
 
         $settingsInfo['strict'] = true;
         $settingsInfo['security']['wantMessagesSigned'] = false;
         $settings7 = new Settings($settingsInfo);
         $response7 = new Response($settings7, $message);
         $response7->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response7->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response7->getError());
 
         $settingsInfo['security']['wantMessagesSigned'] = true;
         $settings8 = new Settings($settingsInfo);
@@ -1554,14 +1555,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $response = new Response($settings, $message);
         $response->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $settingsInfo['strict'] = true;
         $settingsInfo['security']['wantAssertionsEncrypted'] = false;
         $settings = new Settings($settingsInfo);
         $response2 = new Response($settings, $message);
         $response2->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response2->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response2->getError());
 
         $settingsInfo['security']['wantAssertionsEncrypted'] = true;
         $settings = new Settings($settingsInfo);
@@ -1576,7 +1577,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
         $response4 = new Response($settings, $message);
         $response4->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response4->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response4->getError());
 
         $settingsInfo['strict'] = true;
         $settings = new Settings($settingsInfo);
@@ -1639,7 +1640,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_settings, $xml);
 
         $response->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
     }
 
     /**
@@ -1654,7 +1655,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_settings, $xml);
 
         $response->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
     }
 
     /**
@@ -1730,7 +1731,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response4 = new Response($settings, $message4);
 
         $response4->isValid();
-        $this->assertContains('No Signature found. SAML Response rejected', $response4->getError());
+        $this->assertStringContainsString('No Signature found. SAML Response rejected', $response4->getError());
     }
 
     /**
