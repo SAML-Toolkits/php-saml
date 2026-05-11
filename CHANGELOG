@@ -3,6 +3,8 @@ CHANGELOG
 
 v3.8.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
+* Force Fix phpunit > 8.5.51 due GHSA-vvj3-c3rp-c85p. Adapt tests to work with that phpunit version
+* Drop support PHP < 7.2
 
 v3.8.1
 * Update xmlseclibs version requirement to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
