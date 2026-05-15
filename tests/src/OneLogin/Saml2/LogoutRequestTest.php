@@ -8,7 +8,6 @@ use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
-
 use DomDocument;
 
 /**
@@ -21,7 +20,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
     /**
      * Initializes the Test Suite
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -296,7 +295,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $id = LogoutRequest::getID($logoutRequest);
         $this->assertEquals('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', $id);
 
-        $dom = new DOMDocument;
+        $dom = new DOMDocument();
         $dom->loadXML($logoutRequest);
         $id2 = LogoutRequest::getID($dom);
         $this->assertEquals('ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e', $id2);
@@ -506,7 +505,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($logoutRequest2->isValid());
         $errorException = $logoutRequest2->getErrorException();
         $this->assertStringContainsString('The LogoutRequest was received at', $errorException->getMessage());
-        $this->assertEquals($errorException->getMessage(), $logoutRequest2->getError());
+        $this->assertEquals(htmlentities($errorException->getMessage()), $logoutRequest2->getError());
     }
 
     /**

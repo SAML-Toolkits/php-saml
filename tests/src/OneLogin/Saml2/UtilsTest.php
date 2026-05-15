@@ -6,10 +6,8 @@ use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
-
 use DOMDocument;
 use Exception;
 
@@ -20,7 +18,6 @@ use Exception;
  */
 class UtilsTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Tests the loadXML method of the Utils
      *
@@ -139,7 +136,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $res4 = Utils::validateXML($metadataSigned, 'saml-schema-metadata-2.0.xsd');
         $this->assertTrue($res4 instanceof DOMDocument);
 
-        $dom = new DOMDocument;
+        $dom = new DOMDocument();
         Utils::loadXML($dom, $metadataOk);
         $res5 = Utils::validateXML($dom, 'saml-schema-metadata-2.0.xsd');
         $this->assertTrue($res5 instanceof DOMDocument);
@@ -241,11 +238,11 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
      */
     public function testRedirect()
     {
+        $_SERVER['HTTP_HOST'] = 'example.com';
         // Check relative and absolute
         $hostname = Utils::getSelfHost();
         $url = "http://$hostname/example";
         $url2 = '/example';
-
         $targetUrl = Utils::redirect($url, array(), true);
         $targetUrl2 = Utils::redirect($url2, array(), true);
 
@@ -546,9 +543,9 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedUrl2, Utils::getSelfURL());
     }
 
-   /**
-     * @covers OneLogin\Saml2\Utils::setBaseURL
-     */
+    /**
+      * @covers OneLogin\Saml2\Utils::setBaseURL
+      */
     public function testSetBaseURL2()
     {
         $_SERVER['HTTP_HOST'] = 'sp.example.com';
@@ -1124,7 +1121,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $settings = new Settings($settingsInfo);
 
         $key = $settings->getSPkey();
-        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
         $seckey->loadKey($key);
 
         $xmlNameIdEnc = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64'));
@@ -1155,14 +1152,14 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         }
 
         $key2 = file_get_contents(TEST_ROOT . '/data/misc/sp2.key');
-        $seckey2 = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+        $seckey2 = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
         $seckey2->loadKey($key2);
         $decryptedNameId2 = Utils::decryptElement($encryptedData, $seckey2);
         $this->assertEquals('saml:NameID', $decryptedNameId2->tagName);
         $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decryptedNameId2->nodeValue);
 
         $key3 = file_get_contents(TEST_ROOT . '/data/misc/sp2.key');
-        $seckey3 = new XMLSecurityKey(XMLSecurityKey::RSA_SHA512, array('type'=>'private'));
+        $seckey3 = new XMLSecurityKey(XMLSecurityKey::RSA_SHA512, array('type' => 'private'));
         $seckey3->loadKey($key3);
         try {
             $res = Utils::decryptElement($encryptedData, $seckey3);
@@ -1443,8 +1440,8 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the validateBinarySign method of the Utils
-     * Case where the signature is wrong 
-     * 
+     * Case where the signature is wrong
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignSignatureWrong()
@@ -1479,8 +1476,8 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the validateBinarySign method of the Utils
-     * Case where the cert is wrong 
-     * 
+     * Case where the cert is wrong
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignCertWrong()
@@ -1517,7 +1514,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the validateBinarySign method of the Utils
      * Case removed element, ex RelayState
-     * 
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignRemovedParam()
@@ -1555,7 +1552,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the validateBinarySign method of the Utils
      * Case No Query String
-     * 
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignNoQueryString()
@@ -1605,7 +1602,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the validateBinarySign method of the Utils
      * Case No Cert
-     * 
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignNoCert()
@@ -1656,7 +1653,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the validateBinarySign method of the Utils
      * Case Invalid Parameters: Ex. SAMLRequest and SAMLResponse present at the same time
-     * 
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignReqAndRes()
@@ -1696,7 +1693,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $expectedMessage = "Both SAMLRequest and SAMLResponse provided";
             $this->assertEquals($expectedMessage, $e->getMessage());
         }
-        
+
         $getData2 = array(
             'SAMLRequest' => 'fZJNa+MwEIb/ivHdiTyyZEskhkJYCPQDtmUPvQRZHm8NtqRKMuTnr2J3IbuHXsQwM887My86BDVPTj7a33aJP/FzwRCz6zyZINfKMV+8kVaFMUijZgwyavn68PQoYUek8zZabaf8DvmeUCGgj6M1eXY+HfOLILwHVQ+MK1ozrBG7itQcKzpQ3pQCdDU0DdQIefYLfUjkMU9CCQ9hwbMJUZmYUqSsCkILIG8ll8Alg/c8O6VrRqPiSn3E6OR+H+IyDDtt5z2a3tnRxHAXhSns3IfLs2cbX8yLfxgi+iQvBC2IKKB8g1JWm3x7uN0r10V8+yU/9m6HVzW7Cdchh/1900Y8J1vOp+yH9bOK3/t1y4x9MaytMnplwogm5u1l6KDrgUHFGeVEU92xUlCkrOZMNITr9LIUdvprhW3qtoKTrxhuZp5Nj9f2gn0D0IPQyfnkPlOEQpO0uko1DDSBqqtEl+aITew//m/yn2/U/gE=',
             'SAMLResponse' => 'fZJva8IwEMa/Ssl7TZrW/gnqGHMMwSlM8cXeyLU9NaxNQi9lfvxVZczB5ptwSe733MPdjQma2qmFPdjOvyE5awiDU1MbUpevCetaoyyQJmWgQVK+VOvH14WSQ6Fca70tbc1ukPsEEGHrtTUsmM8mbDfKUhnFci8gliGINI/yXIAAiYnsw6JIRgWWAKlkwRZb6skJ64V6nKjDuSEPxvdPIowHIhpIsQkTFaYqSt9ZMEPy2oC/UEfvHSnOnfZFV38MjR1oN7TtgRv8tAZre9CGV9jYkGtT4Wnoju6Bauprme/ebOyErZbPi9XLfLnDoohwhHGc5WVSVhjCKM6rBMpYQpWJrIizfZ4IZNPxuTPqYrmd/m+EdONqPOfy8yG5rhxv0EMFHs52xvxWaHyd3tqD7+j37clWGGyh7vD+POiSrdZdWSIR49NrhR9R/teGTL8A',
@@ -1729,7 +1726,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests the validateBinarySign method of the Utils
      * Case Invalid Parameters: Ex. Duplicated Parameters
-     * 
+     *
      * @covers OneLogin\Saml2\Utils::validateSign
      */
     public function testValidateBinarySignDuplicatedParameters()
