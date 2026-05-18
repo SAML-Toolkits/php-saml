@@ -1195,6 +1195,71 @@ You should be able to workaround this by configuring your server so that it is a
 Or by using the method described on the previous section.
 
 
+### Working behind a reverse proxy that strips a path prefix (X-Forwarded-Prefix) ###
+
+Some reverse-proxy strip a path prefix before forwarding the request to the application backend. A typical deployment is:
+
+| Layer        | URL the layer sees                                                |
+| ------------ | ------------------------------------------------------------------|
+| User browser | `https://domain.com/portal/connect/azure/check`                   |
+| IdP signs    | `https://domain.com/portal/connect/azure/check` as `@Destination` |
+| Proxy        | strips `/portal`                                                  |
+| Application  | sees `REQUEST_URI = /connect/azure/check`, no `HTTPS`, plus       |
+|              |  `X-Forwarded-Proto`: `https` and `X-Forwarded-Prefix`: `/portal` |
+
+In this scenario two pieces of the original URL are missing from the
+application server's `$_SERVER`: the HTTPs scheme and the path prefix.
+`setProxyVars(true)` covers the scheme (and the port) via
+`X-Forwarded-Proto` / `X-Forwarded-Port`, but the toolkit does **not**
+read `X-Forwarded-Prefix`. As a result `Utils::getSelfRoutedURLNoQuery()`
+returns `https://domain.com/connect/azure/check` (after `setProxyVars(true)`),
+which does not match the IdP-signed `@Destination`
+`https://domain.com/portal/connect/azure/check`, and validation fails
+with `The response was received at X instead of Y`.
+
+No code changes to the toolkit are required to make this work.
+Two equivalent approaches using only the public `Utils` API:
+
+**Option A**
+
+```php
+use OneLogin\Saml2\Utils;
+
+Utils::setProxyVars(true);
+Utils::setBaseURL('https://domain.com/portal/');  // scheme + host + prefix
+$auth->processResponse();
+```
+
+`setBaseURL` parses its argument into protocol, host, port and
+`baseURLPath`, then `getSelfRoutedURLNoQuery()` prepends the
+`baseURLPath` to the proxy-stripped `REQUEST_URI`, producing the
+original full URL the IdP signed.
+
+> **Important:** pass `setBaseURL` the URL *up to and including the
+> stripped prefix*, with a trailing slash — e.g.
+> `'https://domain.com/portal/'`. Do **not** pass the full ACS URL
+> (e.g. `'https://domain.com/portal/connect/azure/check'`); doing so
+> causes `buildWithBaseURLPath` to append `REQUEST_URI` to a
+> `baseURLPath` that already contains it, producing a doubled path
+> like `/portal/connect/azure/check/connect/azure/check`.
+
+**Option B**
+
+Use this form if the application already reads `X-Forwarded-*` headers
+through a framework abstraction and wants to feed each component to the
+toolkit explicitly:
+
+```php
+use OneLogin\Saml2\Utils;
+
+Utils::setSelfProtocol('https');
+Utils::setSelfHost('domain.com');
+Utils::setSelfPort(443);
+Utils::setBaseURLPath('/portal');
+$auth->processResponse();
+```
+
+
 ### SP Key rollover ###
 
 If you plan to update the SP x509cert and privateKey you can define the new x509cert as `$settings['sp']['x509certNew']` and it will be
