@@ -34,10 +34,11 @@ class Utils
     const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
     const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
+
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
      */
-    private static $_proxyVars = false;
+    private static $_proxyUsage = false;
 
     /**
      * @var string|null
@@ -431,19 +432,37 @@ class Utils
     }
 
     /**
-     * @param bool $proxyVars Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     * @param bool $proxyUsage Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
      */
-    public static function setProxyVars($proxyVars)
+    public static function setProxyUsage($proxyUsage)
     {
-        self::$_proxyVars = (bool)$proxyVars;
+        self::$_proxyUsage = (bool)$proxyUsage;
     }
 
     /**
      * @return bool
      */
+    public static function getProxyUsage()
+    {
+        return self::$_proxyUsage;
+    }
+
+    /**
+     * For retro-compatibility
+     * @param bool $proxyVars Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     */
+    public static function setProxyVars($proxyVars)
+    {
+        self::setProxyUsage($proxyVars);
+    }
+
+    /**
+     * For retro-compatibility
+     * @return bool
+     */
     public static function getProxyVars()
     {
-        return self::$_proxyVars;
+        return self::getProxyUsage();
     }
 
     /**

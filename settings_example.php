@@ -16,6 +16,11 @@ $settings = array(
     //     http://example.com/sp/
     'baseurl' => null,
 
+    // If 'useProxy' is true, some Utils methods will take care of the
+    // $_SERVER["HTTP_X_FORWARDED_PORT"] and $_SERVER['HTTP_X_FORWARDED_PROTO']
+    // vars (otherwise they are ignored).
+    'useProxy' => false,
+
     // Service Provider Data that we are deploying
     'sp' => array(
         // Identifier of the SP entity  (must be a URI)

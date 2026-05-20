@@ -95,6 +95,10 @@ class Response
     {
         $this->_settings = $settings;
 
+        if ($this->_settings->proxyUsage()){
+            Utils::setProxyUsage(true);
+        }
+
         $baseURL = $this->_settings->getBaseURL();
         if (!empty($baseURL)) {
             Utils::setBaseURL($baseURL);

@@ -37,6 +37,11 @@ class Settings
     private $_baseurl;
 
     /**
+     * @var bool
+     */
+    private $_useProxy = false;
+
+    /**
      * Strict. If active, PHP Toolkit will reject unsigned or unencrypted messages
      * if it expects them signed or encrypted. If not, the messages will be accepted
      * and some security issues will be also relaxed.
@@ -260,6 +265,10 @@ class Settings
             }
             if (isset($settings['debug'])) {
                 $this->_debug = $settings['debug'];
+            }
+
+            if (isset($settings['useProxy'])) {
+                $this->_useProxy = $settings['useProxy'];
             }
 
             if (isset($settings['baseurl'])) {
@@ -1130,6 +1139,16 @@ class Settings
     public function isDebugActive()
     {
         return $this->_debug;
+    }
+
+    /**
+     * Returns if the app is behind a reverse proxy.
+     *
+     * @return bool Proxy usage parameter
+     */
+    public function proxyUsage()
+    {
+        return $this->_useProxy;
     }
 
     /**
