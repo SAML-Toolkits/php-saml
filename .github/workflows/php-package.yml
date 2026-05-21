@@ -52,3 +52,8 @@ jobs:
 
       - name: Run unit tests
         run: vendor/bin/phpunit --verbose --debug
+
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: php vendor/bin/php-coveralls --coverage_clover=tests/build/logs/clover.xml -v
