@@ -74,6 +74,11 @@ class LogoutRequest
             Utils::setBaseURL($baseURL);
         }
 
+        $localURLPath = $this->_settings->getLocalURLPath();
+        if (!empty($localURLPath)) {
+            Utils::setLocalURLPath($localURLPath);
+        }
+
         if (!isset($request) || empty($request)) {
             $spData = $this->_settings->getSPData();
             $idpData = $this->_settings->getIdPData();

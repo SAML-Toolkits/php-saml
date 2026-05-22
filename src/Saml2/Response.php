@@ -104,6 +104,11 @@ class Response
             Utils::setBaseURL($baseURL);
         }
 
+        $localURLPath = $this->_settings->getLocalURLPath();
+        if (!empty($localURLPath)) {
+            Utils::setLocalURLPath($localURLPath);
+        }
+
         $this->response = base64_decode($response);
 
         $this->document = new DOMDocument();

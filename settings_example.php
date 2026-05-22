@@ -16,6 +16,11 @@ $settings = array(
     //     http://example.com/sp/
     'baseurl' => null,
 
+    // Set a base path to the application on the server or local virtual host.
+	// Could be used when behin a proxy, in the view that process the SAML Message.
+    // Ex. /my/local/installation/directory/
+    'localUrlPath' => null,
+    
     // If 'useProxy' is true, some Utils methods will take care of the
     // $_SERVER["HTTP_X_FORWARDED_PORT"] and $_SERVER['HTTP_X_FORWARDED_PROTO']
     // vars (otherwise they are ignored).

@@ -37,6 +37,11 @@ class Settings
     private $_baseurl;
 
     /**
+     * @var string
+     */
+    private $_localUrlPath;
+
+    /**
      * @var bool
      */
     private $_useProxy = false;
@@ -273,6 +278,10 @@ class Settings
 
             if (isset($settings['baseurl'])) {
                 $this->_baseurl = $settings['baseurl'];
+            }
+
+            if (isset($settings['localUrlPath'])) {
+                $this->_localUrlPath = $settings['localUrlPath'];
             }
 
             if (isset($settings['compress'])) {
@@ -1169,6 +1178,26 @@ class Settings
     public function getBaseURL()
     {
         return $this->_baseurl;
+    }
+
+    /**
+     * Set a baseurl value.
+     *
+     * @param string $baseurl Base URL.
+     */
+    public function setLocalURLPath($localurlpath)
+    {
+        $this->_localUrlPath = $localurlpath;
+    }
+
+    /**
+     * Returns the localUrlPath set on the settings if any.
+     *
+     * @return null|string The localUrlPath
+     */
+    public function getLocalURLPath()
+    {
+        return $this->_localUrlPath;
     }
 
     /**

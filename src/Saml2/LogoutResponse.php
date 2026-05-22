@@ -80,6 +80,11 @@ class LogoutResponse
             Utils::setBaseURL($baseURL);
         }
 
+        $localURLPath = $this->_settings->getLocalURLPath();
+        if (!empty($localURLPath)) {
+            Utils::setLocalURLPath($localURLPath);
+        }
+        
         if ($response) {
             $decoded = base64_decode($response);
             $inflated = @gzinflate($decoded);
