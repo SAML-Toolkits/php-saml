@@ -216,7 +216,7 @@ class Response
                 if (isset($requestId) && $requestId != $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new ValidationError(
-                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            "No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: $requestId",
                             ValidationError::WRONG_INRESPONSETO
                         );
                     } else {
