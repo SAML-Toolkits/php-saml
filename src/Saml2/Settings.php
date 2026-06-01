@@ -863,7 +863,7 @@ class Settings
      */
     public function getIdPSLOResponseUrl()
     {
-        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['responseUrl'])) {
+        if (isset($this->_idp['singleLogoutService']) && !empty($this->_idp['singleLogoutService']['responseUrl'])) {
             return $this->_idp['singleLogoutService']['responseUrl'];
         }
         return $this->getIdPSLOUrl();
