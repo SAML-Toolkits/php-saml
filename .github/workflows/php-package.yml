@@ -22,7 +22,7 @@ jobs:
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, mcrypt, xml
+          extensions: mbstring, intl, xml
           tools: composer:v2
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug
@@ -31,7 +31,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
         run: composer validate
