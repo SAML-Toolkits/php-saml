@@ -8,6 +8,7 @@ v4.4.0
 * Added clarification on reverse-proxy scenario (Path Prefix)
 * Update error message for missing InResponseTo
 * [#637](https://github.com/SAML-Toolkits/php-saml/issues/637) Fix incorrect @phpstan-return annotation on processSLO method
+* Fix bug on setSchemasPath method from Auth class. Also see [#635](https://github.com/SAML-Toolkits/php-saml/issues/635)
 * Force phpunit > 9.6.32 due CVE-2026-24765
 
 v4.3.2
