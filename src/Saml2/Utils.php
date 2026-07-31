@@ -925,7 +925,7 @@ class Utils
      * @param string|int|null $validUntil    The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
-     * @phpstan-return ($cacheDuration is true ? string : never)
+    * @phpstan-return int|null
      *
      * @throws Exception
      */

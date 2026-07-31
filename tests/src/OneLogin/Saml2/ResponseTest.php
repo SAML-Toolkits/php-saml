@@ -6,7 +6,6 @@ use OneLogin\Saml2\Response;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
-
 use DOMDocument;
 use Exception;
 
@@ -21,7 +20,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * Initializes the Test Suite
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -1462,7 +1461,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $response->isValid($inResponseTo);
-        $this->assertEquals('No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
+        $this->assertEquals('No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
     }
 
     /**
