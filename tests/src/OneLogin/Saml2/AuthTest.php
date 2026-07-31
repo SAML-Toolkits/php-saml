@@ -239,6 +239,43 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the processResponse method of the Auth class
+     * Case Invalid Response, Missing Destination and destination required
+     *
+     * @covers OneLogin\Saml2\Auth::processResponse
+     */
+    public function testProcessResponseInvalidMissingDestination()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['requireDestination'] = true;
+        $auth = new Auth($settingsInfo);
+
+        $_SERVER['HTTP_HOST'] = 'stuff.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/endpoints/endpoints/acs.php';
+
+        $message = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+
+        $auth->processResponse();
+
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals('The response has no Destination value', $auth->getLastErrorReason());
+
+        $errorException = $auth->getLastErrorException();
+        $this->assertInstanceOf(ValidationError::class, $errorException);
+        $this->assertEquals(ValidationError::MISSING_DESTINATION, $errorException->getCode());
+
+        unset($_POST['SAMLResponse']);
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
+    }
+
+    /**
+     * Tests the processResponse method of the Auth class
      * Case Valid Response, After processing the response the user
      * is authenticated, attributes are returned, also has a nameID and
      * the error array is empty

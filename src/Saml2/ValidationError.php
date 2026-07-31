@@ -73,6 +73,7 @@ class ValidationError extends Exception
     const NOT_SUPPORTED = 46;
     const KEY_ALGORITHM_ERROR = 47;
     const MISSING_ENCRYPTED_ELEMENT = 48;
+    const MISSING_DESTINATION = 49;
 
 
     /**

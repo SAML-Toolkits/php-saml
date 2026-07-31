@@ -1144,6 +1144,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response4 = new Response($settings, $xml2);
         $this->assertTrue($response4->isValid());
 
+        // Missing Destination
+        $xmlNoDestination = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $settingsInfo['security']['requireDestination'] = true;
+        $settingsRequireDestination = new Settings($settingsInfo);
+        $responseNoDestination = new Response($settingsRequireDestination, $xmlNoDestination);
+        $this->assertFalse($responseNoDestination->isValid());
+        $this->assertEquals('The response has no Destination value', $responseNoDestination->getError());
+
         // Destination strict match
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_strict_destination.xml.base64');
         $response5 = new Response($settings, $xml5);
@@ -1153,6 +1161,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response6 = new Response($settings2, $xml5);
         $this->assertFalse($response6->isValid());
         $this->assertStringContainsString('The response was received at', $response6->getError());
+
         unset($settingsInfo['strict']);
         unset($settingsInfo['security']['destinationStrictlyMatches']);
         unset($_SERVER['HTTP_HOST']);
