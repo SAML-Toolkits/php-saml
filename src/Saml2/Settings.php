@@ -390,6 +390,11 @@ class Settings
             $this->_security['relaxDestinationValidation'] = false;
         }
 
+        // Require Destination attribute on incoming SAML Responses
+        if (!isset($this->_security['requireDestination'])) {
+            $this->_security['requireDestination'] = false;
+        }
+
         // Strict Destination match validation
         if (!isset($this->_security['destinationStrictlyMatches'])) {
             $this->_security['destinationStrictlyMatches'] = false;
