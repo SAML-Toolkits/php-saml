@@ -42,7 +42,7 @@ jobs:
       # Pin to SHA. Right now using >= 2.37.1 which fixes CVE-2026-46420
       # Check https://github.com/shivammathur/setup-php/releases for latest.
       - name: Setup PHP ${{ matrix.php-versions }}, with composer and extensions
-        uses: shivammathur/setup-php@7163319 # v2 — replace with full 40-char SHA from latest release
+        uses: shivammathur/setup-php@716331904ea2625d93a4f4f8f8c050d235845675 # v2
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, intl, mcrypt, xml
