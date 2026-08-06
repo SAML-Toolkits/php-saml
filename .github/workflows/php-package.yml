@@ -46,16 +46,9 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, intl, mcrypt, xml
           # Composer 2.2 LTS supports PHP 5.3+
-          tools: composer:2.2.29@f38623ebdeeab5905b24b048fd32804150e598436cc43db9fc12362894c1279d
+          tools: composer:v2
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug2
-
-      # setup-php installs Composer 2.10.x which requires PHP 7.2.5+.
-      # For PHP 5.3–7.1 we must replace it with the 2.2 LTS phar.
-      - name: Install Composer 2.2 LTS
-        run: |
-          curl -sS https://getcomposer.org/download/2.2.29/composer.phar -o "$(which composer)"
-          composer --version
 
       - name: Validate composer.json and composer.lock
         run: composer validate
