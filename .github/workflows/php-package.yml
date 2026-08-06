@@ -8,38 +8,60 @@ on:
     branches: [ master, 3.*, 4.* ]
   pull_request:
     branches: [ master, 3.*, 4.* ]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ${{ matrix.operating-system }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ['ubuntu-latest']
-        php-versions: [5.3, 5.4, 5.5, 5.6, 7.0, 7.1]
+        operating-system: ['ubuntu-22.04'] # ubuntu-22.04 is the last runner with reliable PHP 5.x toolchain support.
+        php-versions: ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1']
     steps:
-      - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, mcrypt, xml
-          tools: composer:v2
-          ini-values: post_max_size=256M, max_execution_time=180
-          coverage: xdebug
+      # Checkout FIRST so the workspace is ready for all later steps.
+      # Pin to a full commit SHA for supply-chain safety.
+      # To find the latest SHA for a tag, run:
+      #   git ls-remote --tags https://github.com/actions/checkout.git | grep v4
+      #   or check https://github.com/actions/checkout/releases
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      # Set git line-ending config
       - name: Set git to use LF
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v2
+      # Setup PHP
+      # Pin to SHA. Right now using >= 2.37.1 which fixes CVE-2026-46420
+      # Check https://github.com/shivammathur/setup-php/releases for latest.
+      - name: Setup PHP ${{ matrix.php-versions }}, with composer and extensions
+        uses: shivammathur/setup-php@716331904ea2625d93a4f4f8f8c050d235845675 # v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, intl, mcrypt, xml
+          # Composer 2.2 LTS supports PHP 5.3+
+          tools: composer:v2
+          ini-values: post_max_size=256M, max_execution_time=180
+          coverage: xdebug2
+
+      # setup-php installs Composer 2.10.x which requires PHP 7.2.5+.
+      # For PHP 5.3–7.1 we must replace it with the 2.2 LTS phar.
+      - name: Install Composer 2.2 LTS
+        run: |
+          sudo curl -sS https://getcomposer.org/download/2.2.29/composer.phar -o "$(which composer)"
+          composer --version
 
       - name: Validate composer.json and composer.lock
         run: composer validate
 
       - name: Install Composer dependencies
         run: |
-          composer self-update
           composer install --prefer-source --no-interaction
 
       - name: Syntax check PHP

@@ -26,10 +26,10 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8",
-        "satooshi/php-coveralls": "1.0.1",
-        "sebastian/phpcpd": "*",
-        "phploc/phploc": "*",
-        "pdepend/pdepend" : "1.1.0",
+        "php-coveralls/php-coveralls": "^1.0.2",
+        "sebastian/phpcpd": "^2.0 || ^3.0",
+        "phploc/phploc": "^2.1 || ^3.0 || ^4.0",
+        "pdepend/pdepend" : "^2.5.0",
         "squizlabs/php_codesniffer": "2.9.0"
     }
 }
