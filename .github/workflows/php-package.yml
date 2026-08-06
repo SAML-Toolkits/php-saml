@@ -46,9 +46,10 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, intl, mcrypt, xml
-          tools: composer:2.8.6@sha256:59b2c50e10cafa0d8efc19ede9a326d782f096c674a26baf98cf042ce23de890
+          # Composer 2.2 LTS supports PHP 5.3+
+          tools: composer:v2.2
           ini-values: post_max_size=256M, max_execution_time=180
-          coverage: xdebug
+          coverage: xdebug2
 
       - name: Validate composer.json and composer.lock
         run: composer validate
