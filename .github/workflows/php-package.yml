@@ -50,6 +50,13 @@ jobs:
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug2
 
+      # setup-php installs Composer 2.10.x which requires PHP 7.2.5+.
+      # For PHP 5.3–7.1 we must replace it with the 2.2 LTS phar.
+      - name: Install Composer 2.2 LTS
+        run: |
+          sudo curl -sS https://getcomposer.org/download/2.2.29/composer.phar -o "$(which composer)"
+          composer --version
+
       - name: Validate composer.json and composer.lock
         run: composer validate
 
