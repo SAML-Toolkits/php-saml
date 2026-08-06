@@ -586,6 +586,25 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers OneLogin\Saml2\Utils::setLocalURLPath
+     */
+    public function testSetLocalURLPath()
+    {
+        $_SERVER['HTTP_HOST'] = 'sp.example.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/localPathToApplication/route.php';
+        $_SERVER['SCRIPT_NAME'] = '/localPathToApplication/route.php';
+        //unset($_SERVER['PATH_INFO']);
+
+        $expectedUrlNQ = 'https://sp.example.com/route.php';
+
+		Utils::setLocalURLPath('/localPathToApplication/');
+		
+        $this->assertEquals('sp.example.com', Utils::getSelfHost());
+        $this->assertEquals($expectedUrlNQ, Utils::getSelfURLNoQuery());
+    }
+
+    /**
      * Tests the getSelfURLhost method of the Utils
      *
      * @covers OneLogin\Saml2\Utils::getSelfURLhost

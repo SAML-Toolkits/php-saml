@@ -37,6 +37,16 @@ class Settings
     private $_baseurl;
 
     /**
+     * @var string
+     */
+    private $_localUrlPath;
+
+    /**
+     * @var bool
+     */
+    private $_useProxy = false;
+
+    /**
      * Strict. If active, PHP Toolkit will reject unsigned or unencrypted messages
      * if it expects them signed or encrypted. If not, the messages will be accepted
      * and some security issues will be also relaxed.
@@ -262,8 +272,16 @@ class Settings
                 $this->_debug = $settings['debug'];
             }
 
+            if (isset($settings['useProxy'])) {
+                $this->_useProxy = $settings['useProxy'];
+            }
+
             if (isset($settings['baseurl'])) {
                 $this->_baseurl = $settings['baseurl'];
+            }
+
+            if (isset($settings['localUrlPath'])) {
+                $this->_localUrlPath = $settings['localUrlPath'];
             }
 
             if (isset($settings['compress'])) {
@@ -1138,6 +1156,16 @@ class Settings
     }
 
     /**
+     * Returns if the app is behind a reverse proxy.
+     *
+     * @return bool Proxy usage parameter
+     */
+    public function proxyUsage()
+    {
+        return $this->_useProxy;
+    }
+
+    /**
      * Set a baseurl value.
      *
      * @param string $baseurl Base URL.
@@ -1155,6 +1183,26 @@ class Settings
     public function getBaseURL()
     {
         return $this->_baseurl;
+    }
+
+    /**
+     * Set a baseurl value.
+     *
+     * @param string $baseurl Base URL.
+     */
+    public function setLocalURLPath($localurlpath)
+    {
+        $this->_localUrlPath = $localurlpath;
+    }
+
+    /**
+     * Returns the localUrlPath set on the settings if any.
+     *
+     * @return null|string The localUrlPath
+     */
+    public function getLocalURLPath()
+    {
+        return $this->_localUrlPath;
     }
 
     /**

@@ -34,10 +34,11 @@ class Utils
     const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
     const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
+
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
      */
-    private static $_proxyVars = false;
+    private static $_proxyUsage = false;
 
     /**
      * @var string|null
@@ -63,6 +64,11 @@ class Utils
      * @var string|null
      */
     private static $_baseurlpath;
+
+    /**
+     * @var string|null
+     */
+    private static $_localpath;
 
     /**
      * This function load an XML string in a save way.
@@ -431,19 +437,61 @@ class Utils
     }
 
     /**
-     * @param bool $proxyVars Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     * Set the local path value.
+     *
+     * @param string $path The path of base path of application on server
      */
-    public static function setProxyVars($proxyVars)
+    public static function setLocalURLPath($path)
     {
-        self::$_proxyVars = (bool)$proxyVars;
+        if (empty($path)) {
+            self::$_localpath = null;
+        } else if ($path == '/') {
+            self::$_localpath = '/';
+        } else {
+            self::$_localpath = '/' . trim($path, '/') . '/';
+        }
+    }
+
+    /**
+     * @return string The local path to be used when constructing URLs
+     */
+    public static function getLocalURLPath()
+    {
+        return self::$_localpath;
+    }
+
+    /**
+     * @param bool $proxyUsage Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     */
+    public static function setProxyUsage($proxyUsage)
+    {
+        self::$_proxyUsage = (bool)$proxyUsage;
     }
 
     /**
      * @return bool
      */
+    public static function getProxyUsage()
+    {
+        return self::$_proxyUsage;
+    }
+
+    /**
+     * For retro-compatibility
+     * @param bool $proxyVars Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     */
+    public static function setProxyVars($proxyVars)
+    {
+        self::setProxyUsage($proxyVars);
+    }
+
+    /**
+     * For retro-compatibility
+     * @return bool
+     */
     public static function getProxyVars()
     {
-        return self::$_proxyVars;
+        return self::getProxyUsage();
     }
 
     /**
@@ -621,18 +669,14 @@ class Utils
     public static function getSelfURLNoQuery()
     {
         $selfURLNoQuery = self::getSelfURLhost();
+        $route = self::shiftLocalURLPath($_SERVER['SCRIPT_NAME']);
+        $route = self::buildWithBaseURLPath($route);
 
-        $infoWithBaseURLPath = self::buildWithBaseURLPath($_SERVER['SCRIPT_NAME']);
-        if (!empty($infoWithBaseURLPath)) {
-            $selfURLNoQuery .= $infoWithBaseURLPath;
-        } else {
-            $selfURLNoQuery .= $_SERVER['SCRIPT_NAME'];
-        }
-
+        $selfURLNoQuery .= $route;
+        
         if (isset($_SERVER['PATH_INFO'])) {
             $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
-
         return $selfURLNoQuery;
     }
 
@@ -648,12 +692,8 @@ class Utils
 
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
-            if (!empty($_SERVER['QUERY_STRING'])) {
-                $route = self::strLreplace($_SERVER['QUERY_STRING'], '', $route);
-                if (substr($route, -1) == '?') {
-                    $route = substr($route, 0, -1);
-                }
-            }
+            $route = self::truncateQueryString($route);
+            $route = self::shiftLocalURLPath($route);
         }
 
         $infoWithBaseURLPath = self::buildWithBaseURLPath($route);
@@ -671,14 +711,17 @@ class Utils
         return $selfRoutedURLNoQuery;
     }
 
-    public static function strLreplace($search, $replace, $subject)
+    public static function truncateQueryString($subject)
     {
-        $pos = strrpos($subject, $search);
-
-        if ($pos !== false) {
-            $subject = substr_replace($subject, $replace, $pos, strlen($search));
+        if (!empty($_SERVER['QUERY_STRING'])) {
+            $pos = strrpos($subject, $_SERVER['QUERY_STRING']);
+            if ($pos !== false) {
+                $subject = substr_replace($subject, '', $pos, strlen($_SERVER['QUERY_STRING']));
+            }
         }
-
+        if (substr($subject, -1) == '?') {
+            $subject = substr($subject, 0, -1);
+        }
         return $subject;
     }
 
@@ -694,17 +737,14 @@ class Utils
         $requestURI = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
-            $matches = array();
-            if ($requestURI[0] !== '/' && preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
-                $requestURI = $matches[1];
-            }
+            $requestURI = self::shiftLocalURLPath($requestURI);
         }
 
         $infoWithBaseURLPath = self::buildWithBaseURLPath($requestURI);
         if (!empty($infoWithBaseURLPath)) {
             $requestURI = $infoWithBaseURLPath;
         }
-
+		
         return $selfURLhost . $requestURI;
     }
 
@@ -734,6 +774,40 @@ class Utils
                 }
             }
         }
+        else{
+            $result = $info;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the part of the URL without the localPath.
+     *
+     * @param string $info Contains path info
+     *
+     * @return string
+     */
+    protected static function shiftLocalURLPath($info)
+    {
+        $result = '/';
+        if (!empty($info)) {
+            $localURLPath = self::getLocalURLPath();
+            if (!empty($localURLPath)) {
+                $extractedInfo = $info;
+                if ($localURLPath != '/') {
+                    // Remove base path from the path info.
+                    $extractedInfo = str_replace($localURLPath, '', $info);
+                }
+                // Remove starting and ending slash.
+                $extractedInfo = trim($extractedInfo, '/');
+                if (!empty($extractedInfo)) {
+                    $result .= $extractedInfo;
+                }
+            }
+            else{
+                $result = $info;
+            }
+        }	
         return $result;
     }
 

@@ -71,11 +71,20 @@ class LogoutResponse
     {
         $this->_settings = $settings;
 
+        if ($this->_settings->proxyUsage()){
+            Utils::setProxyUsage(true);
+        }
+
         $baseURL = $this->_settings->getBaseURL();
         if (!empty($baseURL)) {
             Utils::setBaseURL($baseURL);
         }
 
+        $localURLPath = $this->_settings->getLocalURLPath();
+        if (!empty($localURLPath)) {
+            Utils::setLocalURLPath($localURLPath);
+        }
+        
         if ($response) {
             $decoded = base64_decode($response);
             $inflated = @gzinflate($decoded);

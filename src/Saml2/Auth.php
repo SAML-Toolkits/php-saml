@@ -174,6 +174,9 @@ class Auth
     public function __construct(?array $settings = null, bool $spValidationOnly = false)
     {
         $this->_settings = new Settings($settings, $spValidationOnly);
+        if ($this->_settings->proxyUsage()){
+            Utils::setProxyUsage(true);
+        }
     }
 
     /**
