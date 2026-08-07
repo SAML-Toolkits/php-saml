@@ -41,13 +41,26 @@ jobs:
       # Pin to SHA. Right now using >= 2.37.1 which fixes CVE-2026-46420
       # Check https://github.com/shivammathur/setup-php/releases for latest.
       - name: Setup PHP ${{ matrix.php-versions }}, with composer and extensions
-        uses: shivammathur/setup-php@716331904ea2625d93a4f4f8f8c050d235845675 # v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, intl, mcrypt, xml
           tools: composer:v2
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug2
+
+      - name: Install Composer 2.8.9
+        run: |
+          EXPECTED_SHA256="$(curl -sSf https://getcomposer.org/download/2.8.9/composer.phar.sha256sum | awk '{ print $1 }')"
+          curl -sSf https://getcomposer.org/download/2.8.9/composer.phar -o /tmp/composer.phar
+          ACTUAL_SHA256="$(sha256sum /tmp/composer.phar | awk '{ print $1 }')"
+          if [ "$EXPECTED_SHA256" != "$ACTUAL_SHA256" ]; then
+            echo "::error::Composer checksum mismatch!"
+            exit 1
+          fi
+          sudo cp /tmp/composer.phar "$(which composer)"
+          rm /tmp/composer.phar
+          composer --version
 
       - name: Validate composer.json and composer.lock
         run: composer validate
