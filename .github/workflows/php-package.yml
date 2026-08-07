@@ -49,6 +49,7 @@ jobs:
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug2
 
+      # Newer composer versions are not compatible with this project (Dependency resolution fails)
       - name: Install Composer 2.8.9
         run: |
           EXPECTED_SHA256="$(curl -sSf https://getcomposer.org/download/2.8.9/composer.phar.sha256sum | awk '{ print $1 }')"
@@ -61,6 +62,13 @@ jobs:
           sudo cp /tmp/composer.phar "$(which composer)"
           rm /tmp/composer.phar
           composer --version
+
+      # Remove the GitHub OAuth token that setup-php auto-registers.
+      # This project only uses public packages and Composer 2.8.9 is
+      # vulnerable to CVE-2026-45793 (token leaked in error messages
+      # when the new GitHub token format is encountered).
+      - name: Remove GitHub OAuth token from Composer
+        run: composer config --global --unset github-oauth.github.com
 
       - name: Validate composer.json and composer.lock
         run: composer validate
