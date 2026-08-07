@@ -58,8 +58,12 @@ jobs:
 
       - name: Syntax check PHP
         run: |
-          mkdir -p tests/build/dependences
-          php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  src/.
+          mkdir -p tests/build/logs tests/build/dependences
+          php vendor/bin/pdepend \
+            --summary-xml=tests/build/logs/dependence-summary.xml \
+            --jdepend-chart=tests/build/dependences/jdepend.svg \
+            --overview-pyramid=tests/build/dependences/pyramid.svg \
+            src/.
 
       - name: PHP Code Sniffer
         run: php vendor/bin/phpcs --standard=tests/ZendModStandard src/Saml2 demo1 demo2 endpoints tests/src
