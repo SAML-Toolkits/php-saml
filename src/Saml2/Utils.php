@@ -71,7 +71,7 @@ class Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
-     * @return DOMDocument|false $dom The result of load the XML at the DOMDocument
+     * @return DOMDocument|false $dom The result of loading the XML at the DOMDocument
      *
      * @throws Exception
      */
@@ -80,16 +80,7 @@ class Utils
         assert($dom instanceof DOMDocument);
         assert(is_string($xml));
 
-        $oldEntityLoader = null;
-        if (PHP_VERSION_ID < 80000) {
-            $oldEntityLoader = libxml_disable_entity_loader(true);
-        }
-
         $res = $dom->loadXML($xml);
-
-        if (PHP_VERSION_ID < 80000) {
-            libxml_disable_entity_loader($oldEntityLoader);
-        }
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
@@ -144,14 +135,7 @@ class Utils
             $schemaFile = __DIR__ . '/schemas/' . $schema;
         }
 
-        $oldEntityLoader = null;
-        if (PHP_VERSION_ID < 80000) {
-            $oldEntityLoader = libxml_disable_entity_loader(false);
-        }
         $res = $dom->schemaValidate($schemaFile);
-        if (PHP_VERSION_ID < 80000) {
-            libxml_disable_entity_loader($oldEntityLoader);
-        }
         if (!$res) {
             $xmlErrors = libxml_get_errors();
             syslog(LOG_INFO, 'Error validating the metadata: '.var_export($xmlErrors, true));
@@ -177,7 +161,7 @@ class Utils
      * (Standard importNode with deep copy
      *  mangles nested default namespaces)
      *
-     * The reference node must not be a DomDocument
+     * The reference node must not be a DOMDocument
      * It CAN be the top element of a document
      * Returns the copied node in the target document
      *
@@ -212,7 +196,7 @@ class Utils
     /**
      * Returns a x509 cert (adding header & footer if required).
      *
-     * @param string $x509cert  A x509 unformated cert
+     * @param string $x509cert  A x509 unformatted cert
      * @param bool   $heads     True if we want to include head and footer
      *
      * @return string $x509 Formatted cert
@@ -983,15 +967,11 @@ class Utils
     /**
      * Checks if the session is started or not.
      *
-     * @return bool true if the sessíon is started
+     * @return bool true if the session is started
      */
     public static function isSessionStarted()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            return session_status() === PHP_SESSION_ACTIVE ? true : false;
-        } else {
-            return session_id() === '' ? false : true;
-        }
+        return session_status() === PHP_SESSION_ACTIVE;
     }
 
     /**
@@ -1368,7 +1348,7 @@ class Utils
     }
 
     /**
-     * Adds signature key and senders certificate to an element (Message or Assertion).
+     * Adds signature key and sender's certificate to an element (Message or Assertion).
      *
      * @param string|DOMDocument $xml             The element we should sign
      * @param string             $key             The private key

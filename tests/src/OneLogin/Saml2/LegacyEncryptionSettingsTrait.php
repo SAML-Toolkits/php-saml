@@ -11,13 +11,18 @@ trait LegacyEncryptionSettingsTrait
      *
      * @return Settings
      */
-    protected function createLegacyEncryptionSettings(array $settingsInfo)
+    protected function createLegacyEncryptionSettingsInfo(array $settingsInfo)
     {
         if (!isset($settingsInfo['security'])) {
             $settingsInfo['security'] = array();
         }
         $settingsInfo['security']['allowRSA15KeyTransport'] = true;
 
-        return new Settings($settingsInfo);
+        return $settingsInfo;
+    }
+
+    protected function createLegacyEncryptionSettings(array $settingsInfo)
+    {
+        return new Settings($this->createLegacyEncryptionSettingsInfo($settingsInfo));
     }
 }

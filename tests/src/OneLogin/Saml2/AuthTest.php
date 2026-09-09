@@ -16,6 +16,8 @@ use Exception;
  */
 class AuthTest extends \PHPUnit\Framework\TestCase
 {
+    use LegacyEncryptionSettingsTrait;
+
     private $_auth;
     private $_settingsInfo;
 
@@ -1469,7 +1471,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests that we can get most recently constructed
-     * LogoutResponse.
+     * LogoutRequest.
      *
      * @covers OneLogin\Saml2\Auth::getLastRequestXML()
      */
@@ -1512,14 +1514,11 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
         $response = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
         $this->_auth->processResponse();
-        file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
         $this->assertEquals($response, $this->_auth->getLastResponseXML());
 
         $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $decryptedResponse = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
-        $legacySettingsInfo = $this->_settingsInfo;
-        $legacySettingsInfo['security']['allowRSA15KeyTransport'] = true;
-        $legacyAuth = new Auth($legacySettingsInfo);
+        $legacyAuth = new Auth($this->createLegacyEncryptionSettingsInfo($this->_settingsInfo));
         $legacyAuth->processResponse();
         $this->assertEquals($decryptedResponse, $legacyAuth->getLastResponseXML());
     }
