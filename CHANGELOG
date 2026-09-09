@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+[UNRELEASED]
+* Update xmlseclibs requirement to ^4.0 due [AIKIDO-2026-134354](https://intel.aikido.dev/cve/AIKIDO-2026-134354) / [GHSA-m5mw-mr39-66vp](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-m5mw-mr39-66vp)
+* Require PHP >= 8.0 (xmlseclibs 4 requirement)
+* Add `security.allowRSA15KeyTransport` setting (default false) to opt in to RSA-1.5 key transport for legacy IdPs with xmlseclibs 4
+
 v4.4.0
 * PHP 8.5 Compatibility
 * Github Actions: Update Checkout to v4. Remove mcrypt install

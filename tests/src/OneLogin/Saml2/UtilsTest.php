@@ -58,7 +58,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
                       <!ELEMENT foo ANY >
                       <!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>';
         try {
-            $res = Utils::loadXML($dom, $attackXXE);
+            Utils::loadXML($dom, $attackXXE);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertEquals('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks', $e->getMessage());
@@ -1129,7 +1129,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $domNameIdEnc->loadXML($xmlNameIdEnc);
         $encryptedNameIDNodes = $domNameIdEnc->getElementsByTagName('EncryptedID');
         $encryptedData = $encryptedNameIDNodes->item(0)->firstChild;
-        $decryptedNameId = Utils::decryptElement($encryptedData, $seckey);
+        $decryptedNameId = Utils::decryptElement($encryptedData, $seckey, allowRSA15KeyTransport: true);
         $this->assertEquals('saml:NameID', $decryptedNameId->tagName);
         $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decryptedNameId->nodeValue);
 
@@ -1140,12 +1140,12 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $encryptedAssertionEncNode = $encryptedAssertionEncNodes->item(0);
         $encryptedDataAssertNodes = $encryptedAssertionEncNode->getElementsByTagName('EncryptedData');
         $encryptedDataAssert = $encryptedDataAssertNodes->item(0);
-        $decryptedAssertion = Utils::decryptElement($encryptedDataAssert, $seckey);
+        $decryptedAssertion = Utils::decryptElement($encryptedDataAssert, $seckey, allowRSA15KeyTransport: true);
 
         $this->assertEquals('saml:Assertion', $decryptedAssertion->tagName);
 
         try {
-            $res = Utils::decryptElement($encryptedNameIDNodes->item(0), $seckey);
+            Utils::decryptElement($encryptedNameIDNodes->item(0), $seckey);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
             $this->assertStringContainsString('Algorithm mismatch between input key and key in message', $e->getMessage());
@@ -1154,7 +1154,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $key2 = file_get_contents(TEST_ROOT . '/data/misc/sp2.key');
         $seckey2 = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
         $seckey2->loadKey($key2);
-        $decryptedNameId2 = Utils::decryptElement($encryptedData, $seckey2);
+        $decryptedNameId2 = Utils::decryptElement($encryptedData, $seckey2, allowRSA15KeyTransport: true);
         $this->assertEquals('saml:NameID', $decryptedNameId2->tagName);
         $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decryptedNameId2->nodeValue);
 
@@ -1162,7 +1162,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $seckey3 = new XMLSecurityKey(XMLSecurityKey::RSA_SHA512, array('type' => 'private'));
         $seckey3->loadKey($key3);
         try {
-            $res = Utils::decryptElement($encryptedData, $seckey3);
+            Utils::decryptElement($encryptedData, $seckey3, true, true);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
             $this->assertStringContainsString('Algorithm mismatch between input key and key used to encrypt  the symmetric key for the message', $e->getMessage());
@@ -1174,7 +1174,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $encryptedNameIDNodes2 = $domNameIdEnc2->getElementsByTagName('EncryptedID');
         $encryptedData2 = $encryptedNameIDNodes2->item(0)->firstChild;
         try {
-            $res = Utils::decryptElement($encryptedData2, $seckey);
+            Utils::decryptElement($encryptedData2, $seckey);
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertStringContainsString('Unable to locate algorithm for this Encrypted Key', $e->getMessage());
@@ -1186,10 +1186,45 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $encryptedNameIDNodes3 = $domNameIdEnc3->getElementsByTagName('EncryptedID');
         $encryptedData3 = $encryptedNameIDNodes3->item(0)->firstChild;
         try {
-            $res = Utils::decryptElement($encryptedData3, $seckey);
+            Utils::decryptElement($encryptedData3, $seckey);
             $this->fail('ValidationError was not raised');
         } catch (ValidationError $e) {
             $this->assertStringContainsString('Algorithm mismatch between input key and key in message', $e->getMessage());
+        }
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     */
+    public function testDecryptElementKeyTransport()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+        $key = $settings->getSPkey();
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey($key);
+
+        $xmlOaep = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_oaep.xml.base64'));
+        $domOaep = new DOMDocument();
+        $domOaep->loadXML($xmlOaep);
+        $encryptedDataOaep = $domOaep->getElementsByTagName('EncryptedID')->item(0)->firstChild;
+        $decryptedOaep = Utils::decryptElement($encryptedDataOaep, $seckey);
+        $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decryptedOaep->nodeValue);
+
+        $xmlRsa15 = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64'));
+        $domRsa15 = new DOMDocument();
+        $domRsa15->loadXML($xmlRsa15);
+        $encryptedDataRsa15 = $domRsa15->getElementsByTagName('EncryptedID')->item(0)->firstChild;
+        $decryptedRsa15 = Utils::decryptElement($encryptedDataRsa15, $seckey, true, true);
+        $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decryptedRsa15->nodeValue);
+
+        try {
+            Utils::decryptElement($encryptedDataRsa15, $seckey);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
         }
     }
 
@@ -1346,7 +1381,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertFalse(Utils::validateSign($signatureWrapping, $cert));
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
-            $this->assertStringContainsString('Reference validation failed', $e->getMessage());
+            $this->assertStringContainsString('Reference URI identifies multiple nodes', $e->getMessage());
         }
     }
 

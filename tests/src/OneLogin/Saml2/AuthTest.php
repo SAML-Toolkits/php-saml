@@ -1517,8 +1517,11 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
         $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $decryptedResponse = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
-        $this->_auth->processResponse();
-        $this->assertEquals($decryptedResponse, $this->_auth->getLastResponseXML());
+        $legacySettingsInfo = $this->_settingsInfo;
+        $legacySettingsInfo['security']['allowRSA15KeyTransport'] = true;
+        $legacyAuth = new Auth($legacySettingsInfo);
+        $legacyAuth->processResponse();
+        $this->assertEquals($decryptedResponse, $legacyAuth->getLastResponseXML());
     }
 
     /**

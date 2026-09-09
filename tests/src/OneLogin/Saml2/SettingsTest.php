@@ -1011,6 +1011,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('requireDestination', $security);
         $this->assertArrayHasKey('rejectUnsolicitedResponsesWithInResponseTo', $security);
         $this->assertArrayHasKey('destinationStrictlyMatches', $security);
+        $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
     }
 
     /**
@@ -1067,6 +1068,9 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertArrayHasKey('requireDestination', $security);
         $this->assertFalse($security['requireDestination']);
+
+        $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
+        $this->assertFalse($security['allowRSA15KeyTransport']);
     }
 
     /**

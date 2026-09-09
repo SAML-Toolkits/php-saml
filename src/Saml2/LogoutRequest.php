@@ -218,7 +218,7 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameIdData($request, $key = null)
+    public static function getNameIdData($request, $key = null, $allowRSA15KeyTransport = false)
     {
         if ($request instanceof DOMDocument) {
             $dom = $request;
@@ -243,7 +243,7 @@ LOGOUTREQUEST;
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
             $seckey->loadKey($key);
 
-            $nameId = Utils::decryptElement($encryptedData, $seckey);
+            $nameId = Utils::decryptElement($encryptedData, $seckey, allowRSA15KeyTransport: $allowRSA15KeyTransport);
 
         } else {
             $entries = Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
@@ -282,9 +282,9 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameId($request, $key = null)
+    public static function getNameId($request, $key = null, $allowRSA15KeyTransport = false)
     {
-        $nameId = self::getNameIdData($request, $key);
+        $nameId = self::getNameIdData($request, $key, $allowRSA15KeyTransport);
         return $nameId['Value'];
     }
 
@@ -414,7 +414,11 @@ LOGOUTREQUEST;
                     }
                 }
 
-                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
+                static::getNameId(
+                    $dom,
+                    $this->_settings->getSPkey(),
+                    $security['allowRSA15KeyTransport']
+                );
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);

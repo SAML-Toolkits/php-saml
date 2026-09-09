@@ -626,7 +626,12 @@ class Response
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
             $seckey->loadKey($pem);
 
-            $nameId = Utils::decryptElement($encryptedData, $seckey);
+            $security = $this->_settings->getSecurityData();
+            $nameId = Utils::decryptElement(
+                $encryptedData,
+                $seckey,
+                allowRSA15KeyTransport: $security['allowRSA15KeyTransport']
+            );
 
         } else {
             $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
@@ -1134,7 +1139,7 @@ class Response
             );
         }
 
-        $objenc = new XMLSecEnc();
+        $objenc = Utils::createDecryptionContext($this->_settings->getSecurityData()['allowRSA15KeyTransport']);
         $encData = $objenc->locateEncryptedData($dom);
         if (!$encData) {
             throw new ValidationError(
@@ -1228,7 +1233,10 @@ class Response
      */
     private function decryptNameId(\DOMElement $encryptedData, string $pem)
     {
-        $objenc = new XMLSecEnc();
+        $security = $this->_settings->getSecurityData();
+        $allowRSA15KeyTransport = $security['allowRSA15KeyTransport'];
+
+        $objenc = Utils::createDecryptionContext($allowRSA15KeyTransport);
         $encData = $objenc->locateEncryptedData($encryptedData);
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
@@ -1239,23 +1247,30 @@ class Response
             );
         }
 
-        $key = null;
+        $inputKey = null;
         if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
             if ($objKeyInfo->isEncrypted) {
-                $objencKey = $objKeyInfo->encryptedCtx;
                 $objKeyInfo->loadKey($pem, false, false);
-                $key = $objencKey->decryptKey($objKeyInfo);
+                $inputKey = $objKeyInfo;
             } else {
                 // symmetric encryption key support
                 $objKeyInfo->loadKey($pem, false, false);
+                $inputKey = $objKey;
             }
         }
 
-        if (empty($objKey->key)) {
-            $objKey->loadKey($key);
+        if ($inputKey === null) {
+            throw new ValidationError(
+                "Could not locate <dsig:KeyInfo> for the encrypted key.",
+                ValidationError::KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA
+            );
         }
 
-        return Utils::decryptElement($encryptedData, $objKey);
+        return Utils::decryptElement(
+            $encryptedData,
+            $inputKey,
+            allowRSA15KeyTransport: $allowRSA15KeyTransport
+        );
     }
 
     /**

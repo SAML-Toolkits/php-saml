@@ -15,6 +15,8 @@ if (!defined('TEST_ROOT')) {
     define('TEST_ROOT', __DIR__);
 }
 
+require_once __DIR__.'/src/OneLogin/Saml2/LegacyEncryptionSettingsTrait.php';
+
 if (!defined('ONELOGIN_CUSTOMPATH')) {
     define('ONELOGIN_CUSTOMPATH', __DIR__.'/data/customPath/');
 }

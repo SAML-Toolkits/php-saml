@@ -1194,18 +1194,19 @@ class Utils
     /**
      * Decrypts an encrypted element.
      *
-     * @param DOMElement     $encryptedData The encrypted data.
-     * @param XMLSecurityKey $inputKey      The decryption key.
-     * @param bool           $formatOutput  Format or not the output.
+     * @param DOMElement     $encryptedData           The encrypted data.
+     * @param XMLSecurityKey $inputKey                The decryption key.
+     * @param bool           $formatOutput            Format or not the output.
+     * @param bool           $allowRSA15KeyTransport  Allow RSA-1.5 key transport (legacy interop).
      *
      * @return DOMElement  The decrypted element.
      *
      * @throws ValidationError
      */
-    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true)
+    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true, $allowRSA15KeyTransport = false)
     {
 
-        $enc = new XMLSecEnc();
+        $enc = self::createDecryptionContext($allowRSA15KeyTransport);
 
         $enc->setNode($encryptedData);
         $enc->type = $encryptedData->getAttribute("Type");
@@ -1526,6 +1527,21 @@ class Utils
             }
         }
         return $valid;
+    }
+
+    /**
+     * Creates an XMLSecEnc instance configured for decryption.
+     *
+     * @param bool $allowRSA15KeyTransport Allow RSA-1.5 key transport (legacy interop).
+     *
+     * @return XMLSecEnc
+     */
+    public static function createDecryptionContext($allowRSA15KeyTransport = false)
+    {
+        $enc = new XMLSecEnc();
+        $enc->allowRSA15KeyTransport = $allowRSA15KeyTransport;
+
+        return $enc;
     }
 
     /**
