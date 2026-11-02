@@ -253,6 +253,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     */
     public function testRedirect()
     {
+		$_SERVER['HTTP_HOST'] = 'example.com';
         // Check relative and absolute
         $hostname = OneLogin_Saml2_Utils::getSelfHost();
         $url = "http://$hostname/example";
