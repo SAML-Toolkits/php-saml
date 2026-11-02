@@ -238,9 +238,13 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
      * Tests the redirect method of the Utils
      *
      * @covers OneLogin\Saml2\Utils::redirect
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testRedirect()
     {
+        $_SERVER['HTTP_HOST'] = 'example.org';
         // Check relative and absolute
         $hostname = Utils::getSelfHost();
         $url = "http://$hostname/example";
