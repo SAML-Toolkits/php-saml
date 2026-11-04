@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v4.4.1
+* 4.4.0 was released with wrong target (master branch, so removing it)
+* More strictString comparison
+
 v4.4.0
 * Update xmlseclibs requirement to ^4.0.1. See [GHSA-m5mw-mr39-66vp](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-m5mw-mr39-66vp) and other security vulnerabilities discovered on August.
 * Require PHP >= 8.0 (xmlseclibs 4 requirement)
