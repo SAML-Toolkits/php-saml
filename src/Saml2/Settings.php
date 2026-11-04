@@ -438,6 +438,16 @@ class Settings
             $this->_security['encryption_algorithm'] = XMLSecurityKey::AES128_CBC;
         }
 
+        // RSA-1.5 key transport (legacy SAML interop; denied by default in xmlseclibs 4)
+        if (!isset($this->_security['allowRSA15KeyTransport'])) {
+            $this->_security['allowRSA15KeyTransport'] = false;
+        }
+
+        // CBC data encryption (unauthenticated, padding oracle; accepted by default by xmlseclibs 4)
+        if (!isset($this->_security['allowCBCEncryption'])) {
+            $this->_security['allowCBCEncryption'] = true;
+        }
+
         if (!isset($this->_security['lowercaseUrlencoding'])) {
             $this->_security['lowercaseUrlencoding'] = false;
         }

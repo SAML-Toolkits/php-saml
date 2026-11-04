@@ -23,6 +23,7 @@ use DOMNodeList;
 use DomNode;
 use DOMXPath;
 use Exception;
+use Throwable;
 
 /**
  * Utils of SAML PHP Toolkit
@@ -71,7 +72,7 @@ class Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
-     * @return DOMDocument|false $dom The result of load the XML at the DOMDocument
+     * @return DOMDocument|false $dom The result of loading the XML at the DOMDocument
      *
      * @throws Exception
      */
@@ -80,16 +81,7 @@ class Utils
         assert($dom instanceof DOMDocument);
         assert(is_string($xml));
 
-        $oldEntityLoader = null;
-        if (PHP_VERSION_ID < 80000) {
-            $oldEntityLoader = libxml_disable_entity_loader(true);
-        }
-
         $res = $dom->loadXML($xml);
-
-        if (PHP_VERSION_ID < 80000) {
-            libxml_disable_entity_loader($oldEntityLoader);
-        }
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
@@ -144,14 +136,7 @@ class Utils
             $schemaFile = __DIR__ . '/schemas/' . $schema;
         }
 
-        $oldEntityLoader = null;
-        if (PHP_VERSION_ID < 80000) {
-            $oldEntityLoader = libxml_disable_entity_loader(false);
-        }
         $res = $dom->schemaValidate($schemaFile);
-        if (PHP_VERSION_ID < 80000) {
-            libxml_disable_entity_loader($oldEntityLoader);
-        }
         if (!$res) {
             $xmlErrors = libxml_get_errors();
             syslog(LOG_INFO, 'Error validating the metadata: '.var_export($xmlErrors, true));
@@ -177,7 +162,7 @@ class Utils
      * (Standard importNode with deep copy
      *  mangles nested default namespaces)
      *
-     * The reference node must not be a DomDocument
+     * The reference node must not be a DOMDocument
      * It CAN be the top element of a document
      * Returns the copied node in the target document
      *
@@ -212,7 +197,7 @@ class Utils
     /**
      * Returns a x509 cert (adding header & footer if required).
      *
-     * @param string $x509cert  A x509 unformated cert
+     * @param string $x509cert  A x509 unformatted cert
      * @param bool   $heads     True if we want to include head and footer
      *
      * @return string $x509 Formatted cert
@@ -466,7 +451,7 @@ class Utils
 
         $portnumber = self::getSelfPort();
 
-        if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
+        if (isset($portnumber) && ($portnumber !== '80') && ($portnumber !== '443')) {
             $port = ':' . $portnumber;
         }
 
@@ -723,7 +708,7 @@ class Utils
             $result = $baseURLPath;
             if (!empty($info)) {
                 $extractedInfo = $info;
-                if ($baseURLPath != '/') {
+                if ($baseURLPath !== '/') {
                     // Remove base path from the path info.
                     $extractedInfo = str_replace($baseURLPath, '', $info);
                 }
@@ -983,15 +968,11 @@ class Utils
     /**
      * Checks if the session is started or not.
      *
-     * @return bool true if the sessíon is started
+     * @return bool true if the session is started
      */
     public static function isSessionStarted()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            return session_status() === PHP_SESSION_ACTIVE ? true : false;
-        } else {
-            return session_id() === '' ? false : true;
-        }
+        return session_status() === PHP_SESSION_ACTIVE;
     }
 
     /**
@@ -1113,11 +1094,8 @@ class Utils
         $doc->appendChild($nameId);
 
         if (!empty($cert)) {
-            if ($encAlg == XMLSecurityKey::AES128_CBC) {
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
-            } else {
-                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
-            }
+            // RSA-1.5 key transport is rejected by default by xmlseclibs 4 receivers
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
             $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
@@ -1194,18 +1172,20 @@ class Utils
     /**
      * Decrypts an encrypted element.
      *
-     * @param DOMElement     $encryptedData The encrypted data.
-     * @param XMLSecurityKey $inputKey      The decryption key.
-     * @param bool           $formatOutput  Format or not the output.
+     * @param DOMElement     $encryptedData           The encrypted data.
+     * @param XMLSecurityKey $inputKey                The decryption key.
+     * @param bool           $formatOutput            Format or not the output.
+     * @param bool           $allowRSA15KeyTransport  Allow RSA-1.5 key transport (legacy interop).
+     * @param bool           $allowCBCEncryption      Accept data encrypted with CBC (unauthenticated).
      *
      * @return DOMElement  The decrypted element.
      *
      * @throws ValidationError
      */
-    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true)
+    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true, $allowRSA15KeyTransport = false, $allowCBCEncryption = true)
     {
 
-        $enc = new XMLSecEnc();
+        $enc = self::createDecryptionContext($allowRSA15KeyTransport, $allowCBCEncryption);
 
         $enc->setNode($encryptedData);
         $enc->type = $encryptedData->getAttribute("Type");
@@ -1227,11 +1207,12 @@ class Utils
         }
 
         $inputKeyAlgo = $inputKey->getAlgorithm();
+        $encKey = null;
         if ($symmetricKeyInfo->isEncrypted) {
             $symKeyInfoAlgo = $symmetricKeyInfo->getAlgorithm();
 
-            if ($symKeyInfoAlgo === XMLSecurityKey::RSA_OAEP_MGF1P && $inputKeyAlgo === XMLSecurityKey::RSA_1_5) {
-                $inputKeyAlgo = XMLSecurityKey::RSA_OAEP_MGF1P;
+            if (in_array($symKeyInfoAlgo, array(XMLSecurityKey::RSA_OAEP_MGF1P, XMLSecurityKey::RSA_OAEP), true) && $inputKeyAlgo === XMLSecurityKey::RSA_1_5) {
+                $inputKeyAlgo = $symKeyInfoAlgo;
             }
 
             if ($inputKeyAlgo !== $symKeyInfoAlgo) {
@@ -1255,21 +1236,6 @@ class Utils
                 );
             }
 
-            $key = $encKey->decryptKey($symmetricKeyInfo);
-            if (strlen($key) != $keySize) {
-                $encryptedKey = $encKey->getCipherValue();
-                $pkey = openssl_pkey_get_details($symmetricKeyInfo->key);
-                $pkey = sha1(serialize($pkey), true);
-                $key = sha1($encryptedKey . $pkey, true);
-
-                /* Make sure that the key has the correct length. */
-                if (strlen($key) > $keySize) {
-                    $key = substr($key, 0, $keySize);
-                } elseif (strlen($key) < $keySize) {
-                    $key = str_pad($key, $keySize);
-                }
-            }
-            $symmetricKey->loadKey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {
@@ -1283,31 +1249,52 @@ class Utils
             $symmetricKey = $inputKey;
         }
 
-        $decrypted = $enc->decryptNode($symmetricKey, false);
+        // From here on every failure depends on the decrypted bytes, so all of
+        // them are reported the same way to avoid a padding/parsing oracle.
+        $useInternalErrors = libxml_use_internal_errors(true);
+        try {
+            if ($encKey !== null) {
+                $key = $encKey->decryptKey($symmetricKeyInfo);
+                if (strlen($key) != $keySize) {
+                    // Deterministic substitute key, derived from the encrypted key and the
+                    // SP private key, so a bad key transport is indistinguishable from a good one.
+                    // (xmlseclibs 4 keeps keys as PEM strings, not OpenSSL handles)
+                    $encryptedKey = $encKey->getCipherValue();
+                    $key = hash_hmac('sha256', $encryptedKey, $symmetricKeyInfo->key, true);
 
-        $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
-        $newDoc = new DOMDocument();
-        if ($formatOutput) {
-            $newDoc->preserveWhiteSpace = false;
-            $newDoc->formatOutput = true;
-        }
-        $newDoc = self::loadXML($newDoc, $xml);
-        if (!$newDoc) {
+                    /* Make sure that the key has the correct length. */
+                    if (strlen($key) > $keySize) {
+                        $key = substr($key, 0, $keySize);
+                    } elseif (strlen($key) < $keySize) {
+                        $key = str_pad($key, $keySize);
+                    }
+                }
+                $symmetricKey->loadKey($key);
+            }
+
+            $decrypted = $enc->decryptNode($symmetricKey, false);
+
+            $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
+            $newDoc = new DOMDocument();
+            if ($formatOutput) {
+                $newDoc->preserveWhiteSpace = false;
+                $newDoc->formatOutput = true;
+            }
+            $newDoc = self::loadXML($newDoc, $xml);
+            if (!$newDoc || $newDoc->firstChild->firstChild === null) {
+                throw new Exception('Invalid decrypted element');
+            }
+        } catch (Throwable $e) {
             throw new ValidationError(
-                'Failed to parse decrypted XML.',
-                ValidationError::INVALID_XML_FORMAT
+                XMLSecurityKey::DECRYPTION_FAILURE,
+                ValidationError::DECRYPTION_FAILED
             );
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($useInternalErrors);
         }
 
-        $decryptedElement = $newDoc->firstChild->firstChild;
-        if ($decryptedElement === null) {
-            throw new ValidationError(
-                'Missing encrypted element.',
-                ValidationError::MISSING_ENCRYPTED_ELEMENT
-            );
-        }
-
-        return $decryptedElement;
+        return $newDoc->firstChild->firstChild;
     }
 
      /**
@@ -1335,15 +1322,17 @@ class Utils
             throw new Exception('Unsupported signing algorithm.');
         }
 
-        $keyInfo = openssl_pkey_get_details($key->key);
-        if ($keyInfo === false) {
+        // xmlseclibs 4 keeps the key material as a PEM string, so it can be reloaded as is
+        if (!is_string($key->key) || $key->key === '') {
             throw new Exception('Unable to get key details from XMLSecurityKey.');
         }
-        if (!isset($keyInfo['key'])) {
-            throw new Exception('Missing key in public key details.');
-        }
         $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
-        $newKey->loadKey($keyInfo['key']);
+        $cert = $key->getX509Certificate();
+        if ($cert !== null) {
+            $newKey->loadKey($cert, false, true);
+        } else {
+            $newKey->loadKey($key->key);
+        }
         return $newKey;
     }
 
@@ -1367,7 +1356,7 @@ class Utils
     }
 
     /**
-     * Adds signature key and senders certificate to an element (Message or Assertion).
+     * Adds signature key and sender's certificate to an element (Message or Assertion).
      *
      * @param string|DOMDocument $xml             The element we should sign
      * @param string             $key             The private key
@@ -1489,6 +1478,21 @@ class Utils
             throw $e;
         }
 
+        // Before verifying the signature, confirm the signature covers the element it is attached to.
+        // Extra security measure to prevent certain types of attacks.
+        $covered = false;
+        foreach ($objXMLSecDSig->getValidatedNodes() ?: array() as $validatedNode) {
+            for ($node = $objDSig->parentNode; $node !== null; $node = $node->parentNode) {
+                if ($node->isSameNode($validatedNode)) {
+                    $covered = true;
+                    break 2;
+                }
+            }
+        }
+        if (!$covered) {
+            throw new Exception('The Signature does not cover the element it is attached to');
+        }
+
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
 
         if (!empty($multiCerts)) {
@@ -1526,6 +1530,25 @@ class Utils
             }
         }
         return $valid;
+    }
+
+    /**
+     * Creates an XMLSecEnc instance configured for decryption.
+     *
+     * @param bool $allowRSA15KeyTransport Allow RSA-1.5 key transport (legacy interop).
+     * @param bool $allowCBCEncryption     Accept data encrypted with CBC (unauthenticated). If false only AES-GCM is accepted.
+     *
+     * @return XMLSecEnc
+     */
+    public static function createDecryptionContext($allowRSA15KeyTransport = false, $allowCBCEncryption = true)
+    {
+        $enc = new XMLSecEnc();
+        $enc->allowRSA15KeyTransport = $allowRSA15KeyTransport;
+        if (!$allowCBCEncryption) {
+            $enc->allowedDataAlgorithms = XMLSecEnc::DEFAULT_DATA_ALGORITHMS;
+        }
+
+        return $enc;
     }
 
     /**
@@ -1616,7 +1639,7 @@ class Utils
             $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
             $objKey->loadKey($cert, false, true);
 
-            if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+            if ($signAlg !== XMLSecurityKey::RSA_SHA1) {
                 try {
                     $objKey = Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {

@@ -8,13 +8,18 @@ use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 use DomDocument;
+use Exception;
 
 /**
  * Unit tests for Logout Request
  */
 class LogoutRequestTest extends \PHPUnit\Framework\TestCase
 {
+    use LegacyEncryptionSettingsTrait;
+    use EncryptedNameIdTrait;
+
     private $_settings;
 
     /**
@@ -349,7 +354,7 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         }
 
         $key = $this->_settings->getSPkey();
-        $nameIdData4 = LogoutRequest::getNameIdData($request2, $key);
+        $nameIdData4 = LogoutRequest::getNameIdData($request2, $key, true);
 
         $expectedNameIdData = array(
             'Value' => 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69',
@@ -410,8 +415,169 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
             $this->assertStringContainsString('Key is required in order to decrypt the NameID', $e->getMessage());
         }
         $key = $this->_settings->getSPkey();
-        $nameId3 = LogoutRequest::getNameId($request2, $key);
+        $nameId3 = LogoutRequest::getNameId($request2, $key, true);
         $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $nameId3);
+    }
+
+    /**
+     * @covers OneLogin\Saml2\LogoutRequest::getNameIdData
+     */
+    public function testEncryptedNameIdKeyTransport()
+    {
+        $expectedNameIdData = array(
+            'Value' => 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69',
+            'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress',
+            'SPNameQualifier' => 'https://pitbulk.no-ip.org/newonelogin/demo1/metadata.php'
+        );
+
+        $key = $this->_settings->getSPkey();
+
+        $oaepRequest = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid_oaep.xml');
+        $this->assertEquals($expectedNameIdData, LogoutRequest::getNameIdData($oaepRequest, $key));
+
+        $rsa15Request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid.xml');
+        $this->assertEquals($expectedNameIdData, LogoutRequest::getNameIdData($rsa15Request, $key, true));
+
+        try {
+            LogoutRequest::getNameIdData($rsa15Request, $key);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
+        }
+    }
+
+    /**
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     */
+    public function testEncryptedNameIdKeyTransportIsValid()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        $prepareRequest = function ($xml) {
+            $currentURL = Utils::getSelfRoutedURLNoQuery();
+            $xml = str_replace('http://idp.example.com/SingleLogoutService.php', $currentURL, $xml);
+            $xml = str_replace('http://stuff.com/endpoints/metadata.php', 'http://idp.example.com/', $xml);
+
+            return base64_encode(gzdeflate($xml));
+        };
+
+        $oaepXml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid_oaep.xml');
+        $oaepLogoutRequest = new LogoutRequest(new Settings($settingsInfo), $prepareRequest($oaepXml));
+        $this->assertTrue($oaepLogoutRequest->isValid());
+
+        $legacySettings = $this->createLegacyEncryptionSettings($settingsInfo);
+        $legacySettings->setStrict(true);
+        $rsa15Xml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid.xml');
+        $legacyLogoutRequest = new LogoutRequest($legacySettings, $prepareRequest($rsa15Xml));
+        $this->assertTrue($legacyLogoutRequest->isValid());
+
+        $blockedLogoutRequest = new LogoutRequest(new Settings($settingsInfo), $prepareRequest($rsa15Xml));
+        $this->assertFalse($blockedLogoutRequest->isValid());
+        $this->assertStringContainsString(
+            'RSA-1.5 key transport is disabled',
+            $blockedLogoutRequest->getErrorException()->getMessage()
+        );
+    }
+
+    /**
+     * CBC data encryption is accepted by default and rejected when allowCBCEncryption is false
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::getNameIdData
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     */
+    public function testAllowCBCEncryption()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        $prepareRequest = function ($xml) {
+            $currentURL = Utils::getSelfRoutedURLNoQuery();
+            $xml = str_replace('http://idp.example.com/SingleLogoutService.php', $currentURL, $xml);
+            $xml = str_replace('http://stuff.com/endpoints/metadata.php', 'http://idp.example.com/', $xml);
+
+            return base64_encode(gzdeflate($xml));
+        };
+
+        // aes128-cbc + rsa-oaep-mgf1p
+        $cbcXml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid_oaep.xml');
+        $key = (new Settings($settingsInfo))->getSPkey();
+        $expectedNameId = 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69';
+
+        $this->assertEquals($expectedNameId, LogoutRequest::getNameId($cbcXml, $key));
+        $this->assertTrue((new LogoutRequest(new Settings($settingsInfo), $prepareRequest($cbcXml)))->isValid());
+
+        try {
+            LogoutRequest::getNameId($cbcXml, $key, false, false);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('Data encryption algorithm is not allowed', $e->getMessage());
+        }
+
+        $settingsInfo['security']['allowCBCEncryption'] = false;
+        $blockedLogoutRequest = new LogoutRequest(new Settings($settingsInfo), $prepareRequest($cbcXml));
+        $this->assertFalse($blockedLogoutRequest->isValid());
+        $this->assertStringContainsString(
+            'Data encryption algorithm is not allowed',
+            $blockedLogoutRequest->getErrorException()->getMessage()
+        );
+
+        // AES-GCM is still accepted
+        $gcmXml = $this->buildLogoutRequestWithEncryptedId($this->buildEncryptedNameId());
+        $this->assertEquals($expectedNameId, LogoutRequest::getNameId($gcmXml, $key, false, false));
+        $gcmLogoutRequest = new LogoutRequest(new Settings($settingsInfo), base64_encode(gzdeflate($gcmXml)));
+        $this->assertTrue($gcmLogoutRequest->isValid());
+    }
+
+    /**
+     * When signed messages are required, the EncryptedID is only decrypted after
+     * the signature has been verified
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     */
+    public function testEncryptedNameIdIsDecryptedAfterVerifyingTheSignature()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+
+        // An EncryptedID that can not be decrypted
+        $xml = $this->buildLogoutRequestWithEncryptedId($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, null, true));
+        $logoutRequest = new LogoutRequest(new Settings($settingsInfo), base64_encode(gzdeflate($xml)));
+        $this->assertFalse($logoutRequest->isValid());
+        $this->assertEquals('The Message of the Logout Request is not signed and the SP require it', $logoutRequest->getError());
+
+        // Without requiring signed messages it is decrypted
+        $settingsInfo['security']['wantMessagesSigned'] = false;
+        $logoutRequest = new LogoutRequest(new Settings($settingsInfo), base64_encode(gzdeflate($xml)));
+        $this->assertFalse($logoutRequest->isValid());
+        $this->assertEquals('Failure decrypting Data', $logoutRequest->getError());
+    }
+
+    /**
+     * An unsigned LogoutRequest with an EncryptedID whose session key has an
+     * unexpected size must be rejected, not crash the validation
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     */
+    public function testIsValidEncryptedNameIdUnexpectedKeySize()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settings = new Settings($settingsInfo);
+
+        $xml = $this->buildLogoutRequestWithEncryptedId($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, random_bytes(32)));
+        $logoutRequest = new LogoutRequest($settings, base64_encode(gzdeflate($xml)));
+        $this->assertFalse($logoutRequest->isValid());
+        $this->assertEquals('Failure decrypting Data', $logoutRequest->getError());
+
+        $xml = $this->buildLogoutRequestWithEncryptedId($this->buildEncryptedNameId());
+        $logoutRequest = new LogoutRequest($settings, base64_encode(gzdeflate($xml)));
+        $this->assertTrue($logoutRequest->isValid());
     }
 
     /**

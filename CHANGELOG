@@ -2,6 +2,18 @@ CHANGELOG
 =========
 
 v4.4.0
+* Update xmlseclibs requirement to ^4.0.1. See [GHSA-m5mw-mr39-66vp](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-m5mw-mr39-66vp) and other security vulnerabilities discovered on August.
+* Require PHP >= 8.0 (xmlseclibs 4 requirement)
+* Add `security.allowRSA15KeyTransport` setting (default false) to opt in to RSA-1.5 key transport for legacy IdPs with xmlseclibs 4
+* Add `security.allowCBCEncryption` setting (default true) to reject CBC data encryption (only AES-GCM is accepted) on received EncryptedAssertion and EncryptedID elements
+* Fix HTTP-Redirect signature validation for non RSA-SHA1 SigAlg with xmlseclibs 4 (castKey)
+* Fix fatal error when the decrypted key of an EncryptedID has an unexpected size with xmlseclibs 4
+* Encrypted NameIDs are now always generated with RSA-OAEP-MGF1P key transport (RSA-1.5 is rejected by default by xmlseclibs 4 receivers)
+* Support http://www.w3.org/2009/xmlenc11#rsa-oaep key transport on EncryptedID
+* In strict mode with `wantMessagesSigned`, verify the signature of a Response with an EncryptedAssertion before decrypting it (if it is not signed or the signature is invalid the assertion is not decrypted and isValid() reports the cause). The EncryptedID of a LogoutRequest is decrypted after its signature is verified
+* Add extra check at validateSign to confirm the signature covers the element it is attached to.
+* Report every decryption failure with the same error (ValidationError::DECRYPTION_FAILED), so a CBC padding error can not be told apart from a parsing error
+* Use stricts === and !== comparisons
 * PHP 8.5 Compatibility
 * Github Actions: Update Checkout to v4. Remove mcrypt install
 * [#648](https://github.com/SAML-Toolkits/php-saml/pull/648) Fix empty responseUrl bypassing SLO URL fallback

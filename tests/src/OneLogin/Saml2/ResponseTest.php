@@ -2,11 +2,14 @@
 
 namespace OneLogin\Saml2\Tests;
 
+use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\Response;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 use DOMDocument;
+use DOMXPath;
 use Exception;
 
 /**
@@ -15,7 +18,12 @@ use Exception;
 
 class ResponseTest extends \PHPUnit\Framework\TestCase
 {
+    use LegacyEncryptionSettingsTrait;
+    use EncryptedNameIdTrait;
+
     private $_settings;
+
+    private $_legacySettings;
 
     /**
      * Initializes the Test Suite
@@ -25,8 +33,8 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
-        $settings = new Settings($settingsInfo);
-        $this->_settings = $settings;
+        $this->_settings = new Settings($settingsInfo);
+        $this->_legacySettings = $this->createLegacyEncryptionSettings($settingsInfo);
     }
 
 
@@ -44,7 +52,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
 
         $xmlEnc = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $responseEnc = new Response($this->_settings, $xmlEnc);
+        $responseEnc = new Response($this->_legacySettings, $xmlEnc);
 
         $this->assertTrue($responseEnc instanceof Response);
     }
@@ -66,7 +74,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $encodedResponse2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $decryptedResponse2 = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
-        $response2 = new Response($this->_settings, $encodedResponse2);
+        $response2 = new Response($this->_legacySettings, $encodedResponse2);
         $responseDoc2 = new DOMDocument();
         $responseDoc2 = Utils::loadXML($responseDoc2, $decryptedResponse2);
         $responseParsedDoc2 = $response2->getXMLDocument();
@@ -130,11 +138,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('support@onelogin.com', $response->getNameId());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $response2->getNameId());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals('_68392312d490db6d355555cfbbd8ec95d746516f60', $response3->getNameId());
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_nameid.xml.base64');
@@ -223,11 +231,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', $response->getNameIdFormat());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified', $response2->getNameIdFormat());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals('urn:oasis:names:tc:SAML:2.0:nameid-format:transient', $response3->getNameIdFormat());
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_nameid.xml.base64');
@@ -252,10 +260,10 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_settings, $xml);
         $this->assertEquals('https://test.example.com/saml/metadata', $response->getNameIdNameQualifier());
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals(null, $response2->getNameIdNameQualifier());
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals(null, $response3->getNameIdNameQualifier());
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_nameid.xml.base64');
         $response4 = new Response($this->_settings, $xml4);
@@ -278,10 +286,10 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_settings, $xml);
         $this->assertNull($response->getNameIdSPNameQualifier());
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals('http://stuff.com/endpoints/metadata.php', $response2->getNameIdSPNameQualifier());
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals('http://stuff.com/endpoints/metadata.php', $response3->getNameIdSPNameQualifier());
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
         $response4 = new Response($this->_settings, $xml4);
@@ -314,7 +322,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedNameIdData, $nameIdData);
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $expectedNameIdData2 = array(
             'Value' => '2de11defd199f8d5bb63f9b7deb265ba5c675c10',
             'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
@@ -324,7 +332,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedNameIdData2, $nameIdData2);
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $expectedNameIdData3 = array(
             'Value' => '_68392312d490db6d355555cfbbd8ec95d746516f60',
             'Format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
@@ -526,7 +534,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response->checkStatus();
 
         $xmlEnc = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $responseEnc = new Response($this->_settings, $xmlEnc);
+        $responseEnc = new Response($this->_legacySettings, $xmlEnc);
 
         $response->checkStatus();
 
@@ -563,7 +571,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array('{audience}'), $response->getAudiences());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
 
         $this->assertEquals(array('http://stuff.com/endpoints/metadata.php'), $response2->getAudiences());
     }
@@ -579,11 +587,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array('http://login.example.com/issuer'), $response->getIssuers());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals(array('http://idp.example.com/'), $response2->getIssuers());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/double_signed_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/'), $response3->getIssuers());
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/double_signed_response.xml.base64');
@@ -591,7 +599,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php'), $response4->getIssuers());
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/signed_message_encrypted_assertion.xml.base64');
-        $response5 = new Response($this->_settings, $xml5);
+        $response5 = new Response($this->_legacySettings, $xml5);
         $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/'), $response5->getIssuers());
 
         $xml6 = file_get_contents(TEST_ROOT . '/data/responses/signed_assertion_response.xml.base64');
@@ -599,7 +607,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php'), $response6->getIssuers());
 
         $xml7 = file_get_contents(TEST_ROOT . '/data/responses/signed_encrypted_assertion.xml.base64');
-        $response7 = new Response($this->_settings, $xml7);
+        $response7 = new Response($this->_legacySettings, $xml7);
         $this->assertEquals(array('http://idp.example.com/'), $response7->getIssuers());
 
     }
@@ -616,11 +624,11 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array('http://login.example.com/issuer'), $response->getIssuers());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertEquals(array('http://idp.example.com/'), $response2->getIssuers());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/double_signed_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/'), $response3->getIssuers());
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_issuer_response.xml.base64');
@@ -651,7 +659,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('_531c32d283bdff7e04e487bcdbc4dd8d', $response->getSessionIndex());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
 
         $this->assertEquals('_7164a9a9f97828bfdb8d0ebc004a05d2e7d873f70c', $response2->getSessionIndex());
     }
@@ -684,7 +692,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         // Encrypted Attributes are not supported
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_attrs.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEmpty($response3->getAttributes());
 
         // Duplicated Attribute names
@@ -730,7 +738,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($response2->getAttributesWithFriendlyName());
         // Encrypted Attributes are not supported
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_attrs.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEmpty($response3->getAttributesWithFriendlyName());
         // Duplicated Attribute names
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/duplicated_attributes_with_friendly_names.xml.base64');
@@ -753,7 +761,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_2.xml.base64');
-        $response = new Response($this->_settings, $xml);
+        $response = new Response($this->_legacySettings, $xml);
 
         $nameId = $response->getNameId();
         $this->assertFalse($response->isValid());
@@ -834,8 +842,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $settingsInfo['idp']['certFingerprint'] = "385b1eec71143f00db6af936e2ea12a28771d72c";
         $settingsInfo['sp']['privateKey'] = 'MIICXAIBAAKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABAoGBALGR6bRBit+yV5TUU3MZSrf8WQSLWDLgs/33FQSAEYSib4+DJke2lKbI6jkGUoSJgFUXFbaQLtMY2+3VDsMKPBdAge9gIdvbkC4yoKjLGm/FBDOxxZcfLpR+9OPqU3qM9D0CNuliBWI7Je+p/zs09HIYucpDXy9E18KA1KNF6rfhAkEA9KoNam6wAKnmvMzz31ws3RuIOUeo2rx6aaVY95+P9tTxd6U+pNkwxy1aCGP+InVSwlYNA1aQ4Axi/GdMIWMkxwJBAPO1CP7cQNZQmu7yusY+GUObDII5YK9WLaY4RAicn5378crPBFxvUkqf9G6FHo7u88iTCIp+vwa3Hn9Tumg3iP0CQQDgUXWBasCVqzCxU5wY4tMDWjXYhpoLCpmVeRML3dDJt004rFm2HKe7Rhpw7PTZNQZOxUSjFeA4e0LaNf838UWLAkB8QfbHM3ffjhOg96PhhjINdVWoZCb230LBOHj/xxPfUmFTHcBEfQIBSJMxcrBFAnLL9qPpMXymqOFk3ETz9DTlAj8E0qGbp78aVbTOtuwEwNJII+RPw+Zkc+lKR+yaWkAzfIXw527NPHH3+rnBG72wyZr9ud4LAum9jh+5No1LQpk=';
         $settingsInfo['sp']['x509cert'] = 'MIICGzCCAYQCCQCNNcQXom32VDANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzELMAkGA1UECBMCSU4xFTATBgNVBAcTDEluZGlhbmFwb2xpczERMA8GA1UEChMIT25lTG9naW4xDDAKBgNVBAsTA0VuZzAeFw0xNDA0MjMxODQxMDFaFw0xNTA0MjMxODQxMDFaMFIxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJJTjEVMBMGA1UEBxMMSW5kaWFuYXBvbGlzMREwDwYDVQQKEwhPbmVMb2dpbjEMMAoGA1UECxMDRW5nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDo6m+QZvYQ/xL0ElLgupK1QDcYL4f5PckwsNgS9pUvV7fzTqCHk8ThLxTk42MQ2McJsOeUJVP728KhymjFCqxgP4VuwRk9rpAl0+mhy6MPdyjyA6G14jrDWS65ysLchK4t/vwpEDz0SQlEoG1kMzllSm7zZS3XregA7DjNaUYQqwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBALM2vGCiQ/vm+a6v40+VX2zdqHA2Q/1vF1ibQzJ54MJCOVWvs+vQXfZFhdm0OPM2IrDU7oqvKPqP6xOAeJK6H0yP7M4YL3fatSvIYmmfyXC9kt3Svz/NyrHzPhUnJ0ye/sUSXxnzQxwcm/9PwAqrQaA3QpQkH57ybF/OoryPe+2h';
-
-        $settings = new Settings($settingsInfo);
+        $settings = $this->createLegacyEncryptionSettings($settingsInfo);
 
         $xml = file_get_contents(TEST_ROOT . '/data/responses/wrapped_response_3.xml.base64');
         try {
@@ -886,7 +893,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($response2->getSessionNotOnOrAfter());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertEquals(2696012228, $response3->getSessionNotOnOrAfter());
     }
 
@@ -921,7 +928,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($response->validateTimestamps());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertTrue($response2->validateTimestamps());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/expired_response.xml.base64');
@@ -1056,13 +1063,13 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testIsInValidEncAttrs()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/encrypted_attrs.xml.base64');
-        $response = new Response($this->_settings, $xml);
+        $response = new Response($this->_legacySettings, $xml);
 
         $this->assertFalse($response->isValid());
         $this->assertEquals('No Signature found. SAML Response rejected', $response->getError());
 
-        $this->_settings->setStrict(true);
-        $response2 = new Response($this->_settings, $xml);
+        $this->_legacySettings->setStrict(true);
+        $response2 = new Response($this->_legacySettings, $xml);
 
         $this->assertFalse($response2->isValid());
         $this->assertEquals('There is an EncryptedAttribute in the Response and this SP not support them', $response2->getError());
@@ -1616,13 +1623,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($settings, $xml);
 
         $this->assertFalse(@$response->isValid());
-
-        $possibleErrors = [
-          "openssl_x509_read(): supplied parameter cannot be coerced into an X509 certificate!",
-          "openssl_x509_read(): X.509 Certificate cannot be retrieved",
-          "Unable to extract public key"
-        ];
-        $this->assertTrue(in_array($response->getError(), $possibleErrors));
+        $this->assertSame('Unable to extract certificate', $response->getError(false));
     }
 
     /**
@@ -1723,21 +1724,21 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testIsValidEnc()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/double_signed_encrypted_assertion.xml.base64');
-        $response = new Response($this->_settings, $xml);
+        $response = new Response($this->_legacySettings, $xml);
         $this->assertTrue($response->isValid());
 
         $xml2 = file_get_contents(TEST_ROOT . '/data/responses/signed_encrypted_assertion.xml.base64');
-        $response2 = new Response($this->_settings, $xml2);
+        $response2 = new Response($this->_legacySettings, $xml2);
         $this->assertTrue($response2->isValid());
 
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/signed_message_encrypted_assertion.xml.base64');
-        $response3 = new Response($this->_settings, $xml3);
+        $response3 = new Response($this->_legacySettings, $xml3);
         $this->assertTrue($response3->isValid());
 
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
         $settingsInfo['strict'] = true;
-        $settings = new Settings($settingsInfo);
+        $settings = $this->createLegacyEncryptionSettings($settingsInfo);
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         // In order to avoid the destination problem
@@ -1747,7 +1748,6 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $message4 = base64_encode($plainMessage4);
 
         $response4 = new Response($settings, $message4);
-
         $response4->isValid();
         $this->assertStringContainsString('No Signature found. SAML Response rejected', $response4->getError());
     }
@@ -1837,13 +1837,286 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testCanGetEncryptedNameIdInEncryptedAssertion()
     {
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion.xml.base64');
-        $response = new Response($this->_settings, $xml);
+        $response = new Response($this->_legacySettings, $xml);
         $this->assertTrue($response->isValid());
         $this->assertSame('user@example.com', $response->getNameId());
 
         $xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_encrypted_assertion2.xml.base64');
-        $response = new Response($this->_settings, $xml);
+        $response = new Response($this->_legacySettings, $xml);
         $this->assertTrue($response->isValid());
         $this->assertSame('492882615acf31c8096b627245d76ae53036c090', $response->getNameId());
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Response::getNameId
+     */
+    public function testEncryptedNameIdKeyTransport()
+    {
+        $expectedNameId = '2de11defd199f8d5bb63f9b7deb265ba5c675c10';
+
+        $oaepXml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_oaep.xml.base64');
+        $oaepResponse = new Response($this->_settings, $oaepXml);
+        $this->assertEquals($expectedNameId, $oaepResponse->getNameId());
+
+        $rsa15Xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
+        $legacyResponse = new Response($this->_legacySettings, $rsa15Xml);
+        $this->assertEquals($expectedNameId, $legacyResponse->getNameId());
+
+        try {
+            $blockedResponse = new Response($this->_settings, $rsa15Xml);
+            $blockedResponse->getNameId();
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
+        }
+    }
+
+    /**
+     * CBC data encryption is accepted by default and rejected when allowCBCEncryption is false
+     *
+     * @covers OneLogin\Saml2\Response::getNameId
+     * @covers OneLogin\Saml2\Response::decryptAssertion
+     */
+    public function testAllowCBCEncryption()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['allowCBCEncryption'] = false;
+        $gcmOnlySettings = new Settings($settingsInfo);
+        $gcmOnlyLegacySettings = $this->createLegacyEncryptionSettings($settingsInfo);
+
+        // aes128-cbc + rsa-oaep-mgf1p in an EncryptedID
+        $cbcXml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_oaep.xml.base64');
+        $response = new Response($this->_settings, $cbcXml);
+        $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $response->getNameId());
+
+        try {
+            $blockedResponse = new Response($gcmOnlySettings, $cbcXml);
+            $blockedResponse->getNameId();
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('Data encryption algorithm is not allowed', $e->getMessage());
+        }
+
+        // aes128-cbc in an EncryptedAssertion, rejected while constructing the Response
+        $cbcAssertionXml = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $response = new Response($this->_legacySettings, $cbcAssertionXml);
+        $this->assertNotEmpty($response->getNameId());
+
+        try {
+            new Response($gcmOnlyLegacySettings, $cbcAssertionXml);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('Data encryption algorithm is not allowed', $e->getMessage());
+        }
+
+        // AES-GCM is still accepted
+        $gcmXml = $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId());
+        $response = new Response($gcmOnlySettings, $gcmXml);
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $response->getNameId());
+    }
+
+    /**
+     * When signed messages are required, the signature of the Response is verified
+     * before decrypting the EncryptedAssertion
+     *
+     * @covers OneLogin\Saml2\Response::__construct
+     */
+    public function testMessageSignatureIsVerifiedBeforeDecrypting()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $settings = $this->createLegacyEncryptionSettings($settingsInfo);
+
+        // Signed Response: decrypted
+        $signedXml = file_get_contents(TEST_ROOT . '/data/responses/signed_message_encrypted_assertion.xml.base64');
+        $response = new Response($settings, $signedXml);
+        $this->assertEquals(array('https://pitbulk.no-ip.org/simplesaml/saml2/idp/metadata.php', 'http://idp.example.com/'), $response->getIssuers());
+
+        $this->assertTrue($response->encrypted);
+
+        // Unsigned Response: not decrypted, reported by isValid
+        $unsignedXml = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $unsignedResponse = new Response($settings, $unsignedXml);
+        $this->assertFalse($unsignedResponse->encrypted);
+        $this->assertFalse($unsignedResponse->isValid());
+        $this->assertSame(ValidationError::NO_SIGNED_MESSAGE, $unsignedResponse->getErrorException()->getCode());
+
+        // Signed Response with a tampered ciphertext
+        $dom = new DOMDocument();
+        $dom->loadXML(base64_decode($signedXml));
+        $xpath = new DOMXPath($dom);
+        $xpath->registerNamespace('samlp', Constants::NS_SAMLP);
+        $xpath->registerNamespace('saml', Constants::NS_SAML);
+        $xpath->registerNamespace('xenc', Constants::NS_XENC);
+        $cipherValue = $xpath->query('/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData/xenc:CipherData/xenc:CipherValue')->item(0);
+        $cipherValue->nodeValue = base64_encode(random_bytes(64));
+        $tamperedXml = base64_encode($dom->saveXML());
+
+        $tamperedResponse = new Response($settings, $tamperedXml);
+        $this->assertFalse($tamperedResponse->encrypted);
+        $this->assertFalse($tamperedResponse->isValid());
+        $this->assertSame('Reference validation failed', $tamperedResponse->getError());
+
+        // Without strict, the tampered ciphertext reaches the decryption
+        $settingsInfo['strict'] = false;
+        $settingsInfo['security']['wantMessagesSigned'] = false;
+        try {
+            new Response($this->createLegacyEncryptionSettings($settingsInfo), $tamperedXml);
+            $this->fail('ValidationError was not raised');
+        } catch (ValidationError $e) {
+            $this->assertSame(ValidationError::DECRYPTION_FAILED, $e->getCode());
+        }
+
+        // The signature is only required in strict mode
+        $settingsInfo['strict'] = false;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $response = new Response($this->createLegacyEncryptionSettings($settingsInfo), $unsignedXml);
+        $this->assertTrue($response->encrypted);
+        $this->assertEquals(array('http://idp.example.com/'), $response->getIssuers());
+    }
+
+    /**
+     * The EncryptedID of the Subject of an EncryptedAssertion is decrypted with any
+     * data and key transport algorithm, and the algorithm settings apply to it
+     *
+     * @covers OneLogin\Saml2\Response::decryptNameId
+     */
+    public function testEncryptedNameIdInEncryptedAssertionAlgorithms()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['allowCBCEncryption'] = false;
+        $withoutCBC = $this->createLegacyEncryptionSettings($settingsInfo);
+
+        $nameId = '<saml:NameID xmlns:saml="' . Constants::NS_SAML . '">subject-nameid</saml:NameID>';
+        $cases = array(
+            array(XMLSecurityKey::AES128_GCM, XMLSecurityKey::RSA_OAEP_MGF1P),
+            array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::RSA_OAEP_MGF1P),
+            array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::RSA_1_5),
+        );
+        foreach ($cases as $case) {
+            list($dataAlgorithm, $keyAlgorithm) = $case;
+            $encryptedId = '<saml:EncryptedID xmlns:saml="' . Constants::NS_SAML . '">'
+                . $this->encryptForSP($nameId, $keyAlgorithm, null, false, $dataAlgorithm)
+                . '</saml:EncryptedID>';
+            $xml = $this->buildResponseWithEncryptedAssertion($encryptedId);
+
+            $response = new Response($this->_legacySettings, $xml);
+            $this->assertTrue($response->encryptedNameId, $dataAlgorithm . ' ' . $keyAlgorithm);
+            $this->assertSame('subject-nameid', $response->getNameId(), $dataAlgorithm . ' ' . $keyAlgorithm);
+
+            if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
+                try {
+                    new Response($this->_settings, $xml);
+                    $this->fail('Exception was not raised');
+                } catch (Exception $e) {
+                    $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
+                }
+            }
+            if ($dataAlgorithm === XMLSecurityKey::AES128_CBC) {
+                try {
+                    new Response($withoutCBC, $xml);
+                    $this->fail('Exception was not raised');
+                } catch (Exception $e) {
+                    $this->assertStringContainsString('Data encryption algorithm is not allowed', $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * An EncryptedAssertion whose plaintext does not declare the saml namespace (it is declared
+     * by the Response) can have an EncryptedID in its Subject: the NameID can be read, with
+     * the EncryptedID declaring its own namespace or not
+     *
+     * @covers OneLogin\Saml2\Response::getNameId
+     */
+    public function testEncryptedNameIdInEncryptedAssertionWithoutNamespaceDeclarations()
+    {
+        $nameIdDoc = new DOMDocument();
+        $nameIdDoc->loadXML('<saml:NameID xmlns:saml="' . Constants::NS_SAML . '">subject-nameid</saml:NameID>');
+        $encryptedNameId = $this->encryptForSP($nameIdDoc->saveXML($nameIdDoc->documentElement));
+
+        foreach (array('<saml:EncryptedID xmlns:saml="' . Constants::NS_SAML . '">', '<saml:EncryptedID>') as $encryptedIdTag) {
+            // As a child of a node that declares the namespace, the Assertion is encrypted without declaring it
+            $holderXml = '<holder xmlns:saml="' . Constants::NS_SAML . '">'
+                . '<saml:Assertion ID="_cccd6024116641fe48e0ae2c51220d02755f96c98d" Version="2.0" IssueInstant="2014-03-31T18:23:24Z">'
+                . '<saml:Issuer>http://idp.example.com/</saml:Issuer>'
+                . '<saml:Subject>' . $encryptedIdTag . $encryptedNameId . '</saml:EncryptedID></saml:Subject>'
+                . '</saml:Assertion></holder>';
+            $holder = new DOMDocument();
+            $holder->loadXML($holderXml);
+            $encryptedAssertion = $this->encryptForSP($holder->documentElement->firstChild);
+
+            $xml = '<samlp:Response xmlns:samlp="' . Constants::NS_SAMLP . '" xmlns:saml="' . Constants::NS_SAML . '" ID="_r1" Version="2.0" IssueInstant="2014-03-31T18:23:24Z">'
+                . '<saml:Issuer>http://idp.example.com/</saml:Issuer>'
+                . '<samlp:Status><samlp:StatusCode Value="' . Constants::STATUS_SUCCESS . '"/></samlp:Status>'
+                . '<saml:EncryptedAssertion>' . $encryptedAssertion . '</saml:EncryptedAssertion>'
+                . '</samlp:Response>';
+
+            $response = new Response($this->_settings, base64_encode($xml));
+            $this->assertSame('subject-nameid', $response->getNameId(), $encryptedIdTag);
+        }
+    }
+
+    /**
+     * Only the EncryptedID of the Subject of the Assertion is decrypted
+     *
+     * @covers OneLogin\Saml2\Response::decryptAssertion
+     */
+    public function testOnlyTheEncryptedIdOfTheSubjectIsDecrypted()
+    {
+        $assertion = '<saml:Assertion xmlns:saml="' . Constants::NS_SAML . '" ID="_cccd6024116641fe48e0ae2c51220d02755f96c98d" Version="2.0" IssueInstant="2014-03-31T18:23:24Z">'
+            . '<saml:Issuer>http://idp.example.com/</saml:Issuer>'
+            . '<saml:Advice>' . $this->buildEncryptedNameId() . '</saml:Advice>'
+            . '<saml:Subject><saml:NameID>REAL</saml:NameID></saml:Subject>'
+            . '</saml:Assertion>';
+
+        $xml = '<samlp:Response xmlns:samlp="' . Constants::NS_SAMLP . '" xmlns:saml="' . Constants::NS_SAML . '" ID="_r1" Version="2.0" IssueInstant="2014-03-31T18:23:24Z">'
+            . '<saml:Issuer>http://idp.example.com/</saml:Issuer>'
+            . '<samlp:Status><samlp:StatusCode Value="' . Constants::STATUS_SUCCESS . '"/></samlp:Status>'
+            . '<saml:EncryptedAssertion>' . $this->encryptForSP($assertion) . '</saml:EncryptedAssertion>'
+            . '</samlp:Response>';
+
+        $response = new Response($this->_settings, base64_encode($xml));
+        $this->assertFalse($response->encryptedNameId);
+        $this->assertSame('REAL', $response->getNameId());
+        $this->assertStringContainsString('EncryptedID', $response->getXMLDocument()->saveXML());
+    }
+
+    /**
+     * EncryptedID (EncryptedKey inside its KeyInfo) inside an EncryptedAssertion
+     *
+     * @covers OneLogin\Saml2\Response::getNameId
+     */
+    public function testEncryptedNameIdInEncryptedAssertionKeyTransport()
+    {
+        foreach (array(XMLSecurityKey::RSA_OAEP_MGF1P, XMLSecurityKey::RSA_OAEP) as $keyTransport) {
+            $response = new Response($this->_settings, $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId($keyTransport)));
+            $this->assertTrue($response->encryptedNameId);
+            $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $response->getNameId());
+        }
+
+        $rsa15Xml = $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId(XMLSecurityKey::RSA_1_5));
+        $response = new Response($this->_legacySettings, $rsa15Xml);
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $response->getNameId());
+
+        try {
+            new Response($this->_settings, $rsa15Xml);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
+        }
+
+        // Decrypted while constructing the Response, before any signature validation
+        try {
+            new Response($this->_settings, $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, random_bytes(32))));
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertEquals('Failure decrypting Data', $e->getMessage());
+        }
     }
 }

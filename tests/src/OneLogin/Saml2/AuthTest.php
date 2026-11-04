@@ -16,6 +16,8 @@ use Exception;
  */
 class AuthTest extends \PHPUnit\Framework\TestCase
 {
+    use LegacyEncryptionSettingsTrait;
+
     private $_auth;
     private $_settingsInfo;
 
@@ -203,6 +205,29 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
         $errorException = $this->_auth->getLastErrorException();
         $this->assertEquals("Reference validation failed", $errorException->getMessage());
+    }
+
+    /**
+     * Tests the processResponse method of the Auth class
+     * Case Response with an EncryptedAssertion that is not signed when signed messages
+     * are required: it is reported as an invalid response instead of raising an
+     * exception, and the assertion is not decrypted
+     *
+     * @covers OneLogin\Saml2\Auth::processResponse
+     */
+    public function testProcessResponseEncryptedAssertionNotSignedWhenRequired()
+    {
+        $settingsInfo = $this->createLegacyEncryptionSettingsInfo($this->_settingsInfo);
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+
+        $auth = new Auth($settingsInfo);
+        $auth->processResponse();
+
+        $this->assertFalse($auth->isAuthenticated());
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals('The Message of the Response is not signed and the SP requires it', $auth->getLastErrorReason());
     }
 
     /**
@@ -1469,7 +1494,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests that we can get most recently constructed
-     * LogoutResponse.
+     * LogoutRequest.
      *
      * @covers OneLogin\Saml2\Auth::getLastRequestXML()
      */
@@ -1512,13 +1537,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
         $response = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
         $this->_auth->processResponse();
-        file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
         $this->assertEquals($response, $this->_auth->getLastResponseXML());
 
         $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $decryptedResponse = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
-        $this->_auth->processResponse();
-        $this->assertEquals($decryptedResponse, $this->_auth->getLastResponseXML());
+        $legacyAuth = new Auth($this->createLegacyEncryptionSettingsInfo($this->_settingsInfo));
+        $legacyAuth->processResponse();
+        $this->assertEquals($decryptedResponse, $legacyAuth->getLastResponseXML());
     }
 
     /**
