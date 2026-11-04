@@ -443,6 +443,11 @@ class Settings
             $this->_security['allowRSA15KeyTransport'] = false;
         }
 
+        // CBC data encryption (unauthenticated, padding oracle; accepted by default by xmlseclibs 4)
+        if (!isset($this->_security['allowCBCEncryption'])) {
+            $this->_security['allowCBCEncryption'] = true;
+        }
+
         if (!isset($this->_security['lowercaseUrlencoding'])) {
             $this->_security['lowercaseUrlencoding'] = false;
         }

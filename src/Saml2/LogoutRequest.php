@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of php-saml.
  *
@@ -10,10 +11,10 @@
  * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
  * @link    https://github.com/SAML-Toolkits/php-saml
  */
+
 namespace OneLogin\Saml2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
-
 use DOMDocument;
 use Exception;
 
@@ -104,13 +105,13 @@ class LogoutRequest
             /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
-            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_ENTITY) {
+            if (!empty($nameIdFormat) && $nameIdFormat === Constants::NAMEID_ENTITY) {
                 $nameIdNameQualifier = null;
                 $nameIdSPNameQualifier = null;
             }
 
             // NameID Format UNSPECIFIED omitted
-            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_UNSPECIFIED) {
+            if (!empty($nameIdFormat) && $nameIdFormat === Constants::NAMEID_UNSPECIFIED) {
                 $nameIdFormat = null;
             }
 
@@ -218,7 +219,7 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameIdData($request, $key = null, $allowRSA15KeyTransport = false)
+    public static function getNameIdData($request, $key = null, $allowRSA15KeyTransport = false, $allowCBCEncryption = true)
     {
         if ($request instanceof DOMDocument) {
             $dom = $request;
@@ -240,10 +241,10 @@ LOGOUTREQUEST;
                 );
             }
 
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
             $seckey->loadKey($key);
 
-            $nameId = Utils::decryptElement($encryptedData, $seckey, allowRSA15KeyTransport: $allowRSA15KeyTransport);
+            $nameId = Utils::decryptElement($encryptedData, $seckey, allowRSA15KeyTransport: $allowRSA15KeyTransport, allowCBCEncryption: $allowCBCEncryption);
 
         } else {
             $entries = Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
@@ -282,9 +283,9 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameId($request, $key = null, $allowRSA15KeyTransport = false)
+    public static function getNameId($request, $key = null, $allowRSA15KeyTransport = false, $allowCBCEncryption = true)
     {
-        $nameId = self::getNameIdData($request, $key, $allowRSA15KeyTransport);
+        $nameId = self::getNameIdData($request, $key, $allowRSA15KeyTransport, $allowCBCEncryption);
         return $nameId['Value'];
     }
 
@@ -414,12 +415,6 @@ LOGOUTREQUEST;
                     }
                 }
 
-                static::getNameId(
-                    $dom,
-                    $this->_settings->getSPkey(),
-                    $security['allowRSA15KeyTransport']
-                );
-
                 // Check issuer
                 $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
@@ -446,6 +441,16 @@ LOGOUTREQUEST;
                     );
                 }
             }
+
+            // An EncryptedID is only decrypted once the signature has been verified,
+            // so tampered ciphertexts do not reach the decryption code
+            $security = $this->_settings->getSecurityData();
+            static::getNameId(
+                $dom,
+                $this->_settings->getSPkey(),
+                $security['allowRSA15KeyTransport'],
+                $security['allowCBCEncryption']
+            );
 
             return true;
         } catch (Exception $e) {

@@ -20,6 +20,7 @@ use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
 use Exception;
+use Throwable;
 
 /**
  * SAML 2 Authentication Response
@@ -76,6 +77,20 @@ class Response
     private $_error;
 
     /**
+     * If the message was rejected before decrypting it, this var has the cause (reported by isValid)
+     *
+     * @var Exception|null
+     */
+    private $_messageSignatureError;
+
+    /**
+     * If the signature of the message was already validated
+     *
+     * @var Exception|null
+     */
+    private $_responseSignatureValidated = false;
+
+    /**
      * NotOnOrAfter value of a valid SubjectConfirmationData node
      *
      * @var int
@@ -114,9 +129,57 @@ class Response
         // Quick check for the presence of EncryptedAssertion
         $encryptedAssertionNodes = $this->document->getElementsByTagName('EncryptedAssertion');
         if ($encryptedAssertionNodes->length !== 0) {
+            try {
+                $this->validateMessageSignatureBeforeDecryption();
+                $this->_responseSignatureValidated = true;
+            } catch (Throwable $e) {
+                // The EncryptedAssertion is not decrypted. isValid() reports the cause
+                $this->_messageSignatureError = $e instanceof Exception ? $e : new ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    ValidationError::INVALID_SIGNATURE
+                );
+                return;
+            }
             $this->decryptedDocument = clone $this->document;
             $this->encrypted = true;
             $this->decryptedDocument = $this->decryptAssertion($this->decryptedDocument);
+        }
+    }
+
+    /**
+     * When signed messages are required, the Response signature also covers the
+     * EncryptedAssertion, so it is verified before decrypting: tampered
+     * ciphertexts never reach the decryption code (no padding oracle).
+     *
+     * @throws Exception
+     * @throws ValidationError
+     */
+    private function validateMessageSignatureBeforeDecryption()
+    {
+        // We only pre validate the signature of the Response if strict mode is enabled, otherwise we validate signature later.
+        if (!$this->_settings->isStrict()) {
+            return;
+        }
+
+        $security = $this->_settings->getSecurityData();
+        $hasSignedResponse = Utils::query($this->document, Utils::RESPONSE_SIGNATURE_XPATH)->length == 1;
+        if ($hasSignedResponse) {
+            $idpData = $this->_settings->getIdPData();
+            $multiCerts = null;
+            if (isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing'])) {
+                $multiCerts = $idpData['x509certMulti']['signing'];
+            }
+            if (!Utils::validateSign($this->document, $idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+                throw new ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    ValidationError::INVALID_SIGNATURE
+                );
+            }
+        } else if ($security['wantMessagesSigned']) {
+            throw new ValidationError(
+                "The Message of the Response is not signed and the SP requires it",
+                ValidationError::NO_SIGNED_MESSAGE
+            );
         }
     }
 
@@ -134,8 +197,13 @@ class Response
     {
         $this->_error = null;
         try {
+            // The message was rejected before decrypting it
+            if ($this->_messageSignatureError !== null) {
+                throw $this->_messageSignatureError;
+            }
+
             // Check SAML version
-            if ($this->document->documentElement->getAttribute('Version') != '2.0') {
+            if ($this->document->documentElement->getAttribute('Version') !== '2.0') {
                 throw new ValidationError(
                     "Unsupported SAML version",
                     ValidationError::UNSUPPORTED_SAML_VERSION
@@ -213,7 +281,7 @@ class Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                if (isset($requestId) && $requestId !== $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new ValidationError(
                             "No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: $requestId",
@@ -340,7 +408,7 @@ class Response
                 $anySubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
                 foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != Constants::CM_BEARER) {
+                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') !== Constants::CM_BEARER) {
                         continue;
                     }
                     $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
@@ -350,7 +418,7 @@ class Response
                         $scnData = $subjectConfirmationDataNodes->item(0);
                         if ($scnData->hasAttribute('InResponseTo')) {
                             $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
+                            if (isset($responseInResponseTo) && $responseInResponseTo !== $inResponseTo) {
                                 continue;
                             }
                         }
@@ -421,12 +489,14 @@ class Response
                     $multiCerts = $idpData['x509certMulti']['signing'];
                 }
 
-                // If find a Signature on the Response, validates it checking the original response
-                if ($hasSignedResponse && !Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
-                    throw new ValidationError(
-                        "Signature validation failed. SAML Response rejected",
-                        ValidationError::INVALID_SIGNATURE
-                    );
+                // If find a Signature on the Response, validates it checking the original response, if not already validated
+                if (!$this->_responseSignatureValidated) {
+                    if ($hasSignedResponse && !Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+                        throw new ValidationError(
+                            "Signature validation failed. SAML Response rejected",
+                            ValidationError::INVALID_SIGNATURE
+                        );
+                    }
                 }
 
                 // If find a Signature on the Assertion (decrypted assertion if was encrypted)
@@ -630,7 +700,8 @@ class Response
             $nameId = Utils::decryptElement(
                 $encryptedData,
                 $seckey,
-                allowRSA15KeyTransport: $security['allowRSA15KeyTransport']
+                allowRSA15KeyTransport: $security['allowRSA15KeyTransport'],
+                allowCBCEncryption: $security['allowCBCEncryption']
             );
 
         } else {
@@ -664,7 +735,7 @@ class Response
                     if ($this->_settings->isStrict() && $attr == 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
-                        if ($spEntityId != $nameId->getAttribute($attr)) {
+                        if ($spEntityId !== $nameId->getAttribute($attr)) {
                             throw new ValidationError(
                                 "The SPNameQualifier value mismatch the SP entityID value.",
                                 ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
@@ -899,7 +970,7 @@ class Response
 
             $signedElement = '{'.$signNode->parentNode->namespaceURI.'}'.$signNode->parentNode->localName;
 
-            if ($signedElement != $responseTag && $signedElement != $assertionTag) {
+            if ($signedElement !== $responseTag && $signedElement !== $assertionTag) {
                 throw new ValidationError(
                     "Invalid Signature Element $signedElement SAML Response rejected",
                     ValidationError::WRONG_SIGNED_ELEMENT
@@ -930,7 +1001,7 @@ class Response
                 if (!empty($sei)) {
                     $sei = substr($sei, 1);
 
-                    if ($sei != $idValue) {
+                    if ($sei !== $idValue) {
                         throw new ValidationError(
                             'Found an invalid Signed Element. SAML Response rejected',
                             ValidationError::INVALID_SIGNED_ELEMENT
@@ -1139,8 +1210,12 @@ class Response
             );
         }
 
-        $objenc = Utils::createDecryptionContext($this->_settings->getSecurityData()['allowRSA15KeyTransport']);
-        $encData = $objenc->locateEncryptedData($dom);
+        $security = $this->_settings->getSecurityData();
+        $objenc = Utils::createDecryptionContext($security['allowRSA15KeyTransport'], $security['allowCBCEncryption']);
+
+        // The EncryptedData of the EncryptedAssertion, not the first one of the document
+        $doc = $dom instanceof DOMDocument ? $dom : $dom->ownerDocument;
+        $encData = Utils::query($doc, '/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData')->item(0);
         if (!$encData) {
             throw new ValidationError(
                 "Cannot locate encrypted assertion",
@@ -1157,38 +1232,51 @@ class Response
             );
         }
 
-        $key = null;
-        if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
-            if ($objKeyInfo->isEncrypted) {
-                $objencKey = $objKeyInfo->encryptedCtx;
-                $objKeyInfo->loadKey($pem, false, false);
-                $key = $objencKey->decryptKey($objKeyInfo);
-            } else {
-                // symmetric encryption key support
-                $objKeyInfo->loadKey($pem, false, false);
+        $objKeyInfo = $objenc->locateKeyInfo($objKey);
+
+        // Failures from here depend on the decrypted bytes: report them all the same way
+        $useInternalErrors = libxml_use_internal_errors(true);
+        try {
+            $key = null;
+            if ($objKeyInfo) {
+                if ($objKeyInfo->isEncrypted) {
+                    $objencKey = $objKeyInfo->encryptedCtx;
+                    $objKeyInfo->loadKey($pem, false, false);
+                    $key = $objencKey->decryptKey($objKeyInfo);
+                } else {
+                    // symmetric encryption key support
+                    $objKeyInfo->loadKey($pem, false, false);
+                }
             }
+
+            if (empty($objKey->key)) {
+                $objKey->loadKey($key);
+            }
+
+            $decryptedXML = $objenc->decryptNode($objKey, false);
+            $decrypted = new DOMDocument();
+            $check = Utils::loadXML($decrypted, $decryptedXML);
+            if ($check === false) {
+                throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
+            }
+        } catch (Throwable $e) {
+            throw new ValidationError(
+                XMLSecurityKey::DECRYPTION_FAILURE,
+                ValidationError::DECRYPTION_FAILED
+            );
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($useInternalErrors);
         }
 
-        if (empty($objKey->key)) {
-            $objKey->loadKey($key);
-        }
+        // check if the Subject of the decrypted assertion contains an encryptedID
+        $encryptedData = Utils::query($decrypted, '/saml:Assertion/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->item(0);
 
-        $decryptedXML = $objenc->decryptNode($objKey, false);
-        $decrypted = new DOMDocument();
-        $check = Utils::loadXML($decrypted, $decryptedXML);
-        if ($check === false) {
-            throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
-        }
-
-        // check if the decrypted assertion contains an encryptedID
-        $encryptedID = $decrypted->getElementsByTagName('EncryptedID')->item(0);
-
-        if ($encryptedID) {
+        if ($encryptedData) {
             // decrypt the encryptedID
             $this->encryptedNameId = true;
-            $encryptedData = $encryptedID->getElementsByTagName('EncryptedData')->item(0);
             $nameId = $this->decryptNameId($encryptedData, $pem);
-            Utils::treeCopyReplace($encryptedID, $nameId);
+            Utils::treeCopyReplace($encryptedData->parentNode, $nameId);
         }
 
         if ($encData->parentNode instanceof DOMDocument) {
@@ -1235,9 +1323,11 @@ class Response
     {
         $security = $this->_settings->getSecurityData();
         $allowRSA15KeyTransport = $security['allowRSA15KeyTransport'];
+        $allowCBCEncryption = $security['allowCBCEncryption'];
 
-        $objenc = Utils::createDecryptionContext($allowRSA15KeyTransport);
-        $encData = $objenc->locateEncryptedData($encryptedData);
+        $objenc = Utils::createDecryptionContext($allowRSA15KeyTransport, $allowCBCEncryption);
+        // The given EncryptedData, not the first one of the document
+        $encData = $encryptedData;
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
@@ -1269,7 +1359,8 @@ class Response
         return Utils::decryptElement(
             $encryptedData,
             $inputKey,
-            allowRSA15KeyTransport: $allowRSA15KeyTransport
+            allowRSA15KeyTransport: $allowRSA15KeyTransport,
+            allowCBCEncryption: $allowCBCEncryption
         );
     }
 

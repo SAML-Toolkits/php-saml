@@ -136,6 +136,12 @@ $advancedSettings = array(
         // Enable only for IdPs that still use RSA-1.5; prefer RSA-OAEP where possible.
         'allowRSA15KeyTransport' => false,
 
+        // Allow CBC data encryption (aes*-cbc, tripledes-cbc) when decrypting encrypted
+        // assertions/NameIDs. CBC is not authenticated and is exposed to padding oracle
+        // attacks. Set it to false to only accept AES-GCM if your IdP supports it
+        // (xmlseclibs 4 still accepts CBC by default).
+        'allowCBCEncryption' => true,
+
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
         'lowercaseUrlencoding' => false,

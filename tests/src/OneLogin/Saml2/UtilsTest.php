@@ -9,6 +9,7 @@ use OneLogin\Saml2\ValidationError;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use DOMDocument;
+use DOMXPath;
 use Exception;
 
 /**
@@ -18,6 +19,8 @@ use Exception;
  */
 class UtilsTest extends \PHPUnit\Framework\TestCase
 {
+    use EncryptedNameIdTrait;
+
     /**
      * Tests the loadXML method of the Utils
      *
@@ -922,7 +925,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         );
 
         $nameidExpectedEncId = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"';
-        $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
+        $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>';
 
         $this->assertStringContainsString($nameidExpectedEncId, $nameIdEnc);
         $this->assertStringContainsString($nameidExpectedEncData, $nameIdEnc);
@@ -997,7 +1000,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         );
 
         $nameidExpectedEncId = '<saml:EncryptedID><xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"';
-        $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/><xenc:CipherData><xenc:CipherValue>';
+        $nameidExpectedEncData = '<xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"><xenc:EncryptedKey><xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/><xenc:CipherData><xenc:CipherValue>';
 
         $this->assertStringContainsString($nameidExpectedEncId, $nameIdEnc);
         $this->assertStringContainsString($nameidExpectedEncData, $nameIdEnc);
@@ -1225,6 +1228,235 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertStringContainsString('RSA-1.5 key transport is disabled', $e->getMessage());
+        }
+    }
+
+    /**
+     * A decrypted session key of unexpected size must fail as a regular decryption error
+     *
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     */
+    public function testDecryptElementUnexpectedKeySize()
+    {
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        foreach (array(5, 24, 32) as $size) {
+            $dom = new DOMDocument();
+            $dom->loadXML($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, random_bytes($size)));
+            try {
+                Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey);
+                $this->fail('Exception was not raised');
+            } catch (Exception $e) {
+                $this->assertEquals('Failure decrypting Data', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * With RSA-1.5 enabled, an invalid key transport must be indistinguishable from a valid one
+     *
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     */
+    public function testDecryptElementRSA15NoOracle()
+    {
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        $encryptedIds = array(
+            'garbage' => $this->buildEncryptedNameId(XMLSecurityKey::RSA_1_5, null, true),
+            'wrongKey' => $this->buildEncryptedNameId(XMLSecurityKey::RSA_1_5, random_bytes(16)),
+            'wrongSize' => $this->buildEncryptedNameId(XMLSecurityKey::RSA_1_5, random_bytes(5)),
+        );
+        foreach ($encryptedIds as $encryptedId) {
+            $dom = new DOMDocument();
+            $dom->loadXML($encryptedId);
+            try {
+                Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey, true, true);
+                $this->fail('Exception was not raised');
+            } catch (Exception $e) {
+                $this->assertEquals('Failure decrypting Data', $e->getMessage());
+            }
+        }
+
+        $dom = new DOMDocument();
+        $dom->loadXML($this->buildEncryptedNameId(XMLSecurityKey::RSA_1_5));
+        $decrypted = Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey, true, true);
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $decrypted->nodeValue);
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     * @covers OneLogin\Saml2\Utils::createDecryptionContext
+     */
+    public function testDecryptElementAllowCBCEncryption()
+    {
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        // aes128-cbc + rsa-oaep-mgf1p
+        $dom = new DOMDocument();
+        $dom->loadXML(base64_decode(file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_oaep.xml.base64')));
+        $encryptedData = $dom->getElementsByTagName('EncryptedData')->item(0);
+
+        $decrypted = Utils::decryptElement($encryptedData, $seckey);
+        $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $decrypted->nodeValue);
+
+        try {
+            Utils::decryptElement($encryptedData, $seckey, true, false, false);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertEquals("Data encryption algorithm is not allowed: '" . XMLSecurityKey::AES128_CBC . "'", $e->getMessage());
+        }
+
+        // AES-GCM is still accepted
+        $dom = new DOMDocument();
+        $dom->loadXML($this->buildEncryptedNameId());
+        $decrypted = Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey, true, false, false);
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $decrypted->nodeValue);
+    }
+
+    /**
+     * Every failure that depends on the decrypted bytes is reported the same way,
+     * so a CBC padding error can not be told apart from a parsing error
+     *
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     */
+    public function testDecryptElementFailuresAreUniform()
+    {
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        $nameId = '<saml:NameID xmlns:saml="' . Constants::NS_SAML . '">ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69</saml:NameID>';
+        $encryptedData = $this->encryptForSP($nameId, XMLSecurityKey::RSA_OAEP_MGF1P, null, false, XMLSecurityKey::AES128_CBC);
+
+        $failures = 0;
+        $outcomes = array();
+        for ($value = 0; $value < 256; $value++) {
+            $dom = new DOMDocument();
+            $dom->loadXML($encryptedData);
+            $xpath = new DOMXPath($dom);
+            $xpath->registerNamespace('xenc', Constants::NS_XENC);
+            $cipherValue = $xpath->query('/xenc:EncryptedData/xenc:CipherData/xenc:CipherValue')->item(0);
+
+            // The last byte of the second to last block changes the padding byte of the
+            // plaintext (and garbles the previous block): invalid padding for most values,
+            // valid padding but invalid XML for 1 to 16
+            $raw = base64_decode($cipherValue->nodeValue);
+            $raw[strlen($raw) - 17] = chr($value);
+            $cipherValue->nodeValue = base64_encode($raw);
+
+            try {
+                Utils::decryptElement($dom->documentElement, $seckey);
+            } catch (ValidationError $e) {
+                $failures++;
+                $outcomes[$e->getCode() . ': ' . $e->getMessage()] = true;
+            }
+        }
+
+        $this->assertGreaterThan(240, $failures);
+        $this->assertSame(array(ValidationError::DECRYPTION_FAILED . ': Failure decrypting Data'), array_keys($outcomes));
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     */
+    public function testDecryptElementRSAOAEP()
+    {
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        $dom = new DOMDocument();
+        $dom->loadXML($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP));
+        $decrypted = Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey);
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $decrypted->nodeValue);
+    }
+
+    /**
+     * An encrypted NameID generated by the toolkit can be decrypted with the default settings
+     *
+     * @covers OneLogin\Saml2\Utils::generateNameId
+     */
+    public function testGenerateNameIdEncryptedRoundTrip()
+    {
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+        $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
+        $seckey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+
+        foreach (array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES128_GCM) as $encAlg) {
+            $nameIdEnc = Utils::generateNameId('ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde', null, null, $cert, null, $encAlg);
+            $this->assertStringNotContainsString(XMLSecurityKey::RSA_1_5, $nameIdEnc);
+
+            $dom = new DOMDocument();
+            $dom->loadXML('<root xmlns:saml="' . Constants::NS_SAML . '">' . $nameIdEnc . '</root>');
+            $decrypted = Utils::decryptElement($dom->getElementsByTagName('EncryptedData')->item(0), $seckey);
+            $this->assertEquals('ONELOGIN_ce998811003f4e60f8b07a311dc641621379cfde', $decrypted->nodeValue);
+        }
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::castKey
+     */
+    public function testCastKey()
+    {
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+        $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
+        $key->loadKey($cert, false, true);
+
+        $this->assertSame($key, Utils::castKey($key, XMLSecurityKey::RSA_SHA1));
+
+        $newKey = Utils::castKey($key, XMLSecurityKey::RSA_SHA256);
+        $this->assertEquals(XMLSecurityKey::RSA_SHA256, $newKey->type);
+        $this->assertEquals($key->getX509Certificate(), $newKey->getX509Certificate());
+
+        $privateKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, array('type' => 'private'));
+        $privateKey->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+        $this->assertEquals(1, $newKey->verifySignature('data', $privateKey->signData('data')));
+
+        try {
+            Utils::castKey($key, XMLSecurityKey::HMAC_SHA1);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertEquals('Unsupported signing algorithm.', $e->getMessage());
+        }
+    }
+
+    /**
+     * @covers OneLogin\Saml2\Utils::validateBinarySign
+     */
+    public function testValidateBinarySignAlgorithms()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+        $idpData = array('x509cert' => $cert);
+        // First cert does not match the signing key
+        $idpDataMulti = array('x509certMulti' => array('signing' => array(
+            Utils::formatCert($settingsInfo['idp']['x509cert']),
+            $cert
+        )));
+
+        $samlRequest = base64_encode(gzdeflate('<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="ONELOGIN_21584ccdfaca36a145ae990442dcd96bfe60151e" Version="2.0" IssueInstant="2014-03-31T18:23:24Z"/>'));
+        $relayState = 'http://relay.example.com/';
+
+        foreach (array(XMLSecurityKey::RSA_SHA1, XMLSecurityKey::RSA_SHA256, XMLSecurityKey::RSA_SHA384, XMLSecurityKey::RSA_SHA512) as $signAlg) {
+            $key = new XMLSecurityKey($signAlg, array('type' => 'private'));
+            $key->loadKey(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key'));
+            $msg = 'SAMLRequest='.urlencode($samlRequest).'&RelayState='.urlencode($relayState).'&SigAlg='.urlencode($signAlg);
+            $getData = array(
+                'SAMLRequest' => $samlRequest,
+                'RelayState' => $relayState,
+                'SigAlg' => $signAlg,
+                'Signature' => base64_encode($key->signData($msg))
+            );
+
+            $this->assertTrue(Utils::validateBinarySign('SAMLRequest', $getData, $idpData));
+            $this->assertTrue(Utils::validateBinarySign('SAMLRequest', $getData, $idpDataMulti));
+
+            $getData['RelayState'] = 'http://evil.example.com/';
+            $this->assertFalse(Utils::validateBinarySign('SAMLRequest', $getData, $idpData));
+            $this->assertFalse(Utils::validateBinarySign('SAMLRequest', $getData, $idpDataMulti));
         }
     }
 
