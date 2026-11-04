@@ -167,11 +167,13 @@ class XmlSecLibs4CompatibilityTest extends \PHPUnit\Framework\TestCase
             // addSign sets its own ID, so the content (the Issuer) is the one that changes
             $tampered = str_replace('stuff.com', 'evil.example.com', $signed);
             $this->assertNotSame($signed, $tampered);
+            $rejection = null;
             try {
-                $this->assertFalse(Utils::validateSign($tampered, $idpData['x509cert']), "$message, tampered");
+                Utils::validateSign($tampered, $idpData['x509cert']);
             } catch (Exception $e) {
-                $this->assertEquals('Reference validation failed', $e->getMessage(), "$message, tampered");
+                $rejection = $e->getMessage();
             }
+            $this->assertSame('Reference validation failed', $rejection, "$message, tampered");
         }
     }
 
