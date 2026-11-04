@@ -473,7 +473,7 @@ class Utils
     {
         if (empty($baseurlpath)) {
             self::$_baseurlpath = null;
-        } else if ($baseurlpath == '/') {
+        } else if ($baseurlpath === '/') {
             self::$_baseurlpath = '/';
         } else {
             self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
@@ -595,7 +595,7 @@ class Utils
      */
     public static function isHTTPS()
     {
-        return self::getSelfProtocol() == 'https';
+        return self::getSelfProtocol() === 'https';
     }
 
     /**
@@ -1517,9 +1517,11 @@ class Utils
                 }
             } else {
                 if (!empty($fingerprint)) {
+                    // The KeyInfo is not signed, so the message may carry no certificate (or an empty one):
+                    // there is nothing to compare the fingerprint with
                     $domCert = $objKey->getX509Certificate();
-                    $domCertFingerprint = Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
-                    if (Utils::formatFingerPrint($fingerprint) == $domCertFingerprint) {
+                    $domCertFingerprint = empty($domCert) ? null : Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
+                    if ($domCertFingerprint !== null && Utils::formatFingerPrint($fingerprint) === $domCertFingerprint) {
                         $objKey->loadKey($domCert, false, true);
                         if ($objXMLSecDSig->verify($objKey) === 1) {
                             $valid = true;
@@ -1615,7 +1617,7 @@ class Utils
             $signedQuery .= '&SigAlg='.urlencode($signAlg);
         }
 
-        if ($messageType == "SAMLRequest") {
+        if ($messageType === "SAMLRequest") {
             $strMessageType = "Logout Request";
         } else {
             $strMessageType = "Logout Response";
