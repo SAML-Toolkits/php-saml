@@ -23,6 +23,7 @@ v4.4.0
 * Fix bug on setSchemasPath method from Auth class. Also see [#635](https://github.com/SAML-Toolkits/php-saml/issues/635)
 * [#631](https://github.com/SAML-Toolkits/php-saml/issues/631) Allow to require Destination
 * Force phpunit > 9.6.32 due CVE-2026-24765
+* Update PHP Codesniffer due vulnerability to 3.13.6
 
 v4.3.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
