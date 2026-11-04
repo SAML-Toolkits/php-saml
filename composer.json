@@ -24,7 +24,7 @@
         "sebastian/phpcpd": "^4.0 || ^5.0 || ^6.0 ",
         "phploc/phploc": "^4.0 || ^5.0 || ^6.0 || ^7.0",
         "pdepend/pdepend": "^2.8.0",
-        "squizlabs/php_codesniffer": "^3.5.8"
+        "squizlabs/php_codesniffer": "^3.13.6"
     },
     "config": {
         "platform": {
