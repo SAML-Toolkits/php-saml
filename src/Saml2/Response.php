@@ -86,7 +86,7 @@ class Response
     /**
      * If the signature of the message was already validated
      *
-     * @var Exception|null
+     * @var bool
      */
     private $_responseSignatureValidated = false;
 
