@@ -56,7 +56,7 @@ class Utils
     private static $_protocolRegex = '@^https?://@i';
 
     /**
-     * @var int|null
+     * @var int|string|null The value set by setSelfPort (getSelfPort normalizes it to an integer)
      */
     private static $_port;
 
@@ -385,17 +385,19 @@ class Utils
             if (preg_match('#^https?://([^/]*)/?(.*)#i', $baseurl, $matches)) {
                 if (strpos($baseurl, 'https://') === false) {
                     self::setSelfProtocol('http');
-                    $port = '80';
+                    $port = 80;
                 } else {
                     self::setSelfProtocol('https');
-                    $port = '443';
+                    $port = 443;
                 }
 
                 $currentHost = $matches[1];
                 if (false !== strpos($currentHost, ':')) {
                     list($currentHost, $possiblePort) = explode(':', $matches[1], 2);
-                    if (is_numeric($possiblePort)) {
-                        $port = $possiblePort;
+                    // A port that is not valid is ignored: the default one of the protocol is used
+                    $validPort = self::normalizePort($possiblePort);
+                    if ($validPort !== null) {
+                        $port = $validPort;
                     }
                 }
 
@@ -451,7 +453,7 @@ class Utils
 
         $portnumber = self::getSelfPort();
 
-        if (isset($portnumber) && ($portnumber !== '80') && ($portnumber !== '443')) {
+        if (isset($portnumber) && ($portnumber !== 80) && ($portnumber !== 443)) {
             $port = ':' . $portnumber;
         }
 
@@ -512,7 +514,7 @@ class Utils
     }
 
     /**
-     * @param int $port The port number to use when constructing URLs
+     * @param int|string|null $port The port number to use when constructing URLs (an integer, or a string with an integer)
      */
     public static function setSelfPort($port)
     {
@@ -535,7 +537,7 @@ class Utils
         $protocol = 'http';
         if (self::$_protocol) {
             $protocol = self::$_protocol;
-        } elseif (self::getSelfPort() == 443) {
+        } elseif (self::getSelfPort() === 443) {
             $protocol = 'https';
         } elseif (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
@@ -563,7 +565,13 @@ class Utils
     }
 
     /**
-     * @return null|string The port number used for the request
+     * Returns the port number used for the request. It is the first one that is available of the one
+     * set by setSelfPort, X-Forwarded-Port (if the proxy vars are enabled), SERVER_PORT or the port
+     * of the host header. The values that come from $_SERVER are strings, but the port is always
+     * returned as an integer.
+     *
+     * @return null|int The port number used for the request, null if it is not known or if the value
+     *                  that was read is not a port number (an integer from 1 to 65535)
      */
     public static function getSelfPort()
     {
@@ -580,12 +588,26 @@ class Utils
             // strip the port
             if (false !== strpos($currentHost, ':')) {
                 list($currentHost, $port) = explode(':', $currentHost, 2);
-                if (is_numeric($port)) {
-                    $portnumber = $port;
-                }
+                $portnumber = $port;
             }
         }
-        return $portnumber;
+        return self::normalizePort($portnumber);
+    }
+
+    /**
+     * @param mixed $port A port number, as an integer or as a string
+     *
+     * @return null|int The port number as an integer, null if the value is not a port number (an integer from 1 to 65535)
+     */
+    private static function normalizePort($port)
+    {
+        if (!is_int($port) && !is_string($port)) {
+            return null;
+        }
+
+        $port = filter_var($port, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1, 'max_range' => 65535)));
+
+        return $port === false ? null : $port;
     }
 
     /**

@@ -1186,7 +1186,7 @@ if (isset($_SESSION['samlUserdata'])) {   // If there is user data we print it.
 php-saml toolkit uses a bunch of methods in OneLogin\Saml2\Utils that try to guess the URL where the SAML messages are processed.
 
 * `getSelfHost` Returns the current host.
-* `getSelfPort` Return the port number used for the request
+* `getSelfPort` Return the port number used for the request, as an integer (`null` if it is not known or it is not a valid port number). `setSelfPort` accepts an integer or a string with an integer.
 * `isHTTPS` Checks if the protocol is https or http.
 * `getSelfURLhost` Returns the protocol + the current host + the port (if different than common ports).
 * `getSelfURL` Returns the URL of the current host + current view + query.

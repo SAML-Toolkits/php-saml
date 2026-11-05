@@ -421,19 +421,179 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(Utils::getSelfPort());
 
         $_SERVER['HTTP_HOST'] = 'example.org:8080';
-        $this->assertEquals(8080, Utils::getSelfPort());
+        $this->assertSame(8080, Utils::getSelfPort());
 
         $_SERVER["SERVER_PORT"] = 80;
-        $this->assertEquals(80, Utils::getSelfPort());
+        $this->assertSame(80, Utils::getSelfPort());
 
         $_SERVER["HTTP_X_FORWARDED_PORT"] = 443;
-        $this->assertEquals(80, Utils::getSelfPort());
+        $this->assertSame(80, Utils::getSelfPort());
 
         Utils::setProxyVars(true);
-        $this->assertEquals(443, Utils::getSelfPort());
+        $this->assertSame(443, Utils::getSelfPort());
 
         Utils::setSelfPort(8080);
-        $this->assertEquals(8080, Utils::getSelfPort());
+        $this->assertSame(8080, Utils::getSelfPort());
+    }
+
+    /**
+     * getSelfPort returns an integer (or null) whatever the type of the value that it reads.
+     * The values of $_SERVER are strings, but the port can also be an integer (setSelfPort(443),
+     * or code that sets it at $_SERVER), and a value that is not a port number is not a port
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfPort
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfPortReturnsAnInteger()
+    {
+        $valid = array(
+            array('80', 80),
+            array(80, 80),
+            array('443', 443),
+            array(443, 443),
+            array('8080', 8080),
+            array(8080, 8080),
+            array(' 8443 ', 8443),
+            array('1', 1),
+            array('65535', 65535),
+        );
+        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb', '8080, 8081');
+
+        // Where the port is read from
+        $sources = array(
+            'SERVER_PORT' => function ($port) {
+                $_SERVER['SERVER_PORT'] = $port;
+            },
+            'X-Forwarded-Port' => function ($port) {
+                Utils::setProxyVars(true);
+                $_SERVER['HTTP_X_FORWARDED_PORT'] = $port;
+            },
+            'Host header' => function ($port) {
+                $_SERVER['HTTP_HOST'] = 'example.org:' . $port;
+            },
+            'setSelfPort' => function ($port) {
+                Utils::setSelfPort($port);
+            },
+        );
+        $reset = function () {
+            unset($_SERVER['SERVER_PORT'], $_SERVER['HTTP_X_FORWARDED_PORT'], $_SERVER['HTTP_HOST']);
+            Utils::setBaseURL(null);
+            Utils::setProxyVars(false);
+        };
+
+        foreach ($sources as $name => $setPort) {
+            foreach ($valid as $case) {
+                list($port, $expected) = $case;
+                $reset();
+                $setPort($port);
+                $this->assertSame($expected, Utils::getSelfPort(), "$name: " . var_export($port, true));
+            }
+            foreach ($invalid as $port) {
+                $reset();
+                $setPort($port);
+                $this->assertNull(Utils::getSelfPort(), "$name: " . var_export($port, true));
+            }
+        }
+    }
+
+    /**
+     * The URL of the host does not have the port when it is the default one of HTTP or HTTPS,
+     * whether the port is an integer or a string (the strings come from $_SERVER and from the
+     * base URL), and it has the port when it is another one
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfURLhost
+     * @covers OneLogin\Saml2\Utils::getSelfURLNoQuery
+     * @covers OneLogin\Saml2\Utils::getSelfRoutedURLNoQuery
+     * @covers OneLogin\Saml2\Utils::getSelfURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfURLhostWithAPortOfAnyType()
+    {
+        Utils::setSelfHost('example.test');
+
+        $cases = array(
+            array('https', 443, 'https://example.test'),
+            array('https', '443', 'https://example.test'),
+            array('http', 80, 'http://example.test'),
+            array('http', '80', 'http://example.test'),
+            array('https', 8443, 'https://example.test:8443'),
+            array('https', '8443', 'https://example.test:8443'),
+            array('http', 8080, 'http://example.test:8080'),
+            array('http', '8080', 'http://example.test:8080'),
+            // A value that is not a port is not added to the URL
+            array('https', 'abc', 'https://example.test'),
+            array('https', '443abc', 'https://example.test'),
+        );
+        foreach ($cases as $case) {
+            list($protocol, $port, $expected) = $case;
+            Utils::setSelfProtocol($protocol);
+            Utils::setSelfPort($port);
+            $this->assertSame($expected, Utils::getSelfURLhost(), $protocol . ' ' . var_export($port, true));
+        }
+
+        // The port of the request, or the one that a proxy sends
+        Utils::setSelfProtocol('https');
+        Utils::setSelfPort(null);
+        foreach (array(443, '443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https://example.test', Utils::getSelfURLhost(), 'SERVER_PORT ' . var_export($port, true));
+        }
+        foreach (array(8443, '8443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https://example.test:8443', Utils::getSelfURLhost(), 'SERVER_PORT ' . var_export($port, true));
+        }
+
+        Utils::setProxyVars(true);
+        $_SERVER['SERVER_PORT'] = '8080';
+        foreach (array(443, '443') as $port) {
+            $_SERVER['HTTP_X_FORWARDED_PORT'] = $port;
+            $this->assertSame('https://example.test', Utils::getSelfURLhost(), 'X-Forwarded-Port ' . var_export($port, true));
+        }
+        Utils::setProxyVars(false);
+
+        // The URLs that are compared with the one that the IdP sent (the Destination, #661)
+        Utils::setSelfProtocol('https');
+        Utils::setSelfPort(443);
+        $_SERVER['REQUEST_URI'] = '/admin/saml/acs?x=1';
+        $_SERVER['QUERY_STRING'] = 'x=1';
+        $_SERVER['SCRIPT_NAME'] = '/admin/saml/acs';
+        unset($_SERVER['PATH_INFO']);
+        $this->assertSame('https://example.test/admin/saml/acs', Utils::getSelfURLNoQuery());
+        $this->assertSame('https://example.test/admin/saml/acs', Utils::getSelfRoutedURLNoQuery());
+        $this->assertSame('https://example.test/admin/saml/acs?x=1', Utils::getSelfURL());
+    }
+
+    /**
+     * The protocol is https when the port is 443, whatever the type of the port
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAPortOfAnyType()
+    {
+        foreach (array(443, '443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https', Utils::getSelfProtocol(), 'SERVER_PORT ' . var_export($port, true));
+            $this->assertTrue(Utils::isHTTPS());
+        }
+        foreach (array(80, '80', 8443, '8443', 'abc') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('http', Utils::getSelfProtocol(), 'SERVER_PORT ' . var_export($port, true));
+            $this->assertFalse(Utils::isHTTPS());
+        }
+
+        unset($_SERVER['SERVER_PORT']);
+        foreach (array(443, '443') as $port) {
+            Utils::setSelfPort($port);
+            $this->assertSame('https', Utils::getSelfProtocol(), 'setSelfPort ' . var_export($port, true));
+        }
     }
 
     /**
@@ -531,7 +691,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('http', Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', Utils::getSelfHost());
-        $this->assertEquals('81', Utils::getSelfPort());
+        $this->assertSame(81, Utils::getSelfPort());
         $this->assertEquals('/example2/', Utils::getBaseURLPath());
 
         $this->assertEquals($expectedUrlNQ2, Utils::getSelfURLNoQuery());
@@ -544,6 +704,38 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedUrlNQ2, Utils::getSelfURLNoQuery());
         $this->assertEquals($expectedRoutedUrlNQ2, Utils::getSelfRoutedURLNoQuery());
         $this->assertEquals($expectedUrl2, Utils::getSelfURL());
+    }
+
+    /**
+     * The port of the base URL is an integer: the one that it has, or the default one of its protocol
+     * (the default ports are not part of the URLs that are built)
+     *
+     * @covers OneLogin\Saml2\Utils::setBaseURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetBaseURLPort()
+    {
+        $cases = array(
+            array('https://sp.example.com', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:443/path/', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com:80/path/', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:8443/path/', 'https', 8443, 'https://sp.example.com:8443'),
+            array('http://sp.example.com:8080', 'http', 8080, 'http://sp.example.com:8080'),
+            // A port that is not valid is ignored, the default one of the protocol is used
+            array('https://sp.example.com:abc/path/', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com:/path/', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:99999/path/', 'https', 443, 'https://sp.example.com'),
+        );
+        foreach ($cases as $case) {
+            list($baseURL, $protocol, $port, $expectedHost) = $case;
+            Utils::setBaseURL($baseURL);
+            $this->assertSame($protocol, Utils::getSelfProtocol(), $baseURL);
+            $this->assertSame($port, Utils::getSelfPort(), $baseURL);
+            $this->assertSame($expectedHost, Utils::getSelfURLhost(), $baseURL);
+        }
     }
 
     /**

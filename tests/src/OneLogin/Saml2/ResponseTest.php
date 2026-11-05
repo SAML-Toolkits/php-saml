@@ -1178,6 +1178,48 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the isValid method of the Response class
+     * Case the Destination has the default port (not written) and the port of the SP is set as an integer
+     * or as a string: it is the same URL, the port is not added to the URL where the response was received
+     * (#661)
+     *
+     * @covers OneLogin\Saml2\Response::isValid
+     */
+    public function testDestinationWithAPortOfAnyType()
+    {
+        $destination = 'https://example.test/admin/saml/acs';
+        $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64'));
+        $xml = preg_replace('/Destination="[^"]*"/', 'Destination="' . $destination . '"', $xml, 1, $count);
+        $this->assertEquals(1, $count);
+        $xml = base64_encode($xml);
+
+        $this->_settings->setStrict(true);
+        $_SERVER['REQUEST_URI'] = '/admin/saml/acs';
+        Utils::setSelfProtocol('https');
+        Utils::setSelfHost('example.test');
+
+        try {
+            foreach (array(443, '443') as $port) {
+                Utils::setSelfPort($port);
+                $response = new Response($this->_settings, $xml);
+                $response->isValid();
+                $this->assertStringNotContainsString('The response was received at', (string) $response->getError(), var_export($port, true));
+            }
+
+            // Another port is another destination
+            foreach (array(8443, '8443') as $port) {
+                Utils::setSelfPort($port);
+                $response = new Response($this->_settings, $xml);
+                $this->assertFalse($response->isValid());
+                $this->assertEquals("The response was received at https://example.test:8443/admin/saml/acs instead of $destination", $response->getError());
+            }
+        } finally {
+            Utils::setBaseURL(null);
+            unset($_SERVER['REQUEST_URI']);
+        }
+    }
+
+    /**
+     * Tests the isValid method of the Response class
      * Case Invalid Response, Invalid Audience
      *
      * @covers OneLogin\Saml2\Response::isValid
