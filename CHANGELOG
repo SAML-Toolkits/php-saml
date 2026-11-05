@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+v4.4.2 
+* Fix [#661](https://github.com/SAML-Toolkits/php-saml/issues/661). Type comparaison error for proxy port
+
 v4.4.1
 * 4.4.0 was released with wrong target (master branch, so removing it)
 * More strictString comparison
