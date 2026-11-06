@@ -1,6 +1,6 @@
-# SAML PHP Toolkit Compatible with PHP 5.X & 7.X
+# SAML PHP Toolkit Compatible with PHP versions: 7.2, 7.3 and 7.4
 
-[![php-saml 3.x-dev package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=3.x-dev)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=3.x-dev)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=3.x-dev) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=v3.1.0) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
+[![php-saml 3.x-dev package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=3.x-dev)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=3.x-dev)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=3.x-dev) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=3.9.0) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
 
 Add SAML support to your PHP 7.X software using this library.
 
@@ -135,7 +135,7 @@ Compatibility
 -------------
 
 Version 3.8.2 supports PHP 7.2, 7.3 and 7.4
-Older versions support PHP 5.6, 7.0 and 7.1 as well
+Older versions (master branch, 2.x) support PHP 5.6, 7.0 and 7.1 as well
 
 Namespaces
 ----------
