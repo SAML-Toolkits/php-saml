@@ -190,7 +190,7 @@ class OneLogin_Saml2_Auth
      */
     public function setSchemasPath($path)
     {
-        $this->_paths['schemas'] = $path;
+        $this->_settings->setSchemasPath($path);
     }
 
     /**
@@ -260,7 +260,7 @@ class OneLogin_Saml2_Auth
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
                 $this->_errorReason = $logoutResponse->getError();
-            } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
+            } elseif ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
             } else {
                 $this->_lastMessageId = $logoutResponse->id;
@@ -272,7 +272,7 @@ class OneLogin_Saml2_Auth
                     }
                 }
             }
-        } else if (isset($_GET['SAMLRequest'])) {
+        } elseif (isset($_GET['SAMLRequest'])) {
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
@@ -301,7 +301,7 @@ class OneLogin_Saml2_Auth
 
                 $security = $this->_settings->getSecurityData();
                 if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-                    $signature = $this->buildResponseSignature($logoutResponse, isset($parameters['RelayState'])? $parameters['RelayState']: null, $security['signatureAlgorithm']);
+                    $signature = $this->buildResponseSignature($logoutResponse, isset($parameters['RelayState']) ? $parameters['RelayState'] : null, $security['signatureAlgorithm']);
                     $parameters['SigAlg'] = $security['signatureAlgorithm'];
                     $parameters['Signature'] = $signature;
                 }

@@ -40,6 +40,20 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the setSchemasPath method of the OneLogin_Saml2_Auth class
+     *
+     * @covers OneLogin_Saml2_Auth::setSchemasPath
+     */
+    public function testSetSchemasPath()
+    {
+        $customPath = 'custompath/';
+
+        $this->_auth->setSchemasPath($customPath);
+
+        $this->assertEquals($customPath, $this->_auth->getSettings()->getSchemasPath());
+    }
+
+    /**
      * Tests the use of the spValidationOnly at OneLogin_Saml2_Auth
      *
      * @covers OneLogin_Saml2_Auth
