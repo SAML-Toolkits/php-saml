@@ -21,6 +21,7 @@ v3.9.0
 * Reject decrypted EncryptedID content that is not an element (a text node made LogoutRequest::getNameIdData fail with a PHP Error)
 * Fix Utils::validateSign crash when the signature has no certificate and the IdP is identified by fingerprint
 * Added clarification on reverse-proxy scenario (Path Prefix)
+* [#648](https://github.com/SAML-Toolkits/php-saml/pull/648) Fix empty responseUrl bypassing SLO URL fallback
 
 v3.8.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
