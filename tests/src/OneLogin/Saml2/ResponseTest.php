@@ -1521,7 +1521,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $response->isValid($inResponseTo);
-        $this->assertEquals('No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
+        $this->assertEquals('No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
     }
 
     /**
