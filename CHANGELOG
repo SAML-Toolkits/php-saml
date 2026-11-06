@@ -25,6 +25,7 @@ v3.9.0
 * Github Actions: Remove mcrypt install
 * Update error message for missing InResponseTo
 * [#637](https://github.com/SAML-Toolkits/php-saml/issues/637) Fix incorrect @phpstan-return annotation on processSLO method
+* Fix bug on setSchemasPath method from Auth class. Also see [#635](https://github.com/SAML-Toolkits/php-saml/issues/635)
 
 v3.8.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)

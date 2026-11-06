@@ -8,9 +8,7 @@ use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
-
 use Exception;
 
 /**
@@ -51,6 +49,20 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
         $authSettings = $this->_auth->getSettings();
         $this->assertEquals($authSettings, $settings);
+    }
+
+    /**
+     * Tests the setSchemasPath method of the OneLogin\Saml2\Auth class
+     *
+     * @covers OneLogin\Saml2\Auth::setSchemasPath
+     */
+    public function testSetSchemasPath()
+    {
+        $customPath = 'custompath/';
+
+        $this->_auth->setSchemasPath($customPath);
+
+        $this->assertEquals($customPath, $this->_auth->getSettings()->getSchemasPath());
     }
 
     /**
@@ -804,7 +816,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $targetUrl = $this->_auth->processSLO(false, null, false, $callback, true);
         $parsedQuery = getParamsFromUrl($targetUrl);
 
-        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];;;
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
         $this->assertStringContainsString($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);
