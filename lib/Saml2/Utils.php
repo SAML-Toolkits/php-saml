@@ -973,6 +973,7 @@ class OneLogin_Saml2_Utils
      * @param string|int|null $validUntil The valid until date, as a string or as a timestamp
      *
      * @return int|null $expireTime  The expiration time.
+     * @phpstan-return int|null
      *
      * @throws Exception
      */
