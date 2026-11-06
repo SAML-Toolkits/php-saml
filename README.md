@@ -8,6 +8,8 @@ Add SAML support to your PHP 7.X software using this library.
 Warning
 -------
 
+Version 3.9.0 try to mitigate the xmlseclibs advisories published in August 2026 (GHSA-7mf5-fjj8-mvjc, GHSA-39hg-wfcm-v4wv, GHSA-7h47-29x2-r2gc, GHSA-m5mw-mr39-66vp, GHSA-w5f2-cpgp-pg76, GHSA-7hf8-fh6v-wmm6, GHSA-9wcx-p7hr-f935) while keeping xmlseclibs 3.x, as xmlseclibs 4.x requires PHP 8
+
 Version 3.8.2 updates xmlseclibs to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
 
 Version 3.8.1 updates xmlseclibs to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
@@ -152,6 +154,8 @@ In production, the `strict` parameter **MUST** be set as `"true"` and the
 `signatureAlgorithm` and `digestAlgorithm` under `security` must be set to
 something other than SHA1 (see https://shattered.io/ ). Otherwise your
 environment is not secure and will be exposed to attacks.
+
+In strict mode, the signature of a <samlp:Response> that contains an EncryptedAssertion is verified before decrypting it, and an EncryptedID of a <samlp:LogoutRequest> is decrypted after its signature is verified, so tampered ciphertexts are rejected without being processed.
 
 In production also we highly recommended to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
 
@@ -555,6 +559,17 @@ $advancedSettings = array(
         // 'http://www.w3.org/2009/xmlenc11#aes256-gcm';
         // Notice that aes-cbc are not consider secure anymore so should not be used
         'encryption_algorithm' => 'http://www.w3.org/2009/xmlenc11#aes128-gcm',
+
+        // Allow RSA-1.5 key transport when decrypting encrypted assertions/NameIDs from
+        // legacy IdPs. xmlseclibs 4 denies RSA-1.5 by default (Bleichenbacher risk).
+        // Enable only for IdPs that still use RSA-1.5; prefer RSA-OAEP where possible.
+        'allowRSA15KeyTransport' => true,
+
+        // Allow CBC data encryption (aes*-cbc, tripledes-cbc) when decrypting encrypted
+        // assertions/NameIDs. CBC is not authenticated and is exposed to padding oracle
+        // attacks. Set it to false to only accept AES-GCM if your IdP supports it
+        // (xmlseclibs 4 still accepts CBC by default).
+        'allowCBCEncryption' => true,
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
