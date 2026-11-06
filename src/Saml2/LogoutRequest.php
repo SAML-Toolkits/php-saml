@@ -95,7 +95,7 @@ class LogoutRequest
 
             if (!empty($nameId)) {
                 if (empty($nameIdFormat)
-                    && $spData['NameIDFormat'] != Constants::NAMEID_UNSPECIFIED) {
+                    && $spData['NameIDFormat'] !== Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
             } else {
@@ -106,13 +106,13 @@ class LogoutRequest
             /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
-            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_ENTITY) {
+            if (!empty($nameIdFormat) && $nameIdFormat === Constants::NAMEID_ENTITY) {
                 $nameIdNameQualifier = null;
                 $nameIdSPNameQualifier = null;
             }
 
             // NameID Format UNSPECIFIED omitted
-            if (!empty($nameIdFormat) && $nameIdFormat == Constants::NAMEID_UNSPECIFIED) {
+            if (!empty($nameIdFormat) && $nameIdFormat === Constants::NAMEID_UNSPECIFIED) {
                 $nameIdFormat = null;
             }
 
@@ -443,7 +443,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);
-                if (!empty($issuer) && $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer !== $idPEntityId) {
                     throw new ValidationError(
                         "Invalid issuer in the Logout Request",
                         ValidationError::WRONG_ISSUER

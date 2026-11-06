@@ -203,7 +203,7 @@ class Response
             }
 
             // Check SAML version
-            if ($this->document->documentElement->getAttribute('Version') != '2.0') {
+            if ($this->document->documentElement->getAttribute('Version') !== '2.0') {
                 throw new ValidationError(
                     "Unsupported SAML version",
                     ValidationError::UNSUPPORTED_SAML_VERSION
@@ -281,7 +281,7 @@ class Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                if (isset($requestId) && $requestId !== $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new ValidationError(
                             "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
@@ -401,7 +401,7 @@ class Response
                 $anySubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
                 foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != Constants::CM_BEARER) {
+                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') !== Constants::CM_BEARER) {
                         continue;
                     }
                     $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
@@ -411,7 +411,7 @@ class Response
                         $scnData = $subjectConfirmationDataNodes->item(0);
                         if ($scnData->hasAttribute('InResponseTo')) {
                             $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
+                            if (isset($responseInResponseTo) && $responseInResponseTo !== $inResponseTo) {
                                 continue;
                             }
                         }
@@ -717,7 +717,7 @@ class Response
 
             foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
                 if ($nameId->hasAttribute($attr)) {
-                    if ($this->_settings->isStrict() && $attr == 'SPNameQualifier') {
+                    if ($this->_settings->isStrict() && $attr === 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
                         if ($spEntityId != $nameId->getAttribute($attr)) {
@@ -895,7 +895,7 @@ class Response
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+                if ($childNode->nodeType === XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }

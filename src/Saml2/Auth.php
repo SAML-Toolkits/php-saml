@@ -760,7 +760,7 @@ class Auth
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
-            if ($type == "SAMLRequest") {
+            if ($type === "SAMLRequest") {
                 $errorMsg = "Trying to sign the SAML Request but can't load the SP private key";
             } else {
                 $errorMsg = "Trying to sign the SAML Response but can't load the SP private key";

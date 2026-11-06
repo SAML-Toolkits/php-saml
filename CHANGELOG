@@ -12,7 +12,8 @@ v3.9.0
 * Add the 'allowRSA15KeyTransport' and 'allowCBCEncryption' security settings (true by default) to reject rsa-1_5 key transport and CBC data encryption
 * Add the $allowRSA15KeyTransport and $allowCBCEncryption parameters (true by default) to LogoutRequest::getNameIdData() and LogoutRequest::getNameId()
 * Report every decryption failure with the same error (ValidationError::DECRYPTION_FAILED) and replace invalid encrypted keys by a deterministic key (RFC 3218), with the same work whatever the padding of the encrypted key
-In strict mode with `wantMessagesSigned`, verify the signature of a Response with an EncryptedAssertion before decrypting it (if it is not signed or the signature is invalid the assertion is not decrypted and isValid() reports the cause). The EncryptedID of a LogoutRequest is decrypted after its signature is verified
+* Use strict === and !== at string comparison
+* In strict mode with `wantMessagesSigned`, verify the signature of a Response with an EncryptedAssertion before decrypting it (if it is not signed or the signature is invalid the assertion is not decrypted and isValid() reports the cause). The EncryptedID of a LogoutRequest is decrypted after its signature is verified
 * Load XML documents with LIBXML_NONET
 * Fix the decryption of an EncryptedID inside an EncryptedAssertion (it failed with an algorithm mismatch)
 * Reject decrypted EncryptedID content that is not an element (a text node made LogoutRequest::getNameIdData fail with a PHP Error)

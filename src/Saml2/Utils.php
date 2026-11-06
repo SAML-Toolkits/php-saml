@@ -745,7 +745,7 @@ class Utils
             $result = $baseURLPath;
             if (!empty($info)) {
                 $extractedInfo = $info;
-                if ($baseURLPath != '/') {
+                if ($baseURLPath !== '/') {
                     // Remove base path from the path info.
                     $extractedInfo = str_replace($baseURLPath, '', $info);
                 }
@@ -1752,7 +1752,7 @@ class Utils
                 if (!empty($fingerprint)) {
                     $domCert = $objKey->getX509Certificate();
                     $domCertFingerprint = Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
-                    if (Utils::formatFingerPrint($fingerprint) == $domCertFingerprint) {
+                    if (Utils::formatFingerPrint($fingerprint) === $domCertFingerprint) {
                         $objKey->loadKey($domCert, false, true);
                         if ($objXMLSecDSig->verify($objKey) === 1) {
                             $valid = true;
@@ -1829,7 +1829,7 @@ class Utils
             $signedQuery .= '&SigAlg='.urlencode($signAlg);
         }
 
-        if ($messageType == "SAMLRequest") {
+        if ($messageType === "SAMLRequest") {
             $strMessageType = "Logout Request";
         } else {
             $strMessageType = "Logout Response";
@@ -1862,7 +1862,7 @@ class Utils
             $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
             $objKey->loadKey($cert, false, true);
 
-            if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+            if ($signAlg !== XMLSecurityKey::RSA_SHA1) {
                 try {
                     $objKey = Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {
