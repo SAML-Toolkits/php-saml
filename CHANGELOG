@@ -21,6 +21,7 @@ v.2.22.0
 * OneLogin_Saml2_Utils::getSelfPort now returns an integer (null if the port is not valid)
 * When the protocol (from setSelfProtocol or $_SERVER['HTTP_X_FORWARDED_PROTO']) is an array, now the first value is used by OneLogin_Saml2_Utils::getSelfProtocol (true is https, and a value that is not a string is http)
 * Fix OneLogin_Saml2_Utils::validateSign when the signature has no certificate and the IdP is identified by fingerprint (the fingerprint of the missing certificate was calculated, raising a failed assertion warning)
+* Added clarification on reverse-proxy scenario (Path Prefix)
 
 v.2.21.2
 * Same as 2.21.1 but set the version updated, 2.21.1 was released with wrong version.json 2.20.0
