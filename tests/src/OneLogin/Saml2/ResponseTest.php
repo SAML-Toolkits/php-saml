@@ -1167,6 +1167,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response4 = new Response($settings, $xml2);
         $this->assertTrue($response4->isValid());
 
+        // Missing Destination
+        $xmlNoDestination = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $settingsInfo['security']['requireDestination'] = true;
+        $settingsRequireDestination = new Settings($settingsInfo);
+        $responseNoDestination = new Response($settingsRequireDestination, $xmlNoDestination);
+        $this->assertFalse($responseNoDestination->isValid());
+        $this->assertEquals('The response has no Destination value', $responseNoDestination->getError());
+
         // Destination strict match
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_strict_destination.xml.base64');
         $response5 = new Response($settings, $xml5);
@@ -1176,11 +1184,54 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response6 = new Response($settings2, $xml5);
         $this->assertFalse($response6->isValid());
         $this->assertStringContainsString('The response was received at', $response6->getError());
+
         unset($settingsInfo['strict']);
         unset($settingsInfo['security']['destinationStrictlyMatches']);
         unset($_SERVER['HTTP_HOST']);
         unset($_SERVER['HTTPS']);
         unset($_SERVER['REQUEST_URI']);
+    }
+
+    /**
+     * Tests the isValid method of the Response class
+     * Case the Destination has the default port (not written) and the port of the SP is set as an integer
+     * or as a string: it is the same URL, the port is not added to the URL where the response was received
+     * (#661)
+     *
+     * @covers OneLogin\Saml2\Response::isValid
+     */
+    public function testDestinationWithAPortOfAnyType()
+    {
+        $destination = 'https://example.test/admin/saml/acs';
+        $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64'));
+        $xml = preg_replace('/Destination="[^"]*"/', 'Destination="' . $destination . '"', $xml, 1, $count);
+        $this->assertEquals(1, $count);
+        $xml = base64_encode($xml);
+
+        $this->_settings->setStrict(true);
+        $_SERVER['REQUEST_URI'] = '/admin/saml/acs';
+        Utils::setSelfProtocol('https');
+        Utils::setSelfHost('example.test');
+
+        try {
+            foreach (array(443, '443') as $port) {
+                Utils::setSelfPort($port);
+                $response = new Response($this->_settings, $xml);
+                $response->isValid();
+                $this->assertStringNotContainsString('The response was received at', (string) $response->getError(), var_export($port, true));
+            }
+
+            // Another port is another destination
+            foreach (array(8443, '8443') as $port) {
+                Utils::setSelfPort($port);
+                $response = new Response($this->_settings, $xml);
+                $this->assertFalse($response->isValid());
+                $this->assertEquals("The response was received at https://example.test:8443/admin/saml/acs instead of $destination", $response->getError());
+            }
+        } finally {
+            Utils::setBaseURL(null);
+            unset($_SERVER['REQUEST_URI']);
+        }
     }
 
     /**
@@ -1479,7 +1530,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('No Signature found. SAML Response rejected', $response->getError());
 
         $response->isValid($inResponseTo);
-        $this->assertEquals('No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
+        $this->assertEquals('No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: '.$inResponseTo, $response->getError());
     }
 
     /**
@@ -1713,6 +1764,61 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($settings, $xml);
 
         $this->assertTrue($response->isValid());
+    }
+
+    /**
+     * Tests the isValid method of the Response
+     * Case: the IdP is identified by its fingerprint and the Signature has no KeyInfo. The
+     * KeyInfo is not signed, so anybody can remove it from a valid response: there is no
+     * certificate to compare with the fingerprint and the response is invalid.
+     *
+     * @covers OneLogin\Saml2\Response::isValid
+     */
+    public function testIsValidFingerprintWithoutKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $cert = Utils::formatCert($settingsInfo['idp']['x509cert']);
+
+        $fingerprintInfo = $settingsInfo;
+        $fingerprintInfo['idp']['certFingerprint'] = Utils::calculateX509Fingerprint($cert);
+        $fingerprintInfo['idp']['x509cert'] = null;
+
+        // The KeyInfo of the Signature is not covered by the signature of the other element in a double signed
+        // response, so only the responses with one Signature are used
+        foreach (array('signed_message_response', 'signed_assertion_response') as $name) {
+            $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/' . $name . '.xml.base64'));
+
+            // Control: the fingerprint of the certificate in the KeyInfo is valid
+            $response = new Response(new Settings($fingerprintInfo), base64_encode($xml));
+            $this->assertTrue($response->isValid(), $name);
+
+            $dom = new DOMDocument();
+            $dom->loadXML($xml);
+            $keyInfos = $dom->getElementsByTagNameNS(Constants::NS_DS, 'KeyInfo');
+            $this->assertEquals(1, $keyInfos->length, $name);
+            $keyInfos->item(0)->parentNode->removeChild($keyInfos->item(0));
+            $withoutKeyInfo = base64_encode($dom->saveXML());
+
+            // With the fingerprint the response is rejected (not because of a PHP error: with the
+            // assertions disabled the code that was fixed only emitted a deprecation, that isValid reports as its error)
+            $response = new Response(new Settings($fingerprintInfo), $withoutKeyInfo);
+            $toException = function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, 0, $severity, $file, $line);
+            };
+            set_error_handler($toException);
+            try {
+                $valid = $response->isValid();
+            } finally {
+                restore_error_handler();
+            }
+            $this->assertFalse($valid, $name);
+            $this->assertEquals('Signature validation failed. SAML Response rejected', $response->getError(), $name);
+
+            // The signature is still valid for the certificate
+            $response = new Response(new Settings($settingsInfo), $withoutKeyInfo);
+            $this->assertTrue($response->isValid(), $name);
+        }
     }
 
     /**

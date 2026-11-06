@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of php-saml.
  *
@@ -14,7 +15,6 @@
 namespace OneLogin\Saml2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
-
 use Exception;
 
 /**
@@ -213,7 +213,7 @@ class Auth
      */
     public function setSchemasPath($path)
     {
-        $this->_paths['schemas'] = $path;
+        $this->_settings->setSchemasPath($path);
     }
 
     /**
@@ -286,7 +286,7 @@ class Auth
                 $this->_lastErrorException = $logoutResponse->getErrorException();
                 $this->_lastError = $logoutResponse->getError();
 
-            } else if ($logoutResponse->getStatus() !== Constants::STATUS_SUCCESS) {
+            } elseif ($logoutResponse->getStatus() !== Constants::STATUS_SUCCESS) {
                 $this->_errors[] = 'logout_not_success';
             } else {
                 $this->_lastMessageId = $logoutResponse->id;
@@ -298,7 +298,7 @@ class Auth
                     }
                 }
             }
-        } else if (isset($_GET['SAMLRequest'])) {
+        } elseif (isset($_GET['SAMLRequest'])) {
             $logoutRequest = $this->buildLogoutRequest($this->_settings, $_GET['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
@@ -328,7 +328,7 @@ class Auth
 
                 $security = $this->_settings->getSecurityData();
                 if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-                    $signature = $this->buildResponseSignature($logoutResponse, isset($parameters['RelayState'])? $parameters['RelayState']: null, $security['signatureAlgorithm']);
+                    $signature = $this->buildResponseSignature($logoutResponse, isset($parameters['RelayState']) ? $parameters['RelayState'] : null, $security['signatureAlgorithm']);
                     $parameters['SigAlg'] = $security['signatureAlgorithm'];
                     $parameters['Signature'] = $signature;
                 }
@@ -621,7 +621,7 @@ class Auth
         return $this->redirectTo($sloUrl, $parameters, $stay);
     }
 
-   /**
+    /**
      * Gets the IdP SSO url.
      *
      * @return string The url of the IdP Single Sign On Service
@@ -760,7 +760,7 @@ class Auth
     {
         $key = $this->_settings->getSPkey();
         if (empty($key)) {
-            if ($type == "SAMLRequest") {
+            if ($type === "SAMLRequest") {
                 $errorMsg = "Trying to sign the SAML Request but can't load the SP private key";
             } else {
                 $errorMsg = "Trying to sign the SAML Response but can't load the SP private key";

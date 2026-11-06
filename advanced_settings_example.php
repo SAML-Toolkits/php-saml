@@ -81,6 +81,10 @@ $advancedSettings = array(
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
 
+        // If true, SAMLResponses without a Destination attribute
+        // will be rejected.
+        'requireDestination' => false,
+
         // If true, SAMLResponses with an empty value at its Destination
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,

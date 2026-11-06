@@ -8,9 +8,7 @@ use OneLogin\Saml2\LogoutRequest;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
 use OneLogin\Saml2\ValidationError;
-
 use RobRichards\XMLSecLibs\XMLSecurityKey;
-
 use Exception;
 
 /**
@@ -51,6 +49,20 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
         $authSettings = $this->_auth->getSettings();
         $this->assertEquals($authSettings, $settings);
+    }
+
+    /**
+     * Tests the setSchemasPath method of the OneLogin\Saml2\Auth class
+     *
+     * @covers OneLogin\Saml2\Auth::setSchemasPath
+     */
+    public function testSetSchemasPath()
+    {
+        $customPath = 'custompath/';
+
+        $this->_auth->setSchemasPath($customPath);
+
+        $this->assertEquals($customPath, $this->_auth->getSettings()->getSchemasPath());
     }
 
     /**
@@ -247,6 +259,43 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $validRequestId = '_57bcbf70-7b1f-012e-c821-782bcb13bb38';
         $this->_auth->processResponse($validRequestId);
         $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
+    }
+
+    /**
+     * Tests the processResponse method of the Auth class
+     * Case Invalid Response, Missing Destination and destination required
+     *
+     * @covers OneLogin\Saml2\Auth::processResponse
+     */
+    public function testProcessResponseInvalidMissingDestination()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['requireDestination'] = true;
+        $auth = new Auth($settingsInfo);
+
+        $_SERVER['HTTP_HOST'] = 'stuff.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/endpoints/endpoints/acs.php';
+
+        $message = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+
+        $auth->processResponse();
+
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals('The response has no Destination value', $auth->getLastErrorReason());
+
+        $errorException = $auth->getLastErrorException();
+        $this->assertInstanceOf(ValidationError::class, $errorException);
+        $this->assertEquals(ValidationError::MISSING_DESTINATION, $errorException->getCode());
+
+        unset($_POST['SAMLResponse']);
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
     }
 
     /**
@@ -804,7 +853,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $targetUrl = $this->_auth->processSLO(false, null, false, $callback, true);
         $parsedQuery = getParamsFromUrl($targetUrl);
 
-        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];;;
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
         $this->assertStringContainsString($sloResponseUrl, $targetUrl);
         $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
         $this->assertArrayNotHasKey('RelayState', $parsedQuery);

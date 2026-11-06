@@ -86,7 +86,7 @@ class Response
     /**
      * If the signature of the message was already validated
      *
-     * @var Exception|null
+     * @var bool
      */
     private $_responseSignatureValidated = false;
 
@@ -203,7 +203,7 @@ class Response
             }
 
             // Check SAML version
-            if ($this->document->documentElement->getAttribute('Version') != '2.0') {
+            if ($this->document->documentElement->getAttribute('Version') !== '2.0') {
                 throw new ValidationError(
                     "Unsupported SAML version",
                     ValidationError::UNSUPPORTED_SAML_VERSION
@@ -281,10 +281,10 @@ class Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                if (isset($requestId) && $requestId !== $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new ValidationError(
-                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            "No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: $requestId",
                             ValidationError::WRONG_INRESPONSETO
                         );
                     } else {
@@ -361,6 +361,11 @@ class Response
                             }
                         }
                     }
+                } elseif ($security['requireDestination']) {
+                    throw new ValidationError(
+                        "The response has no Destination value",
+                        ValidationError::MISSING_DESTINATION
+                    );
                 }
 
                 // Check audience
@@ -401,7 +406,7 @@ class Response
                 $anySubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
                 foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != Constants::CM_BEARER) {
+                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') !== Constants::CM_BEARER) {
                         continue;
                     }
                     $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
@@ -411,7 +416,7 @@ class Response
                         $scnData = $subjectConfirmationDataNodes->item(0);
                         if ($scnData->hasAttribute('InResponseTo')) {
                             $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
+                            if (isset($responseInResponseTo) && $responseInResponseTo !== $inResponseTo) {
                                 continue;
                             }
                         }
@@ -717,10 +722,10 @@ class Response
 
             foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
                 if ($nameId->hasAttribute($attr)) {
-                    if ($this->_settings->isStrict() && $attr == 'SPNameQualifier') {
+                    if ($this->_settings->isStrict() && $attr === 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
-                        if ($spEntityId != $nameId->getAttribute($attr)) {
+                        if ($spEntityId !== $nameId->getAttribute($attr)) {
                             throw new ValidationError(
                                 "The SPNameQualifier value mistmatch the SP entityID value.",
                                 ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
@@ -895,7 +900,7 @@ class Response
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+                if ($childNode->nodeType === XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
@@ -955,7 +960,7 @@ class Response
 
             $signedElement = '{'.$signNode->parentNode->namespaceURI.'}'.$signNode->parentNode->localName;
 
-            if ($signedElement != $responseTag && $signedElement != $assertionTag) {
+            if ($signedElement !== $responseTag && $signedElement !== $assertionTag) {
                 throw new ValidationError(
                     "Invalid Signature Element $signedElement SAML Response rejected",
                     ValidationError::WRONG_SIGNED_ELEMENT
@@ -986,7 +991,7 @@ class Response
                 if (!empty($sei)) {
                     $sei = substr($sei, 1);
 
-                    if ($sei != $idValue) {
+                    if ($sei !== $idValue) {
                         throw new ValidationError(
                             'Found an invalid Signed Element. SAML Response rejected',
                             ValidationError::INVALID_SIGNED_ELEMENT
