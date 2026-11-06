@@ -422,6 +422,12 @@ class OneLogin_Saml2_Settings
             $this->_security['wantNameIdEncrypted'] = false;
         }
 
+        // Accept received encrypted elements whose key is wrapped with rsa-1_5
+        // (Bleichenbacher oracle)
+        if (!isset($this->_security['allowRSA15KeyTransport'])) {
+            $this->_security['allowRSA15KeyTransport'] = true;
+        }
+
         // XML validation
         if (!isset($this->_security['wantXMLValidation'])) {
             $this->_security['wantXMLValidation'] = true;

@@ -383,10 +383,40 @@ class XMLSecurityKey {
         return openssl_verify ($data, $signature, $this->key, $algo);
     }
 
+    /**
+     * Runs an mcrypt operation without raising E_DEPRECATED notices.
+     *
+     * mcrypt is deprecated as of PHP 7.1 and every call of its functions raises an
+     * E_DEPRECATED notice, so error handlers that convert them to exceptions made every
+     * block cipher encryption and decryption fail. Only the deprecation notices are
+     * masked, other errors are reported, and the previous error_reporting is restored.
+     *
+     * @param string $method encryptMcrypt or decryptMcrypt
+     * @param string $data   The data
+     *
+     * @return string
+     */
+    private function runMcrypt($method, $data) {
+        $errorReporting = error_reporting();
+        error_reporting($errorReporting & ~E_DEPRECATED);
+        try {
+            $result = $this->$method($data);
+        } catch (Exception $e) {
+            error_reporting($errorReporting);
+            throw $e;
+        } catch (Throwable $e) {
+            // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+            error_reporting($errorReporting);
+            throw $e;
+        }
+        error_reporting($errorReporting);
+        return $result;
+    }
+
     public function encryptData($data) {
         switch ($this->cryptParams['library']) {
             case 'mcrypt':
-                return $this->encryptMcrypt($data);
+                return $this->runMcrypt('encryptMcrypt', $data);
             case 'openssl':
                 return $this->encryptOpenSSL($data);
         }
@@ -395,7 +425,7 @@ class XMLSecurityKey {
     public function decryptData($data) {
         switch ($this->cryptParams['library']) {
             case 'mcrypt':
-                return $this->decryptMcrypt($data);
+                return $this->runMcrypt('decryptMcrypt', $data);
             case 'openssl':
                 return $this->decryptOpenSSL($data);
         }

@@ -52,6 +52,20 @@ class OneLogin_Saml2_Response
     private $_error;
 
     /**
+     * If the message was rejected before decrypting it, this var has the cause (reported by isValid)
+     *
+     * @var Exception|null
+     */
+    private $_messageSignatureError;
+
+    /**
+     * If the signature of the Response was verified (successfully) before decrypting it
+     *
+     * @var bool
+     */
+    private $_responseSignatureValidated = false;
+
+    /**
      * NotOnOrAfter value of a valid SubjectConfirmationData node
      *
      * @var int
@@ -90,9 +104,62 @@ class OneLogin_Saml2_Response
         // Quick check for the presence of EncryptedAssertion
         $encryptedAssertionNodes = $this->document->getElementsByTagName('EncryptedAssertion');
         if ($encryptedAssertionNodes->length !== 0) {
+            try {
+                $this->_validateMessageSignatureBeforeDecryption();
+            } catch (Exception $e) {
+                // The EncryptedAssertion is not decrypted. isValid() reports the cause
+                $this->_messageSignatureError = $e;
+                return;
+            } catch (Throwable $e) {
+                // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+                $this->_messageSignatureError = new OneLogin_Saml2_ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                );
+                return;
+            }
             $this->decryptedDocument = clone $this->document;
             $this->encrypted = true;
             $this->decryptedDocument = $this->_decryptAssertion($this->decryptedDocument);
+        }
+    }
+
+    /**
+     * In strict mode, the Response signature also covers the EncryptedAssertion,
+     * so it is verified before decrypting: tampered ciphertexts never reach the
+     * decryption code (no padding/Bleichenbacher oracle). When signed messages
+     * are required, an unsigned Response is not decrypted.
+     *
+     * @throws Exception
+     * @throws OneLogin_Saml2_ValidationError
+     */
+    private function _validateMessageSignatureBeforeDecryption()
+    {
+        // Without strict mode, the signature is validated later, by isValid()
+        if (!$this->_settings->isStrict()) {
+            return;
+        }
+
+        $security = $this->_settings->getSecurityData();
+        if (OneLogin_Saml2_Utils::query($this->document, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH)->length == 1) {
+            $idpData = $this->_settings->getIdPData();
+            $multiCerts = null;
+            if (isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing'])) {
+                $multiCerts = $idpData['x509certMulti']['signing'];
+            }
+            if (!OneLogin_Saml2_Utils::validateSign($this->document, $idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Signature validation failed. SAML Response rejected",
+                    OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+                );
+            }
+            // Only set once the signature was actually verified, so isValid() does not repeat it
+            $this->_responseSignatureValidated = true;
+        } else if ($security['wantMessagesSigned']) {
+            throw new OneLogin_Saml2_ValidationError(
+                "The Message of the Response is not signed and the SP requires it",
+                OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
+            );
         }
     }
 
@@ -107,6 +174,11 @@ class OneLogin_Saml2_Response
     {
         $this->_error = null;
         try {
+            // The message was rejected before decrypting it
+            if ($this->_messageSignatureError !== null) {
+                throw $this->_messageSignatureError;
+            }
+
             // Check SAML version
             if ($this->document->documentElement->getAttribute('Version') != '2.0') {
                 throw new OneLogin_Saml2_ValidationError(
@@ -388,8 +460,9 @@ class OneLogin_Saml2_Response
                     $multiCerts = $idpData['x509certMulti']['signing'];
                 }
 
-                # If find a Signature on the Response, validates it checking the original response
-                if ($hasSignedResponse && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+                # If find a Signature on the Response, validates it checking the original response,
+                # unless it was already verified before decrypting the EncryptedAssertion
+                if ($hasSignedResponse && !$this->_responseSignatureValidated && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Signature validation failed. SAML Response rejected",
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
@@ -589,7 +662,8 @@ class OneLogin_Saml2_Response
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
             $seckey->loadKey($pem);
 
-            $nameId = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey);
+            $security = $this->_settings->getSecurityData();
+            $nameId = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey, true, $security['allowRSA15KeyTransport']);
 
         } else {
             $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
@@ -1102,14 +1176,20 @@ class OneLogin_Saml2_Response
                 OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND
             );
         }
+
+        $doc = $dom instanceof DOMDocument ? $dom : $dom->ownerDocument;
+        $encData = OneLogin_Saml2_Utils::query($doc, '/samlp:Response/saml:EncryptedAssertion/xenc:EncryptedData')->item(0);
         $objenc = new XMLSecEnc();
-        $encData = $objenc->locateEncryptedData($dom);
         if (!$encData) {
             throw new OneLogin_Saml2_ValidationError(
                 "Cannot locate encrypted assertion",
                 OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT
             );
         }
+
+        $security = $this->_settings->getSecurityData();
+        OneLogin_Saml2_Utils::validateEncryptedDataStructure($encData, $security['allowRSA15KeyTransport']);
+
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
@@ -1123,31 +1203,49 @@ class OneLogin_Saml2_Response
             if ($objKeyInfo->isEncrypted) {
                 $objencKey = $objKeyInfo->encryptedCtx;
                 $objKeyInfo->loadKey($pem, false, false);
-                $key = $objencKey->decryptKey($objKeyInfo);
+                $key = OneLogin_Saml2_Utils::decryptSymmetricKey($objencKey, $objKeyInfo, $objKey->getSymmetricKeySize());
             } else {
                 // symmetric encryption key support
                 $objKeyInfo->loadKey($pem, false, false);
             }
         }
 
-        if (empty($objKey->key)) {
-            $objKey->loadKey($key);
+        // Failures from here depend on the decrypted bytes: report them all the same way
+        $useInternalErrors = libxml_use_internal_errors(true);
+        try {
+            if (empty($objKey->key)) {
+                $objKey->loadKey($key);
+            }
+            $decryptedXML = $objenc->decryptNode($objKey, false);
+            if (!is_string($decryptedXML) || $decryptedXML === '') {
+                throw new Exception('Empty decrypted assertion');
+            }
+            $decrypted = new DOMDocument();
+            $check = OneLogin_Saml2_Utils::loadXML($decrypted, $decryptedXML);
+        } catch (Exception $e) {
+            $check = false;
+        } catch (Throwable $e) {
+            // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+            $check = false;
         }
-        $decryptedXML = $objenc->decryptNode($objKey, false);
-        $decrypted = new DOMDocument();
-        $check = OneLogin_Saml2_Utils::loadXML($decrypted, $decryptedXML);
+        libxml_clear_errors();
+        libxml_use_internal_errors($useInternalErrors);
+        while (openssl_error_string() !== false);
+
         if ($check === false) {
-            throw new Exception('Error: string from decrypted assertion could not be loaded into a XML document');
+            throw new OneLogin_Saml2_ValidationError(
+                OneLogin_Saml2_Utils::DECRYPTION_FAILED_MESSAGE,
+                OneLogin_Saml2_ValidationError::DECRYPTION_FAILED
+            );
         }
 
-        // check if the decrypted assertion contains an encryptedID
-        $encryptedID = $decrypted->getElementsByTagName('EncryptedID')->item(0);
-        if ($encryptedID) {
+        // check if the Subject of the decrypted assertion contains an encryptedID
+        $encryptedData = OneLogin_Saml2_Utils::query($decrypted, '/saml:Assertion/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->item(0);
+        if ($encryptedData) {
             // decrypt the encryptedID
             $this->encryptedNameId = true;
-            $encryptedData = $encryptedID->getElementsByTagName('EncryptedData')->item(0);
             $nameId = $this->decryptNameId($encryptedData, $pem);
-            OneLogin_Saml2_Utils::treeCopyReplace($encryptedID, $nameId);
+            OneLogin_Saml2_Utils::treeCopyReplace($encryptedData->parentNode, $nameId);
         }
 
         if ($encData->parentNode instanceof DOMDocument) {
@@ -1193,33 +1291,32 @@ class OneLogin_Saml2_Response
      * @throws OneLogin_Saml2_Error
      * @throws OneLogin_Saml2_ValidationError
      */
-    private function decryptNameId(\DOMElement $encryptedData, string $pem)
+    private function decryptNameId(DOMElement $encryptedData, $pem)
     {
         $objenc = new XMLSecEnc();
-        $encData = $objenc->locateEncryptedData($encryptedData);
-        $objenc->setNode($encData);
-        $objenc->type = $encData->getAttribute("Type");
+        $objenc->setNode($encryptedData);
+        $objenc->type = $encryptedData->getAttribute("Type");
         if (!$objKey = $objenc->locateKey()) {
             throw new OneLogin_Saml2_ValidationError(
                 "Unknown algorithm",
-                ValidationError::KEY_ALGORITHM_ERROR
+                OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
             );
         }
-        $key = null;
-        if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
-            if ($objKeyInfo->isEncrypted) {
-                $objencKey = $objKeyInfo->encryptedCtx;
-                $objKeyInfo->loadKey($pem, false, false);
-                $key = $objencKey->decryptKey($objKeyInfo);
-            } else {
-                // symmetric encryption key support
-                $objKeyInfo->loadKey($pem, false, false);
-            }
+
+        $security = $this->_settings->getSecurityData();
+        OneLogin_Saml2_Utils::validateEncryptedDataStructure($encryptedData, $security['allowRSA15KeyTransport']);
+
+        $objKeyInfo = $objenc->locateKeyInfo($objKey);
+        if ($objKeyInfo && $objKeyInfo->isEncrypted) {
+            // As getNameIdData(): decryptElement unwraps the symmetric key with the SP private key
+            $inputKey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+        } else {
+            // symmetric encryption key support
+            $inputKey = $objKey;
         }
-        if (empty($objKey->key)) {
-            $objKey->loadKey($key);
-        }
-        return OneLogin_Saml2_Utils::decryptElement($encryptedData, $objKey);
+        $inputKey->loadKey($pem, false, false);
+
+        return OneLogin_Saml2_Utils::decryptElement($encryptedData, $inputKey, true, $security['allowRSA15KeyTransport']);
     }
 
     /**

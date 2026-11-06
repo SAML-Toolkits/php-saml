@@ -178,6 +178,29 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the processResponse method of the OneLogin_Saml2_Auth class
+    * Case Response with an EncryptedAssertion that is not signed when signed messages
+    * are required: it is reported as an invalid response instead of raising an
+    * exception, and the assertion is not decrypted
+    *
+    * @covers OneLogin_Saml2_Auth::processResponse
+    */
+    public function testProcessResponseEncryptedAssertionNotSignedWhenRequired()
+    {
+        $settingsInfo = $this->_settingsInfo;
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['wantMessagesSigned'] = true;
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+        $auth->processResponse();
+
+        $this->assertFalse($auth->isAuthenticated());
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals('The Message of the Response is not signed and the SP requires it', $auth->getLastErrorReason());
+    }
+
+    /**
+    * Tests the processResponse method of the OneLogin_Saml2_Auth class
     * Case Invalid Response, Invalid requestID
     *
     * @covers OneLogin_Saml2_Auth::processResponse
