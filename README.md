@@ -12,6 +12,8 @@ Add SAML support to your PHP software using this library.
 Warning
 -------
 
+Version 2.22.0 mitigates the xmlseclibs advisories published in August 2026, as this branch keeps the bundled xmlseclibs 3.x (xmlseclibs 4.x requires PHP 8) ([GHSA-7mf5-fjj8-mvjc](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-7mf5-fjj8-mvjc), [GHSA-39hg-wfcm-v4wv](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-39hg-wfcm-v4wv), [GHSA-7h47-29x2-r2gc](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-7h47-29x2-r2gc), [GHSA-m5mw-mr39-66vp](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-m5mw-mr39-66vp), [GHSA-w5f2-cpgp-pg76](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-w5f2-cpgp-pg76), [GHSA-7hf8-fh6v-wmm6](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-7hf8-fh6v-wmm6), [GHSA-9wcx-p7hr-f935](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-9wcx-p7hr-f935)). The toolkit now validates received Signatures and encrypted elements before xmlseclibs processes them: only the Transforms, canonicalization and signature algorithms used by SAML are accepted, the Reference must identify exactly one element and the Signature must cover the element it is attached to, KeyInfo and EncryptedKey references that xmlseclibs would follow without limit are rejected and every decryption failure is reported with the same error. The bundled xmlseclibs only supports CBC (not authenticated) for encrypted data, so if you receive encrypted assertions or NameIDs, also enable 'wantMessagesSigned' (with strict mode, the Response and LogoutRequest signatures are then required and verified before decrypting) and set 'allowRSA15KeyTransport' to false if your IdP uses RSA-OAEP. The encrypted NameIDs sent by the SP now use RSA-OAEP key transport instead of RSA-1.5.
+
 Version 2.21.1 updates xmlseclibs to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
 
 Version 2.18.0 introduces the 'rejectUnsolicitedResponsesWithInResponseTo' setting parameter, by default disabled, that will allow invalidate unsolicited SAMLResponse. This version as well will reject SAMLResponse if requestId was provided to the validator but the SAMLResponse does not contain a InResponseTo attribute.  And an additional setting parameter 'destinationStrictlyMatches', by default disabled, that will force that the Destination URL should strictly match to the address that process the SAMLResponse.
@@ -95,13 +97,13 @@ Installation
 
 ### Dependencies ###
 
- * `php >= 5.3.3` and some core extensions like `php-xml`, `php-date`, `php-zlib`.
+ * `php > 5.4` and some core extensions like `php-xml`, `php-date`, `php-zlib`.
  * `openssl`. Install the openssl library. It handles x509 certificates.
  * `mcrypt`. Install that library and its php driver if you're going to handle
    encrypted data (`nameID`, `assertions`).
  * `curl`. Install that library and its php driver if you plan to use the IdP Metadata parser.
 
-Since [PHP 5.3 is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version.
+Since [PHP 5.X and 7.X is officially unsupported](http://php.net/eol.php) we recommend you to use a newer PHP version and use the 4.x-dev branch.
 
 ### Code ###
 
@@ -176,6 +178,10 @@ In production, the `strict` parameter **MUST** be set as `"true"` and the
 `signatureAlgorithm` and `digestAlgorithm` under `security` must be set to
 something other than SHA1 (see https://shattered.io/ ). Otherwise your
 environment is not secure and will be exposed to attacks.
+
+The xmlseclibs included in this branch can only decrypt CBC (no AES-GCM support), that why the 'allowCBCEncryption' does not exists in this branch as it should always have the value set as true (otherwise any encryption should be rejected as CBC is the only supported one).
+
+In strict mode, the signature of a signed <samlp:Response> that contains an EncryptedAssertion is verified before decrypting it (with `wantMessagesSigned`, an unsigned one is not decrypted), and an EncryptedID of a <samlp:LogoutRequest> is decrypted after its signature is verified, so tampered ciphertexts are rejected without being processed.
 
 In production also we highly recommended to register on the settings the IdP certificate instead of using the fingerprint method. The fingerprint, is a hash, so at the end is open to a collision attack that can end on a signature validation bypass. Other SAML toolkits deprecated that mechanism, we maintain it for compatibility and also to be used on test environment.
 
@@ -489,7 +495,7 @@ $advancedSettings = array (
         /** signatures and encryptions offered */
 
         // Indicates that the nameID of the <samlp:logoutRequest> sent by this SP
-        // will be encrypted.
+        // will be encrypted (aes128-cbc, with rsa-oaep-mgf1p key transport).
         'nameIdEncrypted' => false,
 
         // Indicates whether the <samlp:AuthnRequest> messages sent by this SP
@@ -520,6 +526,10 @@ $advancedSettings = array (
 
         // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest>
         // and <samlp:LogoutResponse> elements received by this SP to be signed.
+        // In strict mode, the signature of a <samlp:Response> that contains an
+        // EncryptedAssertion is verified before decrypting it. With this option an
+        // unsigned one is not decrypted, so tampered ciphertexts are always
+        // rejected without being processed.
         'wantMessagesSigned' => false,
 
         // Indicates a requirement for the <saml:Assertion> elements received by
@@ -582,6 +592,11 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
         // Notice that sha1 is a deprecated algorithm and should not be used
         'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+
+        // If false, received encrypted elements whose key is wrapped with
+        // 'http://www.w3.org/2001/04/xmlenc#rsa-1_5' are rejected (only RSA-OAEP
+        // is accepted). RSA-1.5 is exposed to Bleichenbacher padding oracle attacks.
+        'allowRSA15KeyTransport' => true,
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification

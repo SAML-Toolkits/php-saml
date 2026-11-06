@@ -11,6 +11,30 @@ class OneLogin_Saml2_Utils
     const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
     const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
+    const DECRYPTION_FAILED_MESSAGE = 'Failure decrypting Data';
+
+    /**
+     * @var array Transforms accepted on a received Signature Reference. SAML only
+     *            needs enveloped-signature plus canonicalization (XPath/XSLT are rejected).
+     */
+    private static $_allowedSignatureTransforms = array(
+        'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
+        'http://www.w3.org/2001/10/xml-exc-c14n#',
+        'http://www.w3.org/2001/10/xml-exc-c14n#WithComments',
+        'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
+        'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments'
+    );
+
+    /**
+     * @var array CanonicalizationMethod algorithms accepted on a received Signature.
+     */
+    private static $_allowedCanonicalizationMethods = array(
+        'http://www.w3.org/2001/10/xml-exc-c14n#',
+        'http://www.w3.org/2001/10/xml-exc-c14n#WithComments',
+        'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
+        'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments'
+    );
+
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
      */
@@ -86,7 +110,7 @@ class OneLogin_Saml2_Utils
 
         $oldEntityLoader = libxml_disable_entity_loader(true);
 
-        $res = $dom->loadXML($xml);
+        $res = $dom->loadXML($xml, LIBXML_NONET);
 
         libxml_disable_entity_loader($oldEntityLoader);
 
@@ -1088,7 +1112,9 @@ class OneLogin_Saml2_Utils
         $doc->appendChild($nameId);
 
         if (!empty($cert)) {
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
+            // RSA-1.5 key transport is exposed to Bleichenbacher attacks and rejected by
+            // receivers that set 'allowRSA15KeyTransport' to false (or use xmlseclibs 4)
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
             $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
@@ -1165,16 +1191,18 @@ class OneLogin_Saml2_Utils
     /**
      * Decrypts an encrypted element.
      *
-     * @param DOMElement     $encryptedData The encrypted data.
-     * @param XMLSecurityKey $inputKey      The decryption key.
-     * @param bool           $formatOutput  Format or not the output.
+     * @param DOMElement     $encryptedData          The encrypted data.
+     * @param XMLSecurityKey $inputKey               The decryption key.
+     * @param bool           $formatOutput           Format or not the output.
+     * @param bool           $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
      *
      * @return DOMElement  The decrypted element.
      *
      * @throws OneLogin_Saml2_ValidationError
      */
-    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true)
+    public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true, $allowRSA15KeyTransport = true)
     {
+        self::validateEncryptedDataStructure($encryptedData, $allowRSA15KeyTransport);
 
         $enc = new XMLSecEnc();
 
@@ -1226,20 +1254,7 @@ class OneLogin_Saml2_Utils
                 );
             }
 
-            $key = $encKey->decryptKey($symmetricKeyInfo);
-            if (strlen($key) != $keySize) {
-                $encryptedKey = $encKey->getCipherValue();
-                $pkey = openssl_pkey_get_details($symmetricKeyInfo->key);
-                $pkey = sha1(serialize($pkey), true);
-                $key = sha1($encryptedKey . $pkey, true);
-
-                /* Make sure that the key has the correct length. */
-                if (strlen($key) > $keySize) {
-                    $key = substr($key, 0, $keySize);
-                } elseif (strlen($key) < $keySize) {
-                    $key = str_pad($key, $keySize);
-                }
-            }
+            $key = self::decryptSymmetricKey($encKey, $symmetricKeyInfo, $keySize);
             $symmetricKey->loadKey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorithm();
@@ -1254,31 +1269,231 @@ class OneLogin_Saml2_Utils
             $symmetricKey = $inputKey;
         }
 
-        $decrypted = $enc->decryptNode($symmetricKey, false);
+        // From here on every failure depends on the decrypted bytes, so all of
+        // them are reported the same way to avoid a padding/parsing oracle.
+        $useInternalErrors = libxml_use_internal_errors(true);
+        try {
+            $decrypted = $enc->decryptNode($symmetricKey, false);
 
-        $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
-        $newDoc = new DOMDocument();
-        if ($formatOutput) {
-            $newDoc->preserveWhiteSpace = false;
-            $newDoc->formatOutput = true;
+            $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
+            $newDoc = new DOMDocument();
+            if ($formatOutput) {
+                $newDoc->preserveWhiteSpace = false;
+                $newDoc->formatOutput = true;
+            }
+            $newDoc = self::loadXML($newDoc, $xml);
+        } catch (Exception $e) {
+            $newDoc = false;
+        } catch (Throwable $e) {
+            // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+            $newDoc = false;
         }
-        $newDoc = self::loadXML($newDoc, $xml);
-        if (!$newDoc) {
+        libxml_clear_errors();
+        libxml_use_internal_errors($useInternalErrors);
+        while (openssl_error_string() !== false);
+
+        // The decrypted content must be an element (not text, a comment...)
+        if (!$newDoc || !($newDoc->firstChild->firstChild instanceof DOMElement)) {
             throw new OneLogin_Saml2_ValidationError(
-                'Failed to parse decrypted XML.',
+                self::DECRYPTION_FAILED_MESSAGE,
+                OneLogin_Saml2_ValidationError::DECRYPTION_FAILED
+            );
+        }
+
+        return $newDoc->firstChild->firstChild;
+    }
+
+    /**
+     * Decrypts the symmetric key of an EncryptedKey with the SP private key.
+     *
+     * A decryption error or a key of unexpected size is replaced by a
+     * deterministic key derived from the private key, so a forged EncryptedKey
+     * fails later in the same way as a valid one (RFC 3218, section 2.3.2).
+     * The replacement key is always computed and the RSA decryption does not
+     * raise exceptions, so the work done does not depend on the padding.
+     *
+     * @param XMLSecEnc      $encKey  The EncryptedKey context.
+     * @param XMLSecurityKey $keyInfo The key transport key, loaded with the SP private key.
+     * @param int            $keySize The size of the expected symmetric key.
+     *
+     * @return string The symmetric key
+     *
+     * @throws Exception
+     */
+    public static function decryptSymmetricKey(XMLSecEnc $encKey, XMLSecurityKey $keyInfo, $keySize)
+    {
+        if (empty($keyInfo->key)) {
+            throw new Exception('Key is missing data to perform the decryption');
+        }
+
+        $encryptedKey = $encKey->getCipherValue();
+
+        $pkey = openssl_pkey_get_details($keyInfo->key);
+        $pkey = sha1(serialize($pkey), true);
+        $replacementKey = sha1($encryptedKey . $pkey, true);
+
+        /* Make sure that the key has the correct length. */
+        if (strlen($replacementKey) > $keySize) {
+            $replacementKey = substr($replacementKey, 0, $keySize);
+        } elseif (strlen($replacementKey) < $keySize) {
+            $replacementKey = str_pad($replacementKey, $keySize);
+        }
+
+        $paddings = array(
+            XMLSecurityKey::RSA_1_5 => OPENSSL_PKCS1_PADDING,
+            XMLSecurityKey::RSA_OAEP_MGF1P => OPENSSL_PKCS1_OAEP_PADDING
+        );
+        $key = null;
+        $algorithm = $keyInfo->getAlgorithm();
+        if (isset($paddings[$algorithm]) && is_string($encryptedKey)) {
+            openssl_private_decrypt($encryptedKey, $key, $keyInfo->key, $paddings[$algorithm]);
+        }
+        while (openssl_error_string() !== false);
+
+        return (is_string($key) && strlen($key) == $keySize) ? $key : $replacementKey;
+    }
+
+    /**
+     * Checks the algorithms and KeyInfo of a received xenc:EncryptedData before
+     * xmlseclibs processes it (it has no algorithm policy and resolves
+     * RetrievalMethod/EncryptedKey references without a depth limit).
+     *
+     * @param DOMElement $encryptedData          The xenc:EncryptedData element.
+     * @param bool       $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
+     *
+     * @throws OneLogin_Saml2_ValidationError
+     */
+    public static function validateEncryptedDataStructure(DOMElement $encryptedData, $allowRSA15KeyTransport = true)
+    {
+        $dom = $encryptedData->ownerDocument;
+        if ($dom->doctype !== null) {
+            throw new OneLogin_Saml2_ValidationError(
+                'Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks',
                 OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT
             );
         }
 
-        $decryptedElement = $newDoc->firstChild->firstChild;
-        if ($decryptedElement === null) {
+        // The data encryption algorithms supported by the bundled xmlseclibs
+        $dataAlgorithms = array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC);
+        $keyAlgorithms = array(XMLSecurityKey::RSA_OAEP_MGF1P);
+        if ($allowRSA15KeyTransport) {
+            $keyAlgorithms[] = XMLSecurityKey::RSA_1_5;
+        }
+
+        $xpath = new DOMXPath($dom);
+        $xpath->registerNamespace('xenc', OneLogin_Saml2_Constants::NS_XENC);
+        $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
+
+        // xmlseclibs uses the first EncryptionMethod descendant, so that is the one checked
+        $encMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedData)->item(0);
+        if ($encMethod === null || !in_array($encMethod->getAttribute('Algorithm'), $dataAlgorithms, true)) {
             throw new OneLogin_Saml2_ValidationError(
-                'Missing encrypted element.',
-                OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT
+                'Unsupported or not allowed data encryption algorithm',
+                OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
             );
         }
 
-        return $decryptedElement;
+        // RetrievalMethod is resolved document-wide, so check every EncryptedKey. xmlseclibs
+        // follows KeyInfo children named RetrievalMethod/EncryptedKey in any namespace
+        foreach ($xpath->query('//*[local-name()="EncryptedKey"]') as $encryptedKey) {
+            if ($xpath->query('.//*[local-name()="RetrievalMethod" or local-name()="EncryptedKey"]', $encryptedKey)->length > 0) {
+                throw new OneLogin_Saml2_ValidationError(
+                    'Nested EncryptedKey references are not supported',
+                    OneLogin_Saml2_ValidationError::UNSUPPORTED_RETRIEVAL_METHOD
+                );
+            }
+            $keyMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedKey)->item(0);
+            if ($keyMethod === null || !in_array($keyMethod->getAttribute('Algorithm'), $keyAlgorithms, true)) {
+                throw new OneLogin_Saml2_ValidationError(
+                    'Unsupported or not allowed key transport algorithm',
+                    OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
+                );
+            }
+        }
+    }
+
+    /**
+     * Checks that a received ds:Signature only uses what SAML needs before
+     * xmlseclibs processes it: it evaluates Reference transforms (XPath
+     * included) before any cryptographic check, accepts a DOCTYPE, picks
+     * the first node when a Reference URI matches several and follows
+     * RetrievalMethod/EncryptedKey references of the KeyInfo without a depth
+     * limit (the KeyInfo is not covered by the signature).
+     *
+     * @param DOMElement $signatureNode The ds:Signature element
+     *
+     * @throws Exception
+     */
+    public static function validateSignatureStructure(DOMElement $signatureNode)
+    {
+        $dom = $signatureNode->ownerDocument;
+        if ($dom->doctype !== null) {
+            throw new Exception('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks');
+        }
+
+        $xpath = new DOMXPath($dom);
+        $xpath->registerNamespace('ds', OneLogin_Saml2_Constants::NS_DS);
+
+        $signedInfo = $xpath->query('./ds:SignedInfo', $signatureNode);
+        if ($signedInfo->length != 1 || $xpath->query('./ds:SignatureValue', $signatureNode)->length != 1) {
+            throw new Exception('Invalid Signature structure');
+        }
+        $signedInfo = $signedInfo->item(0);
+
+        // Matched by local name, as xmlseclibs does
+        $keyReferences = $xpath->query('./ds:KeyInfo/*[local-name()="RetrievalMethod" or local-name()="EncryptedKey"]', $signatureNode);
+        if ($keyReferences->length > 0) {
+            throw new Exception('Unsupported KeyInfo in the Signature');
+        }
+
+        $canonicalizationMethod = $xpath->query('./ds:CanonicalizationMethod', $signedInfo);
+        if ($canonicalizationMethod->length != 1
+            || !in_array($canonicalizationMethod->item(0)->getAttribute('Algorithm'), self::$_allowedCanonicalizationMethods, true)
+        ) {
+            throw new Exception('Unsupported CanonicalizationMethod in the Signature');
+        }
+
+        $signatureMethod = $xpath->query('./ds:SignatureMethod', $signedInfo);
+        if ($signatureMethod->length != 1
+            || !self::isSupportedSigningAlgorithm($signatureMethod->item(0)->getAttribute('Algorithm'))
+        ) {
+            throw new Exception('Unsupported signing algorithm.');
+        }
+
+        $reference = $xpath->query('./ds:Reference', $signedInfo);
+        if ($reference->length != 1) {
+            throw new Exception('Unexpected number of Reference nodes found for signature');
+        }
+        $reference = $reference->item(0);
+        if ($xpath->query('./ds:DigestMethod', $reference)->length != 1
+            || $xpath->query('./ds:DigestValue', $reference)->length != 1
+            || $xpath->query('./ds:Transforms', $reference)->length > 1
+        ) {
+            throw new Exception('Invalid Reference structure in the Signature');
+        }
+        foreach ($xpath->query('./ds:Transforms/ds:Transform', $reference) as $transform) {
+            if (!in_array($transform->getAttribute('Algorithm'), self::$_allowedSignatureTransforms, true)) {
+                throw new Exception('Unsupported Transform in the Signature');
+            }
+        }
+
+        $uri = $reference->getAttribute('URI');
+        if ($uri !== '') {
+            if (strlen($uri) < 2 || $uri[0] !== '#') {
+                throw new Exception('Reference URI must point to an element of the same document');
+            }
+            // xmlseclibs matches both @ID and @Id and digests the first match
+            $id = substr($uri, 1);
+            $matches = 0;
+            foreach ($xpath->query('//@ID | //@Id') as $attr) {
+                if ($attr->value === $id) {
+                    $matches++;
+                }
+            }
+            if ($matches != 1) {
+                throw new Exception('Reference URI must identify exactly one element');
+            }
+        }
     }
 
     /**
@@ -1313,7 +1528,13 @@ class OneLogin_Saml2_Utils
             throw new Exception('Missing key in public key details.');
         }
         $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
-        $newKey->loadKey($keyInfo['key']);
+        // Keep the X.509 certificate when the key was loaded from one
+        $cert = $key->getX509Certificate();
+        if ($cert !== null) {
+            $newKey->loadKey($cert, false, true);
+        } else {
+            $newKey->loadKey($keyInfo['key']);
+        }
         return $newKey;
     }
 
@@ -1451,12 +1672,34 @@ class OneLogin_Saml2_Utils
             throw new Exception('Unsupported signing algorithm.');
         }
 
+        self::validateSignatureStructure($objDSig);
+
+        // xmlseclibs detaches the Signature in validateReference(), so keep
+        // the element it is attached to for the coverage check below
+        $signatureParent = $objDSig->parentNode;
+
         $objXMLSecDSig->canonicalizeSignedInfo();
 
         try {
             $retVal = $objXMLSecDSig->validateReference();
         } catch (Exception $e) {
             throw $e;
+        }
+
+        // Before verifying the signature, confirm the signature covers the element it is attached to.
+        // Extra security measure to prevent certain types of attacks.
+        $covered = false;
+        $validatedNodes = $objXMLSecDSig->getValidatedNodes();
+        foreach ($validatedNodes ? $validatedNodes : array() as $validatedNode) {
+            for ($node = $signatureParent; $node !== null; $node = $node->parentNode) {
+                if ($node->isSameNode($validatedNode)) {
+                    $covered = true;
+                    break 2;
+                }
+            }
+        }
+        if (!$covered) {
+            throw new Exception('The Signature does not cover the element it is attached to');
         }
 
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
@@ -1566,6 +1809,15 @@ class OneLogin_Saml2_Utils
         } else {
             $strMessageType = "Logout Response";
         }
+
+        // Reject unsupported algorithms (HMAC, ...) whatever the number of certs
+        if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($signAlg)) {
+            throw new OneLogin_Saml2_ValidationError(
+                "Invalid signAlg in the received ".$strMessageType,
+                OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+            );
+        }
+
         $existsMultiX509Sign = isset($idpData['x509certMulti']) && isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing']);
         if ((!isset($idpData['x509cert']) || empty($idpData['x509cert'])) && !$existsMultiX509Sign) {
             throw new OneLogin_Saml2_Error(

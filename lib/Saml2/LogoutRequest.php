@@ -189,15 +189,16 @@ LOGOUTREQUEST;
     /**
      * Gets the NameID Data of the the Logout Request.
      *
-     * @param string|DOMDocument $request Logout Request Message
-     * @param string|null $key The SP key
+     * @param string|DOMDocument $request                Logout Request Message
+     * @param string|null        $key                    The SP key
+     * @param bool               $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      *
      * @throws OneLogin_Saml2_Error
      * @throws OneLogin_Saml2_ValidationError
      */
-    public static function getNameIdData($request, $key = null)
+    public static function getNameIdData($request, $key = null, $allowRSA15KeyTransport = true)
     {
         if ($request instanceof DOMDocument) {
             $dom = $request;
@@ -222,7 +223,7 @@ LOGOUTREQUEST;
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
             $seckey->loadKey($key);
 
-            $nameId = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey);
+            $nameId = OneLogin_Saml2_Utils::decryptElement($encryptedData, $seckey, true, $allowRSA15KeyTransport);
 
         } else {
             $entries = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
@@ -252,17 +253,18 @@ LOGOUTREQUEST;
     /**
      * Gets the NameID of the Logout Request.
      *
-     * @param string|DOMDocument $request Logout Request Message
-     * @param string|null $key The SP key
+     * @param string|DOMDocument $request                Logout Request Message
+     * @param string|null        $key                    The SP key
+     * @param bool               $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
      *
      * @return string Name ID Value
      *
      * @throws OneLogin_Saml2_Error
      * @throws OneLogin_Saml2_ValidationError
      */
-    public static function getNameId($request, $key = null)
+    public static function getNameId($request, $key = null, $allowRSA15KeyTransport = true)
     {
-        $nameId = self::getNameIdData($request, $key);
+        $nameId = self::getNameIdData($request, $key, $allowRSA15KeyTransport);
         return $nameId['Value'];
     }
 
@@ -318,6 +320,27 @@ LOGOUTREQUEST;
             $sessionIndexes[] = $sessionIndexNode->textContent;
         }
         return $sessionIndexes;
+    }
+
+    /**
+     * Checks the algorithms of the EncryptedID of the Logout Request against
+     * the security settings, before getNameId() decrypts it.
+     *
+     * @param DOMDocument $dom Logout Request Message
+     *
+     * @throws OneLogin_Saml2_ValidationError
+     */
+    private function _validateEncryptedNameId(DOMDocument $dom)
+    {
+        $encryptedEntries = OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutRequest/saml:EncryptedID');
+        if ($encryptedEntries->length == 1) {
+            // Same EncryptedData that getNameIdData() decrypts
+            $encryptedData = $encryptedEntries->item(0)->getElementsByTagName('EncryptedData')->item(0);
+            if ($encryptedData instanceof DOMElement) {
+                $security = $this->_settings->getSecurityData();
+                OneLogin_Saml2_Utils::validateEncryptedDataStructure($encryptedData, $security['allowRSA15KeyTransport']);
+            }
+        }
     }
 
     /**
@@ -389,8 +412,6 @@ LOGOUTREQUEST;
                     }
                 }
 
-                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
-
                 // Check issuer
                 $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
@@ -416,6 +437,13 @@ LOGOUTREQUEST;
                         OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                     );
                 }
+            }
+
+            if ($this->_settings->isStrict()) {
+                // An EncryptedID is only decrypted once the signature has been verified,
+                // so tampered ciphertexts do not reach the decryption code
+                $this->_validateEncryptedNameId($dom);
+                static::getNameId($dom, $this->_settings->getSPkey());
             }
 
             return true;

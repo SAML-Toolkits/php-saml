@@ -1821,4 +1821,41 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($response->isValid());
         $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $response->getNameId());
     }
+
+    /**
+    * EncryptedID with rsa-oaep-mgf1p and rsa-1_5 key transport, and the
+    * allowRSA15KeyTransport setting
+    *
+    * @covers OneLogin_Saml2_Response::getNameId
+    */
+    public function testEncryptedNameIdKeyTransport()
+    {
+        $expectedNameId = '2de11defd199f8d5bb63f9b7deb265ba5c675c10';
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['security']['allowRSA15KeyTransport'] = false;
+        $settingsWithoutRSA15 = new OneLogin_Saml2_Settings($settingsInfo);
+
+        // aes128-cbc + rsa-oaep-mgf1p
+        $oaepXml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid_oaep.xml.base64');
+        $oaepResponse = new OneLogin_Saml2_Response($this->_settings, $oaepXml);
+        $this->assertEquals($expectedNameId, $oaepResponse->getNameId());
+        $oaepResponse = new OneLogin_Saml2_Response($settingsWithoutRSA15, $oaepXml);
+        $this->assertEquals($expectedNameId, $oaepResponse->getNameId());
+
+        // aes128-cbc + rsa-1_5
+        $rsa15Xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
+        $rsa15Response = new OneLogin_Saml2_Response($this->_settings, $rsa15Xml);
+        $this->assertEquals($expectedNameId, $rsa15Response->getNameId());
+
+        try {
+            $blockedResponse = new OneLogin_Saml2_Response($settingsWithoutRSA15, $rsa15Xml);
+            $blockedResponse->getNameId();
+            $this->fail('Exception was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage());
+            $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $e->getCode());
+        }
+    }
 }

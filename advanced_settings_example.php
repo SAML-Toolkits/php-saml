@@ -17,7 +17,7 @@ $advancedSettings = array (
         /** signatures and encryptions offered */
 
         // Indicates that the nameID of the <samlp:logoutRequest> sent by this SP
-        // will be encrypted.
+        // will be encrypted (aes128-cbc, with rsa-oaep-mgf1p key transport).
         'nameIdEncrypted' => false,
 
         // Indicates whether the <samlp:AuthnRequest> messages sent by this SP
@@ -49,6 +49,10 @@ $advancedSettings = array (
 
         // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest> and
         // <samlp:LogoutResponse> elements received by this SP to be signed.
+        // In strict mode, the signature of a <samlp:Response> that contains an
+        // EncryptedAssertion is verified before decrypting it. With this option an
+        // unsigned one is not decrypted, so tampered ciphertexts are always
+        // rejected without being processed.
         'wantMessagesSigned' => false,
 
         // Indicates a requirement for the <saml:Assertion> elements received by
@@ -115,6 +119,11 @@ $advancedSettings = array (
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
         // Notice that sha1 is a deprecated algorithm and should not be used
         'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+
+        // If false, received encrypted elements whose key is wrapped with
+        // 'http://www.w3.org/2001/04/xmlenc#rsa-1_5' are rejected (only RSA-OAEP
+        // is accepted). RSA-1.5 is exposed to Bleichenbacher padding oracle attacks.
+        'allowRSA15KeyTransport' => true,
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification

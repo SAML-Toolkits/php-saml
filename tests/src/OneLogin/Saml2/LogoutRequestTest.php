@@ -421,6 +421,57 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * EncryptedID with rsa-oaep-mgf1p and rsa-1_5 key transport, and the
+    * $allowRSA15KeyTransport parameter and setting
+    *
+    * @covers OneLogin_Saml2_LogoutRequest::getNameIdData
+    * @covers OneLogin_Saml2_LogoutRequest::getNameId
+    * @covers OneLogin_Saml2_LogoutRequest::isValid
+    */
+    public function testGetNameIdAllowRSA15KeyTransport()
+    {
+        $key = $this->_settings->getSPkey();
+        $expectedNameId = 'ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69';
+
+        // aes128-cbc + rsa-oaep-mgf1p
+        $oaepRequest = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid_oaep.xml');
+        $this->assertEquals($expectedNameId, OneLogin_Saml2_LogoutRequest::getNameId($oaepRequest, $key));
+        $this->assertEquals($expectedNameId, OneLogin_Saml2_LogoutRequest::getNameId($oaepRequest, $key, false));
+        $nameIdData = OneLogin_Saml2_LogoutRequest::getNameIdData($oaepRequest, $key, false);
+        $this->assertEquals($expectedNameId, $nameIdData['Value']);
+
+        // aes128-cbc + rsa-1_5
+        $rsa15Request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_encrypted_nameid.xml');
+        $this->assertEquals($expectedNameId, OneLogin_Saml2_LogoutRequest::getNameId($rsa15Request, $key, true));
+        try {
+            OneLogin_Saml2_LogoutRequest::getNameId($rsa15Request, $key, false);
+            $this->fail('OneLogin_Saml2_ValidationError was not raised');
+        } catch (OneLogin_Saml2_ValidationError $e) {
+            $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage());
+        }
+
+        // In strict mode, isValid() decrypts the EncryptedID applying the setting
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['allowRSA15KeyTransport'] = false;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+
+        $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+        foreach (array('oaep' => $oaepRequest, 'rsa-1_5' => $rsa15Request) as $name => $request) {
+            $request = str_replace(array('http://idp.example.com/SingleLogoutService.php', 'http://stuff.com/endpoints/endpoints/sls.php'), $currentURL, $request);
+            $request = str_replace('http://stuff.com/endpoints/metadata.php', 'http://idp.example.com/', $request);
+            $logoutRequest = new OneLogin_Saml2_LogoutRequest($settings, base64_encode(gzdeflate($request)));
+            if ($name === 'oaep') {
+                $this->assertTrue($logoutRequest->isValid(), (string) $logoutRequest->getError());
+            } else {
+                $this->assertFalse($logoutRequest->isValid());
+                $this->assertEquals('Unsupported or not allowed key transport algorithm', $logoutRequest->getError());
+            }
+        }
+    }
+
+    /**
     * Tests the getIssuer of the OneLogin_Saml2_LogoutRequest
     *
     * @covers OneLogin_Saml2_LogoutRequest::getIssuer
