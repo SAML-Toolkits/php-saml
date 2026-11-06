@@ -361,6 +361,11 @@ class Response
                             }
                         }
                     }
+                } elseif ($security['requireDestination']) {
+                    throw new ValidationError(
+                        "The response has no Destination value",
+                        ValidationError::MISSING_DESTINATION
+                    );
                 }
 
                 // Check audience
