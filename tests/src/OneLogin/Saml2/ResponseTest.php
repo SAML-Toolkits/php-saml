@@ -779,6 +779,41 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the getErrorException method of the OneLogin_Saml2_Response
+     *
+     * @covers OneLogin_Saml2_Response::getErrorException
+     */
+    public function testGetErrorException()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/response4.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+
+        $this->assertNull($response->getErrorException());
+
+        $this->assertFalse($response->isValid());
+        $errorException = $response->getErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_ASSERTIONS, $errorException->getCode());
+        $this->assertEquals('SAML Response must contain 1 assertion', $errorException->getMessage());
+        $this->assertEquals($errorException->getMessage(), $response->getError());
+
+        $xml2 = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
+        $response2 = new OneLogin_Saml2_Response($this->_settings, $xml2);
+
+        $this->assertTrue($response2->isValid());
+        $this->assertNull($response2->getErrorException());
+
+        // A new validation clears the Exception of the previous one
+        $this->_settings->setStrict(true);
+        $this->assertFalse($response2->isValid());
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $response2->getErrorException());
+        $this->_settings->setStrict(false);
+        $this->assertTrue($response2->isValid());
+        $this->assertNull($response2->getErrorException());
+        $this->assertNull($response2->getError());
+    }
+
+    /**
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
     * Test that the SignatureWrappingAttack is not allowed

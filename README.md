@@ -1449,6 +1449,8 @@ Main class of PHP Toolkit
  * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
+ * `getLastErrorReason` - Returns the reason of the last error
+ * `getLastErrorException` - Returns the Exception of the last error (its code identifies the error)
  * `getSSOurl` - Gets the SSO url.
  * `getSLOurl` - Gets the SLO url.
  * `getLastRequestID` - The ID of the last Request SAML message generated.
@@ -1494,6 +1496,7 @@ SAML 2 Authentication Response class
  * `validateTimestamps` - Verifies that the document is still valid according
    Conditions Element.
  * `getError` - After executing a validation process, if it fails, this method returns the cause
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause
  * `getXMLDocument` - Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
 
 ##### OneLogin_Saml2_LogoutRequest - `LogoutRequest.php` #####
@@ -1509,6 +1512,7 @@ SAML 2 Logout Request class
  * `getSessionIndexes` - Gets the SessionIndexes from the Logout Request.
  * `isValid` - Checks if the Logout Request received is valid.
  * `getError` - After executing a validation process, if it fails, this method returns the cause
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause
  * `getXML` - Returns the XML that will be sent as part of the request or that was received at the SP.
 
 ##### OneLogin_Saml2_LogoutResponse - `LogoutResponse.php` #####
@@ -1523,6 +1527,7 @@ SAML 2 Logout Response class
  * `build` - Generates a Logout Response object.
  * `getResponse` - Returns a Logout Response object.
  * `getError` - After executing a validation process, if it fails, this method returns the cause.
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause.
  * `getXML` - Returns the XML that will be sent as part of the response or that was received at the SP.
 
 ##### OneLogin_Saml2_Settings - `Settings.php` #####

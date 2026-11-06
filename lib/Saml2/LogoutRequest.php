@@ -31,6 +31,13 @@ class OneLogin_Saml2_LogoutRequest
     private $_error;
 
     /**
+     * After execute a validation process, if it fails, this var contains the Exception of the cause
+     *
+     * @var Exception|null
+     */
+    private $_errorException;
+
+    /**
      * Constructs the Logout Request object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
@@ -353,6 +360,7 @@ LOGOUTREQUEST;
     public function isValid($retrieveParametersFromServer = false)
     {
         $this->_error = null;
+        $this->_errorException = null;
         try {
             $dom = new DOMDocument();
             $dom = OneLogin_Saml2_Utils::loadXML($dom, $this->_logoutRequest);
@@ -449,6 +457,7 @@ LOGOUTREQUEST;
             return true;
         } catch (Exception $e) {
             $this->_error = $e->getMessage();
+            $this->_errorException = $e;
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
                 echo htmlentities($this->_error);
@@ -465,6 +474,17 @@ LOGOUTREQUEST;
     public function getError()
     {
         return $this->_error;
+    }
+
+    /**
+     * After execute a validation process, if fails this method returns the Exception of the cause
+     * (its code identifies the error, see OneLogin_Saml2_ValidationError)
+     *
+     * @return Exception|null Cause
+     */
+    public function getErrorException()
+    {
+        return $this->_errorException;
     }
 
     /**

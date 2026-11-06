@@ -169,6 +169,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getLastErrorReason
+    * @covers OneLogin_Saml2_Auth::getLastErrorException
     */
     public function testProcessResponseInvalid()
     {
@@ -188,6 +189,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->_auth->getAttribute('uid'));
         $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
         $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("Reference validation failed", $errorException->getMessage());
     }
 
     /**
@@ -211,6 +214,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($auth->isAuthenticated());
         $this->assertEquals(array('invalid_response'), $auth->getErrors());
         $this->assertEquals('The Message of the Response is not signed and the SP requires it', $auth->getLastErrorReason());
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $auth->getLastErrorException());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE, $auth->getLastErrorException()->getCode());
     }
 
     /**
@@ -233,6 +238,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processResponse($requestId);
 
         $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("No Signature found. SAML Response rejected", $errorException->getMessage());
 
         $this->_auth->setStrict(true);
         $this->_auth->processResponse($requestId);
@@ -269,6 +276,10 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('invalid_response'), $auth->getErrors());
         $this->assertEquals('The response has no Destination value', $auth->getLastErrorReason());
+
+        $errorException = $auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::MISSING_DESTINATION, $errorException->getCode());
 
         unset($_POST['SAMLResponse']);
         unset($_SERVER['HTTP_HOST']);
@@ -538,10 +549,15 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processSLO(true);
         // The Destination fails
         $this->assertEquals($this->_auth->getErrors(), array('invalid_logout_response'));
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $errorException->getCode());
+        $this->assertEquals($errorException->getMessage(), $this->_auth->getLastErrorReason());
 
         $this->_auth->setStrict(false);
         $this->_auth->processSLO(true);
         $this->assertEmpty($this->_auth->getErrors());
+        $this->assertNull($this->_auth->getLastErrorException());
     }
 
     /**
@@ -748,6 +764,28 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Tests the getLastErrorException method of the OneLogin_Saml2_Auth class
+     * Case Invalid Logout Request (it is not answered, so there is no redirection)
+     *
+     * @covers OneLogin_Saml2_Auth::processSLO
+     * @covers OneLogin_Saml2_Auth::getLastErrorException
+     */
+    public function testProcessSLORequestInvalidLastErrorException()
+    {
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
+
+        $this->_auth->setStrict(true);
+        $this->_auth->processSLO(true);
+        // Fail due destination missmatch
+        $this->assertEquals(array('invalid_logout_request'), $this->_auth->getErrors());
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $errorException->getCode());
+        $this->assertEquals($errorException->getMessage(), $this->_auth->getLastErrorReason());
+
+        unset($_GET['SAMLRequest']);
+    }
     /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
     * Case Logout Request NotOnOrAfter failed

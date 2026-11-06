@@ -27,6 +27,7 @@ v.2.22.0
 * [#637](https://github.com/SAML-Toolkits/php-saml/issues/637) Fix incorrect @phpstan-return annotation on processSLO method (it returns null when it processes a Logout Response or an invalid Logout Request)
 * Fix bug on setSchemasPath method from OneLogin_Saml2_Auth class (the path was not passed to the settings, so it was not used). Also see [#635](https://github.com/SAML-Toolkits/php-saml/issues/635)
 * [#631](https://github.com/SAML-Toolkits/php-saml/issues/631) Allow to require Destination: add the 'requireDestination' security setting (false by default) to reject SAMLResponses without a Destination attribute
+* Add OneLogin_Saml2_Auth::getLastErrorException() and the getErrorException() method to OneLogin_Saml2_Response, OneLogin_Saml2_LogoutRequest and OneLogin_Saml2_LogoutResponse: they return the Exception of the last validation error, whose code identifies the error (getLastErrorReason() and getError() still return its message)
 
 v.2.21.2
 * Same as 2.21.1 but set the version updated, 2.21.1 was released with wrong version.json 2.20.0
