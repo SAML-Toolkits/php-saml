@@ -339,6 +339,11 @@ class OneLogin_Saml2_Response
                             }
                         }
                     }
+                } elseif ($security['requireDestination']) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        "The response has no Destination value",
+                        OneLogin_Saml2_ValidationError::MISSING_DESTINATION
+                    );
                 }
 
                 // Check audience

@@ -1117,6 +1117,14 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response4 = new OneLogin_Saml2_Response($settings, $xml2);
         $this->assertTrue($response4->isValid());
 
+        // Missing Destination
+        $xmlNoDestination = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $settingsInfo['security']['requireDestination'] = true;
+        $settingsRequireDestination = new OneLogin_Saml2_Settings($settingsInfo);
+        $responseNoDestination = new OneLogin_Saml2_Response($settingsRequireDestination, $xmlNoDestination);
+        $this->assertFalse($responseNoDestination->isValid());
+        $this->assertEquals('The response has no Destination value', $responseNoDestination->getError());
+
         // Destination strict match
         $xml3 = file_get_contents(TEST_ROOT . '/data/responses/invalids/invalid_strict_destination.xml.base64');
         $response5 = new OneLogin_Saml2_Response($settings, $xml3);

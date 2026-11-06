@@ -1025,6 +1025,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('wantXMLValidation', $security);
         $this->assertArrayHasKey('wantNameId', $security);
         $this->assertArrayHasKey('relaxDestinationValidation', $security);
+        $this->assertArrayHasKey('requireDestination', $security);
         $this->assertArrayHasKey('destinationStrictlyMatches', $security);
         $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
     }
@@ -1080,6 +1081,9 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('wantNameId', $security);
         $this->assertTrue($security['wantNameId']);
+
+        $this->assertArrayHasKey('requireDestination', $security);
+        $this->assertFalse($security['requireDestination']);
 
         $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
         $this->assertTrue($security['allowRSA15KeyTransport']);
