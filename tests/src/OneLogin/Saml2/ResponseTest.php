@@ -1136,6 +1136,48 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the isValid method of the OneLogin_Saml2_Response class
+     * Case the Destination has the default port (not written) and the port of the SP is set as an integer
+     * or as a string: it is the same URL, the port is not added to the URL where the response was received
+     * (#661)
+     *
+     * @covers OneLogin_Saml2_Response::isValid
+     */
+    public function testDestinationWithAPortOfAnyType()
+    {
+        $destination = 'https://example.test/admin/saml/acs';
+        $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/unsigned_response.xml.base64'));
+        $xml = preg_replace('/Destination="[^"]*"/', 'Destination="' . $destination . '"', $xml, 1, $count);
+        $this->assertEquals(1, $count);
+        $xml = base64_encode($xml);
+
+        $this->_settings->setStrict(true);
+        $_SERVER['REQUEST_URI'] = '/admin/saml/acs';
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        OneLogin_Saml2_Utils::setSelfHost('example.test');
+
+        try {
+            foreach (array(443, '443') as $port) {
+                OneLogin_Saml2_Utils::setSelfPort($port);
+                $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+                $response->isValid();
+                $this->assertNotContains('The response was received at', (string) $response->getError(), var_export($port, true));
+            }
+
+            // Another port is another destination
+            foreach (array(8443, '8443') as $port) {
+                OneLogin_Saml2_Utils::setSelfPort($port);
+                $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+                $this->assertFalse($response->isValid());
+                $this->assertEquals("The response was received at https://example.test:8443/admin/saml/acs instead of $destination", $response->getError());
+            }
+        } finally {
+            OneLogin_Saml2_Utils::setBaseURL(null);
+            unset($_SERVER['REQUEST_URI']);
+        }
+    }
+
+    /**
     * Tests the isValid method of the OneLogin_Saml2_Response class
     * Case Invalid Response, Invalid Audience
     *
@@ -1673,6 +1715,61 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $response = new OneLogin_Saml2_Response($settings, $xml);
 
         $this->assertTrue($response->isValid());
+    }
+
+    /**
+     * Tests the isValid method of the OneLogin_Saml2_Response
+     * Case: the IdP is identified by its fingerprint and the Signature has no KeyInfo. The
+     * KeyInfo is not signed, so anybody can remove it from a valid response: there is no
+     * certificate to compare with the fingerprint and the response is invalid.
+     *
+     * @covers OneLogin_Saml2_Response::isValid
+     */
+    public function testIsValidFingerprintWithoutKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $cert = OneLogin_Saml2_Utils::formatCert($settingsInfo['idp']['x509cert']);
+
+        $fingerprintInfo = $settingsInfo;
+        $fingerprintInfo['idp']['certFingerprint'] = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert);
+        $fingerprintInfo['idp']['x509cert'] = null;
+
+        // The KeyInfo of the Signature is not covered by the signature of the other element in a double signed
+        // response, so only the responses with one Signature are used
+        foreach (array('signed_message_response', 'signed_assertion_response') as $name) {
+            $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/' . $name . '.xml.base64'));
+
+            // Control: the fingerprint of the certificate in the KeyInfo is valid
+            $response = new OneLogin_Saml2_Response(new OneLogin_Saml2_Settings($fingerprintInfo), base64_encode($xml));
+            $this->assertTrue($response->isValid(), $name);
+
+            $dom = new DOMDocument();
+            $dom->loadXML($xml);
+            $keyInfos = $dom->getElementsByTagNameNS(OneLogin_Saml2_Constants::NS_DS, 'KeyInfo');
+            $this->assertEquals(1, $keyInfos->length, $name);
+            $keyInfos->item(0)->parentNode->removeChild($keyInfos->item(0));
+            $withoutKeyInfo = base64_encode($dom->saveXML());
+
+            // With the fingerprint the response is rejected (not because of a PHP error: with the
+            // assertions enabled the code that was fixed raised a warning, that isValid reported as its error)
+            $response = new OneLogin_Saml2_Response(new OneLogin_Saml2_Settings($fingerprintInfo), $withoutKeyInfo);
+            $toException = function ($severity, $message, $file, $line) {
+                throw new ErrorException($message, 0, $severity, $file, $line);
+            };
+            set_error_handler($toException);
+            try {
+                $valid = $response->isValid();
+            } finally {
+                restore_error_handler();
+            }
+            $this->assertFalse($valid, $name);
+            $this->assertEquals('Signature validation failed. SAML Response rejected', $response->getError(), $name);
+
+            // The signature is still valid for the certificate
+            $response = new OneLogin_Saml2_Response(new OneLogin_Saml2_Settings($settingsInfo), $withoutKeyInfo);
+            $this->assertTrue($response->isValid(), $name);
+        }
     }
 
     /**

@@ -180,7 +180,7 @@ class OneLogin_Saml2_Response
             }
 
             // Check SAML version
-            if ($this->document->documentElement->getAttribute('Version') != '2.0') {
+            if ($this->document->documentElement->getAttribute('Version') !== '2.0') {
                 throw new OneLogin_Saml2_ValidationError(
                     "Unsupported SAML version",
                     OneLogin_Saml2_ValidationError::UNSUPPORTED_SAML_VERSION
@@ -258,7 +258,7 @@ class OneLogin_Saml2_Response
                 }
 
                 // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
-                if (isset($requestId) && $requestId != $responseInResponseTo) {
+                if (isset($requestId) && $requestId !== $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new OneLogin_Saml2_ValidationError(
                             "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
@@ -379,7 +379,7 @@ class OneLogin_Saml2_Response
                 $anySubjectConfirmation = false;
                 $subjectConfirmationNodes = $this->_queryAssertion('/saml:Subject/saml:SubjectConfirmation');
                 foreach ($subjectConfirmationNodes as $scn) {
-                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') != OneLogin_Saml2_Constants::CM_BEARER) {
+                    if ($scn->hasAttribute('Method') && $scn->getAttribute('Method') !== OneLogin_Saml2_Constants::CM_BEARER) {
                         continue;
                     }
                     $subjectConfirmationDataNodes = $scn->getElementsByTagName('SubjectConfirmationData');
@@ -389,7 +389,7 @@ class OneLogin_Saml2_Response
                         $scnData = $subjectConfirmationDataNodes->item(0);
                         if ($scnData->hasAttribute('InResponseTo')) {
                             $inResponseTo = $scnData->getAttribute('InResponseTo');
-                            if (isset($responseInResponseTo) && $responseInResponseTo != $inResponseTo) {
+                            if (isset($responseInResponseTo) && $responseInResponseTo !== $inResponseTo) {
                                 continue;
                             }
                         }
@@ -693,10 +693,10 @@ class OneLogin_Saml2_Response
 
             foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
                 if ($nameId->hasAttribute($attr)) {
-                    if ($this->_settings->isStrict() && $attr == 'SPNameQualifier') {
+                    if ($this->_settings->isStrict() && $attr === 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
-                        if ($spEntityId != $nameId->getAttribute($attr)) {
+                        if ($spEntityId !== $nameId->getAttribute($attr)) {
                             throw new OneLogin_Saml2_ValidationError(
                                 "The SPNameQualifier value mismatch the SP entityID value.",
                                 OneLogin_Saml2_ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
@@ -878,7 +878,7 @@ class OneLogin_Saml2_Response
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+                if ($childNode->nodeType === XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
@@ -938,7 +938,7 @@ class OneLogin_Saml2_Response
 
             $signedElement = '{'.$signNode->parentNode->namespaceURI.'}'.$signNode->parentNode->localName;
 
-            if ($signedElement != $responseTag && $signedElement != $assertionTag) {
+            if ($signedElement !== $responseTag && $signedElement !== $assertionTag) {
                 throw new OneLogin_Saml2_ValidationError(
                     "Invalid Signature Element $signedElement SAML Response rejected",
                     OneLogin_Saml2_ValidationError::WRONG_SIGNED_ELEMENT
@@ -969,7 +969,7 @@ class OneLogin_Saml2_Response
                 if (!empty($sei)) {
                     $sei = substr($sei, 1);
 
-                    if ($sei != $idValue) {
+                    if ($sei !== $idValue) {
                         throw new OneLogin_Saml2_ValidationError(
                             'Found an invalid Signed Element. SAML Response rejected',
                             OneLogin_Saml2_ValidationError::INVALID_SIGNED_ELEMENT

@@ -52,7 +52,7 @@ class OneLogin_Saml2_Utils
     private static $_protocol;
 
     /**
-     * @var int|null
+     * @var int|string|null The value set by setSelfPort (getSelfPort normalizes it to an integer)
      */
     private static $_port;
 
@@ -405,22 +405,29 @@ class OneLogin_Saml2_Utils
      */
     public static function setBaseURL($baseurl)
     {
+        if ($baseurl === true) {
+            return;
+        }
+
         if (!empty($baseurl)) {
             $baseurlpath = '/';
+            $matches = array();
             if (preg_match('#^https?://([^/]*)/?(.*)#i', $baseurl, $matches)) {
                 if (strpos($baseurl, 'https://') === false) {
                     self::setSelfProtocol('http');
-                    $port = '80';
+                    $port = 80;
                 } else {
                     self::setSelfProtocol('https');
-                    $port = '443';
+                    $port = 443;
                 }
 
                 $currentHost = $matches[1];
                 if (false !== strpos($currentHost, ':')) {
                     list($currentHost, $possiblePort) = explode(':', $matches[1], 2);
-                    if (is_numeric($possiblePort)) {
-                        $port = $possiblePort;
+                    // A port that is not valid is ignored: the default one of the protocol is used
+                    $validPort = self::normalizePort($possiblePort);
+                    if ($validPort !== null) {
+                        $port = $validPort;
                     }
                 }
 
@@ -476,7 +483,7 @@ class OneLogin_Saml2_Utils
 
         $portnumber = self::getSelfPort();
 
-        if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
+        if (isset($portnumber) && ($portnumber !== 80) && ($portnumber !== 443)) {
             $port = ':' . $portnumber;
         }
 
@@ -498,7 +505,7 @@ class OneLogin_Saml2_Utils
     {
         if (empty($baseurlpath)) {
             self::$_baseurlpath = null;
-        } else if ($baseurlpath == '/') {
+        } else if ($baseurlpath === '/') {
             self::$_baseurlpath = '/';
         } else {
             self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
@@ -539,7 +546,7 @@ class OneLogin_Saml2_Utils
     }
 
     /**
-     * @param $port int The port number to use when constructing URLs
+     * @param $port int|string|null The port number to use when constructing URLs (an integer, or a string with an integer)
      */
     public static function setSelfPort($port)
     {
@@ -547,7 +554,8 @@ class OneLogin_Saml2_Utils
     }
 
     /**
-     * @param $protocol string The protocol to identify as using, usually http or https
+     * @param $protocol string|bool|array The protocol to identify as using, usually http or https
+     *                                    (true is https, and the first value is used if it is an array)
      */
     public static function setSelfProtocol($protocol)
     {
@@ -562,13 +570,26 @@ class OneLogin_Saml2_Utils
         $protocol = 'http';
         if (self::$_protocol) {
             $protocol = self::$_protocol;
-        } elseif (self::getSelfPort() == 443) {
+        } elseif (self::getSelfPort() === 443) {
             $protocol = 'https';
         } elseif (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
         } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
             $protocol = 'https';
         }
+
+        // The values of a header (as PSR-7 returns them): the first one is the protocol
+        if (is_array($protocol)) {
+            $protocol = reset($protocol);
+        }
+
+        if ($protocol === true) {
+            $protocol = 'https';
+        }
+        if (!is_string($protocol)) {
+            $protocol = 'http';
+        }
+
         return $protocol;
     }
 
@@ -590,7 +611,13 @@ class OneLogin_Saml2_Utils
     }
 
     /**
-     * @return null|string The port number used for the request
+     * Returns the port number used for the request. It is the first one that is available of the one
+     * set by setSelfPort, X-Forwarded-Port (if the proxy vars are enabled), SERVER_PORT or the port
+     * of the host header. The values that come from $_SERVER are strings, but the port is always
+     * returned as an integer.
+     *
+     * @return null|int The port number used for the request, null if it is not known or if the value
+     *                  that was read is not a port number (an integer from 1 to 65535)
      */
     public static function getSelfPort()
     {
@@ -607,12 +634,26 @@ class OneLogin_Saml2_Utils
             // strip the port
             if (false !== strpos($currentHost, ':')) {
                 list($currentHost, $port) = explode(':', $currentHost, 2);
-                if (is_numeric($port)) {
-                    $portnumber = $port;
-                }
+                $portnumber = $port;
             }
         }
-        return $portnumber;
+        return self::normalizePort($portnumber);
+    }
+
+    /**
+     * @param mixed $port A port number, as an integer or as a string
+     *
+     * @return null|int The port number as an integer, null if the value is not a port number (an integer from 1 to 65535)
+     */
+    private static function normalizePort($port)
+    {
+        if (!is_int($port) && !is_string($port)) {
+            return null;
+        }
+
+        $port = filter_var($port, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1, 'max_range' => 65535)));
+
+        return $port === false ? null : $port;
     }
 
     /**
@@ -622,7 +663,7 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        return self::getSelfProtocol() == 'https';
+        return self::getSelfProtocol() === 'https';
     }
 
     /**
@@ -734,7 +775,7 @@ class OneLogin_Saml2_Utils
             $result = $baseURLPath;
             if (!empty($info)) {
                 $extractedInfo = $info;
-                if ($baseURLPath != '/') {
+                if ($baseURLPath !== '/') {
                     // Remove base path from the path info.
                     $extractedInfo = str_replace($baseURLPath, '', $info);
                 }
@@ -1726,9 +1767,11 @@ class OneLogin_Saml2_Utils
                 }
             } else {
                 if (!empty($fingerprint)) {
+                    // The KeyInfo is not signed, so the message may carry no certificate (or an empty one):
+                    // there is nothing to compare the fingerprint with
                     $domCert = $objKey->getX509Certificate();
-                    $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
-                    if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) == $domCertFingerprint) {
+                    $domCertFingerprint = empty($domCert) ? null : OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
+                    if ($domCertFingerprint !== null && OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) === $domCertFingerprint) {
                         $objKey->loadKey($domCert, false, true);
                         if ($objXMLSecDSig->verify($objKey) === 1) {
                             $valid = true;
@@ -1804,7 +1847,7 @@ class OneLogin_Saml2_Utils
             $signedQuery .= '&SigAlg='.urlencode($signAlg);
         }
 
-        if ($messageType == "SAMLRequest") {
+        if ($messageType === "SAMLRequest") {
             $strMessageType = "Logout Request";
         } else {
             $strMessageType = "Logout Response";
@@ -1837,7 +1880,7 @@ class OneLogin_Saml2_Utils
             $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
             $objKey->loadKey($cert, false, true);
 
-            if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+            if ($signAlg !== XMLSecurityKey::RSA_SHA1) {
                 try {
                     $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {

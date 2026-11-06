@@ -75,7 +75,7 @@ class OneLogin_Saml2_LogoutRequest
 
             if (!empty($nameId)) {
                 if (empty($nameIdFormat) &&
-                  $spData['NameIDFormat'] != OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
+                  $spData['NameIDFormat'] !== OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
             } else {
@@ -86,12 +86,12 @@ class OneLogin_Saml2_LogoutRequest
             /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
-            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_ENTITY) {
+            if (!empty($nameIdFormat) && $nameIdFormat === OneLogin_Saml2_Constants::NAMEID_ENTITY) {
                 $nameIdNameQualifier = null;
                 $nameIdSPNameQualifier = null;
             }
              // NameID Format UNSPECIFIED omitted
-            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
+            if (!empty($nameIdFormat) && $nameIdFormat === OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                 $nameIdFormat = null;
             }
 
@@ -414,7 +414,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);
-                if (!empty($issuer) && $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer !== $idPEntityId) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Invalid issuer in the Logout Request",
                         OneLogin_Saml2_ValidationError::WRONG_ISSUER
