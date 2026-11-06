@@ -261,7 +261,7 @@ class OneLogin_Saml2_Response
                 if (isset($requestId) && $requestId !== $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new OneLogin_Saml2_ValidationError(
-                            "No InResponseTo at the Response, but it was provided the requestId related to the AuthNRequest sent by the SP: $requestId",
+                            "No InResponseTo at the Response, but it must be provided and be the same as the requestId of the AuthNRequest sent by the SP: $requestId",
                             OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
                         );
                     } else {
