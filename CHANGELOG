@@ -13,10 +13,13 @@ v3.9.0
 * Add the $allowRSA15KeyTransport and $allowCBCEncryption parameters (true by default) to LogoutRequest::getNameIdData() and LogoutRequest::getNameId()
 * Report every decryption failure with the same error (ValidationError::DECRYPTION_FAILED) and replace invalid encrypted keys by a deterministic key (RFC 3218), with the same work whatever the padding of the encrypted key
 * Use strict === and !== at string comparison
+* getSelfPort now returns an integer.
+* When $_SERVER['Forwarded-Proto'] contains an array, now the first value is used in setSelfProtocol.
 * In strict mode with `wantMessagesSigned`, verify the signature of a Response with an EncryptedAssertion before decrypting it (if it is not signed or the signature is invalid the assertion is not decrypted and isValid() reports the cause). The EncryptedID of a LogoutRequest is decrypted after its signature is verified
 * Load XML documents with LIBXML_NONET
 * Fix the decryption of an EncryptedID inside an EncryptedAssertion (it failed with an algorithm mismatch)
 * Reject decrypted EncryptedID content that is not an element (a text node made LogoutRequest::getNameIdData fail with a PHP Error)
+* Fix Utils::validateSign crash when the signature has no certificate and the IdP is identified by fingerprint
 
 v3.8.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)

@@ -720,7 +720,7 @@ class Response
                     if ($this->_settings->isStrict() && $attr === 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
-                        if ($spEntityId != $nameId->getAttribute($attr)) {
+                        if ($spEntityId !== $nameId->getAttribute($attr)) {
                             throw new ValidationError(
                                 "The SPNameQualifier value mistmatch the SP entityID value.",
                                 ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
@@ -955,7 +955,7 @@ class Response
 
             $signedElement = '{'.$signNode->parentNode->namespaceURI.'}'.$signNode->parentNode->localName;
 
-            if ($signedElement != $responseTag && $signedElement != $assertionTag) {
+            if ($signedElement !== $responseTag && $signedElement !== $assertionTag) {
                 throw new ValidationError(
                     "Invalid Signature Element $signedElement SAML Response rejected",
                     ValidationError::WRONG_SIGNED_ELEMENT
@@ -986,7 +986,7 @@ class Response
                 if (!empty($sei)) {
                     $sei = substr($sei, 1);
 
-                    if ($sei != $idValue) {
+                    if ($sei !== $idValue) {
                         throw new ValidationError(
                             'Found an invalid Signed Element. SAML Response rejected',
                             ValidationError::INVALID_SIGNED_ELEMENT
