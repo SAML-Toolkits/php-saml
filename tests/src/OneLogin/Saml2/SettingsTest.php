@@ -6,7 +6,6 @@ use OneLogin\Saml2\Error;
 use OneLogin\Saml2\Metadata;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
-
 use Exception;
 
 /**
@@ -14,7 +13,6 @@ use Exception;
  */
 class SettingsTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Tests the Settings Constructor.
      * Case load setting from array
@@ -249,9 +247,9 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
             $settings = new Settings($settingsInfo);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-             $expectedMessage = "Invalid array settings: 'compress'=>'requests' values must be true or false.";
-             $this->assertEquals($expectedMessage, $e->getMessage());
-             $requestsIsInvalid = true;
+            $expectedMessage = "Invalid array settings: 'compress'=>'requests' values must be true or false.";
+            $this->assertEquals($expectedMessage, $e->getMessage());
+            $requestsIsInvalid = true;
         }
 
         try {
@@ -262,9 +260,9 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
             $settings = new Settings($settingsInfo);
             $this->fail('Error was not raised');
         } catch (Error $e) {
-             $expectedMessage = "Invalid array settings: 'compress'=>'responses' values must be true or false.";
-             $this->assertEquals($expectedMessage, $e->getMessage());
-             $responsesIsInvalid = true;
+            $expectedMessage = "Invalid array settings: 'compress'=>'responses' values must be true or false.";
+            $this->assertEquals($expectedMessage, $e->getMessage());
+            $responsesIsInvalid = true;
         }
 
         $this->assertTrue($requestsIsInvalid);
@@ -276,7 +274,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         return array(
             array(1),
             array(0.1),
-            array(new \stdClass),
+            array(new \stdClass()),
             array("A random string.")
         );
     }
@@ -560,7 +558,7 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
                 'wantAssertionsEncrypted' => true,
                 'expectEncryptionKeyDescriptor' => true,
             ],
-            'both settings enabled'=> [
+            'both settings enabled' => [
                 'alwaysIncludeEncryption' => false,
                 'wantNameIdEncrypted' => true,
                 'wantAssertionsEncrypted' => true,
@@ -1009,6 +1007,8 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('relaxDestinationValidation', $security);
         $this->assertArrayHasKey('rejectUnsolicitedResponsesWithInResponseTo', $security);
         $this->assertArrayHasKey('destinationStrictlyMatches', $security);
+        $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
+        $this->assertArrayHasKey('allowCBCEncryption', $security);
     }
 
     /**
@@ -1062,6 +1062,12 @@ class SettingsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertArrayHasKey('wantNameId', $security);
         $this->assertTrue($security['wantNameId']);
+
+        $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
+        $this->assertTrue($security['allowRSA15KeyTransport']);
+
+        $this->assertArrayHasKey('allowCBCEncryption', $security);
+        $this->assertTrue($security['allowCBCEncryption']);
     }
 
     /**

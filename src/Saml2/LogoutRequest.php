@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of php-saml.
  *
@@ -10,11 +11,12 @@
  * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
  * @link    https://github.com/SAML-Toolkits/php-saml
  */
+
 namespace OneLogin\Saml2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
-
 use DOMDocument;
+use DOMElement;
 use Exception;
 
 /**
@@ -209,8 +211,10 @@ LOGOUTREQUEST;
     /**
      * Gets the NameID Data of the the Logout Request.
      *
-     * @param string|DOMDocument $request Logout Request Message
-     * @param string|null        $key     The SP key
+     * @param string|DOMDocument $request                Logout Request Message
+     * @param string|null        $key                    The SP key
+     * @param bool               $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
+     * @param bool               $allowCBCEncryption     Accept data encrypted with CBC (unauthenticated).
      *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      *
@@ -218,7 +222,7 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameIdData($request, $key = null)
+    public static function getNameIdData($request, $key = null, $allowRSA15KeyTransport = true, $allowCBCEncryption = true)
     {
         if ($request instanceof DOMDocument) {
             $dom = $request;
@@ -240,10 +244,10 @@ LOGOUTREQUEST;
                 );
             }
 
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'private'));
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type' => 'private'));
             $seckey->loadKey($key);
 
-            $nameId = Utils::decryptElement($encryptedData, $seckey);
+            $nameId = Utils::decryptElement($encryptedData, $seckey, true, $allowRSA15KeyTransport, $allowCBCEncryption);
 
         } else {
             $entries = Utils::query($dom, '/samlp:LogoutRequest/saml:NameID');
@@ -273,8 +277,10 @@ LOGOUTREQUEST;
     /**
      * Gets the NameID of the Logout Request.
      *
-     * @param string|DOMDocument $request Logout Request Message
-     * @param string|null        $key     The SP key
+     * @param string|DOMDocument $request                Logout Request Message
+     * @param string|null        $key                    The SP key
+     * @param bool               $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
+     * @param bool               $allowCBCEncryption     Accept data encrypted with CBC (unauthenticated).
      *
      * @return string Name ID Value
      *
@@ -282,9 +288,9 @@ LOGOUTREQUEST;
      * @throws Exception
      * @throws ValidationError
      */
-    public static function getNameId($request, $key = null)
+    public static function getNameId($request, $key = null, $allowRSA15KeyTransport = true, $allowCBCEncryption = true)
     {
-        $nameId = self::getNameIdData($request, $key);
+        $nameId = self::getNameIdData($request, $key, $allowRSA15KeyTransport, $allowCBCEncryption);
         return $nameId['Value'];
     }
 
@@ -341,6 +347,27 @@ LOGOUTREQUEST;
             $sessionIndexes[] = $sessionIndexNode->textContent;
         }
         return $sessionIndexes;
+    }
+
+    /**
+     * Checks the algorithms of the EncryptedID of the Logout Request against
+     * the security settings, before getNameId() decrypts it.
+     *
+     * @param DOMDocument $dom Logout Request Message
+     *
+     * @throws ValidationError
+     */
+    private function validateEncryptedNameId(DOMDocument $dom)
+    {
+        $encryptedEntries = Utils::query($dom, '/samlp:LogoutRequest/saml:EncryptedID');
+        if ($encryptedEntries->length == 1) {
+            // Same EncryptedData that getNameIdData() decrypts
+            $encryptedData = $encryptedEntries->item(0)->getElementsByTagName('EncryptedData')->item(0);
+            if ($encryptedData instanceof DOMElement) {
+                $security = $this->_settings->getSecurityData();
+                Utils::validateEncryptedDataStructure($encryptedData, $security['allowRSA15KeyTransport'], $security['allowCBCEncryption']);
+            }
+        }
     }
 
     /**
@@ -414,8 +441,6 @@ LOGOUTREQUEST;
                     }
                 }
 
-                $nameId = static::getNameId($dom, $this->_settings->getSPkey());
-
                 // Check issuer
                 $issuer = static::getIssuer($dom);
                 if (!empty($issuer) && $issuer != $idPEntityId) {
@@ -441,6 +466,13 @@ LOGOUTREQUEST;
                         ValidationError::INVALID_SIGNATURE
                     );
                 }
+            }
+
+            if ($this->_settings->isStrict()) {
+                // An EncryptedID is only decrypted once the signature has been verified,
+                // so tampered ciphertexts do not reach the decryption code
+                $this->validateEncryptedNameId($dom);
+                static::getNameId($dom, $this->_settings->getSPkey());
             }
 
             return true;

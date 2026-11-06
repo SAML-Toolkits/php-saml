@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of php-saml.
  *
@@ -15,7 +16,6 @@ namespace OneLogin\Saml2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
-
 use DOMDocument;
 use Exception;
 
@@ -433,6 +433,15 @@ class Settings
             $this->_security['encryption_algorithm'] = XMLSecurityKey::AES128_CBC;
         }
 
+        // Accepted algorithms on received encrypted elements
+        // (rsa-1_5: Bleichenbacher oracle; CBC: unauthenticated, padding oracle)
+        if (!isset($this->_security['allowRSA15KeyTransport'])) {
+            $this->_security['allowRSA15KeyTransport'] = true;
+        }
+        if (!isset($this->_security['allowCBCEncryption'])) {
+            $this->_security['allowCBCEncryption'] = true;
+        }
+
         if (!isset($this->_security['lowercaseUrlencoding'])) {
             $this->_security['lowercaseUrlencoding'] = false;
         }
@@ -497,12 +506,12 @@ class Settings
         if (isset($settings['compress'])) {
             if (!is_array($settings['compress'])) {
                 $errors[] = "invalid_syntax";
-            } else if (isset($settings['compress']['requests'])
+            } elseif (isset($settings['compress']['requests'])
                 && $settings['compress']['requests'] !== true
                 && $settings['compress']['requests'] !== false
             ) {
                 $errors[] = "'compress'=>'requests' values must be true or false.";
-            } else if (isset($settings['compress']['responses'])
+            } elseif (isset($settings['compress']['responses'])
                 && $settings['compress']['responses'] !== true
                 && $settings['compress']['responses'] !== false
             ) {
@@ -540,7 +549,7 @@ class Settings
                 || empty($idp['singleSignOnService']['url'])
             ) {
                 $errors[] = 'idp_sso_not_found';
-            } else if (!filter_var($idp['singleSignOnService']['url'], FILTER_VALIDATE_URL)) {
+            } elseif (!filter_var($idp['singleSignOnService']['url'], FILTER_VALIDATE_URL)) {
                 $errors[] = 'idp_sso_url_invalid';
             }
 
@@ -615,7 +624,7 @@ class Settings
                 || empty($sp['assertionConsumerService']['url'])
             ) {
                 $errors[] = 'sp_acs_not_found';
-            } else if (!filter_var($sp['assertionConsumerService']['url'], FILTER_VALIDATE_URL)) {
+            } elseif (!filter_var($sp['assertionConsumerService']['url'], FILTER_VALIDATE_URL)) {
                 $errors[] = 'sp_acs_url_invalid';
             }
 
@@ -926,7 +935,7 @@ class Settings
                         Error::PUBLIC_CERT_FILE_NOT_FOUND
                     );
                 }
-            } else if (isset($this->_security['signMetadata']['keyFileName']) &&
+            } elseif (isset($this->_security['signMetadata']['keyFileName']) &&
                 isset($this->_security['signMetadata']['certFileName'])) {
                 $keyFileName = $this->_security['signMetadata']['keyFileName'];
                 $certFileName = $this->_security['signMetadata']['certFileName'];
@@ -951,7 +960,7 @@ class Settings
                 }
                 $keyMetadata = file_get_contents($keyMetadataFile);
                 $certMetadata = file_get_contents($certMetadataFile);
-            } else if (isset($this->_security['signMetadata']['privateKey']) &&
+            } elseif (isset($this->_security['signMetadata']['privateKey']) &&
                 isset($this->_security['signMetadata']['x509cert'])) {
                 $keyMetadata = Utils::formatPrivateKey($this->_security['signMetadata']['privateKey']);
                 $certMetadata = Utils::formatCert($this->_security['signMetadata']['x509cert']);

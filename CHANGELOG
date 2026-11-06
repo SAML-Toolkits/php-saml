@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+v3.9.0
+* Mitigate the xmlseclibs advisories published in August 2026 (GHSA-7mf5-fjj8-mvjc, GHSA-39hg-wfcm-v4wv, GHSA-7h47-29x2-r2gc, GHSA-m5mw-mr39-66vp, GHSA-w5f2-cpgp-pg76, GHSA-7hf8-fh6v-wmm6, GHSA-9wcx-p7hr-f935) while keeping xmlseclibs 3.x, as xmlseclibs 4.x requires PHP 8
+* Validate received Signatures before xmlseclibs processes them: no DOCTYPE, a single SignedInfo, CanonicalizationMethod, SignatureMethod, Reference, DigestValue and SignatureValue, only the Transforms and canonicalization algorithms used by SAML (XPath Transforms were evaluated before any cryptographic check), a Reference URI that identifies exactly one element of the same document and no RetrievalMethod/EncryptedKey in the KeyInfo
+* Encrypted NameIDs are now always generated with rsa-oaep-mgf1p key transport (rsa-1_5 was used with aes128-cbc)
+* Support http://www.w3.org/2009/xmlenc11#rsa-oaep key transport on EncryptedID (it failed with an algorithm mismatch)
+* Utils::castKey keeps the X.509 certificate of the key
+* Reject unsupported SigAlg values on the HTTP-Redirect binding also when several IdP signing certificates are configured
+* Validate received encrypted elements before decrypting them: accepted data and key transport algorithms, and no nested EncryptedKey/RetrievalMethod references (they were followed without limit, exhausting the memory)
+* Add the 'allowRSA15KeyTransport' and 'allowCBCEncryption' security settings (true by default) to reject rsa-1_5 key transport and CBC data encryption
+* Add the $allowRSA15KeyTransport and $allowCBCEncryption parameters (true by default) to LogoutRequest::getNameIdData() and LogoutRequest::getNameId()
+* Report every decryption failure with the same error (ValidationError::DECRYPTION_FAILED) and replace invalid encrypted keys by a deterministic key (RFC 3218), with the same work whatever the padding of the encrypted key
+In strict mode with `wantMessagesSigned`, verify the signature of a Response with an EncryptedAssertion before decrypting it (if it is not signed or the signature is invalid the assertion is not decrypted and isValid() reports the cause). The EncryptedID of a LogoutRequest is decrypted after its signature is verified
+* Load XML documents with LIBXML_NONET
+* Fix the decryption of an EncryptedID inside an EncryptedAssertion (it failed with an algorithm mismatch)
+* Reject decrypted EncryptedID content that is not an element (a text node made LogoutRequest::getNameIdData fail with a PHP Error)
+
 v3.8.2
 * Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
 * Force Fix phpunit > 8.5.51 due GHSA-vvj3-c3rp-c85p. Adapt tests to work with that phpunit version
