@@ -1,13 +1,13 @@
 # SAML PHP Toolkit
 
-[![php-saml package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=master)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=master) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=2.19.1) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
+[![php-saml package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=master)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=master) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=2.22.0) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
 
 Add SAML support to your PHP software using this library.
 
 
 **The 3.X branch is compatible with PHP 7.0, PHP 7.1, PHP 7.2 , so if you are using that PHP version, use it and not the 2.X or the master branch**
 
-**The 4.X branch is compatible with PHP >= 7.3 and PHP 8.X**
+**The 4.X branch is compatible with PHP 8.X**
 
 Warning
 -------
