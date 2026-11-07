@@ -399,6 +399,11 @@ class OneLogin_Saml2_Settings
             $this->_security['relaxDestinationValidation'] = false;
         }
 
+        // Require Destination attribute on incoming SAML Responses
+        if (!isset($this->_security['requireDestination'])) {
+            $this->_security['requireDestination'] = false;
+        }
+
         // Allow duplicated Attribute Names
         if (!isset($this->_security['allowRepeatAttributeName'])) {
             $this->_security['allowRepeatAttributeName'] = false;
@@ -879,7 +884,7 @@ class OneLogin_Saml2_Settings
      */
     public function getIdPSLOResponseUrl()
     {
-        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['responseUrl'])) {
+        if (isset($this->_idp['singleLogoutService']) && !empty($this->_idp['singleLogoutService']['responseUrl'])) {
             return $this->_idp['singleLogoutService']['responseUrl'];
         }
         return $this->getIdPSLOUrl();

@@ -878,19 +878,19 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
             'cbc last byte modified' => str_replace($cipherValue, $this->flipByte($cipherValue, -1), $xml),
         );
         foreach ($attacks as $name => $attack) {
-            $this->assertResponseNotDecrypted($attack, $settings, 'Reference validation failed', $name);
+            $this->assertResponseNotDecrypted($attack, $settings, 'Reference validation failed', null, $name);
 
             // In strict mode a signed Response is verified before decrypting also when signed messages are not required
-            $this->assertResponseNotDecrypted($attack, $this->getSettings(array(), true), 'Reference validation failed', $name);
+            $this->assertResponseNotDecrypted($attack, $this->getSettings(array(), true), 'Reference validation failed', null, $name);
 
             // Without strict mode the same input is decrypted (and fails with the generic error)
             $this->assertResponseRejected($attack, $this->getSettings(array('wantMessagesSigned' => true)), OneLogin_Saml2_ValidationError::DECRYPTION_FAILED, OneLogin_Saml2_Utils::DECRYPTION_FAILED_MESSAGE, $name);
         }
 
         $notSignedMessage = 'The Message of the Response is not signed and the SP requires it';
-        $this->assertResponseNotDecrypted($this->getEncryptedResponse(), $settings, $notSignedMessage);
+        $this->assertResponseNotDecrypted($this->getEncryptedResponse(), $settings, $notSignedMessage, OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE);
         $signatureRemoved = preg_replace('#<ds:Signature\b.*?</ds:Signature>#s', '', $xml);
-        $this->assertResponseNotDecrypted($signatureRemoved, $settings, $notSignedMessage);
+        $this->assertResponseNotDecrypted($signatureRemoved, $settings, $notSignedMessage, OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE);
 
         // An unsigned Response is decrypted when signed messages are not required
         $response = new OneLogin_Saml2_Response($this->getSettings(array(), true), base64_encode($signatureRemoved));
@@ -1341,14 +1341,20 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
      * @param string                  $xml      SAML Response
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param string                  $message  Expected error message
+     * @param int|null                $code     Expected OneLogin_Saml2_ValidationError code (null if the cause is not a OneLogin_Saml2_ValidationError)
      * @param string                  $name     Name of the attack
      */
-    private function assertResponseNotDecrypted($xml, OneLogin_Saml2_Settings $settings, $message, $name = '')
+    private function assertResponseNotDecrypted($xml, OneLogin_Saml2_Settings $settings, $message, $code = null, $name = '')
     {
         $response = new OneLogin_Saml2_Response($settings, base64_encode($xml));
         $this->assertFalse($response->encrypted, $name);
         $this->assertFalse($response->isValid(), $name);
         $this->assertEquals($message, $response->getError(), $name);
+        $this->assertEquals($message, $response->getErrorException()->getMessage(), $name);
+        if ($code !== null) {
+            $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $response->getErrorException(), $name);
+            $this->assertEquals($code, $response->getErrorException()->getCode(), $name);
+        }
     }
 
     /**

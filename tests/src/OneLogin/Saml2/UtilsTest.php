@@ -416,19 +416,179 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
 
         $_SERVER['HTTP_HOST'] = 'example.org:8080';
-        $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(8080, OneLogin_Saml2_Utils::getSelfPort());
 
         $_SERVER["SERVER_PORT"] = 80;
-        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(80, OneLogin_Saml2_Utils::getSelfPort());
 
         $_SERVER["HTTP_X_FORWARDED_PORT"] = 443;
-        $this->assertEquals(80, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(80, OneLogin_Saml2_Utils::getSelfPort());
 
         OneLogin_Saml2_Utils::setProxyVars(true);
-        $this->assertEquals(443, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(443, OneLogin_Saml2_Utils::getSelfPort());
 
         OneLogin_Saml2_Utils::setSelfPort(8080);
-        $this->assertEquals(8080, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(8080, OneLogin_Saml2_Utils::getSelfPort());
+    }
+
+    /**
+     * getSelfPort returns an integer (or null) whatever the type of the value that it reads.
+     * The values of $_SERVER are strings, but the port can also be an integer (setSelfPort(443),
+     * or code that sets it at $_SERVER), and a value that is not a port number is not a port
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfPort
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfPortReturnsAnInteger()
+    {
+        $valid = array(
+            array('80', 80),
+            array(80, 80),
+            array('443', 443),
+            array(443, 443),
+            array('8080', 8080),
+            array(8080, 8080),
+            array(' 8443 ', 8443),
+            array('1', 1),
+            array('65535', 65535),
+        );
+        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb', '8080, 8081');
+
+        // Where the port is read from
+        $sources = array(
+            'SERVER_PORT' => function ($port) {
+                $_SERVER['SERVER_PORT'] = $port;
+            },
+            'X-Forwarded-Port' => function ($port) {
+                OneLogin_Saml2_Utils::setProxyVars(true);
+                $_SERVER['HTTP_X_FORWARDED_PORT'] = $port;
+            },
+            'Host header' => function ($port) {
+                $_SERVER['HTTP_HOST'] = 'example.org:' . $port;
+            },
+            'setSelfPort' => function ($port) {
+                OneLogin_Saml2_Utils::setSelfPort($port);
+            },
+        );
+        $reset = function () {
+            unset($_SERVER['SERVER_PORT'], $_SERVER['HTTP_X_FORWARDED_PORT'], $_SERVER['HTTP_HOST']);
+            OneLogin_Saml2_Utils::setBaseURL(null);
+            OneLogin_Saml2_Utils::setProxyVars(false);
+        };
+
+        foreach ($sources as $name => $setPort) {
+            foreach ($valid as $case) {
+                list($port, $expected) = $case;
+                $reset();
+                $setPort($port);
+                $this->assertSame($expected, OneLogin_Saml2_Utils::getSelfPort(), "$name: " . var_export($port, true));
+            }
+            foreach ($invalid as $port) {
+                $reset();
+                $setPort($port);
+                $this->assertNull(OneLogin_Saml2_Utils::getSelfPort(), "$name: " . var_export($port, true));
+            }
+        }
+    }
+
+    /**
+     * The URL of the host does not have the port when it is the default one of HTTP or HTTPS,
+     * whether the port is an integer or a string (the strings come from $_SERVER and from the
+     * base URL), and it has the port when it is another one
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfURLhost
+     * @covers OneLogin_Saml2_Utils::getSelfURLNoQuery
+     * @covers OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery
+     * @covers OneLogin_Saml2_Utils::getSelfURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfURLhostWithAPortOfAnyType()
+    {
+        OneLogin_Saml2_Utils::setSelfHost('example.test');
+
+        $cases = array(
+            array('https', 443, 'https://example.test'),
+            array('https', '443', 'https://example.test'),
+            array('http', 80, 'http://example.test'),
+            array('http', '80', 'http://example.test'),
+            array('https', 8443, 'https://example.test:8443'),
+            array('https', '8443', 'https://example.test:8443'),
+            array('http', 8080, 'http://example.test:8080'),
+            array('http', '8080', 'http://example.test:8080'),
+            // A value that is not a port is not added to the URL
+            array('https', 'abc', 'https://example.test'),
+            array('https', '443abc', 'https://example.test'),
+        );
+        foreach ($cases as $case) {
+            list($protocol, $port, $expected) = $case;
+            OneLogin_Saml2_Utils::setSelfProtocol($protocol);
+            OneLogin_Saml2_Utils::setSelfPort($port);
+            $this->assertSame($expected, OneLogin_Saml2_Utils::getSelfURLhost(), $protocol . ' ' . var_export($port, true));
+        }
+
+        // The port of the request, or the one that a proxy sends
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        OneLogin_Saml2_Utils::setSelfPort(null);
+        foreach (array(443, '443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https://example.test', OneLogin_Saml2_Utils::getSelfURLhost(), 'SERVER_PORT ' . var_export($port, true));
+        }
+        foreach (array(8443, '8443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https://example.test:8443', OneLogin_Saml2_Utils::getSelfURLhost(), 'SERVER_PORT ' . var_export($port, true));
+        }
+
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $_SERVER['SERVER_PORT'] = '8080';
+        foreach (array(443, '443') as $port) {
+            $_SERVER['HTTP_X_FORWARDED_PORT'] = $port;
+            $this->assertSame('https://example.test', OneLogin_Saml2_Utils::getSelfURLhost(), 'X-Forwarded-Port ' . var_export($port, true));
+        }
+        OneLogin_Saml2_Utils::setProxyVars(false);
+
+        // The URLs that are compared with the one that the IdP sent (the Destination, #661)
+        OneLogin_Saml2_Utils::setSelfProtocol('https');
+        OneLogin_Saml2_Utils::setSelfPort(443);
+        $_SERVER['REQUEST_URI'] = '/admin/saml/acs?x=1';
+        $_SERVER['QUERY_STRING'] = 'x=1';
+        $_SERVER['SCRIPT_NAME'] = '/admin/saml/acs';
+        unset($_SERVER['PATH_INFO']);
+        $this->assertSame('https://example.test/admin/saml/acs', OneLogin_Saml2_Utils::getSelfURLNoQuery());
+        $this->assertSame('https://example.test/admin/saml/acs', OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
+        $this->assertSame('https://example.test/admin/saml/acs?x=1', OneLogin_Saml2_Utils::getSelfURL());
+    }
+
+    /**
+     * The protocol is https when the port is 443, whatever the type of the port
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfProtocol
+     * @covers OneLogin_Saml2_Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAPortOfAnyType()
+    {
+        foreach (array(443, '443') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('https', OneLogin_Saml2_Utils::getSelfProtocol(), 'SERVER_PORT ' . var_export($port, true));
+            $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+        }
+        foreach (array(80, '80', 8443, '8443', 'abc') as $port) {
+            $_SERVER['SERVER_PORT'] = $port;
+            $this->assertSame('http', OneLogin_Saml2_Utils::getSelfProtocol(), 'SERVER_PORT ' . var_export($port, true));
+            $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+        }
+
+        unset($_SERVER['SERVER_PORT']);
+        foreach (array(443, '443') as $port) {
+            OneLogin_Saml2_Utils::setSelfPort($port);
+            $this->assertSame('https', OneLogin_Saml2_Utils::getSelfProtocol(), 'setSelfPort ' . var_export($port, true));
+        }
     }
 
     /**
@@ -440,6 +600,121 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         OneLogin_Saml2_Utils::setSelfProtocol('https');
         $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+    }
+
+    /**
+     * A bool is accepted by setSelfProtocol too (setSelfProtocol($isSecure)): true is https, and false
+     * is ignored as any empty value, so the protocol is guessed
+     *
+     * @covers OneLogin_Saml2_Utils::setSelfProtocol
+     * @covers OneLogin_Saml2_Utils::getSelfProtocol
+     * @covers OneLogin_Saml2_Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetSelfProtocolWithABool()
+    {
+        OneLogin_Saml2_Utils::setSelfProtocol(true);
+        $this->assertSame('https', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+
+        OneLogin_Saml2_Utils::setSelfProtocol(false);
+        $this->assertSame('http', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertFalse(OneLogin_Saml2_Utils::isHTTPS());
+        $_SERVER['HTTPS'] = 'on';
+        $this->assertSame('https', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertTrue(OneLogin_Saml2_Utils::isHTTPS());
+    }
+
+    /**
+     * Checks the protocol and isHTTPS when the value comes from the header that a proxy sends and when the
+     * application sets it, and that the toolkit does not raise any PHP error with it
+     *
+     * @param mixed  $value            The value of the protocol
+     * @param string $expectedProtocol The protocol that is expected
+     * @param bool   $expectedIsHttps  The value of isHTTPS that is expected
+     * @param string $name             The name of the case
+     */
+    private function assertSelfProtocol($value, $expectedProtocol, $expectedIsHttps, $name)
+    {
+        $reset = function () {
+            OneLogin_Saml2_Utils::setBaseURL(null);
+            OneLogin_Saml2_Utils::setProxyVars(false);
+            unset($_SERVER['HTTP_X_FORWARDED_PROTO']);
+        };
+        $protocol = function () {
+            return array(OneLogin_Saml2_Utils::getSelfProtocol(), OneLogin_Saml2_Utils::isHTTPS());
+        };
+        $expected = array($expectedProtocol, $expectedIsHttps);
+
+        // The protocol that a proxy sends
+        $reset();
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = $value;
+        $this->assertSame($expected, $this->withPhpErrorsAsExceptions($protocol), "X-Forwarded-Proto: $name");
+
+        // The protocol that the application sets
+        $reset();
+        OneLogin_Saml2_Utils::setSelfProtocol($value);
+        $this->assertSame($expected, $this->withPhpErrorsAsExceptions($protocol), "setSelfProtocol: $name");
+
+        $reset();
+    }
+
+    /**
+     * A value that is not a string is not a protocol: it is http, and the toolkit does not raise any PHP
+     * error with it (the protocol that comes from $_SERVER is a string, but the one that the application
+     * sets can be anything)
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfProtocol
+     * @covers OneLogin_Saml2_Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAValueThatIsNotAString()
+    {
+        $values = array(
+            'false' => false,
+            'integer' => 443,
+            'zero' => 0,
+            'float' => 1.5,
+            'object' => new stdClass(),
+            'object with __toString' => new SplFileInfo('https'),
+        );
+        foreach ($values as $name => $value) {
+            $this->assertSelfProtocol($value, 'http', false, $name);
+        }
+
+        // Control: a string is the protocol
+        $this->assertSelfProtocol('https', 'https', true, 'https');
+        $this->assertSelfProtocol('http', 'http', false, 'http');
+    }
+
+    /**
+     * When the value is an array (the values of a header, as PSR-7 returns them) the protocol is the first one
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfProtocol
+     * @covers OneLogin_Saml2_Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAnArray()
+    {
+        $this->assertSelfProtocol(array('https'), 'https', true, 'one value');
+        $this->assertSelfProtocol(array('http'), 'http', false, 'one value, http');
+        $this->assertSelfProtocol(array('https', 'http'), 'https', true, 'the first value is https');
+        $this->assertSelfProtocol(array('http', 'https'), 'http', false, 'only the first value is used');
+        $this->assertSelfProtocol(array('proto' => 'https'), 'https', true, 'the first value of an associative array');
+
+        // The first value has to be a string, as any other value
+        $this->assertSelfProtocol(array(), 'http', false, 'empty array');
+        $this->assertSelfProtocol(array(443), 'http', false, 'the first value is an integer');
+        $this->assertSelfProtocol(array(array('https')), 'http', false, 'the first value is an array');
+        $this->assertSelfProtocol(array(new SplFileInfo('https')), 'http', false, 'the first value is an object');
+        $this->assertSelfProtocol(array(443, 'https'), 'http', false, 'an https value after the first one');
     }
 
     /**
@@ -517,7 +792,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('http', OneLogin_Saml2_Utils::getSelfProtocol());
         $this->assertEquals('anothersp.example.com', OneLogin_Saml2_Utils::getSelfHost());
-        $this->assertEquals('81', OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame(81, OneLogin_Saml2_Utils::getSelfPort());
         $this->assertEquals('/example2/', OneLogin_Saml2_Utils::getBaseURLPath());
 
         $this->assertEquals($expectedUrlNQ2, OneLogin_Saml2_Utils::getSelfURLNoQuery());
@@ -546,6 +821,38 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
         $this->assertEquals("https://sp.example.com/", OneLogin_Saml2_Utils::getSelfURL());
         $this->assertEquals('/', OneLogin_Saml2_Utils::getBaseURLPath());
+    }
+
+    /**
+     * The port of the base URL is an integer: the one that it has, or the default one of its protocol
+     * (the default ports are not part of the URLs that are built)
+     *
+     * @covers OneLogin_Saml2_Utils::setBaseURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetBaseURLPort()
+    {
+        $cases = array(
+            array('https://sp.example.com', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:443/path/', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com:80/path/', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:8443/path/', 'https', 8443, 'https://sp.example.com:8443'),
+            array('http://sp.example.com:8080', 'http', 8080, 'http://sp.example.com:8080'),
+            // A port that is not valid is ignored, the default one of the protocol is used
+            array('https://sp.example.com:abc/path/', 'https', 443, 'https://sp.example.com'),
+            array('http://sp.example.com:/path/', 'http', 80, 'http://sp.example.com'),
+            array('https://sp.example.com:99999/path/', 'https', 443, 'https://sp.example.com'),
+        );
+        foreach ($cases as $case) {
+            list($baseURL, $protocol, $port, $expectedHost) = $case;
+            OneLogin_Saml2_Utils::setBaseURL($baseURL);
+            $this->assertSame($protocol, OneLogin_Saml2_Utils::getSelfProtocol(), $baseURL);
+            $this->assertSame($port, OneLogin_Saml2_Utils::getSelfPort(), $baseURL);
+            $this->assertSame($expectedHost, OneLogin_Saml2_Utils::getSelfURLhost(), $baseURL);
+        }
     }
 
     /**
@@ -1522,6 +1829,159 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Reference URI must identify exactly one element', $e->getMessage());
+        }
+    }
+
+    /**
+     * Runs the callable failing on any PHP error that the code of the toolkit raises, deprecations
+     * included. Without it the failure of the code that is checked here depends on the assertions
+     * (calculateX509Fingerprint asserts that it gets a string: a failed assertion is a warning when
+     * the assertions are enabled, but with the assertions disabled, as in production, the same code
+     * raises nothing). The errors of the libraries are not the ones that are checked (xmlseclibs
+     * emits a warning when the certificate of a KeyInfo can not be read).
+     *
+     * @param callable $callable
+     *
+     * @return mixed The value returned by the callable
+     */
+    private function withPhpErrorsAsExceptions(callable $callable)
+    {
+        $libDir = dirname(TEST_ROOT) . '/lib/';
+        $toException = function ($severity, $message, $file, $line) use ($libDir) {
+            if (strpos($file, $libDir) !== 0) {
+                return true;
+            }
+            throw new ErrorException($message, 0, $severity, $file, $line);
+        };
+        set_error_handler($toException);
+        try {
+            return $callable();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * @param string      $xml     Signed XML
+     * @param string|null $keyInfo KeyInfo (as XML) that replaces the one of the first Signature of the document, null to remove it
+     *                             (the KeyInfo of a Signature inside the signed content is signed by the other Signature, so it is not touched)
+     *
+     * @return string The XML (as a received message, so it is parsed again by validateSign)
+     */
+    private function replaceKeyInfo($xml, $keyInfo = null)
+    {
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+
+        $signature = $dom->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'Signature')->item(0);
+        $keyInfos = $signature->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'KeyInfo');
+        for ($i = $keyInfos->length - 1; $i >= 0; $i--) {
+            $oldKeyInfo = $keyInfos->item($i);
+            if ($keyInfo !== null) {
+                $fragment = $dom->createDocumentFragment();
+                $this->assertTrue($fragment->appendXML(preg_replace('/^<ds:KeyInfo/', '<ds:KeyInfo xmlns:ds="' . XMLSecurityDSig::XMLDSIGNS . '"', $keyInfo)));
+                $oldKeyInfo->parentNode->replaceChild($fragment, $oldKeyInfo);
+            } else {
+                $oldKeyInfo->parentNode->removeChild($oldKeyInfo);
+            }
+        }
+
+        return $dom->saveXML();
+    }
+
+    /**
+     * KeyInfo is not covered by the signature, so a message can be received without it. With the
+     * certificate of the IdP configured the signature is validated, and if only the fingerprint
+     * is configured there is no certificate to compare it with, so the signature is not valid
+     * (and no PHP error is raised)
+     *
+     * @covers OneLogin_Saml2_Utils::validateSign
+     */
+    public function testValidateSignWithoutKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+        $cert = $idpData['x509cert'];
+        $fingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert);
+        $fingerprint256 = OneLogin_Saml2_Utils::calculateX509Fingerprint($cert, 'sha256');
+
+        $signedXmls = array(
+            'metadata' => file_get_contents(TEST_ROOT . '/data/metadata/signed_metadata_settings1.xml'),
+            'message' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64')),
+            'assertion' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_assertion_response.xml.base64')),
+            'double signed' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/double_signed_response.xml.base64')),
+        );
+        foreach ($signedXmls as $name => $xml) {
+            // Control: the KeyInfo that this test writes is a valid one
+            $withKeyInfo = $this->replaceKeyInfo($xml, '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>' . $settingsInfo['idp']['x509cert'] . '</ds:X509Certificate></ds:X509Data></ds:KeyInfo>');
+            $this->assertTrue(OneLogin_Saml2_Utils::validateSign($withKeyInfo, null, $fingerprint), "$name, with KeyInfo");
+
+            $noKeyInfo = $this->replaceKeyInfo($xml);
+            // The metadata and the double signed response have other KeyInfo (the ones that are signed), the Signature that is validated has none
+            $dom = new DOMDocument();
+            $dom->loadXML($noKeyInfo);
+            $signature = $dom->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'Signature')->item(0);
+            $this->assertEquals(0, $signature->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'KeyInfo')->length, $name);
+
+            $this->assertTrue(OneLogin_Saml2_Utils::validateSign($noKeyInfo, $cert), "$name, certificate");
+            $this->assertTrue(OneLogin_Saml2_Utils::validateSign($noKeyInfo, null, null, 'sha1', null, array($cert)), "$name, certificates");
+            $validateWithFingerprint = function () use ($noKeyInfo, $fingerprint) {
+                return OneLogin_Saml2_Utils::validateSign($noKeyInfo, null, $fingerprint);
+            };
+            $this->assertFalse($this->withPhpErrorsAsExceptions($validateWithFingerprint), "$name, fingerprint");
+            $validateWithFingerprint256 = function () use ($noKeyInfo, $fingerprint256) {
+                return OneLogin_Saml2_Utils::validateSign($noKeyInfo, null, $fingerprint256, 'sha256');
+            };
+            $this->assertFalse($this->withPhpErrorsAsExceptions($validateWithFingerprint256), "$name, sha256 fingerprint");
+        }
+    }
+
+    /**
+     * The KeyInfo can be changed by anybody (it is not signed), so whatever it contains the
+     * validation by fingerprint fails as an Exception or returns false, and only the
+     * certificate that matches the fingerprint can be used to verify the signature
+     *
+     * @covers OneLogin_Saml2_Utils::validateSign
+     */
+    public function testValidateSignWithUnusableKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+        $fingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($idpData['x509cert']);
+        $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64'));
+
+        $keyInfos = array(
+            'empty' => '<ds:KeyInfo/>',
+            'empty X509Data' => '<ds:KeyInfo><ds:X509Data/></ds:KeyInfo>',
+            'empty X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate/></ds:X509Data></ds:KeyInfo>',
+            'blank X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate> </ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'not base64 X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>not a certificate!</ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'not a certificate X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>' . base64_encode('not a certificate') . '</ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'X509SubjectName only' => '<ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=feide.erlang.no</ds:X509SubjectName></ds:X509Data></ds:KeyInfo>',
+            'KeyName only' => '<ds:KeyInfo><ds:KeyName>key</ds:KeyName></ds:KeyInfo>',
+            'KeyValue only' => '<ds:KeyInfo><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>AQAB</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue></ds:KeyInfo>',
+        );
+        foreach ($keyInfos as $name => $keyInfo) {
+            $modifiedXml = $this->replaceKeyInfo($xml, $keyInfo);
+
+            // A PHP error of the toolkit fails the test (an Error, on PHP 7, is not caught here and fails it too)
+            $validate = function () use ($modifiedXml, $fingerprint) {
+                return OneLogin_Saml2_Utils::validateSign($modifiedXml, null, $fingerprint);
+            };
+            try {
+                $result = $this->withPhpErrorsAsExceptions($validate);
+            } catch (ErrorException $e) {
+                throw $e;
+            } catch (Exception $e) {
+                $result = false;
+            }
+            $this->assertFalse($result, $name);
         }
     }
 

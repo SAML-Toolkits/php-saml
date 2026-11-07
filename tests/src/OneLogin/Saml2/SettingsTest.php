@@ -539,7 +539,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
     * Case with x509certNew
     *
     * @covers OneLogin_Saml2_Settings::getSPMetadata
-    * @dataProvider testGetSPMetadataWithX509CertNewDataProvider
+    * @dataProvider getSPMetadataWithX509CertNewDataProvider
     */
     public function testGetSPMetadataWithX509CertNew($alwaysIncludeEncryption, $wantNameIdEncrypted, $wantAssertionsEncrypted, $expectEncryptionKeyDescriptor)
     {
@@ -559,7 +559,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectEncryptionKeyDescriptor ? 2 : 0, substr_count($metadata, '<md:KeyDescriptor use="encryption"'));
     }
 
-    public function testGetSPMetadataWithX509CertNewDataProvider()
+    public function getSPMetadataWithX509CertNewDataProvider()
     {
         return array(
             'settings do not require encryption' => array(
@@ -1025,6 +1025,7 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('wantXMLValidation', $security);
         $this->assertArrayHasKey('wantNameId', $security);
         $this->assertArrayHasKey('relaxDestinationValidation', $security);
+        $this->assertArrayHasKey('requireDestination', $security);
         $this->assertArrayHasKey('destinationStrictlyMatches', $security);
         $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
     }
@@ -1080,6 +1081,9 @@ class OneLogin_Saml2_SettingsTest extends PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('wantNameId', $security);
         $this->assertTrue($security['wantNameId']);
+
+        $this->assertArrayHasKey('requireDestination', $security);
+        $this->assertFalse($security['requireDestination']);
 
         $this->assertArrayHasKey('allowRSA15KeyTransport', $security);
         $this->assertTrue($security['allowRSA15KeyTransport']);

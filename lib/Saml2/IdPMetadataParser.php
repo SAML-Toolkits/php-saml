@@ -192,7 +192,7 @@ class OneLogin_Saml2_IdPMetadataParser
                     $metadataInfo['sp']['NameIDFormat'] = $nameIdFormatNodes->item(0)->nodeValue;
                     if (!empty($desiredNameIdFormat)) {
                         foreach ($nameIdFormatNodes as $nameIdFormatNode) {
-                            if (strcmp($nameIdFormatNode->nodeValue, $desiredNameIdFormat) == 0) {
+                            if (strcmp($nameIdFormatNode->nodeValue, $desiredNameIdFormat) === 0) {
                                 $metadataInfo['sp']['NameIDFormat'] = $nameIdFormatNode->nodeValue;
                                 break;
                             }

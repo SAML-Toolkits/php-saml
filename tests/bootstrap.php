@@ -24,6 +24,22 @@ if (!defined('ONELOGIN_CUSTOMPATH')) {
 
 date_default_timezone_set('America/Los_Angeles');
 
+if (function_exists('__phpunit_run_isolated_test')) {
+    // This is the child process of a test that runs in a separate process (@runInSeparateProcess).
+    // PHPUnit 4.8 reads the result of the test from the output of the child process, and when there
+    // is no result (the test called exit(), as a redirection without $stay does) it counts the test
+    // as passed, although its assertions were not executed. Report it as an error instead, as
+    // PHPUnit 8.5 and later do ("Test was run in child process and ended unexpectedly")
+    register_shutdown_function(
+        function () {
+            $output = ob_get_level() > 0 ? ob_get_contents() : '';
+            if (!headers_sent() && strpos((string) $output, 's:10:"testResult"') === false) {
+                fwrite(STDERR, 'The test was run in a child process and ended unexpectedly (exit() was called?), its assertions were not executed');
+            }
+        }
+    );
+}
+
 
 if (!function_exists('getUrlFromRedirect')) {
     /**

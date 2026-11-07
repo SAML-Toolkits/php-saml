@@ -1,13 +1,13 @@
 # SAML PHP Toolkit
 
-[![php-saml package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=master)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=master) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=2.19.1) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
+[![php-saml package](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml/badge.svg?branch=master)](https://github.com/SAML-Toolkits/php-saml/actions/workflows/php-package.yml) [![Coverage Status](https://coveralls.io/repos/github/SAML-Toolkits/php-saml/badge.svg?branch=master)](https://coveralls.io/github/SAML-Toolkits/php-saml?branch=master) ![Packagist Dependency Version (specify version)](https://img.shields.io/packagist/dependency-v/onelogin/php-saml/php?version=2.22.0) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dm/onelogin/php-saml) ![Packagist Downloads](https://img.shields.io/packagist/dt/onelogin/php-saml?label=Total%20downloads)
 
 Add SAML support to your PHP software using this library.
 
 
 **The 3.X branch is compatible with PHP 7.0, PHP 7.1, PHP 7.2 , so if you are using that PHP version, use it and not the 2.X or the master branch**
 
-**The 4.X branch is compatible with PHP >= 7.3 and PHP 8.X**
+**The 4.X branch is compatible with PHP 8.X**
 
 Warning
 -------
@@ -557,6 +557,10 @@ $advancedSettings = array (
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
+
+        // If true, SAMLResponses without a Destination attribute
+        // will be rejected.
+        'requireDestination' => false,
 
         // If true, SAMLResponses with an empty value at its Destination
         // attribute will not be rejected for this fact.
@@ -1261,7 +1265,7 @@ if ($needsAuth) {
 php-saml toolkit uses a bunch of methods in OneLogin_Saml2_Utils that try to guess the URL where the SAML messages are processed.
 
 * `getSelfHost` Returns the current host.
-* `getSelfPort` Return the port number used for the request
+* `getSelfPort` Return the port number used for the request, as an integer (`null` if it is not known or it is not a valid port number). `setSelfPort` accepts an integer or a string with an integer.
 * `isHTTPS` Checks if the protocol is https or http.
 * `getSelfURLhost` Returns the protocol + the current host + the port (if different than common ports).
 * `getSelfURL` Returns the URL of the current host + current view + query.
@@ -1284,6 +1288,67 @@ Is possible that asserting request URL and Destination attribute of SAML respons
 You should be able to workaround this by configuring your server so that it is aware of the proxy and returns the original url when requested.
 
 Or by using the method described on the previous section.
+
+
+### Working behind a reverse proxy that strips a path prefix (X-Forwarded-Prefix) ###
+
+Some reverse-proxy strip a path prefix before forwarding the request to the application backend. A typical deployment is:
+
+| Layer        | URL the layer sees                                                |
+| ------------ | ------------------------------------------------------------------|
+| User browser | `https://domain.com/portal/connect/azure/check`                   |
+| IdP signs    | `https://domain.com/portal/connect/azure/check` as `@Destination` |
+| Proxy        | strips `/portal`                                                  |
+| Application  | sees `REQUEST_URI = /connect/azure/check`, no `HTTPS`, plus       |
+|              |  `X-Forwarded-Proto`: `https` and `X-Forwarded-Prefix`: `/portal` |
+
+In this scenario two pieces of the original URL are missing from the
+application server's `$_SERVER`: the HTTPs scheme and the path prefix.
+`setProxyVars(true)` covers the scheme (and the port) via
+`X-Forwarded-Proto` / `X-Forwarded-Port`, but the toolkit does **not**
+read `X-Forwarded-Prefix`. As a result `OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery()`
+returns `https://domain.com/connect/azure/check` (after `setProxyVars(true)`),
+which does not match the IdP-signed `@Destination`
+`https://domain.com/portal/connect/azure/check`, and validation fails
+with `The response was received at X instead of Y`.
+
+No code changes to the toolkit are required to make this work.
+Two equivalent approaches using only the public `OneLogin_Saml2_Utils` API:
+
+**Option A**
+
+```php
+OneLogin_Saml2_Utils::setProxyVars(true);
+OneLogin_Saml2_Utils::setBaseURL('https://domain.com/portal/');  // scheme + host + prefix
+$auth->processResponse();
+```
+
+`setBaseURL` parses its argument into protocol, host, port and
+`baseURLPath`, then `getSelfRoutedURLNoQuery()` prepends the
+`baseURLPath` to the proxy-stripped `REQUEST_URI`, producing the
+original full URL the IdP signed.
+
+> **Important:** pass `setBaseURL` the URL *up to and including the
+> stripped prefix*, with a trailing slash — e.g.
+> `'https://domain.com/portal/'`. Do **not** pass the full ACS URL
+> (e.g. `'https://domain.com/portal/connect/azure/check'`); doing so
+> causes `buildWithBaseURLPath` to append `REQUEST_URI` to a
+> `baseURLPath` that already contains it, producing a doubled path
+> like `/portal/connect/azure/check/connect/azure/check`.
+
+**Option B**
+
+Use this form if the application already reads `X-Forwarded-*` headers
+through a framework abstraction and wants to feed each component to the
+toolkit explicitly:
+
+```php
+OneLogin_Saml2_Utils::setSelfProtocol('https');
+OneLogin_Saml2_Utils::setSelfHost('domain.com');
+OneLogin_Saml2_Utils::setSelfPort(443);
+OneLogin_Saml2_Utils::setBaseURLPath('/portal');
+$auth->processResponse();
+```
 
 
 ### SP Key rollover ###
@@ -1384,6 +1449,8 @@ Main class of PHP Toolkit
  * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
+ * `getLastErrorReason` - Returns the reason of the last error
+ * `getLastErrorException` - Returns the Exception of the last error (its code identifies the error)
  * `getSSOurl` - Gets the SSO url.
  * `getSLOurl` - Gets the SLO url.
  * `getLastRequestID` - The ID of the last Request SAML message generated.
@@ -1429,6 +1496,7 @@ SAML 2 Authentication Response class
  * `validateTimestamps` - Verifies that the document is still valid according
    Conditions Element.
  * `getError` - After executing a validation process, if it fails, this method returns the cause
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause
  * `getXMLDocument` - Returns the SAML Response document (If contains an encrypted assertion, decrypts it)
 
 ##### OneLogin_Saml2_LogoutRequest - `LogoutRequest.php` #####
@@ -1444,6 +1512,7 @@ SAML 2 Logout Request class
  * `getSessionIndexes` - Gets the SessionIndexes from the Logout Request.
  * `isValid` - Checks if the Logout Request received is valid.
  * `getError` - After executing a validation process, if it fails, this method returns the cause
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause
  * `getXML` - Returns the XML that will be sent as part of the request or that was received at the SP.
 
 ##### OneLogin_Saml2_LogoutResponse - `LogoutResponse.php` #####
@@ -1458,6 +1527,7 @@ SAML 2 Logout Response class
  * `build` - Generates a Logout Response object.
  * `getResponse` - Returns a Logout Response object.
  * `getError` - After executing a validation process, if it fails, this method returns the cause.
+ * `getErrorException` - After executing a validation process, if it fails, this method returns the Exception of the cause.
  * `getXML` - Returns the XML that will be sent as part of the response or that was received at the SP.
 
 ##### OneLogin_Saml2_Settings - `Settings.php` #####

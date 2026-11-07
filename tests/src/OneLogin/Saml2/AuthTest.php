@@ -40,6 +40,20 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the setSchemasPath method of the OneLogin_Saml2_Auth class
+     *
+     * @covers OneLogin_Saml2_Auth::setSchemasPath
+     */
+    public function testSetSchemasPath()
+    {
+        $customPath = 'custompath/';
+
+        $this->_auth->setSchemasPath($customPath);
+
+        $this->assertEquals($customPath, $this->_auth->getSettings()->getSchemasPath());
+    }
+
+    /**
      * Tests the use of the spValidationOnly at OneLogin_Saml2_Auth
      *
      * @covers OneLogin_Saml2_Auth
@@ -155,6 +169,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getLastErrorReason
+    * @covers OneLogin_Saml2_Auth::getLastErrorException
     */
     public function testProcessResponseInvalid()
     {
@@ -174,6 +189,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->_auth->getAttribute('uid'));
         $this->assertEquals($this->_auth->getErrors(), array('invalid_response'));
         $this->assertEquals($this->_auth->getLastErrorReason(), "Reference validation failed");
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("Reference validation failed", $errorException->getMessage());
     }
 
     /**
@@ -197,6 +214,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($auth->isAuthenticated());
         $this->assertEquals(array('invalid_response'), $auth->getErrors());
         $this->assertEquals('The Message of the Response is not signed and the SP requires it', $auth->getLastErrorReason());
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $auth->getLastErrorException());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE, $auth->getLastErrorException()->getCode());
     }
 
     /**
@@ -219,6 +238,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processResponse($requestId);
 
         $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertEquals("No Signature found. SAML Response rejected", $errorException->getMessage());
 
         $this->_auth->setStrict(true);
         $this->_auth->processResponse($requestId);
@@ -227,6 +248,43 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $validRequestId = '_57bcbf70-7b1f-012e-c821-782bcb13bb38';
         $this->_auth->processResponse($validRequestId);
         $this->assertEquals("No Signature found. SAML Response rejected", $this->_auth->getLastErrorReason());
+    }
+
+    /**
+     * Tests the processResponse method of the OneLogin_Saml2_Auth class
+     * Case Invalid Response, Missing Destination and destination required
+     *
+     * @covers OneLogin_Saml2_Auth::processResponse
+     */
+    public function testProcessResponseInvalidMissingDestination()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['requireDestination'] = true;
+        $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+        $_SERVER['HTTP_HOST'] = 'stuff.com';
+        $_SERVER['HTTPS'] = 'https';
+        $_SERVER['REQUEST_URI'] = '/endpoints/endpoints/acs.php';
+
+        $message = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_destination.xml.base64');
+        $_POST['SAMLResponse'] = $message;
+
+        $auth->processResponse();
+
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals('The response has no Destination value', $auth->getLastErrorReason());
+
+        $errorException = $auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::MISSING_DESTINATION, $errorException->getCode());
+
+        unset($_POST['SAMLResponse']);
+        unset($_SERVER['HTTP_HOST']);
+        unset($_SERVER['HTTPS']);
+        unset($_SERVER['REQUEST_URI']);
     }
 
     /**
@@ -402,57 +460,40 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
-    * (phpunit raises an exception when a redirect is executed, the
-    * exception is caught and we check that the targetURL is correct)
+    * (with $stay the target URL is returned instead of executing the
+    * redirection, and we check that the targetURL is correct)
     * Case redirect without url parameter
     *
     * @covers OneLogin_Saml2_Auth::redirectTo
     * @runInSeparateProcess
+    * @preserveGlobalState disabled
     */
-    public function testRedirectTo()
+    function testRedirectTo()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            $_REQUEST['RelayState'] = $relayState;
-            // The Header of the redirect produces an Exception
-            $this->_auth->redirectTo();
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-
-            $this->assertEquals($targetUrl, $relayState);
-        }
+        $relayState = 'http://sp.example.com';
+        $_REQUEST['RelayState'] = $relayState;
+        $targetUrl = $this->_auth->redirectTo('', array(), true);
+        $this->assertEquals($targetUrl, $relayState);
     }
 
     /**
     * Tests the redirectTo method of the OneLogin_Saml2_Auth class
-    * (phpunit raises an exception when a redirect is executed, the
-    * exception is caught and we check that the targetURL is correct)
+    * (with $stay the target URL is returned instead of executing the
+    * redirection, and we check that the targetURL is correct)
     * Case redirect with url parameter
     *
     * @covers OneLogin_Saml2_Auth::redirectTo
     * @runInSeparateProcess
+    * @preserveGlobalState disabled
     */
-    public function testRedirectTowithUrl()
+    function testRedirectTowithUrl()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            $url2 = 'http://sp2.example.com';
-            $_REQUEST['RelayState'] = $relayState;
-            // The Header of the redirect produces an Exception
-            $this->_auth->redirectTo($url2);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
+        $relayState = 'http://sp.example.com';
+        $url2 = 'http://sp2.example.com';
+        $_REQUEST['RelayState'] = $relayState;
+        $targetUrl = $this->_auth->redirectTo($url2, array(), true);
 
-            $this->assertEquals($targetUrl, $url2);
-        }
+        $this->assertEquals($targetUrl, $url2);
     }
 
     /**
@@ -491,10 +532,15 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processSLO(true);
         // The Destination fails
         $this->assertEquals($this->_auth->getErrors(), array('invalid_logout_response'));
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $errorException->getCode());
+        $this->assertEquals($errorException->getMessage(), $this->_auth->getLastErrorReason());
 
         $this->_auth->setStrict(false);
         $this->_auth->processSLO(true);
         $this->assertEmpty($this->_auth->getErrors());
+        $this->assertNull($this->_auth->getLastErrorException());
     }
 
     /**
@@ -654,53 +700,60 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     * @runInSeparateProcess
+    * @preserveGlobalState disabled
     */
-    public function testProcessSLORequestInvalidValid()
+    function testProcessSLORequestInvalidValid()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
         $_GET['SAMLRequest'] = $message;
 
-        try {
-            // The Header of the redirect produces an Exception
-            $this->_auth->processSLO(true);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->processSLO(true, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $this->assertEmpty($this->_auth->getErrors());
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
-        }
+        $this->assertEmpty($this->_auth->getErrors());
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
         $this->_auth->setStrict(true);
         $this->_auth->processSLO(true);
         // Fail due destination missmatch
         $this->assertEquals($this->_auth->getErrors(), array('invalid_logout_request'));
 
-        try {
-            $this->_auth->setStrict(false);
-            $this->_auth->processSLO(true);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $this->_auth->setStrict(false);
+        $targetUrl = $this->_auth->processSLO(true, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $this->assertEmpty($this->_auth->getErrors());
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
-        }
+        $this->assertEmpty($this->_auth->getErrors());
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayNotHasKey('RelayState', $parsedQuery);
     }
 
+    /**
+     * Tests the getLastErrorException method of the OneLogin_Saml2_Auth class
+     * Case Invalid Logout Request (it is not answered, so there is no redirection)
+     *
+     * @covers OneLogin_Saml2_Auth::processSLO
+     * @covers OneLogin_Saml2_Auth::getLastErrorException
+     */
+    public function testProcessSLORequestInvalidLastErrorException()
+    {
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
+
+        $this->_auth->setStrict(true);
+        $this->_auth->processSLO(true);
+        // Fail due destination missmatch
+        $this->assertEquals(array('invalid_logout_request'), $this->_auth->getErrors());
+        $errorException = $this->_auth->getLastErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $errorException->getCode());
+        $this->assertEquals($errorException->getMessage(), $this->_auth->getLastErrorReason());
+
+        unset($_GET['SAMLRequest']);
+    }
     /**
     * Tests the processSLO method of the OneLogin_Saml2_Auth class
     * Case Logout Request NotOnOrAfter failed
@@ -732,8 +785,9 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     *
     * @covers OneLogin_Saml2_Auth::processSLO
     * @runInSeparateProcess
+    * @preserveGlobalState disabled
     */
-    public function testProcessSLORequestDeletingSession()
+    function testProcessSLORequestDeletingSession()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
 
@@ -750,46 +804,32 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         }
         $_SESSION['samltest'] = true;
 
-        try {
-            $this->_auth->setStrict(true);
-            $this->_auth->processSLO(false);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $this->_auth->setStrict(true);
+        $targetUrl = $this->_auth->processSLO(false, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
-            // Session is not alive
-            $this->assertFalse(isset($_SESSION['samltest']));
-        }
+        // Session is not alive
+        $this->assertFalse(isset($_SESSION['samltest']));
 
         $_SESSION['samltest'] = true;
 
-        try {
-            $this->_auth->setStrict(true);
-            $this->_auth->processSLO(true);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $this->_auth->setStrict(true);
+        $targetUrl = $this->_auth->processSLO(true, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
-            $this->assertContains($sloResponseUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
-            // Session is alive
-            $this->assertTrue(isset($_SESSION['samltest']));
-            $this->assertTrue($_SESSION['samltest']);
-        }
+        // Session is alive
+        $this->assertTrue(isset($_SESSION['samltest']));
+        $this->assertTrue($_SESSION['samltest']);
     }
 
     /**
@@ -798,9 +838,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
      * a LogoutResponse is created and a redirection executed
      *
      * @covers OneLogin_Saml2_Auth::processSLO
-     * @runInSeparateProcess
      */
-    public function testProcessSLORequestDeletingSessionCallback()
+    function testProcessSLORequestDeletingSessionCallback()
     {
         $message = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request_deflated.xml.base64');
 
@@ -821,30 +860,23 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
             $_SESSION['samltest'] = false;
         };
 
-        try {
-            $this->_auth->setStrict(true);
-            $this->_auth->processSLO(false, null, false, $callback);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $this->_auth->setStrict(true);
+        $targetUrl = $this->_auth->processSLO(false, null, false, $callback, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
-            $this->assertArrayNotHasKey('RelayState', $parsedQuery);
+        $sloResponseUrl = $this->_settingsInfo['idp']['singleLogoutService']['responseUrl'];
+        $this->assertContains($sloResponseUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLResponse', $parsedQuery);
+        $this->assertArrayNotHasKey('RelayState', $parsedQuery);
 
-            if (getenv("TRAVIS")) {
-                // Can't test that on TRAVIS
-                $this->markTestSkipped("Can't test that on TRAVIS");
-            } else {
-                // Session is alive
-                $this->assertTrue(isset($_SESSION['samltest']));
-                // But has been modified
-                $this->assertFalse($_SESSION['samltest']);
-            }
+        if (getenv("TRAVIS")) {
+            // Can't test that on TRAVIS
+            $this->markTestSkipped("Can't test that on TRAVIS");
+        } else {
+            // Session is alive
+            $this->assertTrue(isset($_SESSION['samltest']));
+            // But has been modified
+            $this->assertFalse($_SESSION['samltest']);
         }
     }
 
@@ -929,27 +961,17 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login with no parameters. An AuthnRequest is built an redirection executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLogin()
+    function testLogin()
     {
-        try {
-            // The Header of the redirect produces an Exception
-            $this->_auth->login();
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->login(null, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
-        }
+        $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
     }
 
     /**
@@ -958,28 +980,18 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * and RelayState. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginWithRelayState()
+    function testLoginWithRelayState()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            // The Header of the redirect produces an Exception
-            $this->_auth->login($relayState);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $relayState = 'http://sp.example.com';
+        $targetUrl = $this->_auth->login($relayState, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $relayState);
-        }
+        $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $relayState);
     }
 
     /**
@@ -988,34 +1000,24 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * SAMLRequest, RelayState and extra parameters in the GET. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginWithRelayStateAndParameters()
+    function testLoginWithRelayStateAndParameters()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+        $relayState = 'http://sp.example.com';
+        $parameters = array ('test1' => 'value1', 'test2' => 'value2');
 
-            // The Header of the redirect produces an Exception
-            $this->_auth->login($relayState, $parameters);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->login($relayState, $parameters, false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $relayState);
-            $this->assertArrayHasKey('test1', $parsedQuery);
-            $this->assertArrayHasKey('test2', $parsedQuery);
-            $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
-            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
-        }
+        $ssoUrl = $this->_settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $relayState);
+        $this->assertArrayHasKey('test1', $parsedQuery);
+        $this->assertArrayHasKey('test2', $parsedQuery);
+        $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
+        $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
     }
 
     /**
@@ -1023,9 +1025,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login signed. An AuthnRequest signed is built an redirect executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginSigned()
+    function testLoginSigned()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -1034,27 +1035,18 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertArrayHasKey('SigAlg', $parsedQuery);
-            $this->assertArrayHasKey('Signature', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $returnTo);
-            $this->assertEquals(XMLSecurityKey::RSA_SHA1, $parsedQuery['SigAlg']);
-        }
+        $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertArrayHasKey('SigAlg', $parsedQuery);
+        $this->assertArrayHasKey('Signature', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $returnTo);
+        $this->assertEquals(XMLSecurityKey::RSA_SHA1, $parsedQuery['SigAlg']);
     }
 
     /**
@@ -1062,9 +1054,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login with no parameters. A AuthN Request is built with ForceAuthn and redirect executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginForceAuthN()
+    function testLoginForceAuthN()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -1073,70 +1064,41 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $encodedRequest = $parsedQuery['SAMLRequest'];
-            $decoded = base64_decode($encodedRequest);
-            $request = gzinflate($decoded);
-            $this->assertNotContains('ForceAuthn="true"', $request);
-        }
+        $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $encodedRequest = $parsedQuery['SAMLRequest'];
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('ForceAuthn="true"', $request);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl2 = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
-            $auth->login($returnTo, array(), false, false);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace2 = $e->getTrace();
-            $targetUrl2 = getUrlFromRedirect($trace2);
-            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+        $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl2, $targetUrl2);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+        $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertNotContains('ForceAuthn="true"', $request2);
 
-            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
-            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
-            $decoded2 = base64_decode($encodedRequest2);
-            $request2 = gzinflate($decoded2);
-            $this->assertNotContains('ForceAuthn="true"', $request2);
-        }
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl3 = $auth->login($returnTo, array(), true, false, true);
+        $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), true, false);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace3 = $e->getTrace();
-            $targetUrl3 = getUrlFromRedirect($trace3);
-            $parsedQuery3 = getParamsFromUrl($targetUrl3);
-
-            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
-            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
-            $decoded3 = base64_decode($encodedRequest3);
-            $request3 = gzinflate($decoded3);
-            $this->assertContains('ForceAuthn="true"', $request3);
-        }
-
+        $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl3, $targetUrl3);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+        $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('ForceAuthn="true"', $request3);
     }
 
     /**
@@ -1144,9 +1106,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login with no parameters. A AuthN Request is built with IsPassive and redirect executed
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginIsPassive()
+    function testLoginIsPassive()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -1155,68 +1116,41 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $encodedRequest = $parsedQuery['SAMLRequest'];
-            $decoded = base64_decode($encodedRequest);
-            $request = gzinflate($decoded);
-            $this->assertNotContains('IsPassive="true"', $request);
-        }
+        $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $encodedRequest = $parsedQuery['SAMLRequest'];
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('IsPassive="true"', $request);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), false, false);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace2 = $e->getTrace();
-            $targetUrl2 = getUrlFromRedirect($trace2);
-            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl2 = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
-            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
-            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
-            $decoded2 = base64_decode($encodedRequest2);
-            $request2 = gzinflate($decoded2);
-            $this->assertNotContains('IsPassive="true"', $request2);
-        }
+        $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl2, $targetUrl2);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+        $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertNotContains('IsPassive="true"', $request2);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), false, true);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace3 = $e->getTrace();
-            $targetUrl3 = getUrlFromRedirect($trace3);
-            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl3 = $auth->login($returnTo, array(), false, true, true);
+        $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
-            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
-            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
-            $decoded3 = base64_decode($encodedRequest3);
-            $request3 = gzinflate($decoded3);
-            $this->assertContains('IsPassive="true"', $request3);
-        }
+        $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl3, $targetUrl3);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+        $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('IsPassive="true"', $request3);
     }
 
     /**
@@ -1224,77 +1158,49 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login with no parameters. A AuthN Request is built with and without NameIDPolicy
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginNameIDPolicy()
+    function testLoginNameIDPolicy()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), false, false, false, false);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->login($returnTo, array(), false, false, true, false);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $encodedRequest = $parsedQuery['SAMLRequest'];
-            $decoded = base64_decode($encodedRequest);
-            $request = gzinflate($decoded);
-            $this->assertNotContains('<samlp:NameIDPolicy', $request);
-        }
+        $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $encodedRequest = $parsedQuery['SAMLRequest'];
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('<samlp:NameIDPolicy', $request);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), false, false, false, true);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace2 = $e->getTrace();
-            $targetUrl2 = getUrlFromRedirect($trace2);
-            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl2 = $auth->login($returnTo, array(), false, false, true, true);
+        $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
-            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
-            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
-            $decoded2 = base64_decode($encodedRequest2);
-            $request2 = gzinflate($decoded2);
-            $this->assertContains('<samlp:NameIDPolicy', $request2);
-        }
+        $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl2, $targetUrl2);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+        $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertContains('<samlp:NameIDPolicy', $request2);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace3 = $e->getTrace();
-            $targetUrl3 = getUrlFromRedirect($trace3);
-            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl3 = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
-            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
-            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
-            $decoded3 = base64_decode($encodedRequest3);
-            $request3 = gzinflate($decoded3);
-            $this->assertContains('<samlp:NameIDPolicy', $request3);
-        }
+        $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl3, $targetUrl3);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+        $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        $this->assertContains('<samlp:NameIDPolicy', $request3);
     }
 
     /**
@@ -1302,83 +1208,57 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Login with no parameters. A AuthN Request is built with and without Subject
     *
     * @covers OneLogin_Saml2_Auth::login
-    * @runInSeparateProcess
     */
-    public function testLoginSubject()
+    function testLoginSubject()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->login($returnTo, array(), false, false, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $encodedRequest = $parsedQuery['SAMLRequest'];
-            $decoded = base64_decode($encodedRequest);
-            $request = gzinflate($decoded);
-            $this->assertNotContains('<saml:Subject', $request);
-        }
+        $ssoUrl = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $encodedRequest = $parsedQuery['SAMLRequest'];
+        $decoded = base64_decode($encodedRequest);
+        $request = gzinflate($decoded);
+        $this->assertNotContains('<saml:Subject', $request);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->login($returnTo, array(), false, false, false, true, "testuser@example.com");
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace2 = $e->getTrace();
-            $targetUrl2 = getUrlFromRedirect($trace2);
-            $parsedQuery2 = getParamsFromUrl($targetUrl2);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl2 = $auth->login($returnTo, array(), false, false, true, true, "testuser@example.com");
+        $parsedQuery2 = getParamsFromUrl($targetUrl2);
 
-            $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl2, $targetUrl2);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
-            $encodedRequest2 = $parsedQuery2['SAMLRequest'];
-            $decoded2 = base64_decode($encodedRequest2);
-            $request2 = gzinflate($decoded2);
-            $this->assertContains('<saml:Subject', $request2);
-            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
-            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
-        }
+        $ssoUrl2 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl2, $targetUrl2);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery2);
+        $encodedRequest2 = $parsedQuery2['SAMLRequest'];
+        $decoded2 = base64_decode($encodedRequest2);
+        $request2 = gzinflate($decoded2);
+        $this->assertContains('<saml:Subject', $request2);
+        $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser@example.com</saml:NameID>', $request2);
+        $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request2);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $settingsInfo['sp']['NameIDFormat'] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
-            $auth2 = new OneLogin_Saml2_Auth($settingsInfo);
-            $auth2->login($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace3 = $e->getTrace();
-            $targetUrl3 = getUrlFromRedirect($trace3);
-            $parsedQuery3 = getParamsFromUrl($targetUrl3);
+        $returnTo = 'http://example.com/returnto';
+        $settingsInfo['sp']['NameIDFormat'] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+        $auth2 = new OneLogin_Saml2_Auth($settingsInfo);
+        $targetUrl3 = $auth2->login($returnTo, array(), false, false, true);
+        $parsedQuery3 = getParamsFromUrl($targetUrl3);
 
-            $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
-            $this->assertContains($ssoUrl3, $targetUrl3);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
-            $encodedRequest3 = $parsedQuery3['SAMLRequest'];
-            $decoded3 = base64_decode($encodedRequest3);
-            $request3 = gzinflate($decoded3);
-            $this->assertContains('<saml:Subject', $request3);
-            $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">testuser@example.com</saml:NameID>', $request3);
-            $this->assertContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
-        }
+        $ssoUrl3 = $settingsInfo['idp']['singleSignOnService']['url'];
+        $this->assertContains($ssoUrl3, $targetUrl3);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery3);
+        $encodedRequest3 = $parsedQuery3['SAMLRequest'];
+        $decoded3 = base64_decode($encodedRequest3);
+        $request3 = gzinflate($decoded3);
+        // Without the nameIdValueReq there is no Subject, the NameIDFormat is the one of the NameIDPolicy
+        $this->assertNotContains('<saml:Subject', $request3);
+        $this->assertContains('Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"', $request3);
+        $this->assertNotContains('testuser@example.com', $request3);
+        $this->assertNotContains('<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">', $request3);
     }
 
     /**
@@ -1386,27 +1266,17 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case Logout with no parameters. A logout Request is built and redirect executed
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogout()
+    function testLogout()
     {
-        try {
-            // The Header of the redirect produces an Exception
-            $this->_auth->logout();
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->logout(null, array(), null, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
-        }
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery());
     }
 
     /**
@@ -1415,28 +1285,18 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * RelayState. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogoutWithRelayState()
+    function testLogoutWithRelayState()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            // The Header of the redirect produces an Exception
-            $this->_auth->logout($relayState);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $relayState = 'http://sp.example.com';
+        $targetUrl = $this->_auth->logout($relayState, array(), null, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $relayState);
-        }
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $relayState);
     }
 
     /**
@@ -1445,34 +1305,24 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * RelayState and extra parameters. A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogoutWithRelayStateAndParameters()
+    function testLogoutWithRelayStateAndParameters()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            $parameters = array ('test1' => 'value1', 'test2' => 'value2');
+        $relayState = 'http://sp.example.com';
+        $parameters = array ('test1' => 'value1', 'test2' => 'value2');
 
-            // The Header of the redirect produces an Exception
-            $this->_auth->logout($relayState, $parameters);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->logout($relayState, $parameters, null, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $relayState);
-            $this->assertArrayHasKey('test1', $parsedQuery);
-            $this->assertArrayHasKey('test2', $parsedQuery);
-            $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
-            $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
-        }
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $relayState);
+        $this->assertArrayHasKey('test1', $parsedQuery);
+        $this->assertArrayHasKey('test2', $parsedQuery);
+        $this->assertEquals($parsedQuery['test1'], $parameters['test1']);
+        $this->assertEquals($parsedQuery['test2'], $parameters['test2']);
     }
 
     /**
@@ -1481,28 +1331,21 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * A redirection is executed
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogoutWithNameIdAndSessionIndex()
+    function testLogoutWithNameIdAndSessionIndex()
     {
-        try {
-            $relayState = 'http://sp.example.com';
-            // The Header of the redirect produces an Exception
-            $nameId = 'my_name_id';
-            $sessionIndex = '_51be37965feb5579d803141076936dc2e9d1d98ebf';
-            $this->_auth->logout(null, array(), $nameId, $sessionIndex);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $nameId = 'my_name_id';
+        $sessionIndex = '_51be37965feb5579d803141076936dc2e9d1d98ebf';
+        $targetUrl = $this->_auth->logout(null, array(), $nameId, $sessionIndex, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-        }
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+
+        $logoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+        $this->assertEquals($nameId, OneLogin_Saml2_LogoutRequest::getNameId($logoutRequest));
+        $this->assertEquals(array($sessionIndex), OneLogin_Saml2_LogoutRequest::getSessionIndexes($logoutRequest));
     }
 
     /**
@@ -1510,34 +1353,24 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * Case nameID loaded after process SAML Response
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogoutNameID()
+    function testLogoutNameID()
     {
         $message = file_get_contents(TEST_ROOT . '/data/responses/valid_response.xml.base64');
         $_POST['SAMLResponse'] = $message;
         $this->_auth->processResponse();
         $nameIdFromResponse = $this->_auth->getNameId();
 
-        try {
-            $nameId = 'my_name_id';
-            $this->_auth->logout();
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $targetUrl = $this->_auth->logout(null, array(), null, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $sloUrl = $this->_settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
 
-            $logoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
-            $nameIdFromRequest = OneLogin_Saml2_LogoutRequest::getNameId($logoutRequest);
-            $this->assertEquals($nameIdFromResponse, $nameIdFromRequest);
-        }
+        $logoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+        $nameIdFromRequest = OneLogin_Saml2_LogoutRequest::getNameId($logoutRequest);
+        $this->assertEquals($nameIdFromResponse, $nameIdFromRequest);
     }
 
     /**
@@ -1546,9 +1379,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * the assertion is built and redirect executed
     *
     * @covers OneLogin_Saml2_Auth::logout
-    * @runInSeparateProcess
     */
-    public function testLogoutSigned()
+    function testLogoutSigned()
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -1557,27 +1389,18 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
-        try {
-            // The Header of the redirect produces an Exception
-            $returnTo = 'http://example.com/returnto';
-            $auth->logout($returnTo);
-            // Do not ever get here
-            $this->assertFalse(true);
-        } catch (Exception $e) {
-            $this->assertContains('Cannot modify header information', $e->getMessage());
-            $trace = $e->getTrace();
-            $targetUrl = getUrlFromRedirect($trace);
-            $parsedQuery = getParamsFromUrl($targetUrl);
+        $returnTo = 'http://example.com/returnto';
+        $targetUrl = $auth->logout($returnTo, array(), null, null, true);
+        $parsedQuery = getParamsFromUrl($targetUrl);
 
-            $sloUrl = $settingsInfo['idp']['singleLogoutService']['url'];
-            $this->assertContains($sloUrl, $targetUrl);
-            $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
-            $this->assertArrayHasKey('RelayState', $parsedQuery);
-            $this->assertArrayHasKey('SigAlg', $parsedQuery);
-            $this->assertArrayHasKey('Signature', $parsedQuery);
-            $this->assertEquals($parsedQuery['RelayState'], $returnTo);
-            $this->assertEquals(XMLSecurityKey::RSA_SHA1, $parsedQuery['SigAlg']);
-        }
+        $sloUrl = $settingsInfo['idp']['singleLogoutService']['url'];
+        $this->assertContains($sloUrl, $targetUrl);
+        $this->assertArrayHasKey('SAMLRequest', $parsedQuery);
+        $this->assertArrayHasKey('RelayState', $parsedQuery);
+        $this->assertArrayHasKey('SigAlg', $parsedQuery);
+        $this->assertArrayHasKey('Signature', $parsedQuery);
+        $this->assertEquals($parsedQuery['RelayState'], $returnTo);
+        $this->assertEquals(XMLSecurityKey::RSA_SHA1, $parsedQuery['SigAlg']);
     }
 
     /**

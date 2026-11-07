@@ -31,6 +31,13 @@ class OneLogin_Saml2_LogoutRequest
     private $_error;
 
     /**
+     * After execute a validation process, if it fails, this var contains the Exception of the cause
+     *
+     * @var Exception|null
+     */
+    private $_errorException;
+
+    /**
      * Constructs the Logout Request object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
@@ -75,7 +82,7 @@ class OneLogin_Saml2_LogoutRequest
 
             if (!empty($nameId)) {
                 if (empty($nameIdFormat) &&
-                  $spData['NameIDFormat'] != OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
+                  $spData['NameIDFormat'] !== OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
             } else {
@@ -86,12 +93,12 @@ class OneLogin_Saml2_LogoutRequest
             /* From saml-core-2.0-os 8.3.6, when the entity Format is used:
                "The NameQualifier, SPNameQualifier, and SPProvidedID attributes MUST be omitted.
             */
-            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_ENTITY) {
+            if (!empty($nameIdFormat) && $nameIdFormat === OneLogin_Saml2_Constants::NAMEID_ENTITY) {
                 $nameIdNameQualifier = null;
                 $nameIdSPNameQualifier = null;
             }
              // NameID Format UNSPECIFIED omitted
-            if (!empty($nameIdFormat) && $nameIdFormat == OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
+            if (!empty($nameIdFormat) && $nameIdFormat === OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED) {
                 $nameIdFormat = null;
             }
 
@@ -353,6 +360,7 @@ LOGOUTREQUEST;
     public function isValid($retrieveParametersFromServer = false)
     {
         $this->_error = null;
+        $this->_errorException = null;
         try {
             $dom = new DOMDocument();
             $dom = OneLogin_Saml2_Utils::loadXML($dom, $this->_logoutRequest);
@@ -414,7 +422,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);
-                if (!empty($issuer) && $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer !== $idPEntityId) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Invalid issuer in the Logout Request",
                         OneLogin_Saml2_ValidationError::WRONG_ISSUER
@@ -449,6 +457,7 @@ LOGOUTREQUEST;
             return true;
         } catch (Exception $e) {
             $this->_error = $e->getMessage();
+            $this->_errorException = $e;
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
                 echo htmlentities($this->_error);
@@ -465,6 +474,17 @@ LOGOUTREQUEST;
     public function getError()
     {
         return $this->_error;
+    }
+
+    /**
+     * After execute a validation process, if fails this method returns the Exception of the cause
+     * (its code identifies the error, see OneLogin_Saml2_ValidationError)
+     *
+     * @return Exception|null Cause
+     */
+    public function getErrorException()
+    {
+        return $this->_errorException;
     }
 
     /**

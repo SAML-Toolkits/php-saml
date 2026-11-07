@@ -467,6 +467,8 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
             } else {
                 $this->assertFalse($logoutRequest->isValid());
                 $this->assertEquals('Unsupported or not allowed key transport algorithm', $logoutRequest->getError());
+                $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $logoutRequest->getErrorException());
+                $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $logoutRequest->getErrorException()->getCode());
             }
         }
     }
@@ -535,6 +537,36 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($logoutRequest2->isValid());
         $this->assertContains('The LogoutRequest was received at', $logoutRequest2->getError());
+    }
+
+    /**
+     * Tests the getErrorException method of the OneLogin_Saml2_LogoutRequest
+     *
+     * @covers OneLogin_Saml2_LogoutRequest::getErrorException
+     */
+    public function testGetErrorException()
+    {
+        $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+
+        $deflatedRequest = gzdeflate($request);
+        $encodedRequest = base64_encode($deflatedRequest);
+
+        $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $encodedRequest);
+
+        $this->assertNull($logoutRequest->getErrorException());
+
+        $this->assertTrue($logoutRequest->isValid());
+        $this->assertNull($logoutRequest->getErrorException());
+
+        $this->_settings->setStrict(true);
+        $logoutRequest2 = new OneLogin_Saml2_LogoutRequest($this->_settings, $encodedRequest);
+
+        $this->assertFalse($logoutRequest2->isValid());
+        $errorException = $logoutRequest2->getErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $errorException);
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $errorException->getCode());
+        $this->assertContains('The LogoutRequest was received at', $errorException->getMessage());
+        $this->assertEquals($errorException->getMessage(), $logoutRequest2->getError());
     }
 
     /**

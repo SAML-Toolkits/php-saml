@@ -37,6 +37,13 @@ class OneLogin_Saml2_LogoutResponse
     private $_error;
 
     /**
+     * After execute a validation process, if it fails, this var contains the Exception of the cause
+     *
+     * @var Exception|null
+     */
+    private $_errorException;
+
+    /**
      * Constructs a Logout Response object (Initialize params from settings and if provided
      * load the Logout Response.
      *
@@ -119,6 +126,7 @@ class OneLogin_Saml2_LogoutResponse
     public function isValid($requestId = null, $retrieveParametersFromServer = false)
     {
         $this->_error = null;
+        $this->_errorException = null;
         try {
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
@@ -139,7 +147,7 @@ class OneLogin_Saml2_LogoutResponse
                 // Check if the InResponseTo of the Logout Response matchs the ID of the Logout Request (requestId) if provided
                 if (isset($requestId) && $this->document->documentElement->hasAttribute('InResponseTo')) {
                     $inResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
-                    if ($requestId != $inResponseTo) {
+                    if ($requestId !== $inResponseTo) {
                         throw new OneLogin_Saml2_ValidationError(
                             "The InResponseTo of the Logout Response: $inResponseTo, does not match the ID of the Logout request sent by the SP: $requestId",
                             OneLogin_Saml2_ValidationError::WRONG_INRESPONSETO
@@ -149,7 +157,7 @@ class OneLogin_Saml2_LogoutResponse
 
                 // Check issuer
                 $issuer = $this->getIssuer();
-                if (!empty($issuer) && $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer !== $idPEntityId) {
                     throw new OneLogin_Saml2_ValidationError(
                         "Invalid issuer in the Logout Response",
                         OneLogin_Saml2_ValidationError::WRONG_ISSUER
@@ -204,6 +212,7 @@ class OneLogin_Saml2_LogoutResponse
             return true;
         } catch (Exception $e) {
             $this->_error = $e->getMessage();
+            $this->_errorException = $e;
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
                 echo htmlentities($this->_error);
@@ -288,6 +297,17 @@ LOGOUTRESPONSE;
     public function getError()
     {
         return $this->_error;
+    }
+
+    /**
+     * After execute a validation process, if fails this method returns the Exception of the cause
+     * (its code identifies the error, see OneLogin_Saml2_ValidationError)
+     *
+     * @return Exception|null Cause
+     */
+    public function getErrorException()
+    {
+        return $this->_errorException;
     }
 
    /**
