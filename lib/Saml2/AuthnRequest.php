@@ -133,7 +133,7 @@ REQUESTEDAUTHN;
 
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
         $acsUrl = htmlspecialchars($spData['assertionConsumerService']['url'], ENT_QUOTES);
-        $destination = $this->_settings->getIdPSSOUrl();
+        $destination = htmlspecialchars($this->_settings->getIdPSSOUrl(), ENT_QUOTES);
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
