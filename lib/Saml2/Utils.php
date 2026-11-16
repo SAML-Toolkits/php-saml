@@ -154,7 +154,7 @@ class OneLogin_Saml2_Utils
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
         } else {
-            $dom = new DOMDocument;
+            $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
             if (!$dom) {
                 return 'unloaded_xml';
@@ -237,24 +237,24 @@ class OneLogin_Saml2_Utils
      *
      * @return string $x509 Formatted cert
      */
-     public static function formatCert($x509cert, $heads = true)
-     {
-         if (is_null($x509cert)) {
-           return;
-         }
+    public static function formatCert($x509cert, $heads = true)
+    {
+        if (is_null($x509cert)) {
+            return;
+        }
 
-         if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
-             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
-         }
+        if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
+            $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
+        }
 
-         $x509cert = str_replace(array("\x0d", "\r", "\n", " "), '', $x509cert);
+        $x509cert = str_replace(array("\x0d", "\r", "\n", " "), '', $x509cert);
 
-         if ($heads && $x509cert !== '') {
-             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
-         }
+        if ($heads && $x509cert !== '') {
+            $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
+        }
 
-         return $x509cert;
-     }
+        return $x509cert;
+    }
 
     /**
      * Returns a private key (adding header & footer if required).
@@ -276,7 +276,7 @@ class OneLogin_Saml2_Utils
                 if ($heads) {
                     $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
                 }
-            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
+            } elseif (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
                 $key = OneLogin_Saml2_Utils::getStringBetween($key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
@@ -362,7 +362,7 @@ class OneLogin_Saml2_Utils
         foreach ($parameters as $name => $value) {
             if ($value === null) {
                 $param = urlencode($name);
-            } else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 $param = "";
                 foreach ($value as $val) {
                     $param .= urlencode($name) . "[]=" . urlencode($val). '&';
@@ -440,10 +440,10 @@ class OneLogin_Saml2_Utils
                 self::setBaseURLPath($baseurlpath);
             }
         } else {
-                self::$_host = null;
-                self::$_protocol = null;
-                self::$_port = null;
-                self::$_baseurlpath = null;
+            self::$_host = null;
+            self::$_protocol = null;
+            self::$_port = null;
+            self::$_baseurlpath = null;
         }
     }
 
@@ -505,7 +505,7 @@ class OneLogin_Saml2_Utils
     {
         if (empty($baseurlpath)) {
             self::$_baseurlpath = null;
-        } else if ($baseurlpath === '/') {
+        } elseif ($baseurlpath === '/') {
             self::$_baseurlpath = '/';
         } else {
             self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
@@ -624,9 +624,9 @@ class OneLogin_Saml2_Utils
         $portnumber = null;
         if (self::$_port) {
             $portnumber = self::$_port;
-        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        } elseif (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
-        } else if (isset($_SERVER["SERVER_PORT"])) {
+        } elseif (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         } else {
             $currentHost = self::getRawHost();
@@ -803,10 +803,32 @@ class OneLogin_Saml2_Utils
             return '';
         }
 
-        $index = strpos($_SERVER['QUERY_STRING'], $name.'=');
-        $substring = substr($_SERVER['QUERY_STRING'], $index + strlen($name) + 1);
-        $end = strpos($substring, '&');
-        return $end ? substr($substring, 0, strpos($substring, '&')) : $substring;
+        foreach (explode('&', $_SERVER['QUERY_STRING']) as $parameter) {
+            $parts = explode('=', $parameter, 2);
+            if ($parts[0] === $name) {
+                return isset($parts[1]) ? $parts[1] : '';
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Returns the name that PHP gives at $_GET to a field of the query
+     * string: the name is URL-decoded, its leading spaces are dropped and
+     * it ends at a NUL byte or at the '[' of an array.
+     *
+     * So " SAMLRequest", "%53AMLRequest", "SAMLRequest%00x" and
+     * "SAMLRequest[]" are all the SAMLRequest parameter for PHP.
+     *
+     * @param string $rawName Name of the field, as it was sent
+     *
+     * @return string
+     */
+    private static function getParsedQueryParamName($rawName)
+    {
+        $name = ltrim(urldecode($rawName), ' ');
+        // On PHP 5 substr() returns false for an empty name
+        return (string) substr($name, 0, strcspn($name, "\0["));
     }
 
     /**
@@ -1156,7 +1178,7 @@ class OneLogin_Saml2_Utils
         if (!empty($cert)) {
             // RSA-1.5 key transport is exposed to Bleichenbacher attacks and rejected by
             // receivers that set 'allowRSA15KeyTransport' to false (or use xmlseclibs 4)
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type' => 'public'));
             $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
@@ -1222,7 +1244,7 @@ class OneLogin_Saml2_Utils
             if ($subCodeEntry->length == 1) {
                 $status['msg'] = $subCodeEntry->item(0)->getAttribute('Value');
             }
-        } else if ($messageEntry->length == 1) {
+        } elseif ($messageEntry->length == 1) {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
         }
@@ -1569,7 +1591,7 @@ class OneLogin_Saml2_Utils
         if (!isset($keyInfo['key'])) {
             throw new Exception('Missing key in public key details.');
         }
-        $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
+        $newKey = new XMLSecurityKey($algorithm, array('type' => $type));
         // Keep the X.509 certificate when the key was loaded from one
         $cert = $key->getX509Certificate();
         if ($cert !== null) {
@@ -1683,7 +1705,7 @@ class OneLogin_Saml2_Utils
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
-        } else if ($xml instanceof DOMElement) {
+        } elseif ($xml instanceof DOMElement) {
             $dom = clone $xml->ownerDocument;
         } else {
             $dom = new DOMDocument();
@@ -1813,19 +1835,37 @@ class OneLogin_Saml2_Utils
                 );
             }
             $keys = array("SAMLRequest", "SAMLResponse", "RelayState", "SigAlg", "Signature");
+            $queryKeys = array();
+            foreach (explode('&', $_SERVER['QUERY_STRING']) as $parameter) {
+                $parts = explode('=', $parameter, 2);
+                $queryKeys[] = self::getParsedQueryParamName($parts[0]);
+            }
+            $queryKeyCounts = array_count_values($queryKeys);
             foreach ($keys as $key) {
-                if (substr_count($_SERVER['QUERY_STRING'], $key) > 1) {
+                if (isset($queryKeyCounts[$key]) && $queryKeyCounts[$key] > 1) {
                     throw new OneLogin_Saml2_Error(
                         "Duplicate parameter in query string",
                         OneLogin_Saml2_Error::INVALID_PARAMETER
                     );
                 }
             }
-            if (substr_count($_SERVER['QUERY_STRING'], "SAMLRequest") > 0 && substr_count($_SERVER['QUERY_STRING'], "SAMLResponse") > 0) {
+            if (isset($queryKeyCounts['SAMLRequest']) && isset($queryKeyCounts['SAMLResponse'])) {
                 throw new OneLogin_Saml2_Error(
                     "Both SAMLRequest and SAMLResponse provided",
                     OneLogin_Saml2_Error::INVALID_PARAMETER
                 );
+            }
+
+            // The signature is verified over the fields as they were sent,
+            // but the message is processed from the parsed ones: reject the
+            // message if they do not hold the same value
+            foreach (array($messageType, 'RelayState', 'SigAlg') as $key) {
+                if (isset($getData[$key]) && urldecode(OneLogin_Saml2_Utils::extractOriginalQueryParam($key)) !== $getData[$key]) {
+                    throw new OneLogin_Saml2_Error(
+                        "The ".$key." parameter does not match the one of the query string",
+                        OneLogin_Saml2_Error::INVALID_PARAMETER
+                    );
+                }
             }
 
             $signedQuery = $messageType.'='.OneLogin_Saml2_Utils::extractOriginalQueryParam($messageType);
