@@ -757,10 +757,13 @@ class Utils
             return '';
         }
 
-        $index = strpos($_SERVER['QUERY_STRING'], $name.'=');
-        $substring = substr($_SERVER['QUERY_STRING'], $index + strlen($name) + 1);
-        $end = strpos($substring, '&');
-        return $end ? substr($substring, 0, strpos($substring, '&')) : $substring;
+        foreach (explode('&', $_SERVER['QUERY_STRING']) as $parameter) {
+            $parts = explode('=', $parameter, 2);
+            if ($parts[0] === $name) {
+                return isset($parts[1]) ? $parts[1] : '';
+            }
+        }
+        return '';
     }
 
     /**
@@ -1604,15 +1607,21 @@ class Utils
                 );
             }
             $keys = ["SAMLRequest", "SAMLResponse", "RelayState", "SigAlg", "Signature"];
+            $queryKeys = array();
+            foreach (explode('&', $_SERVER['QUERY_STRING']) as $parameter) {
+                $parts = explode('=', $parameter, 2);
+                $queryKeys[] = $parts[0];
+            }
+            $queryKeyCounts = array_count_values($queryKeys);
             foreach ($keys as $key) {
-                if (substr_count($_SERVER['QUERY_STRING'], $key) > 1) {
+                if (isset($queryKeyCounts[$key]) && $queryKeyCounts[$key] > 1) {
                     throw new Error(
                         "Duplicate parameter in query string",
                         Error::INVALID_PARAMETER
                     );
                 }
             }
-            if (substr_count($_SERVER['QUERY_STRING'], "SAMLRequest") > 0 && substr_count($_SERVER['QUERY_STRING'], "SAMLResponse") > 0) {
+            if (isset($queryKeyCounts['SAMLRequest']) && isset($queryKeyCounts['SAMLResponse'])) {
                 throw new Error(
                     "Both SAMLRequest and SAMLResponse provided",
                     Error::INVALID_PARAMETER
