@@ -8,10 +8,10 @@
 
 class OneLogin_Saml2_Utils
 {
-    public const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
-    public const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
+    const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
+    const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
-    public const DECRYPTION_FAILED_MESSAGE = 'Failure decrypting Data';
+    const DECRYPTION_FAILED_MESSAGE = 'Failure decrypting Data';
 
     /**
      * @var array Transforms accepted on a received Signature Reference. SAML only
