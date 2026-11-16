@@ -373,6 +373,40 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * The X-Forwarded-Host header of a chain of proxies can be a list of values separated by commas: the host
+     * is the first one, without the spaces around it
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfHost
+     * @covers OneLogin_Saml2_Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfHostWithAListOfValues()
+    {
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $cases = array(
+            'sp.example.com,proxy.internal' => 'sp.example.com',
+            'sp.example.com, proxy.internal' => 'sp.example.com',
+            'sp.example.com , proxy.internal' => 'sp.example.com',
+            ' sp.example.com , proxy.internal ' => 'sp.example.com',
+            'sp.example.com:8443, proxy.internal' => 'sp.example.com',
+            'sp.example.com' => 'sp.example.com',
+            ' sp.example.com ' => 'sp.example.com',
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_HOST'] = $header;
+            $this->assertSame($expected, OneLogin_Saml2_Utils::getSelfHost(), "X-Forwarded-Host: '$header'");
+        }
+
+        // The three headers of a chain of proxies, with spaces around the values
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com , proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https , http';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443 , 80';
+        $this->assertSame('https://sp.example.com:8443', OneLogin_Saml2_Utils::getSelfURLhost());
+    }
+
+    /**
     * Tests the isHTTPS method of the OneLogin_Saml2_Utils
     *
     * @covers OneLogin_Saml2_Utils::isHTTPS
@@ -454,7 +488,7 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             array('1', 1),
             array('65535', 65535),
         );
-        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb', '8080, 8081');
+        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb');
 
         // Where the port is read from
         $sources = array(
@@ -491,6 +525,55 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
                 $this->assertNull(OneLogin_Saml2_Utils::getSelfPort(), "$name: " . var_export($port, true));
             }
         }
+    }
+
+    /**
+     * The X-Forwarded-Port header of a chain of proxies can be a list of values separated by commas:
+     * the port is the first one (as the host of X-Forwarded-Host and the protocol of X-Forwarded-Proto).
+     * Only the first value counts: it is not replaced by the next one when it is not a port. In the other
+     * sources a list is not a port.
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfPort
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfPortWithAListOfValues()
+    {
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $cases = array(
+            '8443, 80' => 8443,
+            '8443,80' => 8443,
+            ' 8443 , 80 ' => 8443,
+            '443, 8443' => 443,
+            '80,443' => 80,
+            '8443' => 8443,
+            'abc, 443' => null,
+            ', 443' => null,
+            '0, 443' => null,
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_PORT'] = $header;
+            $this->assertSame($expected, OneLogin_Saml2_Utils::getSelfPort(), "X-Forwarded-Port: '$header'");
+        }
+
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = 8443;
+        $this->assertSame(8443, OneLogin_Saml2_Utils::getSelfPort());
+
+        // A list in the other sources is not a port
+        OneLogin_Saml2_Utils::setProxyVars(false);
+        unset($_SERVER['HTTP_X_FORWARDED_PORT']);
+        $_SERVER['SERVER_PORT'] = '8443, 80';
+        $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+        unset($_SERVER['SERVER_PORT']);
+        OneLogin_Saml2_Utils::setSelfPort('8443, 80');
+        $this->assertNull(OneLogin_Saml2_Utils::getSelfPort());
+        OneLogin_Saml2_Utils::setSelfPort(null);
+
+        // The header is ignored when the proxy vars are not enabled
+        $_SERVER['SERVER_PORT'] = '8080';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443, 80';
+        $this->assertSame(8080, OneLogin_Saml2_Utils::getSelfPort());
     }
 
     /**
@@ -718,6 +801,35 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * When the value is a list of values separated by commas (the header of a chain of proxies, as
+     * X-Forwarded-Host) the protocol is the first one
+     *
+     * @covers OneLogin_Saml2_Utils::getSelfProtocol
+     * @covers OneLogin_Saml2_Utils::isHTTPS
+     * @covers OneLogin_Saml2_Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAListOfValues()
+    {
+        $this->assertSelfProtocol('https,http', 'https', true, 'https first');
+        $this->assertSelfProtocol('https, http', 'https', true, 'a space after the comma');
+        $this->assertSelfProtocol(' https , http ', 'https', true, 'spaces around the values');
+        $this->assertSelfProtocol('http,https', 'http', false, 'only the first value is used');
+        $this->assertSelfProtocol('http, https, https', 'http', false, 'only the first value is used, three values');
+        $this->assertSelfProtocol(array('https,http'), 'https', true, 'a list inside an array');
+        $this->assertSelfProtocol('https', 'https', true, 'one value');
+
+        // The same chain of proxies in the headers of the request: protocol, host and port
+        OneLogin_Saml2_Utils::setProxyVars(true);
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https,http';
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com,proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443';
+        $this->assertSame('https://sp.example.com:8443', OneLogin_Saml2_Utils::getSelfURLhost());
+    }
+
+    /**
      * @covers OneLogin_Saml2_Utils::setBaseURLPath
      */
     public function testSetBaseURLPath()
@@ -853,6 +965,39 @@ class OneLogin_Saml2_UtilsTest extends PHPUnit_Framework_TestCase
             $this->assertSame($port, OneLogin_Saml2_Utils::getSelfPort(), $baseURL);
             $this->assertSame($expectedHost, OneLogin_Saml2_Utils::getSelfURLhost(), $baseURL);
         }
+    }
+
+    /**
+     * A bool true is not a base URL, so it is ignored: it does not clear the base URL that was set (the
+     * URLs would be built again from the Host header of the request). The 'baseurl' setting is checked
+     * only with empty(), so a true reaches setBaseURL. An empty value does clear it.
+     *
+     * @covers OneLogin_Saml2_Utils::setBaseURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetBaseURLIgnoresATrue()
+    {
+        $_SERVER['HTTP_HOST'] = 'other.example.org';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        unset($_SERVER['PATH_INFO']);
+
+        OneLogin_Saml2_Utils::setBaseURL('https://sp.example.com:8443/app/');
+        $this->assertSame('https://sp.example.com:8443', OneLogin_Saml2_Utils::getSelfURLhost());
+        $this->assertSame('/app/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        OneLogin_Saml2_Utils::setBaseURL(true);
+        $this->assertSame('https', OneLogin_Saml2_Utils::getSelfProtocol());
+        $this->assertSame('sp.example.com', OneLogin_Saml2_Utils::getSelfHost());
+        $this->assertSame(8443, OneLogin_Saml2_Utils::getSelfPort());
+        $this->assertSame('https://sp.example.com:8443', OneLogin_Saml2_Utils::getSelfURLhost());
+        $this->assertSame('/app/', OneLogin_Saml2_Utils::getBaseURLPath());
+
+        // Control: an empty value clears it, and the URL is built from the request
+        OneLogin_Saml2_Utils::setBaseURL(null);
+        $this->assertSame('http://other.example.org', OneLogin_Saml2_Utils::getSelfURLhost());
+        $this->assertNull(OneLogin_Saml2_Utils::getBaseURLPath());
     }
 
     /**
