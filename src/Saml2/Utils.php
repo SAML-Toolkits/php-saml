@@ -81,7 +81,7 @@ class Utils
         assert($dom instanceof DOMDocument);
         assert(is_string($xml));
 
-        $res = $dom->loadXML($xml);
+        $res = $dom->loadXML($xml, LIBXML_NONET);
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
@@ -379,6 +379,10 @@ class Utils
      */
     public static function setBaseURL($baseurl)
     {
+        if ($baseurl === true) {
+            return;
+        }
+
         if (!empty($baseurl)) {
             $baseurlpath = '/';
             $matches = array();
@@ -498,7 +502,7 @@ class Utils
         if (self::$_host) {
             $currentHost = self::$_host;
         } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
-            $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0];
+            $currentHost = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0]);
         } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
@@ -522,7 +526,8 @@ class Utils
     }
 
     /**
-     * @param string $protocol The protocol to identify as using, usually http or https
+     * @param string|bool|array $protocol The protocol to identify as using, usually http or https
+     *                                    (true is https, and the first value is used if it is an array)
      */
     public static function setSelfProtocol($protocol)
     {
@@ -544,6 +549,23 @@ class Utils
         } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
             $protocol = 'https';
         }
+
+        // The values of a header (as PSR-7 returns them): the first one is the protocol
+        if (is_array($protocol)) {
+            $protocol = reset($protocol);
+        }
+
+        if ($protocol === true) {
+            $protocol = 'https';
+        }
+        if (!is_string($protocol)) {
+            $protocol = 'http';
+        }
+
+        // The header of a chain of proxies lists the protocol of each one ('https,http'): the first
+        // one is the protocol (as the first host is the host of X-Forwarded-Host)
+        $protocol = trim(explode(',', $protocol, 2)[0]);
+
         return $protocol;
     }
 
@@ -580,6 +602,10 @@ class Utils
             $portnumber = self::$_port;
         } elseif (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+            // The header of a chain of proxies lists the port of each one ('8443, 80'): the first one is the port
+            if (is_string($portnumber)) {
+                $portnumber = explode(',', $portnumber, 2)[0];
+            }
         } elseif (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         } else {
@@ -1324,7 +1350,8 @@ class Utils
                 $newDoc->formatOutput = true;
             }
             $newDoc = self::loadXML($newDoc, $xml);
-            if (!$newDoc || $newDoc->firstChild->firstChild === null) {
+            // The decrypted content must be an element (not text, a comment...)
+            if (!$newDoc || !($newDoc->firstChild->firstChild instanceof DOMElement)) {
                 throw new Exception('Invalid decrypted element');
             }
         } catch (Throwable $e) {

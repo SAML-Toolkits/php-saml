@@ -732,7 +732,7 @@ class Response
 
             foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
                 if ($nameId->hasAttribute($attr)) {
-                    if ($this->_settings->isStrict() && $attr == 'SPNameQualifier') {
+                    if ($this->_settings->isStrict() && $attr === 'SPNameQualifier') {
                         $spData = $this->_settings->getSPData();
                         $spEntityId = $spData['entityId'];
                         if ($spEntityId !== $nameId->getAttribute($attr)) {
@@ -910,7 +910,7 @@ class Response
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
                 $tagName = ($childNode->prefix ? $childNode->prefix.':' : '') . 'AttributeValue';
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
+                if ($childNode->nodeType === XML_ELEMENT_NODE && $childNode->tagName === $tagName) {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }

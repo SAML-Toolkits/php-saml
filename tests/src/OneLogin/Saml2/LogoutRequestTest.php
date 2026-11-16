@@ -558,6 +558,47 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * The decrypted content of an EncryptedID must be an element. Anyone can encrypt text for the SP
+     * (its certificate is public), and the text node returned as the NameID made getNameIdData fail
+     * with a PHP Error (that is not an Exception) instead of a ValidationError.
+     *
+     * @covers OneLogin\Saml2\Utils::decryptElement
+     * @covers OneLogin\Saml2\LogoutRequest::getNameIdData
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     */
+    public function testDecryptedContentOfTheEncryptedIdMustBeAnElement()
+    {
+        $settingsDir = TEST_ROOT . '/settings/';
+        include $settingsDir . 'settings1.php';
+        $settingsInfo['strict'] = true;
+        $key = (new Settings($settingsInfo))->getSPkey();
+
+        // Control: the content is an element
+        $validXml = $this->buildLogoutRequestWithEncryptedId($this->buildEncryptedNameId());
+        $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', LogoutRequest::getNameId($validXml, $key));
+        $this->assertTrue((new LogoutRequest(new Settings($settingsInfo), base64_encode(gzdeflate($validXml))))->isValid());
+
+        foreach (array('just-text', '<!-- only a comment -->') as $content) {
+            $encryptedId = '<saml:EncryptedID xmlns:saml="' . Constants::NS_SAML . '">' . $this->encryptContentForSP($content) . '</saml:EncryptedID>';
+            $xml = $this->buildLogoutRequestWithEncryptedId($encryptedId);
+
+            $error = null;
+            try {
+                LogoutRequest::getNameIdData($xml, $key);
+            } catch (ValidationError $e) {
+                $error = $e;
+            }
+            $this->assertNotNull($error, $content);
+            $this->assertEquals('Failure decrypting Data', $error->getMessage(), $content);
+            $this->assertEquals(ValidationError::DECRYPTION_FAILED, $error->getCode(), $content);
+
+            $logoutRequest = new LogoutRequest(new Settings($settingsInfo), base64_encode(gzdeflate($xml)));
+            $this->assertFalse($logoutRequest->isValid(), $content);
+            $this->assertEquals('Failure decrypting Data', $logoutRequest->getError(), $content);
+        }
+    }
+
+    /**
      * An unsigned LogoutRequest with an EncryptedID whose session key has an
      * unexpected size must be rejected, not crash the validation
      *

@@ -369,6 +369,40 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * The X-Forwarded-Host header of a chain of proxies can be a list of values separated by commas: the host
+     * is the first one, without the spaces around it
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfHost
+     * @covers OneLogin\Saml2\Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfHostWithAListOfValues()
+    {
+        Utils::setProxyVars(true);
+        $cases = array(
+            'sp.example.com,proxy.internal' => 'sp.example.com',
+            'sp.example.com, proxy.internal' => 'sp.example.com',
+            'sp.example.com , proxy.internal' => 'sp.example.com',
+            ' sp.example.com , proxy.internal ' => 'sp.example.com',
+            'sp.example.com:8443, proxy.internal' => 'sp.example.com',
+            'sp.example.com' => 'sp.example.com',
+            ' sp.example.com ' => 'sp.example.com',
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_HOST'] = $header;
+            $this->assertSame($expected, Utils::getSelfHost(), "X-Forwarded-Host: '$header'");
+        }
+
+        // The three headers of a chain of proxies, with spaces around the values
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com , proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https , http';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443 , 80';
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+    }
+
+    /**
      * Tests the isHTTPS method of the Utils
      *
      * @covers OneLogin\Saml2\Utils::isHTTPS
@@ -459,7 +493,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             array('1', 1),
             array('65535', 65535),
         );
-        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb', '8080, 8081');
+        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb');
 
         // Where the port is read from
         $sources = array(
@@ -496,6 +530,55 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
                 $this->assertNull(Utils::getSelfPort(), "$name: " . var_export($port, true));
             }
         }
+    }
+
+    /**
+     * The X-Forwarded-Port header of a chain of proxies can be a list of values separated by commas:
+     * the port is the first one (as the host of X-Forwarded-Host and the protocol of X-Forwarded-Proto).
+     * Only the first value counts: it is not replaced by the next one when it is not a port. In the other
+     * sources a list is not a port.
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfPort
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfPortWithAListOfValues()
+    {
+        Utils::setProxyVars(true);
+        $cases = array(
+            '8443, 80' => 8443,
+            '8443,80' => 8443,
+            ' 8443 , 80 ' => 8443,
+            '443, 8443' => 443,
+            '80,443' => 80,
+            '8443' => 8443,
+            'abc, 443' => null,
+            ', 443' => null,
+            '0, 443' => null,
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_PORT'] = $header;
+            $this->assertSame($expected, Utils::getSelfPort(), "X-Forwarded-Port: '$header'");
+        }
+
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = 8443;
+        $this->assertSame(8443, Utils::getSelfPort());
+
+        // A list in the other sources is not a port
+        Utils::setProxyVars(false);
+        unset($_SERVER['HTTP_X_FORWARDED_PORT']);
+        $_SERVER['SERVER_PORT'] = '8443, 80';
+        $this->assertNull(Utils::getSelfPort());
+        unset($_SERVER['SERVER_PORT']);
+        Utils::setSelfPort('8443, 80');
+        $this->assertNull(Utils::getSelfPort());
+        Utils::setSelfPort(null);
+
+        // The header is ignored when the proxy vars are not enabled
+        $_SERVER['SERVER_PORT'] = '8080';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443, 80';
+        $this->assertSame(8080, Utils::getSelfPort());
     }
 
     /**
@@ -608,6 +691,150 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
 
         Utils::setSelfProtocol('https');
         $this->assertTrue(Utils::isHTTPS());
+    }
+
+    /**
+     * A bool is accepted by setSelfProtocol too (setSelfProtocol($isSecure)): true is https, and false
+     * is ignored as any empty value, so the protocol is guessed
+     *
+     * @covers OneLogin\Saml2\Utils::setSelfProtocol
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetSelfProtocolWithABool()
+    {
+        Utils::setSelfProtocol(true);
+        $this->assertSame('https', Utils::getSelfProtocol());
+        $this->assertTrue(Utils::isHTTPS());
+
+        Utils::setSelfProtocol(false);
+        $this->assertSame('http', Utils::getSelfProtocol());
+        $this->assertFalse(Utils::isHTTPS());
+        $_SERVER['HTTPS'] = 'on';
+        $this->assertSame('https', Utils::getSelfProtocol());
+        $this->assertTrue(Utils::isHTTPS());
+    }
+
+    /**
+     * Checks the protocol and isHTTPS when the value comes from the header that a proxy sends and when the
+     * application sets it, and that the toolkit does not raise any PHP error with it
+     *
+     * @param mixed  $value            The value of the protocol
+     * @param string $expectedProtocol The protocol that is expected
+     * @param bool   $expectedIsHttps  The value of isHTTPS that is expected
+     * @param string $name             The name of the case
+     */
+    private function assertSelfProtocol($value, $expectedProtocol, $expectedIsHttps, $name)
+    {
+        $reset = function () {
+            Utils::setBaseURL(null);
+            Utils::setProxyVars(false);
+            unset($_SERVER['HTTP_X_FORWARDED_PROTO']);
+        };
+        $protocol = function () {
+            return array(Utils::getSelfProtocol(), Utils::isHTTPS());
+        };
+        $expected = array($expectedProtocol, $expectedIsHttps);
+
+        // The protocol that a proxy sends
+        $reset();
+        Utils::setProxyVars(true);
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = $value;
+        $this->assertSame($expected, $this->withPhpErrorsAsExceptions($protocol), "X-Forwarded-Proto: $name");
+
+        // The protocol that the application sets
+        $reset();
+        Utils::setSelfProtocol($value);
+        $this->assertSame($expected, $this->withPhpErrorsAsExceptions($protocol), "setSelfProtocol: $name");
+
+        $reset();
+    }
+
+    /**
+     * A value that is not a string is not a protocol: it is http, and the toolkit does not raise any PHP
+     * error with it (the protocol that comes from $_SERVER is a string, but the one that the application
+     * sets can be anything)
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAValueThatIsNotAString()
+    {
+        $values = array(
+            'false' => false,
+            'integer' => 443,
+            'zero' => 0,
+            'float' => 1.5,
+            'object' => new \stdClass(),
+            'object with __toString' => new \SplFileInfo('https'),
+        );
+        foreach ($values as $name => $value) {
+            $this->assertSelfProtocol($value, 'http', false, $name);
+        }
+
+        // Control: a string is the protocol
+        $this->assertSelfProtocol('https', 'https', true, 'https');
+        $this->assertSelfProtocol('http', 'http', false, 'http');
+    }
+
+    /**
+     * When the value is an array (the values of a header, as PSR-7 returns them) the protocol is the first one
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAnArray()
+    {
+        $this->assertSelfProtocol(array('https'), 'https', true, 'one value');
+        $this->assertSelfProtocol(array('http'), 'http', false, 'one value, http');
+        $this->assertSelfProtocol(array('https', 'http'), 'https', true, 'the first value is https');
+        $this->assertSelfProtocol(array('http', 'https'), 'http', false, 'only the first value is used');
+        $this->assertSelfProtocol(array('proto' => 'https'), 'https', true, 'the first value of an associative array');
+
+        // The first value has to be a string, as any other value
+        $this->assertSelfProtocol(array(), 'http', false, 'empty array');
+        $this->assertSelfProtocol(array(443), 'http', false, 'the first value is an integer');
+        $this->assertSelfProtocol(array(array('https')), 'http', false, 'the first value is an array');
+        $this->assertSelfProtocol(array(new \SplFileInfo('https')), 'http', false, 'the first value is an object');
+        $this->assertSelfProtocol(array(443, 'https'), 'http', false, 'an https value after the first one');
+    }
+
+    /**
+     * When the value is a list of values separated by commas (the header of a chain of proxies, as
+     * X-Forwarded-Host) the protocol is the first one
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     * @covers OneLogin\Saml2\Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAListOfValues()
+    {
+        $this->assertSelfProtocol('https,http', 'https', true, 'https first');
+        $this->assertSelfProtocol('https, http', 'https', true, 'a space after the comma');
+        $this->assertSelfProtocol(' https , http ', 'https', true, 'spaces around the values');
+        $this->assertSelfProtocol('http,https', 'http', false, 'only the first value is used');
+        $this->assertSelfProtocol('http, https, https', 'http', false, 'only the first value is used, three values');
+        $this->assertSelfProtocol(array('https,http'), 'https', true, 'a list inside an array');
+        $this->assertSelfProtocol('https', 'https', true, 'one value');
+
+        // The same chain of proxies in the headers of the request: protocol, host and port
+        Utils::setProxyVars(true);
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https,http';
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com,proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443';
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
     }
 
     /**
@@ -736,6 +963,39 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertSame($port, Utils::getSelfPort(), $baseURL);
             $this->assertSame($expectedHost, Utils::getSelfURLhost(), $baseURL);
         }
+    }
+
+    /**
+     * A bool true is not a base URL, so it is ignored: it does not clear the base URL that was set (the
+     * URLs would be built again from the Host header of the request). The 'baseurl' setting is checked
+     * only with empty(), so a true reaches setBaseURL. An empty value does clear it.
+     *
+     * @covers OneLogin\Saml2\Utils::setBaseURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetBaseURLIgnoresATrue()
+    {
+        $_SERVER['HTTP_HOST'] = 'other.example.org';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        unset($_SERVER['PATH_INFO']);
+
+        Utils::setBaseURL('https://sp.example.com:8443/app/');
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+        $this->assertSame('/app/', Utils::getBaseURLPath());
+
+        Utils::setBaseURL(true);
+        $this->assertSame('https', Utils::getSelfProtocol());
+        $this->assertSame('sp.example.com', Utils::getSelfHost());
+        $this->assertSame(8443, Utils::getSelfPort());
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+        $this->assertSame('/app/', Utils::getBaseURLPath());
+
+        // Control: an empty value clears it, and the URL is built from the request
+        Utils::setBaseURL(null);
+        $this->assertSame('http://other.example.org', Utils::getSelfURLhost());
+        $this->assertNull(Utils::getBaseURLPath());
     }
 
     /**
@@ -1806,6 +2066,159 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertStringContainsString('Reference URI identifies multiple nodes', $e->getMessage());
+        }
+    }
+
+    /**
+     * Runs the callable failing on any PHP error that the code of the toolkit raises, deprecations
+     * included. Without it the failure of the code that is checked here depends on zend.assertions
+     * (an assertion that fails is a warning on PHP 7 and an Error on PHP 8, but with the assertions
+     * disabled, as in production, the same code only emits a deprecation on PHP 8.1 and later).
+     * The errors of the libraries are not the ones that are checked (xmlseclibs 3 emits a warning
+     * when the certificate of a KeyInfo can not be read, xmlseclibs 4 throws an Exception).
+     *
+     * @param callable $callable
+     *
+     * @return mixed The value returned by the callable
+     */
+    private function withPhpErrorsAsExceptions(callable $callable)
+    {
+        $srcDir = dirname(TEST_ROOT) . '/src/';
+        $toException = function ($severity, $message, $file, $line) use ($srcDir) {
+            if (strpos($file, $srcDir) !== 0) {
+                return true;
+            }
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        };
+        set_error_handler($toException);
+        try {
+            return $callable();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * @param string      $xml     Signed XML
+     * @param string|null $keyInfo KeyInfo (as XML) that replaces the one of the first Signature of the document, null to remove it
+     *                             (the KeyInfo of a Signature inside the signed content is signed by the other Signature, so it is not touched)
+     *
+     * @return string The XML (as a received message, so it is parsed again by validateSign)
+     */
+    private function replaceKeyInfo($xml, $keyInfo = null)
+    {
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+
+        $signature = $dom->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'Signature')->item(0);
+        $keyInfos = $signature->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'KeyInfo');
+        for ($i = $keyInfos->length - 1; $i >= 0; $i--) {
+            $oldKeyInfo = $keyInfos->item($i);
+            if ($keyInfo !== null) {
+                $fragment = $dom->createDocumentFragment();
+                $this->assertTrue($fragment->appendXML(preg_replace('/^<ds:KeyInfo/', '<ds:KeyInfo xmlns:ds="' . XMLSecurityDSig::XMLDSIGNS . '"', $keyInfo)));
+                $oldKeyInfo->parentNode->replaceChild($fragment, $oldKeyInfo);
+            } else {
+                $oldKeyInfo->parentNode->removeChild($oldKeyInfo);
+            }
+        }
+
+        return $dom->saveXML();
+    }
+
+    /**
+     * KeyInfo is not covered by the signature, so a message can be received without it. With the
+     * certificate of the IdP configured the signature is validated, and if only the fingerprint
+     * is configured there is no certificate to compare it with, so the signature is not valid
+     * (and it is not an error that can not be caught as an Exception)
+     *
+     * @covers OneLogin\Saml2\Utils::validateSign
+     */
+    public function testValidateSignWithoutKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+        $cert = $idpData['x509cert'];
+        $fingerprint = Utils::calculateX509Fingerprint($cert);
+        $fingerprint256 = Utils::calculateX509Fingerprint($cert, 'sha256');
+
+        $signedXmls = array(
+            'metadata' => file_get_contents(TEST_ROOT . '/data/metadata/signed_metadata_settings1.xml'),
+            'message' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64')),
+            'assertion' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_assertion_response.xml.base64')),
+            'double signed' => base64_decode(file_get_contents(TEST_ROOT . '/data/responses/double_signed_response.xml.base64')),
+        );
+        foreach ($signedXmls as $name => $xml) {
+            // Control: the KeyInfo that this test writes is a valid one
+            $withKeyInfo = $this->replaceKeyInfo($xml, '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>' . $settingsInfo['idp']['x509cert'] . '</ds:X509Certificate></ds:X509Data></ds:KeyInfo>');
+            $this->assertTrue(Utils::validateSign($withKeyInfo, null, $fingerprint), "$name, with KeyInfo");
+
+            $noKeyInfo = $this->replaceKeyInfo($xml);
+            // The metadata and the double signed response have other KeyInfo (the ones that are signed), the Signature that is validated has none
+            $dom = new DOMDocument();
+            $dom->loadXML($noKeyInfo);
+            $signature = $dom->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'Signature')->item(0);
+            $this->assertEquals(0, $signature->getElementsByTagNameNS(XMLSecurityDSig::XMLDSIGNS, 'KeyInfo')->length, $name);
+
+            $this->assertTrue(Utils::validateSign($noKeyInfo, $cert), "$name, certificate");
+            $this->assertTrue(Utils::validateSign($noKeyInfo, null, null, 'sha1', null, array($cert)), "$name, certificates");
+            $validateWithFingerprint = function () use ($noKeyInfo, $fingerprint) {
+                return Utils::validateSign($noKeyInfo, null, $fingerprint);
+            };
+            $this->assertFalse($this->withPhpErrorsAsExceptions($validateWithFingerprint), "$name, fingerprint");
+            $validateWithFingerprint256 = function () use ($noKeyInfo, $fingerprint256) {
+                return Utils::validateSign($noKeyInfo, null, $fingerprint256, 'sha256');
+            };
+            $this->assertFalse($this->withPhpErrorsAsExceptions($validateWithFingerprint256), "$name, sha256 fingerprint");
+        }
+    }
+
+    /**
+     * The KeyInfo can be changed by anybody (it is not signed), so whatever it contains the
+     * validation by fingerprint fails as an Exception or returns false, and only the
+     * certificate that matches the fingerprint can be used to verify the signature
+     *
+     * @covers OneLogin\Saml2\Utils::validateSign
+     */
+    public function testValidateSignWithUnusableKeyInfo()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $settings = new Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+        $fingerprint = Utils::calculateX509Fingerprint($idpData['x509cert']);
+        $xml = base64_decode(file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64'));
+
+        $keyInfos = array(
+            'empty' => '<ds:KeyInfo/>',
+            'empty X509Data' => '<ds:KeyInfo><ds:X509Data/></ds:KeyInfo>',
+            'empty X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate/></ds:X509Data></ds:KeyInfo>',
+            'blank X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate> </ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'not base64 X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>not a certificate!</ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'not a certificate X509Certificate' => '<ds:KeyInfo><ds:X509Data><ds:X509Certificate>' . base64_encode('not a certificate') . '</ds:X509Certificate></ds:X509Data></ds:KeyInfo>',
+            'X509SubjectName only' => '<ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=feide.erlang.no</ds:X509SubjectName></ds:X509Data></ds:KeyInfo>',
+            'KeyName only' => '<ds:KeyInfo><ds:KeyName>key</ds:KeyName></ds:KeyInfo>',
+            'KeyValue only' => '<ds:KeyInfo><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>AQAB</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue></ds:KeyInfo>',
+        );
+        foreach ($keyInfos as $name => $keyInfo) {
+            $modifiedXml = $this->replaceKeyInfo($xml, $keyInfo);
+
+            // An Error (TypeError, AssertionError...) is not caught here, it fails the test, and a PHP error fails it too
+            $validate = function () use ($modifiedXml, $fingerprint) {
+                return Utils::validateSign($modifiedXml, null, $fingerprint);
+            };
+            try {
+                $result = $this->withPhpErrorsAsExceptions($validate);
+            } catch (\ErrorException $e) {
+                throw $e;
+            } catch (Exception $e) {
+                $result = false;
+            }
+            $this->assertFalse($result, $name);
         }
     }
 

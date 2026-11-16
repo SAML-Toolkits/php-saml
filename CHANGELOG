@@ -11,6 +11,12 @@ v4.5.0
     * A query string with an alias of a reserved parameter is rejected even if the alias has no effect (it comes before the signed parameter or repeats its value)
     * Parameters that only have a reserved name inside their name (`SigAlgorithm`, `xSAMLRequest`...) are ignored; they were a "Duplicate parameter in query string"
     * The messages returned by `getLastErrorReason()`/`getError()` for those requests change accordingly
+* `Utils::getSelfProtocol` always returns a string. When the protocol (the value of `$_SERVER['HTTP_X_FORWARDED_PROTO']` or the one set with `setSelfProtocol`) is an array, the first value is used; `true` is https and any other value that is not a string is http
+* When the protocol is a list of values separated by commas (the `X-Forwarded-Proto` header of a chain of proxies, `https,http`), the first value is used in `Utils::getSelfProtocol`, as `X-Forwarded-Host` already did
+* When X-Forwarded-Host or X-Forwarded-Port are lists of values separated by commas, the first value is used without the spaces around it
+* `Utils::setBaseURL` ignores a boolean `true` (it does not clear the base URL that was set)
+* Reject decrypted EncryptedID content that is not an element (a text node made `LogoutRequest::getNameIdData` fail with a PHP Error)
+* Load XML documents with LIBXML_NONET
 
 v4.4.1
 * 4.4.0 was released with wrong target (master branch, so removing it)

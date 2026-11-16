@@ -94,7 +94,7 @@ class LogoutRequest
 
             if (!empty($nameId)) {
                 if (empty($nameIdFormat)
-                    && $spData['NameIDFormat'] != Constants::NAMEID_UNSPECIFIED) {
+                    && $spData['NameIDFormat'] !== Constants::NAMEID_UNSPECIFIED) {
                     $nameIdFormat = $spData['NameIDFormat'];
                 }
             } else {
@@ -417,7 +417,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);
-                if (!empty($issuer) && $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer !== $idPEntityId) {
                     throw new ValidationError(
                         "Invalid issuer in the Logout Request",
                         ValidationError::WRONG_ISSUER

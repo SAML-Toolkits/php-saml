@@ -61,6 +61,35 @@ trait EncryptedNameIdTrait
     }
 
     /**
+     * Encrypts the content (not the element) of a node for the SP of the test settings, so
+     * the plaintext is not an element: text, a comment...
+     *
+     * @param string $content Content to encrypt
+     *
+     * @return string xenc:EncryptedData element
+     */
+    protected function encryptContentForSP($content)
+    {
+        $cert = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt');
+
+        $doc = new DOMDocument();
+        $doc->loadXML('<saml:NameID xmlns:saml="' . Constants::NS_SAML . '">' . $content . '</saml:NameID>');
+
+        $enc = new XMLSecEnc();
+        $enc->setNode($doc->documentElement);
+        $enc->type = XMLSecEnc::Content;
+
+        $symmetricKey = new XMLSecurityKey(XMLSecurityKey::AES128_GCM);
+        $symmetricKey->generateSessionKey();
+        $transportKey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type' => 'public'));
+        $transportKey->loadKey($cert);
+        $enc->encryptKey($transportKey, $symmetricKey);
+        $encryptedData = $enc->encryptNode($symmetricKey);
+
+        return $encryptedData->ownerDocument->saveXML($encryptedData);
+    }
+
+    /**
      * @return string saml:EncryptedID element
      */
     protected function buildEncryptedNameId($keyTransport = XMLSecurityKey::RSA_OAEP_MGF1P, $wrappedKey = null, $garbageKey = false)
