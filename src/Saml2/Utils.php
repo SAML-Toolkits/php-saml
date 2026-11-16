@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of php-saml.
  *
@@ -16,7 +17,6 @@ namespace OneLogin\Saml2;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecEnc;
-
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
@@ -32,8 +32,8 @@ use Throwable;
  */
 class Utils
 {
-    const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
-    const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
+    public const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
+    public const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
@@ -123,7 +123,7 @@ class Utils
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
         } else {
-            $dom = new DOMDocument;
+            $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
             if (!$dom) {
                 return 'unloaded_xml';
@@ -205,7 +205,7 @@ class Utils
     public static function formatCert($x509cert, $heads = true)
     {
         if (is_null($x509cert)) {
-          return;
+            return;
         }
 
         if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
@@ -232,7 +232,7 @@ class Utils
     public static function formatPrivateKey($key, $heads = true)
     {
         if (is_null($key)) {
-          return;
+            return;
         }
 
         $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
@@ -244,7 +244,7 @@ class Utils
                 if ($heads) {
                     $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
                 }
-            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
+            } elseif (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
                 $key = Utils::getStringBetween($key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
@@ -334,7 +334,7 @@ class Utils
         foreach ($parameters as $name => $value) {
             if ($value === null) {
                 $param = urlencode($name);
-            } else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 $param = "";
                 foreach ($value as $val) {
                     $param .= urlencode($name) . "[]=" . urlencode($val). '&';
@@ -362,9 +362,9 @@ class Utils
         exit();
     }
 
-     /**
-     * @param $protocolRegex string
-     */
+    /**
+    * @param $protocolRegex string
+    */
     public static function setProtocolRegex($protocolRegex)
     {
         if (!empty($protocolRegex)) {
@@ -410,10 +410,10 @@ class Utils
                 self::setBaseURLPath($baseurlpath);
             }
         } else {
-                self::$_host = null;
-                self::$_protocol = null;
-                self::$_port = null;
-                self::$_baseurlpath = null;
+            self::$_host = null;
+            self::$_protocol = null;
+            self::$_port = null;
+            self::$_baseurlpath = null;
         }
     }
 
@@ -475,7 +475,7 @@ class Utils
     {
         if (empty($baseurlpath)) {
             self::$_baseurlpath = null;
-        } else if ($baseurlpath === '/') {
+        } elseif ($baseurlpath === '/') {
             self::$_baseurlpath = '/';
         } else {
             self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
@@ -578,9 +578,9 @@ class Utils
         $portnumber = null;
         if (self::$_port) {
             $portnumber = self::$_port;
-        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        } elseif (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
-        } else if (isset($_SERVER["SERVER_PORT"])) {
+        } elseif (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         } else {
             $currentHost = self::getRawHost();
@@ -767,6 +767,24 @@ class Utils
     }
 
     /**
+     * Returns the name that PHP gives at $_GET to a field of the query
+     * string: the name is URL-decoded, its leading spaces are dropped and
+     * it ends at a NUL byte or at the '[' of an array.
+     *
+     * So " SAMLRequest", "%53AMLRequest", "SAMLRequest%00x" and
+     * "SAMLRequest[]" are all the SAMLRequest parameter for PHP.
+     *
+     * @param string $rawName Name of the field, as it was sent
+     *
+     * @return string
+     */
+    private static function getParsedQueryParamName($rawName)
+    {
+        $name = ltrim(urldecode($rawName), ' ');
+        return substr($name, 0, strcspn($name, "\0["));
+    }
+
+    /**
      * Generates an unique string (used for example as ID for assertions).
      *
      * @return string  A unique string
@@ -804,7 +822,7 @@ class Utils
     public static function parseSAML2Time($time)
     {
         if (empty($time)) {
-          return null;
+            return null;
         }
 
         $matches = array();
@@ -1120,7 +1138,7 @@ class Utils
 
         if (!empty($cert)) {
             // RSA-1.5 key transport is rejected by default by xmlseclibs 4 receivers
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
+            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type' => 'public'));
             $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
@@ -1186,7 +1204,7 @@ class Utils
             if ($subCodeEntry->length == 1) {
                 $status['msg'] = $subCodeEntry->item(0)->getAttribute('Value');
             }
-        } else if ($messageEntry->length == 1) {
+        } elseif ($messageEntry->length == 1) {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
         }
@@ -1322,17 +1340,17 @@ class Utils
         return $newDoc->firstChild->firstChild;
     }
 
-     /**
-      * Converts a XMLSecurityKey to the correct algorithm.
-      *
-      * @param XMLSecurityKey $key       The key.
-      * @param string         $algorithm The desired algorithm.
-      * @param string         $type      Public or private key, defaults to public.
-      *
-      * @return XMLSecurityKey The new key.
-      *
-      * @throws Exception
-      */
+    /**
+     * Converts a XMLSecurityKey to the correct algorithm.
+     *
+     * @param XMLSecurityKey $key       The key.
+     * @param string         $algorithm The desired algorithm.
+     * @param string         $type      Public or private key, defaults to public.
+     *
+     * @return XMLSecurityKey The new key.
+     *
+     * @throws Exception
+     */
     public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
     {
         assert(is_string($algorithm));
@@ -1351,7 +1369,7 @@ class Utils
         if (!is_string($key->key) || $key->key === '') {
             throw new Exception('Unable to get key details from XMLSecurityKey.');
         }
-        $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
+        $newKey = new XMLSecurityKey($algorithm, array('type' => $type));
         $cert = $key->getX509Certificate();
         if ($cert !== null) {
             $newKey->loadKey($cert, false, true);
@@ -1464,7 +1482,7 @@ class Utils
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
-        } else if ($xml instanceof DOMElement) {
+        } elseif ($xml instanceof DOMElement) {
             $dom = clone $xml->ownerDocument;
         } else {
             $dom = new DOMDocument();
@@ -1610,7 +1628,7 @@ class Utils
             $queryKeys = array();
             foreach (explode('&', $_SERVER['QUERY_STRING']) as $parameter) {
                 $parts = explode('=', $parameter, 2);
-                $queryKeys[] = $parts[0];
+                $queryKeys[] = self::getParsedQueryParamName($parts[0]);
             }
             $queryKeyCounts = array_count_values($queryKeys);
             foreach ($keys as $key) {
@@ -1626,6 +1644,18 @@ class Utils
                     "Both SAMLRequest and SAMLResponse provided",
                     Error::INVALID_PARAMETER
                 );
+            }
+
+            // The signature is verified over the fields as they were sent,
+            // but the message is processed from the parsed ones: reject the
+            // message if they do not hold the same value
+            foreach (array($messageType, 'RelayState', 'SigAlg') as $key) {
+                if (isset($getData[$key]) && urldecode(Utils::extractOriginalQueryParam($key)) !== $getData[$key]) {
+                    throw new Error(
+                        "The ".$key." parameter does not match the one of the query string",
+                        Error::INVALID_PARAMETER
+                    );
+                }
             }
 
             $signedQuery = $messageType.'='.Utils::extractOriginalQueryParam($messageType);
