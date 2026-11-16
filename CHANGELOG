@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+v3.10.0
+* [#667](https://github.com/SAML-Toolkits/php-saml/pull/667) HTTP-Redirect signature validation with `retrieveParametersFromServer`: SAMLRequest, SAMLResponse, RelayState, SigAlg and Signature are matched against the complete field names of the query string, instead of searched as substrings of it. A signed Logout Request/Response with one of those names inside a value or inside the name of another parameter (for example `RelayState=Signature`) is now validated; it was rejected with "Duplicate parameter in query string" or "Both SAMLRequest and SAMLResponse provided". A message signed with an empty RelayState (`RelayState=&SigAlg=...`) is now validated; its signature validation failed
+  * Security: with `retrieveParametersFromServer`, a field that PHP parses as one of those parameters (its name has leading spaces, percent-encoded characters, a NUL byte or array brackets) counts as that parameter, so a query string with a second SAMLRequest, SAMLResponse, RelayState, SigAlg or Signature sent that way is rejected with "Duplicate parameter in query string". The message is also rejected ("The SAMLRequest parameter does not match the one of the query string", same for SAMLResponse, RelayState and SigAlg) when the value that PHP parsed is not the value of the query string that the signature covers. Before, the signature of a message could be verified while a different message was processed
+  * Compatibility notes for the two previous changes. They only affect the HTTP-Redirect binding when `retrieveParametersFromServer` is true (`Auth::processSLO`, `LogoutRequest::isValid`, `LogoutResponse::isValid`, `Utils::validateBinarySign`):
+    * `Utils::extractOriginalQueryParam` only returns the value of the field with exactly that name, and an empty string when there is no such field (it returned an unrelated piece of the query string). A name that is part of another name or value, or that comes after a leading `?` at `$_SERVER['QUERY_STRING']`, is not found anymore
+    * `Utils::validateBinarySign` requires that its `$getData` holds the values parsed from `$_SERVER['QUERY_STRING']`. If the application changes the SAMLRequest/SAMLResponse, RelayState or SigAlg values of `$_GET` (adds slashes, trims them...) or sets `$_SERVER['QUERY_STRING']` itself with other content, the message is rejected
+    * A query string with an alias of a reserved parameter is rejected even if the alias has no effect (it comes before the signed parameter or repeats its value)
+    * Parameters that only have a reserved name inside their name (`SigAlgorithm`, `xSAMLRequest`...) are ignored; they were a "Duplicate parameter in query string"
+    * The messages returned by `getLastErrorReason()`/`getError()` for those requests change accordingly
+
 v3.9.1
 * Move back phpunit to require-dev to avoid phpunit installation on production
 
