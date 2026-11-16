@@ -10,6 +10,8 @@ v3.10.0
     * A query string with an alias of a reserved parameter is rejected even if the alias has no effect (it comes before the signed parameter or repeats its value)
     * Parameters that only have a reserved name inside their name (`SigAlgorithm`, `xSAMLRequest`...) are ignored; they were a "Duplicate parameter in query string"
     * The messages returned by `getLastErrorReason()`/`getError()` for those requests change accordingly
+* When the protocol is a list of values separated by commas (the `X-Forwarded-Proto` header of a chain of proxies, `https,http`), the first value is used in `Utils::getSelfProtocol`, as `X-Forwarded-Host` already did
+* Add a test for `Utils::setBaseURL` ignoring a boolean `true` (it does not clear the base URL that was set)
 
 v3.9.1
 * Move back phpunit to require-dev to avoid phpunit installation on production
