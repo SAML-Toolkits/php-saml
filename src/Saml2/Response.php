@@ -245,6 +245,14 @@ class Response
                 );
             }
 
+            // Check SAML version on Assertion
+            if (!$this->checkAssertionSamlVersion()) {
+                throw new ValidationError(
+                    "Unsupported SAML version on the Assertion",
+                    ValidationError::UNSUPPORTED_SAML_VERSION
+                );
+            }
+
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
             $spData = $this->_settings->getSPData();
@@ -591,6 +599,22 @@ class Response
                 ValidationError::STATUS_CODE_IS_NOT_SUCCESS
             );
         }
+    }
+
+    /**
+     * Checks that the samlp:Response/saml:Assertion element has Version="2.0".
+     *
+     * @return boolean true if the Assertion has Version="2.0"
+     */
+    public function checkAssertionSamlVersion()
+    {
+        $document = $this->encrypted ? $this->decryptedDocument : $this->document;
+        foreach ($document->getElementsByTagName('Assertion') as $assertionNode) {
+            if ($assertionNode->getAttribute('Version') !== '2.0') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

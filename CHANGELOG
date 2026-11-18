@@ -12,6 +12,7 @@ v3.10.0
     * The messages returned by `getLastErrorReason()`/`getError()` for those requests change accordingly
 * When the protocol is a list of values separated by commas (the `X-Forwarded-Proto` header of a chain of proxies, `https,http`), the first value is used in `Utils::getSelfProtocol`, as `X-Forwarded-Host` already did
 * Add a test for `Utils::setBaseURL` ignoring a boolean `true` (it does not clear the base URL that was set)
+* Add validation for Assertion Version
 
 v3.9.1
 * Move back phpunit to require-dev to avoid phpunit installation on production
