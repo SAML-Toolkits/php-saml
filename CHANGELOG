@@ -17,6 +17,8 @@ v4.5.0
 * `Utils::setBaseURL` ignores a boolean `true` (it does not clear the base URL that was set)
 * Reject decrypted EncryptedID content that is not an element (a text node made `LogoutRequest::getNameIdData` fail with a PHP Error)
 * Load XML documents with LIBXML_NONET
+* Refactor Signature validation on Signed Responses with Encrypted Assertion
+* Add validateSignatureStructure check into Utils and use at ValidateSignature
 
 v4.4.1
 * 4.4.0 was released with wrong target (master branch, so removing it)

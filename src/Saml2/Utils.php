@@ -36,6 +36,25 @@ class Utils
     public const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 
     /**
+     * Transforms accepted on a received Signature Reference. SAML only needs
+     * enveloped-signature plus canonicalization (XPath/XSLT are rejected).
+     */
+    public const ALLOWED_SIGNATURE_TRANSFORMS = array(
+        'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
+        XMLSecurityDSig::EXC_C14N,
+        XMLSecurityDSig::EXC_C14N_COMMENTS,
+        XMLSecurityDSig::C14N,
+        XMLSecurityDSig::C14N_COMMENTS
+    );
+
+    public const ALLOWED_CANONICALIZATION_METHODS = array(
+        XMLSecurityDSig::EXC_C14N,
+        XMLSecurityDSig::EXC_C14N_COMMENTS,
+        XMLSecurityDSig::C14N,
+        XMLSecurityDSig::C14N_COMMENTS
+    );
+
+    /**
      * @var bool Control if the `Forwarded-For-*` headers are used
      */
     private static $_proxyVars = false;
@@ -1253,7 +1272,6 @@ class Utils
      */
     public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey, $formatOutput = true, $allowRSA15KeyTransport = false, $allowCBCEncryption = true)
     {
-
         $enc = self::createDecryptionContext($allowRSA15KeyTransport, $allowCBCEncryption);
 
         $enc->setNode($encryptedData);
@@ -1540,6 +1558,8 @@ class Utils
             throw new Exception('Unsupported signing algorithm.');
         }
 
+        self::validateSignatureStructure($objDSig);
+
         $objXMLSecDSig->canonicalizeSignedInfo();
 
         try {
@@ -1602,6 +1622,90 @@ class Utils
             }
         }
         return $valid;
+    }
+
+    /**
+     * Checks that a received ds:Signature only uses what SAML needs before
+     * xmlseclibs processes it: it evaluates Reference transforms (XPath
+     * included) before any cryptographic check, accepts a DOCTYPE, picks
+     * the first node when a Reference URI matches several and follows
+     * RetrievalMethod/EncryptedKey references of the KeyInfo without a depth
+     * limit (the KeyInfo is not covered by the signature).
+     *
+     * @param DOMElement $signatureNode The ds:Signature element
+     *
+     * @throws Exception
+     */
+    public static function validateSignatureStructure(DOMElement $signatureNode)
+    {
+        $dom = $signatureNode->ownerDocument;
+        if ($dom->doctype !== null) {
+            throw new Exception('Detected use of DOCTYPE/ENTITY in XML, disabled to prevent XXE/XEE attacks');
+        }
+
+        $xpath = new DOMXPath($dom);
+        $xpath->registerNamespace('ds', Constants::NS_DS);
+
+        $signedInfo = $xpath->query('./ds:SignedInfo', $signatureNode);
+        if ($signedInfo->length != 1 || $xpath->query('./ds:SignatureValue', $signatureNode)->length != 1) {
+            throw new Exception('Invalid Signature structure');
+        }
+        $signedInfo = $signedInfo->item(0);
+
+        // Matched by local name, as xmlseclibs does
+        $keyReferences = $xpath->query('./ds:KeyInfo/*[local-name()="RetrievalMethod" or local-name()="EncryptedKey"]', $signatureNode);
+        if ($keyReferences->length > 0) {
+            throw new Exception('Unsupported KeyInfo in the Signature');
+        }
+
+        $canonicalizationMethod = $xpath->query('./ds:CanonicalizationMethod', $signedInfo);
+        if ($canonicalizationMethod->length != 1
+            || !in_array($canonicalizationMethod->item(0)->getAttribute('Algorithm'), self::ALLOWED_CANONICALIZATION_METHODS, true)
+        ) {
+            throw new Exception('Unsupported CanonicalizationMethod in the Signature');
+        }
+
+        $signatureMethod = $xpath->query('./ds:SignatureMethod', $signedInfo);
+        if ($signatureMethod->length != 1
+            || !self::isSupportedSigningAlgorithm($signatureMethod->item(0)->getAttribute('Algorithm'))
+        ) {
+            throw new Exception('Unsupported signing algorithm.');
+        }
+
+        $reference = $xpath->query('./ds:Reference', $signedInfo);
+        if ($reference->length != 1) {
+            throw new Exception('Unexpected number of Reference nodes found for signature');
+        }
+        $reference = $reference->item(0);
+        if ($xpath->query('./ds:DigestMethod', $reference)->length != 1
+            || $xpath->query('./ds:DigestValue', $reference)->length != 1
+            || $xpath->query('./ds:Transforms', $reference)->length > 1
+        ) {
+            throw new Exception('Invalid Reference structure in the Signature');
+        }
+        foreach ($xpath->query('./ds:Transforms/ds:Transform', $reference) as $transform) {
+            if (!in_array($transform->getAttribute('Algorithm'), self::ALLOWED_SIGNATURE_TRANSFORMS, true)) {
+                throw new Exception('Unsupported Transform in the Signature');
+            }
+        }
+
+        $uri = $reference->getAttribute('URI');
+        if ($uri !== '') {
+            if (strlen($uri) < 2 || $uri[0] !== '#') {
+                throw new Exception('Reference URI must point to an element of the same document');
+            }
+
+            $id = substr($uri, 1);
+            $matches = 0;
+            foreach ($xpath->query('//@ID | //@Id') as $attr) {
+                if ($attr->value === $id) {
+                    $matches++;
+                }
+            }
+            if ($matches != 1) {
+                throw new Exception('Reference URI identifies multiple nodes');
+            }
+        }
     }
 
     /**
