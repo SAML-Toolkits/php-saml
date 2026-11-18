@@ -22,10 +22,18 @@ class OneLogin_Saml2_IdPMetadataParser
      * @param string $desiredNameIdFormat   If available on IdP metadata, use that nameIdFormat
      * @param string $desiredSSOBinding     Parse specific binding SSO endpoint.
      * @param string $desiredSLOBinding     Parse specific binding SLO endpoint.
+     * @param bool   $validatePeer          Enable or disable validate peer SSL certificate
+     * @param array  $curlOptions           Extra curl options (CURLOPT_* => value). They are applied after the
+     *                                      ones set by this method, so they override them: the timeouts (by
+     *                                      default 10 seconds to connect and 120 seconds for the whole request),
+     *                                      CURLOPT_PROTOCOLS, CURLOPT_SSL_VERIFYPEER... The only exception is
+     *                                      CURLOPT_RETURNTRANSFER, which is always enabled
      *
      * @return array metadata info in php-saml settings format
+     *
+     * @throws Exception If the metadata can not be retrieved or if a curl option is not valid
      */
-    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $validatePeer = false)
+    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $validatePeer = false, array $curlOptions = array())
     {
         $metadataInfo = array();
 
@@ -39,6 +47,26 @@ class OneLogin_Saml2_IdPMetadataParser
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $validatePeer);
             curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+            // Do not wait forever for a server that does not answer
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+
+            if (!empty($curlOptions)) {
+                try {
+                    $curlOptionsApplied = curl_setopt_array($ch, $curlOptions);
+                } catch (Exception $e) {
+                    // The PHP warning of an option that is not valid, when an error handler turns it into an exception
+                    throw new Exception('Invalid curl options. '.$e->getMessage());
+                } catch (Throwable $e) {
+                    // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+                    throw new Exception('Invalid curl options. '.$e->getMessage());
+                }
+                if (!$curlOptionsApplied) {
+                    throw new Exception('Invalid curl options');
+                }
+                // The metadata is read from the value that curl_exec returns
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            }
 
             $xml = curl_exec($ch);
             if ($xml !== false) {

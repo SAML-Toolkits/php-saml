@@ -132,10 +132,10 @@ class OneLogin_Saml2_Response
     }
 
     /**
-     * In strict mode, the Response signature also covers the EncryptedAssertion,
-     * so it is verified before decrypting: tampered ciphertexts never reach the
-     * decryption code (no padding/Bleichenbacher oracle). When signed messages
-     * are required, an unsigned Response is not decrypted.
+     * When signed messages are required, the Response signature also covers the
+     * EncryptedAssertion, so it is verified before decrypting: tampered
+     * ciphertexts never reach the decryption code (no padding oracle).
+     * Only checked on strict mode.
      *
      * @throws Exception
      * @throws OneLogin_Saml2_ValidationError
@@ -154,20 +154,36 @@ class OneLogin_Saml2_Response
             if (isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing'])) {
                 $multiCerts = $idpData['x509certMulti']['signing'];
             }
-            if (!OneLogin_Saml2_Utils::validateSign($this->document, $idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
-                throw new OneLogin_Saml2_ValidationError(
-                    "Signature validation failed. SAML Response rejected",
-                    OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
-                );
-            }
-            // Only set once the signature was actually verified, so isValid() does not repeat it
-            $this->_responseSignatureValidated = true;
+            $this->_responseSignatureValidated = $this->_validateResponseSignature($idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], $multiCerts);
         } else if ($security['wantMessagesSigned']) {
             throw new OneLogin_Saml2_ValidationError(
                 "The Message of the Response is not signed and the SP requires it",
                 OneLogin_Saml2_ValidationError::NO_SIGNED_MESSAGE
             );
         }
+    }
+
+    /**
+     * Validates the signature of the Response (on the original document)
+     *
+     * @param string|null $cert           The public cert of the IdP
+     * @param string|null $fingerprint    The fingerprint of the public cert
+     * @param string|null $fingerprintalg The algorithm used to get the fingerprint
+     * @param array|null  $multiCerts     Multiple public certs
+     *
+     * @return bool True only if the signature of the Response is valid
+     *
+     * @throws OneLogin_Saml2_ValidationError
+     */
+    private function _validateResponseSignature($cert, $fingerprint, $fingerprintalg, $multiCerts)
+    {
+        if (!OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+            throw new OneLogin_Saml2_ValidationError(
+                "Signature validation failed. SAML Response rejected",
+                OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
+            );
+        }
+        return true;
     }
 
     /**
@@ -209,6 +225,14 @@ class OneLogin_Saml2_Response
                 throw new OneLogin_Saml2_ValidationError(
                     "SAML Response must contain 1 assertion",
                     OneLogin_Saml2_ValidationError::WRONG_NUMBER_OF_ASSERTIONS
+                );
+            }
+
+            // Check SAML version on Assertion
+            if (!$this->checkAssertionSamlVersion()) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "Unsupported SAML version on the Assertion",
+                    OneLogin_Saml2_ValidationError::UNSUPPORTED_SAML_VERSION
                 );
             }
 
@@ -473,13 +497,9 @@ class OneLogin_Saml2_Response
                     $multiCerts = $idpData['x509certMulti']['signing'];
                 }
 
-                # If find a Signature on the Response, validates it checking the original response,
-                # unless it was already verified before decrypting the EncryptedAssertion
-                if ($hasSignedResponse && !$this->_responseSignatureValidated && !OneLogin_Saml2_Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, OneLogin_Saml2_Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "Signature validation failed. SAML Response rejected",
-                        OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
-                    );
+                // If find a Signature on the Response, validates it checking the original response, if not already validated
+                if ($hasSignedResponse && !$this->_responseSignatureValidated) {
+                    $this->_responseSignatureValidated = $this->_validateResponseSignature($cert, $fingerprint, $fingerprintalg, $multiCerts);
                 }
 
                 # If find a Signature on the Assertion (decrypted assertion if was encrypted)
@@ -564,6 +584,22 @@ class OneLogin_Saml2_Response
                 OneLogin_Saml2_ValidationError::STATUS_CODE_IS_NOT_SUCCESS
             );
         }
+    }
+
+    /**
+     * Checks that the samlp:Response/saml:Assertion element has Version="2.0".
+     *
+     * @return boolean true if the Assertion has Version="2.0"
+     */
+    public function checkAssertionSamlVersion()
+    {
+        $document = $this->encrypted ? $this->decryptedDocument : $this->document;
+        foreach ($document->getElementsByTagName('Assertion') as $assertionNode) {
+            if ($assertionNode->getAttribute('Version') !== '2.0') {
+                return false;
+            }
+        }
+        return true;
     }
 
    /**
@@ -1352,6 +1388,16 @@ class OneLogin_Saml2_Response
     public function getErrorException()
     {
         return $this->_errorException;
+    }
+
+    /**
+     * After execute a validation process, this method returns if the Response element was protected by a valid Signature.
+     *
+     * @return bool
+     */
+    public function hasValidResponseSignature()
+    {
+        return $this->_responseSignatureValidated;
     }
 
     /**

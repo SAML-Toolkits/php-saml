@@ -530,7 +530,7 @@ class OneLogin_Saml2_Utils
         } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
             $currentHost = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
             $values = array_values($currentHost);
-            $currentHost = array_shift($values);
+            $currentHost = trim(array_shift($values));
         } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
@@ -590,6 +590,11 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
+        // The header of a chain of proxies lists the protocol of each one ('https,http'): the first
+        // one is the protocol (as the first host is the host of X-Forwarded-Host)
+        $protocols = explode(',', $protocol, 2);
+        $protocol = trim($protocols[0]);
+
         return $protocol;
     }
 
@@ -626,6 +631,11 @@ class OneLogin_Saml2_Utils
             $portnumber = self::$_port;
         } elseif (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+            // The header of a chain of proxies lists the port of each one ('8443, 80'): the first one is the port
+            if (is_string($portnumber)) {
+                $ports = explode(',', $portnumber, 2);
+                $portnumber = $ports[0];
+            }
         } elseif (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
         } else {
