@@ -2,6 +2,7 @@ CHANGELOG
 =========
 
 v3.10.0
+* Refactor Signature validation on Signed Responses with Encrypted Assertion.
 * [#667](https://github.com/SAML-Toolkits/php-saml/pull/667) HTTP-Redirect signature validation with `retrieveParametersFromServer`: SAMLRequest, SAMLResponse, RelayState, SigAlg and Signature are matched against the complete field names of the query string, instead of searched as substrings of it. A signed Logout Request/Response with one of those names inside a value or inside the name of another parameter (for example `RelayState=Signature`) is now validated; it was rejected with "Duplicate parameter in query string" or "Both SAMLRequest and SAMLResponse provided". A message signed with an empty RelayState (`RelayState=&SigAlg=...`) is now validated; its signature validation failed
   * Security: with `retrieveParametersFromServer`, a field that PHP parses as one of those parameters (its name has leading spaces, percent-encoded characters, a NUL byte or array brackets) counts as that parameter, so a query string with a second SAMLRequest, SAMLResponse, RelayState, SigAlg or Signature sent that way is rejected with "Duplicate parameter in query string". The message is also rejected ("The SAMLRequest parameter does not match the one of the query string", same for SAMLResponse, RelayState and SigAlg) when the value that PHP parsed is not the value of the query string that the signature covers. Before, the signature of a message could be verified while a different message was processed
   * Compatibility notes. Only affect the HTTP-Redirect binding when `retrieveParametersFromServer` is true:
@@ -10,6 +11,10 @@ v3.10.0
     * A query string with an alias of a reserved parameter is rejected even if the alias has no effect (it comes before the signed parameter or repeats its value)
     * Parameters that only have a reserved name inside their name (`SigAlgorithm`, `xSAMLRequest`...) are ignored; they were a "Duplicate parameter in query string"
     * The messages returned by `getLastErrorReason()`/`getError()` for those requests change accordingly
+* When the protocol is a list of values separated by commas (the `X-Forwarded-Proto` header of a chain of proxies, `https,http`), the first value is used in `Utils::getSelfProtocol`, as `X-Forwarded-Host` already did
+* Add a test for `Utils::setBaseURL` ignoring a boolean `true` (it does not clear the base URL that was set)
+* Add validation for Assertion Version
+* [#658](https://github.com/SAML-Toolkits/php-saml/pull/658) `IdPMetadataParser::parseRemoteXML` accepts extra curl options in a new optional `$curlOptions` parameter. They are applied last, so they override the ones that the method sets (except `CURLOPT_RETURNTRANSFER`); options that are not valid raise an Exception. The request now has default timeouts: 10 seconds to connect and 120 seconds in total (it had none), use `$curlOptions` to change them
 
 v3.9.1
 * Move back phpunit to require-dev to avoid phpunit installation on production

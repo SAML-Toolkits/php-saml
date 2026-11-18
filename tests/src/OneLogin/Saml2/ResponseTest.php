@@ -829,6 +829,82 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+    * Tests the hasValidResponseSignature method of the OneLogin_Saml2_Response
+    *
+    * @covers OneLogin\Saml2\Response::hasValidResponseSignature
+    */
+    public function testHasValidResponseSignature()
+    {
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+            $nonStrictsettings = new Settings($settingsInfo);
+            $settingsInfo['strict'] = true;
+            $strictsettings = new Settings($settingsInfo);
+
+            $validSignedResponseEncryptedAssertionList = array(
+                'signed_message_encrypted_assertion.xml.base64',
+                'double_signed_encrypted_assertion.xml.base64',
+            );
+            $validSignedResponseList = array(
+                'signed_message_response.xml.base64',
+                'double_signed_response.xml.base64',
+                'valid_response.xml.base64'
+            );
+
+            foreach ($validSignedResponseList as $validSignedResponse) {
+                $xml = file_get_contents(TEST_ROOT . '/data/responses/' . $validSignedResponse);
+                $response = new Response($nonStrictsettings, $xml);
+                // With strict mode disabled, the signature of the response is not validated in the constructor
+                $this->assertFalse($response->hasValidResponseSignature());
+                $this->assertTrue($response->isValid());
+                $this->assertTrue($response->hasValidResponseSignature());
+
+                $response = new Response($strictsettings, $xml);
+                // With strict mode enabled, the signature of the response is not validated, if not encrypted
+                $this->assertFalse($response->hasValidResponseSignature());
+                $response->isValid();
+                $this->assertFalse($response->hasValidResponseSignature());
+            }
+
+            foreach ($validSignedResponseEncryptedAssertionList as $validSignedResponseEncryptedAssertion) {
+                $xml = file_get_contents(TEST_ROOT . '/data/responses/' . $validSignedResponseEncryptedAssertion);
+                $response = new Response($nonStrictsettings, $xml);
+                // With strict mode disabled, the signature of the response is not validated in the constructor
+                $this->assertFalse($response->hasValidResponseSignature());
+                $this->assertTrue($response->isValid());
+                $this->assertTrue($response->hasValidResponseSignature());
+
+                $response = new Response($strictsettings, $xml);
+                // With strict mode enabled, the signature of the response is not validated, if not encrypted
+                $this->assertTrue($response->hasValidResponseSignature());
+                $response->isValid();
+                $this->assertTrue($response->hasValidResponseSignature());
+            }
+
+            $xml = file_get_contents(TEST_ROOT . '/data/responses/signed_assertion_response.xml.base64');
+            $response = new Response($strictsettings, $xml);
+            // With strict mode enabled but no signature on the response, no validation happens in the constructor
+            $this->assertFalse($response->hasValidResponseSignature());
+            $response->isValid();
+            // Signature of the Assertion valid, but no Signture on Response
+            $this->assertFalse($response->hasValidResponseSignature());
+
+            $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_signature.xml.base64');
+            $response = new Response($nonStrictsettings, $xml);
+            // With strict mode disabled, the signature of the response is not validated in the constructor
+            $this->assertFalse($response->hasValidResponseSignature());
+            // No Signature, so both returns false
+            $this->assertFalse($response->isValid());
+            $this->assertFalse($response->hasValidResponseSignature());
+            $response = new Response($strictsettings, $xml);
+            // With strict mode enabled, but no signature
+            $this->assertFalse($response->hasValidResponseSignature());
+            // No Signature, so both returns false
+            $this->assertFalse($response->isValid());
+            $this->assertFalse($response->hasValidResponseSignature());
+    }
+
+    /**
      * Tests the getNameId method of the Response
      *
      * Test that the SignatureWrappingAttack is not allowed
@@ -869,6 +945,23 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         } catch (Exception $e) {
             $this->assertEquals('DOMDocument::loadXML(): Namespace prefix saml on Assertion is not defined in Entity, line: 1', $e->getMessage());
         }
+    }
+
+    /**
+     * Tests the isValid and checkAssertionSamlVersion methods of the
+     * Response
+     *
+     * Test that an assertion with Version != "2.0" is rejected
+     *
+     * @covers OneLogin\Saml2\Response::isValid
+     * @covers OneLogin\Saml2\Response::checkAssertionSamlVersion
+     */
+    public function testAssertionVersionMustBe20()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/v11_assertion.xml.base64');
+        $response = new Response($this->_settings, $xml);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('Unsupported SAML version on the Assertion', $response->getError());
     }
 
     /**

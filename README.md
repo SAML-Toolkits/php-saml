@@ -8,6 +8,9 @@ Add SAML support to your PHP 7.X software using this library.
 Warning
 -------
 
+Version 3.10.0 includes several security improvements.
+Update to this version if you keep using the 3.x branch.
+
 Version 3.9.0 try to mitigate the xmlseclibs advisories published in August 2026 (GHSA-7mf5-fjj8-mvjc, GHSA-39hg-wfcm-v4wv, GHSA-7h47-29x2-r2gc, GHSA-m5mw-mr39-66vp, GHSA-w5f2-cpgp-pg76, GHSA-7hf8-fh6v-wmm6, GHSA-9wcx-p7hr-f935) while keeping xmlseclibs 3.x, as xmlseclibs 4.x requires PHP 8
 
 Version 3.8.2 updates xmlseclibs to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
@@ -1508,6 +1511,26 @@ Auxiliary class that contains several methods to retrieve and process IdP metada
 
 The class does not validate in any way the URL that is introduced on methods like parseRemoteXML in order to retrieve the remove XML. Usually is the same administrator that handles the Service Provider the ones that set the URL that should belong to a trusted third-party IdP.
 But there are other scenarios, like a SAAS app where the administrator of the app delegates on other administrators. In such case, extra protection should be taken in order to validate such URL inputs and avoid attacks like SSRF.
+
+`parseRemoteXML` retrieves the metadata with curl: only http and https URLs, up to 5 redirections, 10 seconds to connect and 120 seconds for the whole request. Its last parameter, `$curlOptions`, is an array of extra curl options that are applied after those, so they override them:
+
+```php
+$idpInfo = IdPMetadataParser::parseRemoteXML(
+    'https://idp.example.com/metadata',
+    null,
+    null,
+    Constants::BINDING_HTTP_REDIRECT,
+    Constants::BINDING_HTTP_REDIRECT,
+    true,
+    array(
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 300,
+        CURLOPT_PROXY => 'http://proxy.example.com:3128',
+    )
+);
+```
+
+An Exception is raised if one of the options is not valid. Take into account that these options can also remove the protections that the method sets (for example the allowed protocols at `CURLOPT_PROTOCOLS`), so never build them from untrusted input.
 
 
 For more info, look at the source code; each method is documented and details

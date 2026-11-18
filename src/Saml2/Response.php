@@ -131,9 +131,8 @@ class Response
         if ($encryptedAssertionNodes->length !== 0) {
             try {
                 $this->validateMessageSignatureBeforeDecryption();
-                $this->_responseSignatureValidated = true;
             } catch (Throwable $e) {
-                // The EncryptedAssertion is not decrypted. isValid() reports the cause
+                // If the validation fails, isValid() reports the cause
                 $this->_messageSignatureError = $e instanceof Exception ? $e : new ValidationError(
                     "Signature validation failed. SAML Response rejected",
                     ValidationError::INVALID_SIGNATURE
@@ -149,7 +148,8 @@ class Response
     /**
      * When signed messages are required, the Response signature also covers the
      * EncryptedAssertion, so it is verified before decrypting: tampered
-     * ciphertexts never reach the decryption code (no padding/Bleichenbacher oracle).
+     * ciphertexts never reach the decryption code (no padding oracle).
+     * Only checked on strict mode.
      *
      * @throws Exception
      * @throws ValidationError
@@ -169,18 +169,36 @@ class Response
             if (isset($idpData['x509certMulti']['signing']) && !empty($idpData['x509certMulti']['signing'])) {
                 $multiCerts = $idpData['x509certMulti']['signing'];
             }
-            if (!Utils::validateSign($this->document, $idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
-                throw new ValidationError(
-                    "Signature validation failed. SAML Response rejected",
-                    ValidationError::INVALID_SIGNATURE
-                );
-            }
-        } else if ($security['wantMessagesSigned']) {
+            $this->_responseSignatureValidated = $this->validateResponseSignature($idpData['x509cert'], $idpData['certFingerprint'], $idpData['certFingerprintAlgorithm'], $multiCerts);
+        } elseif ($security['wantMessagesSigned']) {
             throw new ValidationError(
                 "The Message of the Response is not signed and the SP requires it",
                 ValidationError::NO_SIGNED_MESSAGE
             );
         }
+    }
+
+    /**
+     * Validates the signature of the Response (on the original document)
+     *
+     * @param string|null $cert           The public cert of the IdP
+     * @param string|null $fingerprint    The fingerprint of the public cert
+     * @param string|null $fingerprintalg The algorithm used to get the fingerprint
+     * @param array|null  $multiCerts     Multiple public certs
+     *
+     * @return bool True only if the signature of the Response is valid
+     *
+     * @throws ValidationError
+     */
+    private function validateResponseSignature($cert, $fingerprint, $fingerprintalg, $multiCerts)
+    {
+        if (!Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
+            throw new ValidationError(
+                "Signature validation failed. SAML Response rejected",
+                ValidationError::INVALID_SIGNATURE
+            );
+        }
+        return true;
     }
 
     /**
@@ -224,6 +242,14 @@ class Response
                 throw new ValidationError(
                     "SAML Response must contain 1 assertion",
                     ValidationError::WRONG_NUMBER_OF_ASSERTIONS
+                );
+            }
+
+            // Check SAML version on Assertion
+            if (!$this->checkAssertionSamlVersion()) {
+                throw new ValidationError(
+                    "Unsupported SAML version on the Assertion",
+                    ValidationError::UNSUPPORTED_SAML_VERSION
                 );
             }
 
@@ -488,13 +514,8 @@ class Response
                 }
 
                 // If find a Signature on the Response, validates it checking the original response, if not already validated
-                if (!$this->_responseSignatureValidated) {
-                    if ($hasSignedResponse && !Utils::validateSign($this->document, $cert, $fingerprint, $fingerprintalg, Utils::RESPONSE_SIGNATURE_XPATH, $multiCerts)) {
-                        throw new ValidationError(
-                            "Signature validation failed. SAML Response rejected",
-                            ValidationError::INVALID_SIGNATURE
-                        );
-                    }
+                if ($hasSignedResponse && !$this->_responseSignatureValidated) {
+                    $this->_responseSignatureValidated = $this->validateResponseSignature($cert, $fingerprint, $fingerprintalg, $multiCerts);
                 }
 
                 // If find a Signature on the Assertion (decrypted assertion if was encrypted)
@@ -578,6 +599,22 @@ class Response
                 ValidationError::STATUS_CODE_IS_NOT_SUCCESS
             );
         }
+    }
+
+    /**
+     * Checks that the samlp:Response/saml:Assertion element has Version="2.0".
+     *
+     * @return boolean true if the Assertion has Version="2.0"
+     */
+    public function checkAssertionSamlVersion()
+    {
+        $document = $this->encrypted ? $this->decryptedDocument : $this->document;
+        foreach ($document->getElementsByTagName('Assertion') as $assertionNode) {
+            if ($assertionNode->getAttribute('Version') !== '2.0') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1362,6 +1399,16 @@ class Response
             $errorMsg = htmlentities($this->_error->getMessage());
         }
         return $errorMsg;
+    }
+
+    /**
+     * After execute a validation process, this method returns if the Response element was protected by a valid Signature.
+     *
+     * @return bool
+     */
+    public function hasValidResponseSignature()
+    {
+        return $this->_responseSignatureValidated;
     }
 
     /**

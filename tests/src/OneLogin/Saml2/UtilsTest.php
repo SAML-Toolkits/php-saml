@@ -372,6 +372,40 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * The X-Forwarded-Host header of a chain of proxies can be a list of values separated by commas: the host
+     * is the first one, without the spaces around it
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfHost
+     * @covers OneLogin\Saml2\Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfHostWithAListOfValues()
+    {
+        Utils::setProxyVars(true);
+        $cases = array(
+            'sp.example.com,proxy.internal' => 'sp.example.com',
+            'sp.example.com, proxy.internal' => 'sp.example.com',
+            'sp.example.com , proxy.internal' => 'sp.example.com',
+            ' sp.example.com , proxy.internal ' => 'sp.example.com',
+            'sp.example.com:8443, proxy.internal' => 'sp.example.com',
+            'sp.example.com' => 'sp.example.com',
+            ' sp.example.com ' => 'sp.example.com',
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_HOST'] = $header;
+            $this->assertSame($expected, Utils::getSelfHost(), "X-Forwarded-Host: '$header'");
+        }
+
+        // The three headers of a chain of proxies, with spaces around the values
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com , proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https , http';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443 , 80';
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+    }
+
+    /**
      * Tests the isHTTPS method of the Utils
      *
      * @covers OneLogin\Saml2\Utils::isHTTPS
@@ -462,7 +496,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             array('1', 1),
             array('65535', 65535),
         );
-        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb', '8080, 8081');
+        $invalid = array('', ' ', '0', 0, '-1', '65536', '99999999999999999999', 'abc', '443abc', '443.5', '1e3', '0x1bb');
 
         // Where the port is read from
         $sources = array(
@@ -499,6 +533,55 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
                 $this->assertNull(Utils::getSelfPort(), "$name: " . var_export($port, true));
             }
         }
+    }
+
+    /**
+     * The X-Forwarded-Port header of a chain of proxies can be a list of values separated by commas:
+     * the port is the first one (as the host of X-Forwarded-Host and the protocol of X-Forwarded-Proto).
+     * Only the first value counts: it is not replaced by the next one when it is not a port. In the other
+     * sources a list is not a port.
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfPort
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfPortWithAListOfValues()
+    {
+        Utils::setProxyVars(true);
+        $cases = array(
+            '8443, 80' => 8443,
+            '8443,80' => 8443,
+            ' 8443 , 80 ' => 8443,
+            '443, 8443' => 443,
+            '80,443' => 80,
+            '8443' => 8443,
+            'abc, 443' => null,
+            ', 443' => null,
+            '0, 443' => null,
+        );
+        foreach ($cases as $header => $expected) {
+            $_SERVER['HTTP_X_FORWARDED_PORT'] = $header;
+            $this->assertSame($expected, Utils::getSelfPort(), "X-Forwarded-Port: '$header'");
+        }
+
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = 8443;
+        $this->assertSame(8443, Utils::getSelfPort());
+
+        // A list in the other sources is not a port
+        Utils::setProxyVars(false);
+        unset($_SERVER['HTTP_X_FORWARDED_PORT']);
+        $_SERVER['SERVER_PORT'] = '8443, 80';
+        $this->assertNull(Utils::getSelfPort());
+        unset($_SERVER['SERVER_PORT']);
+        Utils::setSelfPort('8443, 80');
+        $this->assertNull(Utils::getSelfPort());
+        Utils::setSelfPort(null);
+
+        // The header is ignored when the proxy vars are not enabled
+        $_SERVER['SERVER_PORT'] = '8080';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443, 80';
+        $this->assertSame(8080, Utils::getSelfPort());
     }
 
     /**
@@ -729,6 +812,35 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * When the value is a list of values separated by commas (the header of a chain of proxies, as
+     * X-Forwarded-Host) the protocol is the first one
+     *
+     * @covers OneLogin\Saml2\Utils::getSelfProtocol
+     * @covers OneLogin\Saml2\Utils::isHTTPS
+     * @covers OneLogin\Saml2\Utils::getSelfURLhost
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGetSelfProtocolWithAListOfValues()
+    {
+        $this->assertSelfProtocol('https,http', 'https', true, 'https first');
+        $this->assertSelfProtocol('https, http', 'https', true, 'a space after the comma');
+        $this->assertSelfProtocol(' https , http ', 'https', true, 'spaces around the values');
+        $this->assertSelfProtocol('http,https', 'http', false, 'only the first value is used');
+        $this->assertSelfProtocol('http, https, https', 'http', false, 'only the first value is used, three values');
+        $this->assertSelfProtocol(array('https,http'), 'https', true, 'a list inside an array');
+        $this->assertSelfProtocol('https', 'https', true, 'one value');
+
+        // The same chain of proxies in the headers of the request: protocol, host and port
+        Utils::setProxyVars(true);
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https,http';
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = 'sp.example.com,proxy.internal';
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = '8443';
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+    }
+
+    /**
      * @covers OneLogin\Saml2\Utils::setBaseURLPath
      *
      * @runInSeparateProcess
@@ -853,6 +965,39 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
             $this->assertSame($port, Utils::getSelfPort(), $baseURL);
             $this->assertSame($expectedHost, Utils::getSelfURLhost(), $baseURL);
         }
+    }
+
+    /**
+     * A bool true is not a base URL, so it is ignored: it does not clear the base URL that was set (the
+     * URLs would be built again from the Host header of the request). The 'baseurl' setting is checked
+     * only with empty(), so a true reaches setBaseURL. An empty value does clear it.
+     *
+     * @covers OneLogin\Saml2\Utils::setBaseURL
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSetBaseURLIgnoresATrue()
+    {
+        $_SERVER['HTTP_HOST'] = 'other.example.org';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        unset($_SERVER['PATH_INFO']);
+
+        Utils::setBaseURL('https://sp.example.com:8443/app/');
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+        $this->assertSame('/app/', Utils::getBaseURLPath());
+
+        Utils::setBaseURL(true);
+        $this->assertSame('https', Utils::getSelfProtocol());
+        $this->assertSame('sp.example.com', Utils::getSelfHost());
+        $this->assertSame(8443, Utils::getSelfPort());
+        $this->assertSame('https://sp.example.com:8443', Utils::getSelfURLhost());
+        $this->assertSame('/app/', Utils::getBaseURLPath());
+
+        // Control: an empty value clears it, and the URL is built from the request
+        Utils::setBaseURL(null);
+        $this->assertSame('http://other.example.org', Utils::getSelfURLhost());
+        $this->assertNull(Utils::getBaseURLPath());
     }
 
    /**
