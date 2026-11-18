@@ -2,6 +2,7 @@
 
 namespace OneLogin\Saml2\Tests;
 
+use Exception;
 use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\IdPMetadataParser;
 
@@ -452,5 +453,148 @@ class IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEquals($newSettings, $settingsInfo);
         $this->assertEquals($expectedMergedSettings, $newSettings);
+    }
+
+    /**
+     * The URL of an IdP metadata file of the tests, to retrieve it with curl without
+     * the need of a web server. It requires to enable the file protocol with the curl
+     * options of parseRemoteXML, since by default only http and https are enabled.
+     *
+     * @return string
+     */
+    private function metadataFileUrl()
+    {
+        if (!in_array('file', curl_version()['protocols'], true)) {
+            $this->markTestSkipped('curl has no support for the file protocol');
+        }
+
+        return 'file://' . TEST_ROOT . '/data/metadata/idp/idp_metadata.xml';
+    }
+
+    /**
+     * Tests the parseRemoteXML method of IdPMetadataParser.
+     * Case: by default only http and https URLs are retrieved
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     */
+    public function testParseRemoteXMLOnlyHttpProtocolsByDefault()
+    {
+        $url = $this->metadataFileUrl();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Error on parseRemoteXML. ');
+
+        IdPMetadataParser::parseRemoteXML($url);
+    }
+
+    /**
+     * Tests the parseRemoteXML method of IdPMetadataParser.
+     * Case: the curl options are applied after the ones that the method sets, and override them
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     */
+    public function testParseRemoteXMLCurlOptions()
+    {
+        $url = $this->metadataFileUrl();
+        $expectedInfo = IdPMetadataParser::parseFileXML(TEST_ROOT . '/data/metadata/idp/idp_metadata.xml');
+        $this->assertEquals('https://app.onelogin.com/saml/metadata/383123', $expectedInfo['idp']['entityId']);
+
+        $idpInfo = IdPMetadataParser::parseRemoteXML($url, curlOptions: array(CURLOPT_PROTOCOLS => CURLPROTO_FILE));
+        $this->assertEquals($expectedInfo, $idpInfo);
+
+        // The rest of the parameters are still used
+        $this->assertEquals(Constants::BINDING_HTTP_REDIRECT, $idpInfo['idp']['singleSignOnService']['binding']);
+        $idpInfo = IdPMetadataParser::parseRemoteXML(
+            $url,
+            null,
+            null,
+            Constants::BINDING_HTTP_POST,
+            Constants::BINDING_HTTP_REDIRECT,
+            false,
+            array(CURLOPT_PROTOCOLS => CURLPROTO_FILE, CURLOPT_TIMEOUT => 5)
+        );
+        $this->assertEquals(Constants::BINDING_HTTP_POST, $idpInfo['idp']['singleSignOnService']['binding']);
+        $this->assertEquals($expectedInfo['idp']['entityId'], $idpInfo['idp']['entityId']);
+    }
+
+    /**
+     * Tests the parseRemoteXML method of IdPMetadataParser.
+     * Case: CURLOPT_RETURNTRANSFER can not be disabled with the curl options, the
+     *       metadata is parsed (and it is not sent to the output)
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     */
+    public function testParseRemoteXMLAlwaysReturnsTheTransfer()
+    {
+        $this->expectOutputString('');
+
+        $idpInfo = IdPMetadataParser::parseRemoteXML(
+            $this->metadataFileUrl(),
+            curlOptions: array(CURLOPT_PROTOCOLS => CURLPROTO_FILE, CURLOPT_RETURNTRANSFER => false)
+        );
+        $this->assertEquals('https://app.onelogin.com/saml/metadata/383123', $idpInfo['idp']['entityId']);
+    }
+
+    /**
+     * Tests the parseRemoteXML method of IdPMetadataParser.
+     * Case: the timeout of the request can be set with the curl options
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     */
+    public function testParseRemoteXMLTimeoutCurlOption()
+    {
+        // A server that accepts the connection (it stays on its backlog) but never answers
+        $server = @stream_socket_server('tcp://127.0.0.1:0');
+        if ($server === false) {
+            $this->markTestSkipped('Can not listen on a local port');
+        }
+        $url = 'http://' . stream_socket_get_name($server, false) . '/metadata';
+
+        $error = null;
+        $start = microtime(true);
+        try {
+            IdPMetadataParser::parseRemoteXML($url, curlOptions: array(CURLOPT_TIMEOUT => 1));
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        } finally {
+            $elapsed = microtime(true) - $start;
+            fclose($server);
+        }
+
+        $this->assertNotNull($error, 'The request did not fail');
+        $this->assertStringStartsWith('Error on parseRemoteXML. ', $error);
+        $this->assertMatchesRegularExpression('/timed out|timeout/i', $error);
+        // The default timeout is 120 seconds
+        $this->assertLessThan(10, $elapsed);
+    }
+
+    /**
+     * Tests the parseRemoteXML method of IdPMetadataParser.
+     * Case: curl options that are not valid raise an Exception (not a PHP Error) and
+     *       no request is done
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     *
+     * @dataProvider invalidCurlOptions
+     */
+    public function testParseRemoteXMLInvalidCurlOptions($curlOptions)
+    {
+        // The file exists: with valid options the metadata would be returned
+        $url = $this->metadataFileUrl();
+        $curlOptions[CURLOPT_PROTOCOLS] = CURLPROTO_FILE;
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Error on parseRemoteXML. Invalid curl options');
+
+        IdPMetadataParser::parseRemoteXML($url, curlOptions: $curlOptions);
+    }
+
+    public static function invalidCurlOptions()
+    {
+        return array(
+            'option that does not exist' => array(array(999999 => 1)),
+            'value of the wrong type' => array(array(CURLOPT_HTTPHEADER => 'Accept: application/samlmetadata+xml')),
+            'value that curl rejects' => array(array(CURLOPT_TIMEOUT => -1)),
+        );
     }
 }

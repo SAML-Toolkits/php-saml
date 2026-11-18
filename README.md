@@ -1508,6 +1508,22 @@ Auxiliary class that contains several methods to retrieve and process IdP metada
 The class does not validate in any way the URL that is introduced on methods like parseRemoteXML in order to retrieve the remove XML. Usually is the same administrator that handles the Service Provider the ones that set the URL that should belong to a trusted third-party IdP.
 But there are other scenarios, like a SAAS app where the administrator of the app delegates on other administrators. In such case, extra protection should be taken in order to validate such URL inputs and avoid attacks like SSRF.
 
+`parseRemoteXML` retrieves the metadata with curl: only http and https URLs, up to 5 redirections, 10 seconds to connect and 120 seconds for the whole request. Its last parameter, `$curlOptions`, is an array of extra curl options that are applied after those, so they override them:
+
+```php
+$idpInfo = IdPMetadataParser::parseRemoteXML(
+    'https://idp.example.com/metadata',
+    validatePeer: true,
+    curlOptions: array(
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 120,
+        CURLOPT_PROXY => 'http://proxy.example.com:3128',
+    )
+);
+```
+
+An Exception is raised if one of the options is not valid. Take into account that these options can also remove the protections that the method sets (for example the allowed protocols at `CURLOPT_PROTOCOLS`), so never build them from untrusted input.
+
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where
 HTML documentation about the classes and methods is provided for SAML and

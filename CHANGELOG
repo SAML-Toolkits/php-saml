@@ -20,6 +20,7 @@ v4.5.0
 * Refactor Signature validation on Signed Responses with Encrypted Assertion
 * Add validateSignatureStructure check into Utils and use at ValidateSignature
 * Add validation for Assertion Version
+* [#658](https://github.com/SAML-Toolkits/php-saml/pull/658) `IdPMetadataParser::parseRemoteXML` accepts extra curl options in a new optional `$curlOptions` parameter. They are applied last, so they override the ones that the method sets (except `CURLOPT_RETURNTRANSFER`); options that are not valid raise an Exception. The request now has default timeouts: 10 seconds to connect and 120 seconds in total (it had none), use `$curlOptions` to change them
 
 v4.4.1
 * 4.4.0 was released with wrong target (master branch, so removing it)
