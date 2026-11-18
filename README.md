@@ -8,6 +8,9 @@ Add SAML support to your PHP 7.X software using this library.
 Warning
 -------
 
+Version 3.10.0 includes several security improvements.
+Update to this version if you keep using the 3.x branch.
+
 Version 3.9.0 try to mitigate the xmlseclibs advisories published in August 2026 (GHSA-7mf5-fjj8-mvjc, GHSA-39hg-wfcm-v4wv, GHSA-7h47-29x2-r2gc, GHSA-m5mw-mr39-66vp, GHSA-w5f2-cpgp-pg76, GHSA-7hf8-fh6v-wmm6, GHSA-9wcx-p7hr-f935) while keeping xmlseclibs 3.x, as xmlseclibs 4.x requires PHP 8
 
 Version 3.8.2 updates xmlseclibs to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
