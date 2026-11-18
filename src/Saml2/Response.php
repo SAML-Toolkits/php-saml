@@ -244,6 +244,13 @@ class Response
                     ValidationError::WRONG_NUMBER_OF_ASSERTIONS
                 );
             }
+            // Check SAML version on Assertion
+            if (!$this->checkAssertionSamlVersion()) {
+                throw new ValidationError(
+                    "Unsupported SAML version on the Assertion",
+                    ValidationError::UNSUPPORTED_SAML_VERSION
+                );
+            }
 
             $idpData = $this->_settings->getIdPData();
             $idPEntityId = $idpData['entityId'];
@@ -593,6 +600,26 @@ class Response
                 ValidationError::STATUS_CODE_IS_NOT_SUCCESS
             );
         }
+    }
+
+    /**
+     * Checks that the Assertion element has Version="2.0".
+     *
+     * The Assertion is looked up as validateNumAssertions() does, without using the
+     * Reference of the Signature: a Response where the signed Assertion can not be
+     * located is not a version problem, the validations that come later reject it.
+     *
+     * @return boolean false if an Assertion has a Version that is not "2.0"
+     */
+    public function checkAssertionSamlVersion()
+    {
+        $document = $this->encrypted ? $this->decryptedDocument : $this->document;
+        foreach ($document->getElementsByTagName('Assertion') as $assertionNode) {
+            if ($assertionNode->getAttribute('Version') !== '2.0') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

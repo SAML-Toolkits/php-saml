@@ -933,6 +933,23 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the isValid and checkAssertionSamlVersion methods of the
+     * Response
+     *
+     * Test that an assertion with Version != "2.0" is rejected
+     *
+     * @covers OneLogin\Saml2\Response::isValid
+     * @covers OneLogin\Saml2\Response::checkAssertionSamlVersion
+     */
+    public function testAssertionVersionMustBe20()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/v11_assertion.xml.base64');
+        $response = new Response($this->_settings, $xml);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('Unsupported SAML version on the Assertion', $response->getError());
+    }
+
+    /**
      * Tests the getNameId and getAttributes methods of the
      * Response
      *

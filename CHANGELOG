@@ -19,6 +19,7 @@ v4.5.0
 * Load XML documents with LIBXML_NONET
 * Refactor Signature validation on Signed Responses with Encrypted Assertion
 * Add validateSignatureStructure check into Utils and use at ValidateSignature
+* Add validation for Assertion Version
 
 v4.4.1
 * 4.4.0 was released with wrong target (master branch, so removing it)
