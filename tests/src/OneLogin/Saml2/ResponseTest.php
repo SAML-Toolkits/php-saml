@@ -813,6 +813,82 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertNull($response2->getError());
     }
 
+  /**
+    * Tests the hasValidResponseSignature method of the OneLogin_Saml2_Response
+    *
+    * @covers OneLogin_Saml2_Response::hasValidResponseSignature
+    */
+    public function testHasValidResponseSignature()
+    {
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+            $nonStrictsettings = new OneLogin_Saml2_Settings($settingsInfo);
+            $settingsInfo['strict'] = true;
+            $strictsettings = new OneLogin_Saml2_Settings($settingsInfo);
+
+            $validSignedResponseEncryptedAssertionList = array(
+                'signed_message_encrypted_assertion.xml.base64',
+                'double_signed_encrypted_assertion.xml.base64',
+            );
+            $validSignedResponseList = array(
+                'signed_message_response.xml.base64',
+                'double_signed_response.xml.base64',
+                'valid_response.xml.base64'
+            );
+
+            foreach ($validSignedResponseList as $validSignedResponse) {
+                $xml = file_get_contents(TEST_ROOT . '/data/responses/' . $validSignedResponse);
+                $response = new OneLogin_Saml2_Response($nonStrictsettings, $xml);
+                // With strict mode disabled, the signature of the response is not validated in the constructor
+                $this->assertFalse($response->hasValidResponseSignature());
+                $this->assertTrue($response->isValid());
+                $this->assertTrue($response->hasValidResponseSignature());
+
+                $response = new OneLogin_Saml2_Response($strictsettings, $xml);
+                // With strict mode enabled, the signature of the response is not validated, if not encrypted
+                $this->assertFalse($response->hasValidResponseSignature());
+                $response->isValid();
+                $this->assertFalse($response->hasValidResponseSignature());
+            }
+
+            foreach ($validSignedResponseEncryptedAssertionList as $validSignedResponseEncryptedAssertion) {
+                $xml = file_get_contents(TEST_ROOT . '/data/responses/' . $validSignedResponseEncryptedAssertion);
+                $response = new OneLogin_Saml2_Response($nonStrictsettings, $xml);
+                // With strict mode disabled, the signature of the response is not validated in the constructor
+                $this->assertFalse($response->hasValidResponseSignature());
+                $this->assertTrue($response->isValid());
+                $this->assertTrue($response->hasValidResponseSignature());
+
+                $response = new OneLogin_Saml2_Response($strictsettings, $xml);
+                // With strict mode enabled, the signature of the response is not validated, if not encrypted
+                $this->assertTrue($response->hasValidResponseSignature());
+                $response->isValid();
+                $this->assertTrue($response->hasValidResponseSignature());
+            }
+
+            $xml = file_get_contents(TEST_ROOT . '/data/responses/signed_assertion_response.xml.base64');
+            $response = new OneLogin_Saml2_Response($strictsettings, $xml);
+            // With strict mode enabled but no signature on the response, no validation happens in the constructor
+            $this->assertFalse($response->hasValidResponseSignature());
+            $response->isValid();
+            // Signature of the Assertion valid, but no Signture on Response
+            $this->assertFalse($response->hasValidResponseSignature());
+
+            $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_signature.xml.base64');
+            $response = new OneLogin_Saml2_Response($nonStrictsettings, $xml);
+            // With strict mode disabled, the signature of the response is not validated in the constructor
+            $this->assertFalse($response->hasValidResponseSignature());
+            // No Signature, so both returns false
+            $this->assertFalse($response->isValid());
+            $this->assertFalse($response->hasValidResponseSignature());
+            $response = new OneLogin_Saml2_Response($strictsettings, $xml);
+            // With strict mode enabled, but no signature
+            $this->assertFalse($response->hasValidResponseSignature());
+            // No Signature, so both returns false
+            $this->assertFalse($response->isValid());
+            $this->assertFalse($response->hasValidResponseSignature());
+    }
+
     /**
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
