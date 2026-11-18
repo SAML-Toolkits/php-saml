@@ -933,6 +933,23 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the isValid and checkAssertionSamlVersion methods of the
+     * OneLogin_Saml2_Response
+     *
+     * Test that an assertion with Version != "2.0" is rejected
+     *
+     * @covers OneLogin_Saml2_Response::isValid
+     * @covers OneLogin_Saml2_Response::checkAssertionSamlVersion
+     */
+    public function testAssertionVersionMustBe20()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/invalids/v11_assertion.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $xml);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('Unsupported SAML version on the Assertion', $response->getError());
+    }
+
+    /**
      * Tests the getNameId and getAttributes methods of the
      * OneLogin_Saml2_Response
      *
