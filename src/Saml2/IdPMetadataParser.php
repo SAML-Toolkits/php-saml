@@ -37,10 +37,11 @@ class IdPMetadataParser
      * @param string $desiredSSOBinding   Parse specific binding SSO endpoint
      * @param string $desiredSLOBinding   Parse specific binding SLO endpoint
      * @param bool   $validatePeer        Enable or disable validate peer SSL certificate
+     * @param array  $curlOptions         Extra curl options, applied last (e.g. timeouts, CURLOPT_PROTOCOLS)
      *
      * @return array metadata info in php-saml settings format
      */
-    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT, $validatePeer = false)
+    public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = Constants::BINDING_HTTP_REDIRECT, $validatePeer = false, array $curlOptions = array()))
     {
         $metadataInfo = array();
 
@@ -54,6 +55,9 @@ class IdPMetadataParser
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $validatePeer);
             curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt_array($ch, $curlOptions);
 
             $xml = curl_exec($ch);
             if ($xml !== false) {
