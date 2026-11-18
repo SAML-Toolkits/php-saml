@@ -13,6 +13,7 @@ v3.10.0
 * When the protocol is a list of values separated by commas (the `X-Forwarded-Proto` header of a chain of proxies, `https,http`), the first value is used in `Utils::getSelfProtocol`, as `X-Forwarded-Host` already did
 * Add a test for `Utils::setBaseURL` ignoring a boolean `true` (it does not clear the base URL that was set)
 * Add validation for Assertion Version
+* [#658](https://github.com/SAML-Toolkits/php-saml/pull/658) `IdPMetadataParser::parseRemoteXML` accepts extra curl options in a new optional `$curlOptions` parameter. They are applied last, so they override the ones that the method sets (except `CURLOPT_RETURNTRANSFER`); options that are not valid raise an Exception. The request now has default timeouts: 10 seconds to connect and 120 seconds in total (it had none), use `$curlOptions` to change them
 
 v3.9.1
 * Move back phpunit to require-dev to avoid phpunit installation on production
