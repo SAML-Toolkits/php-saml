@@ -8,6 +8,9 @@ Add SAML support to your PHP software using this library.
 Warning
 -------
 
+Version 4.5.0 includes several security improvements.
+Update to this version if you keep using the 4.x branch.
+
 Version 4.4.0 updates xmlseclibs to 4.0.1 due several vulnerabilities discovered. xmlseclibs 4.X uses phpseclib.
 
 Version 4.3.2 updates xmlseclibs to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
