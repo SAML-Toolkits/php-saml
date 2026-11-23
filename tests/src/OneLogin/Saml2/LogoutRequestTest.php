@@ -1132,4 +1132,37 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
          // The action that triggers the exception
          $id1 = LogoutRequest::getID($xml.'<garbage>');
      }
+
+    /**
+     * Tests that the values written in the LogoutRequest are escaped, so the
+     * XML is well formed and has the values received (#674)
+     *
+     * @covers OneLogin\Saml2\LogoutRequest
+     */
+    public function testValuesAreEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $sloUrl = 'https://idp.example.com/slo?client=foo&id=bar';
+        $entityId = 'https://sp.example.com/metadata?client=foo&id=bar';
+        $nameId = 'user&<"name">@example.com';
+        // A SessionIndex is a value sent by the IdP: it must not be able to add elements
+        $sessionIndex = 'a&b</samlp:SessionIndex><samlp:SessionIndex>injected';
+
+        $settingsInfo['idp']['singleLogoutService']['url'] = $sloUrl;
+        $settingsInfo['sp']['entityId'] = $entityId;
+        $settings = new Settings($settingsInfo);
+
+        $logoutRequest = new LogoutRequest($settings, null, $nameId, $sessionIndex);
+        $xml = $logoutRequest->getXML();
+        $this->assertStringContainsString('Destination="https://idp.example.com/slo?client=foo&amp;id=bar"', $xml);
+
+        $dom = new \DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $this->assertEquals($sloUrl, $dom->documentElement->getAttribute('Destination'));
+        $this->assertEquals($entityId, LogoutRequest::getIssuer($dom));
+        $this->assertEquals($nameId, LogoutRequest::getNameId($dom));
+        $this->assertSame(array($sessionIndex), LogoutRequest::getSessionIndexes($dom));
+    }
 }

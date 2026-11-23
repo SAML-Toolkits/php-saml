@@ -3,8 +3,10 @@
 namespace OneLogin\Saml2\Tests;
 
 use OneLogin\Saml2\AuthnRequest;
+use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Utils;
+use DOMDocument;
 
 /**
  * Unit tests for AuthN Request
@@ -367,5 +369,85 @@ class AuthnRequestTest extends \PHPUnit\Framework\TestCase
 
         $xml = $authnRequest->getXML();
         $this->assertRegExp('#^<samlp:AuthnRequest#', $xml);
+    }
+
+    /**
+     * Tests that the values written in the AuthnRequest are escaped, so the
+     * XML is well formed and has the values of the settings (#674)
+     *
+     * @covers OneLogin\Saml2\AuthnRequest
+     */
+    public function testValuesAreEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $ssoUrl = 'https://idp.example.com/sso?client=foo&id=bar';
+        $acsUrl = 'https://sp.example.com/acs?client=foo&id=bar';
+        $entityId = 'https://sp.example.com/metadata?client=foo&id=bar';
+        $nameIdFormat = 'urn:example:nameid?a=1&b=2';
+        $displayname = 'A & B <"quoted"> \'name\'';
+        $contexts = array('https://example.com/context?a=1&b=2', 'urn:example:<context>');
+        $nameIdValueReq = 'user&<"name">@example.com';
+
+        $settingsInfo['idp']['singleSignOnService']['url'] = $ssoUrl;
+        $settingsInfo['sp']['assertionConsumerService']['url'] = $acsUrl;
+        $settingsInfo['sp']['entityId'] = $entityId;
+        $settingsInfo['sp']['NameIDFormat'] = $nameIdFormat;
+        $settingsInfo['organization'] = array(
+            'en-US' => array(
+                'name' => 'sp_test',
+                'displayname' => $displayname,
+                'url' => 'http://sp.example.com'
+            )
+        );
+        $settingsInfo['security']['requestedAuthnContext'] = $contexts;
+        $settings = new Settings($settingsInfo);
+
+        $authnRequest = new AuthnRequest($settings, false, false, true, $nameIdValueReq);
+        $xml = $authnRequest->getXML();
+        $this->assertStringContainsString('Destination="https://idp.example.com/sso?client=foo&amp;id=bar"', $xml);
+
+        $dom = new DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $root = $dom->documentElement;
+        $this->assertEquals($ssoUrl, $root->getAttribute('Destination'));
+        $this->assertEquals($acsUrl, $root->getAttribute('AssertionConsumerServiceURL'));
+        $this->assertEquals($displayname, $root->getAttribute('ProviderName'));
+        $this->assertEquals($entityId, Utils::query($dom, '/samlp:AuthnRequest/saml:Issuer')->item(0)->textContent);
+        $this->assertEquals($nameIdFormat, Utils::query($dom, '/samlp:AuthnRequest/samlp:NameIDPolicy')->item(0)->getAttribute('Format'));
+
+        $nameId = Utils::query($dom, '/samlp:AuthnRequest/saml:Subject/saml:NameID')->item(0);
+        $this->assertEquals($nameIdValueReq, $nameId->textContent);
+        $this->assertEquals($nameIdFormat, $nameId->getAttribute('Format'));
+
+        $contextNodes = Utils::query($dom, '/samlp:AuthnRequest/samlp:RequestedAuthnContext/saml:AuthnContextClassRef');
+        $this->assertEquals(2, $contextNodes->length);
+        $this->assertEquals($contexts[0], $contextNodes->item(0)->textContent);
+        $this->assertEquals($contexts[1], $contextNodes->item(1)->textContent);
+    }
+
+    /**
+     * Tests that the URL of the redirection is the one of the settings, only
+     * the Destination of the AuthnRequest is escaped (#674)
+     *
+     * @covers OneLogin\Saml2\Auth::login
+     * @covers OneLogin\Saml2\AuthnRequest
+     */
+    public function testRedirectURLIsNotEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $ssoUrl = 'https://idp.example.com/sso?client=foo&id=bar';
+        $settingsInfo['idp']['singleSignOnService']['url'] = $ssoUrl;
+
+        $auth = new Auth($settingsInfo);
+        $targetUrl = $auth->login(null, array(), false, false, true);
+        $this->assertStringStartsWith($ssoUrl . '&SAMLRequest=', $targetUrl);
+
+        $dom = new DOMDocument();
+        $this->assertTrue($dom->loadXML($auth->getLastRequestXML()));
+        $this->assertEquals($ssoUrl, $dom->documentElement->getAttribute('Destination'));
     }
 }
