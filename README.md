@@ -517,12 +517,19 @@ $advancedSettings = array(
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
 
-        // If true, SAMLResponses with an empty value at its Destination
+        // The 3 settings that follow apply to every message received:
+        // SAMLResponse, LogoutRequest and LogoutResponse.
+
+        // If true, messages without a Destination attribute
+        // will be rejected.
+        'requireDestination' => false,
+
+        // If true, messages with an empty value at its Destination
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
 
         // If true, Destination URL should strictly match to the address to
-        // which the response has been sent.
+        // which the message has been sent.
         // Notice that if 'relaxDestinationValidation' is true an empty Destination
         // will be accepted.
         'destinationStrictlyMatches' => false,

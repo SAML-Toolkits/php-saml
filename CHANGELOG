@@ -2,6 +2,9 @@ CHANGELOG
 =========
 
 v3.11.0
+* Fix [#657](https://github.com/SAML-Toolkits/php-saml/issues/657) The Destination check of `Response`, `LogoutRequest` and `LogoutResponse` is done by the new `Utils::checkDestination`, so the 3 messages are validated in the same way:
+  * `security.requireDestination` now also applies to `LogoutRequest` and `LogoutResponse`: when true, a logout message with no Destination attribute is rejected with `ValidationError::MISSING_DESTINATION`
+  * The Destination of a `LogoutRequest` and a `LogoutResponse` is trimmed before it is compared, as the one of the `Response` already was. A Destination that only has whitespaces is now reported as `ValidationError::EMPTY_DESTINATION` instead of `WRONG_DESTINATION`, and `security.relaxDestinationValidation` accepts it
 * Add `IdPMetadataParser::getLastFetchedXMLFromUrl`, which returns the XML that the last call to `IdPMetadataParser::parseRemoteXML` retrieved from the URL (null if the request failed)
 * Several decryption error handling improvements:
   * An encryption algorithm rejected by the `security.allowCBCEncryption` or `security.allowRSA15KeyTransport` settings is reported with the new `ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED` code, and the name of the setting that allows the algorithm is appended to the message. Before, it was reported with `ValidationError::KEY_ALGORITHM_ERROR`, which is still the code of an algorithm that is not supported

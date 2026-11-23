@@ -1146,6 +1146,204 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Builds a SAML message with only the root element.
+     *
+     * @param string      $name        The name of the root element
+     * @param string|null $destination The Destination, null for no attribute
+     *
+     * @return DOMDocument
+     */
+    private function buildMessageWithDestination($name, $destination)
+    {
+        $attribute = isset($destination) ? ' Destination="' . $destination . '"' : '';
+        $dom = new DOMDocument();
+        $dom->loadXML('<samlp:' . $name . ' xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_1" Version="2.0"' . $attribute . '/>');
+
+        return $dom;
+    }
+
+    /**
+     * Calls checkDestination and returns the ValidationError thrown, if any.
+     *
+     * @return ValidationError|null
+     */
+    private function getDestinationError(DOMDocument $dom, array $security, $currentURL, $type)
+    {
+        try {
+            Utils::checkDestination($dom, $security, $currentURL, $type);
+        } catch (ValidationError $e) {
+            return $e;
+        }
+
+        return null;
+    }
+
+    /**
+     * The names of the messages whose Destination is checked.
+     *
+     * @return array
+     */
+    public function destinationMessageProvider()
+    {
+        return array(
+            'Response' => array('Response', 'response'),
+            'LogoutRequest' => array('LogoutRequest', 'LogoutRequest'),
+            'LogoutResponse' => array('LogoutResponse', 'LogoutResponse'),
+        );
+    }
+
+    /**
+     * Tests the checkDestination method of the Utils
+     * Case no Destination attribute
+     *
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     *
+     * @dataProvider destinationMessageProvider
+     */
+    public function testCheckDestinationMissing($name, $type)
+    {
+        $currentURL = Utils::getSelfRoutedURLNoQuery();
+        $dom = $this->buildMessageWithDestination($name, null);
+        $security = array(
+            'requireDestination' => false,
+            'relaxDestinationValidation' => false,
+            'destinationStrictlyMatches' => false,
+        );
+
+        $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+
+        // The other settings do not make the attribute mandatory
+        $security['destinationStrictlyMatches'] = true;
+        $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+
+        // Settings that are not defined are handled as false
+        $this->assertNull($this->getDestinationError($dom, array(), $currentURL, $type));
+
+        $security['requireDestination'] = true;
+        $error = $this->getDestinationError($dom, $security, $currentURL, $type);
+        $this->assertInstanceOf(ValidationError::class, $error);
+        $this->assertEquals("The $type has no Destination value", $error->getMessage());
+        $this->assertEquals(ValidationError::MISSING_DESTINATION, $error->getCode());
+
+        // relaxDestinationValidation is about empty values, not about a missing attribute
+        $security['relaxDestinationValidation'] = true;
+        $error = $this->getDestinationError($dom, $security, $currentURL, $type);
+        $this->assertInstanceOf(ValidationError::class, $error);
+        $this->assertEquals(ValidationError::MISSING_DESTINATION, $error->getCode());
+    }
+
+    /**
+     * Tests the checkDestination method of the Utils
+     * Case empty Destination attribute
+     *
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     *
+     * @dataProvider destinationMessageProvider
+     */
+    public function testCheckDestinationEmpty($name, $type)
+    {
+        $currentURL = Utils::getSelfRoutedURLNoQuery();
+        $security = array(
+            'requireDestination' => true,
+            'relaxDestinationValidation' => false,
+            'destinationStrictlyMatches' => true,
+        );
+
+        foreach (array('', ' ', "\n\t ") as $emptyValue) {
+            $dom = $this->buildMessageWithDestination($name, $emptyValue);
+
+            $security['relaxDestinationValidation'] = false;
+            $error = $this->getDestinationError($dom, $security, $currentURL, $type);
+            $this->assertInstanceOf(ValidationError::class, $error);
+            $this->assertEquals("The $type has an empty Destination value", $error->getMessage());
+            $this->assertEquals(ValidationError::EMPTY_DESTINATION, $error->getCode());
+
+            $security['relaxDestinationValidation'] = true;
+            $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+        }
+    }
+
+    /**
+     * Tests the checkDestination method of the Utils
+     * Case Destination compared with the current URL
+     *
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     *
+     * @dataProvider destinationMessageProvider
+     */
+    public function testCheckDestinationMatch($name, $type)
+    {
+        $currentURL = 'http://sp.example.com/saml/endpoint';
+        $security = array(
+            'requireDestination' => true,
+            'relaxDestinationValidation' => false,
+            'destinationStrictlyMatches' => false,
+        );
+
+        // Same URL, also with whitespaces around
+        foreach (array($currentURL, '  ' . $currentURL . "\n") as $destination) {
+            $dom = $this->buildMessageWithDestination($name, $destination);
+            $security['destinationStrictlyMatches'] = false;
+            $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+            $security['destinationStrictlyMatches'] = true;
+            $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+        }
+
+        // The Destination starts with the current URL: valid unless a strict match is required
+        $dom = $this->buildMessageWithDestination($name, $currentURL . '/extra');
+        $security['destinationStrictlyMatches'] = false;
+        $this->assertNull($this->getDestinationError($dom, $security, $currentURL, $type));
+        $security['destinationStrictlyMatches'] = true;
+        $error = $this->getDestinationError($dom, $security, $currentURL, $type);
+        $this->assertInstanceOf(ValidationError::class, $error);
+        $this->assertEquals("The $type was received at $currentURL instead of $currentURL/extra", $error->getMessage());
+        $this->assertEquals(ValidationError::WRONG_DESTINATION, $error->getCode());
+
+        // Another URL
+        $dom = $this->buildMessageWithDestination($name, 'http://other-sp.example.com/saml/endpoint');
+        foreach (array(false, true) as $strictlyMatches) {
+            $security['destinationStrictlyMatches'] = $strictlyMatches;
+            // relaxDestinationValidation does not relax a wrong Destination
+            foreach (array(false, true) as $relax) {
+                $security['relaxDestinationValidation'] = $relax;
+                $error = $this->getDestinationError($dom, $security, $currentURL, $type);
+                $this->assertInstanceOf(ValidationError::class, $error);
+                $this->assertEquals("The $type was received at $currentURL instead of http://other-sp.example.com/saml/endpoint", $error->getMessage());
+                $this->assertEquals(ValidationError::WRONG_DESTINATION, $error->getCode());
+            }
+        }
+    }
+
+    /**
+     * Tests the checkDestination method of the Utils
+     * Case the Destination does not match the routed URL but matches the
+     * URL of the request (baseurl with a routed path)
+     *
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     */
+    public function testCheckDestinationNoRoutedURL()
+    {
+        $noRoutedURL = Utils::getSelfURLNoQuery();
+        $routedURL = 'http://routed.example.com/other/path';
+        $security = array(
+            'requireDestination' => true,
+            'relaxDestinationValidation' => false,
+            'destinationStrictlyMatches' => true,
+        );
+
+        $dom = $this->buildMessageWithDestination('LogoutRequest', $noRoutedURL);
+        $this->assertNull($this->getDestinationError($dom, $security, $routedURL, 'LogoutRequest'));
+
+        $dom = $this->buildMessageWithDestination('LogoutRequest', $noRoutedURL . '/extra');
+        $error = $this->getDestinationError($dom, $security, $routedURL, 'LogoutRequest');
+        $this->assertInstanceOf(ValidationError::class, $error);
+        $this->assertEquals(ValidationError::WRONG_DESTINATION, $error->getCode());
+
+        $security['destinationStrictlyMatches'] = false;
+        $this->assertNull($this->getDestinationError($dom, $security, $routedURL, 'LogoutRequest'));
+    }
+
+    /**
      * Gets the status of a message
      *
      * @covers OneLogin\Saml2\Utils::getStatus
