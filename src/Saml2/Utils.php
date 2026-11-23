@@ -216,6 +216,14 @@ class Utils
     /**
      * Returns a x509 cert (adding header & footer if required).
      *
+     * The cert can be provided with or without the header and the footer, in
+     * one or several lines. Anything that is not the cert is ignored:
+     *  - Text before the header or after the footer, like comments.
+     *  - A header or a footer that is repeated.
+     *  - A footer that is damaged (a truncated one, with fewer dashes...) or
+     *    missing.
+     * If there are several certs, the first one is returned.
+     *
      * @param string $x509cert  A x509 unformatted cert
      * @param bool   $heads     True if we want to include head and footer
      *
@@ -227,11 +235,29 @@ class Utils
             return;
         }
 
-        if (strpos($x509cert, '-----BEGIN CERTIFICATE-----') !== false) {
-            $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
+        $header = '-----BEGIN CERTIFICATE-----';
+        $footer = '-----END CERTIFICATE-----';
+
+        // What is before the header and after the footer is not the cert.
+        // A cert with a header and no footer is accepted: the rest is the cert
+        $headerPos = strpos($x509cert, $header);
+        if ($headerPos !== false) {
+            $x509cert = substr($x509cert, $headerPos + strlen($header));
+            $footerPos = strpos($x509cert, $footer);
+            if ($footerPos !== false) {
+                $x509cert = substr($x509cert, 0, $footerPos);
+            }
         }
 
+        // Headers and footers that are still there: they were repeated, or
+        // there was a footer and no header
+        $x509cert = str_replace([$header, $footer], '', $x509cert);
+
         $x509cert = str_replace(["\x0d", "\r", "\n", "\t", " "], '', $x509cert);
+
+        // A dash is not a base64 character: after the cert, it is what is
+        // left of a damaged footer
+        $x509cert = preg_replace('#^([A-Za-z0-9+/=]+)-.*$#s', '$1', $x509cert);
 
         if ($heads && $x509cert !== '') {
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
@@ -301,8 +327,12 @@ class Utils
         }
 
         $ini += strlen($start);
-        $len = strpos($str, $end, $ini) - $ini;
-        return substr($str, $ini, $len);
+        $endPos = strpos($str, $end, $ini);
+        if ($endPos === false) {
+            return '';
+        }
+
+        return substr($str, $ini, $endPos - $ini);
     }
 
     /**

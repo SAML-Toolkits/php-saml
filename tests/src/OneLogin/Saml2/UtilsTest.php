@@ -202,6 +202,232 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * The cert of tests/certs/with.comment.crt in base64, in one line.
+     *
+     * @return string
+     */
+    private static function getCertBody()
+    {
+        $cert = file_get_contents(TEST_ROOT . '/certs/with.comment.crt');
+        $lines = array();
+        foreach (explode("\n", $cert) as $line) {
+            if ($line !== '' && $line[0] !== '#' && $line[0] !== '-') {
+                $lines[] = $line;
+            }
+        }
+
+        return implode('', $lines);
+    }
+
+    /**
+     * Ways of writing a cert that formatCert accepts: all of them are the
+     * cert of tests/certs/with.comment.crt.
+     *
+     * @return array
+     */
+    public function certFormatProvider()
+    {
+        $header = '-----BEGIN CERTIFICATE-----';
+        $footer = '-----END CERTIFICATE-----';
+        $body = self::getCertBody();
+        $lines = implode("\n", str_split($body, 64));
+        $pem = "$header\n$lines\n$footer\n";
+        $otherCert = file_get_contents(TEST_ROOT . '/certs/certificate1');
+        $privateKey = file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.key');
+
+        return array(
+            // Well formed
+            'PEM' => array($pem),
+            'PEM without the last line break' => array("$header\n$lines\n$footer"),
+            'base64 in one line' => array($body),
+            'base64 in several lines' => array($lines . "\n"),
+            'base64 in lines of 76 characters' => array(implode("\n", str_split($body, 76))),
+            'PEM with CRLF line breaks' => array(str_replace("\n", "\r\n", $pem)),
+            'PEM with CR line breaks' => array(str_replace("\n", "\r", $pem)),
+            'PEM in one line, with spaces' => array("$header $body $footer"),
+            'PEM in one line, without spaces' => array($header . $body . $footer),
+            'PEM with indented lines' => array("    $header\n    " . str_replace("\n", "\n    ", $lines) . "\n    $footer\n"),
+            'PEM with tabs' => array("$header\n\t" . str_replace("\n", "\n\t", $lines) . "\n$footer\n"),
+            'PEM with empty lines' => array("\n\n$header\n\n$lines\n\n$footer\n\n"),
+
+            // Text that is not the cert (#570)
+            'comment before the header' => array("# certificate comments should be ignored\n" . $pem),
+            'comment after the footer' => array($pem . "# trailing comment\n"),
+            'comments before and after' => array("# before\n" . $pem . "# after\n"),
+            'comment with base64 characters and dashes' => array("# IdP cert - valid until 2030 - ABCDEF==\n" . $pem . "# end - of - file\n"),
+            'bag attributes of openssl' => array("Bag Attributes\n    friendlyName: idp\nsubject=/CN=idp\nissuer=/CN=idp\n" . $pem),
+            'BOM before the header' => array("\xEF\xBB\xBF" . $pem),
+            'private key before the cert' => array($privateKey . "\n" . $pem),
+            'private key after the cert' => array($pem . $privateKey),
+
+            // Several certs: the first one
+            'the same cert twice' => array($pem . $pem),
+            'another cert after it' => array($pem . $otherCert),
+            'another cert after it, with comments' => array("# first\n" . $pem . "# second\n" . $otherCert),
+
+            // Repeated headers and footers (#589)
+            'header and footer twice' => array("$header\n$header\n$lines\n$footer\n$footer\n"),
+            'header and footer twice, in one line' => array($header . $header . $body . $footer . $footer),
+            'header twice' => array("$header\n$header\n$lines\n$footer\n"),
+            'footer twice' => array("$header\n$lines\n$footer\n$footer\n"),
+            'header 3 times' => array("$header\n$header\n$header\n$lines\n$footer\n"),
+            'header twice with a comment before' => array("# comment\n$header\n$header\n$lines\n$footer\n$footer\n"),
+            'header used as footer' => array("$header\n$lines\n$header\n"),
+
+            // Damaged or missing header or footer (#589)
+            'no footer' => array("$header\n$lines\n"),
+            'no footer, in one line' => array($header . $body),
+            'no footer, with a comment before' => array("# comment\n$header\n$lines\n"),
+            'no header' => array("$lines\n$footer\n"),
+            'no header, in one line' => array($body . $footer),
+            'footer used as header' => array("$footer\n$lines\n$footer\n"),
+            'footer with 4 dashes at the end' => array("$header\n$lines\n-----END CERTIFICATE----\n"),
+            'footer with 4 dashes at the start' => array("$header\n$lines\n----END CERTIFICATE-----\n"),
+            'footer with 1 dash' => array("$header\n$lines\n-END CERTIFICATE-\n"),
+            'footer truncated' => array("$header\n$lines\n-----END CERTIF"),
+            'footer truncated to the dashes' => array("$header\n$lines\n-----"),
+            'footer with another text' => array("$header\n$lines\n-----END CERT-----\n"),
+            'footer in lowercase' => array("$header\n$lines\n-----end certificate-----\n"),
+            'footer with a space before the dashes' => array("$header\n$lines\n-----END CERTIFICATE -----\n"),
+            'footer with 2 spaces' => array("$header\n$lines\n-----END  CERTIFICATE-----\n"),
+            'damaged footer and a comment after it' => array("$header\n$lines\n-----END CERTIFICATE----\n# comment\n"),
+            'damaged footer and no header' => array("$lines\n-----END CERTIFICATE----\n"),
+            'damaged footer and header twice' => array("$header\n$header\n$lines\n-----END CERTIFICATE----\n"),
+        );
+    }
+
+    /**
+     * Tests the formatCert method of the Utils
+     * Case the cert is written in a way that is accepted: with comments
+     * (#570), with repeated or damaged headers and footers (#589)...
+     *
+     * @covers OneLogin\Saml2\Utils::formatCert
+     *
+     * @dataProvider certFormatProvider
+     */
+    public function testFormatCertAcceptedFormats($cert)
+    {
+        $body = self::getCertBody();
+        $expected = "-----BEGIN CERTIFICATE-----\n" . chunk_split($body, 64, "\n") . "-----END CERTIFICATE-----\n";
+
+        $this->assertSame($expected, Utils::formatCert($cert));
+        $this->assertSame($expected, Utils::formatCert($cert, true));
+        $this->assertSame($body, Utils::formatCert($cert, false));
+
+        // The cert can be formatted again
+        $this->assertSame($expected, Utils::formatCert(Utils::formatCert($cert)));
+        $this->assertSame($expected, Utils::formatCert(Utils::formatCert($cert, false)));
+        $this->assertSame($body, Utils::formatCert(Utils::formatCert($cert), false));
+
+        // And it is a cert that can be used
+        $this->assertNotFalse(openssl_x509_read(Utils::formatCert($cert)));
+        $this->assertSame(
+            Utils::calculateX509Fingerprint($expected, 'sha256'),
+            Utils::calculateX509Fingerprint(Utils::formatCert($cert), 'sha256')
+        );
+    }
+
+    /**
+     * Tests the formatCert method of the Utils
+     * Case the cert is read from the settings
+     *
+     * @covers OneLogin\Saml2\Utils::formatCert
+     * @covers OneLogin\Saml2\Settings::formatIdPCert
+     * @covers OneLogin\Saml2\Settings::formatIdPCertMulti
+     *
+     * @dataProvider certFormatProvider
+     */
+    public function testFormatCertInSettings($cert)
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $body = self::getCertBody();
+        $expected = "-----BEGIN CERTIFICATE-----\n" . chunk_split($body, 64, "\n") . "-----END CERTIFICATE-----\n";
+
+        $settingsInfo['idp']['x509cert'] = $cert;
+        $settingsInfo['idp']['x509certMulti'] = array(
+            'signing' => array($cert),
+            'encryption' => array($cert),
+        );
+        $settings = new Settings($settingsInfo);
+        $idpData = $settings->getIdPData();
+
+        $this->assertSame($expected, $idpData['x509cert']);
+        $this->assertSame($expected, $idpData['x509certMulti']['signing'][0]);
+        $this->assertSame($expected, $idpData['x509certMulti']['encryption'][0]);
+    }
+
+    /**
+     * Tests the formatCert method of the Utils
+     * Case there is no cert
+     *
+     * @covers OneLogin\Saml2\Utils::formatCert
+     */
+    public function testFormatCertEmpty()
+    {
+        $header = '-----BEGIN CERTIFICATE-----';
+        $footer = '-----END CERTIFICATE-----';
+
+        $this->assertNull(Utils::formatCert(null));
+
+        $emptyCerts = array(
+            '',
+            "  \n\t\r\n",
+            $header,
+            $footer,
+            "$header\n$footer\n",
+            "$header\n$header\n$footer\n$footer\n",
+            "# comment\n$header\n\n$footer\n# comment\n",
+        );
+        foreach ($emptyCerts as $emptyCert) {
+            $this->assertSame('', Utils::formatCert($emptyCert));
+            $this->assertSame('', Utils::formatCert($emptyCert, false));
+        }
+    }
+
+    /**
+     * Tests the formatCert method of the Utils
+     * Case several certs: the first one is the one returned
+     *
+     * @covers OneLogin\Saml2\Utils::formatCert
+     */
+    public function testFormatCertSeveralCerts()
+    {
+        $first = file_get_contents(TEST_ROOT . '/certs/certificate1');
+        $second = file_get_contents(TEST_ROOT . '/certs/with.comment.crt');
+
+        $formattedFirst = Utils::formatCert($first);
+        $this->assertNotFalse(openssl_x509_read($formattedFirst));
+        $this->assertNotEquals($formattedFirst, Utils::formatCert($second));
+
+        $this->assertSame($formattedFirst, Utils::formatCert($first . $second));
+        $this->assertSame($formattedFirst, Utils::formatCert($first . "\n" . $second . $first));
+    }
+
+    /**
+     * Tests the getStringBetween method of the Utils
+     *
+     * @covers OneLogin\Saml2\Utils::getStringBetween
+     */
+    public function testGetStringBetween()
+    {
+        $this->assertSame('value', Utils::getStringBetween('<a>value</a>', '<a>', '</a>'));
+        $this->assertSame('value', Utils::getStringBetween('before<a>value</a>after', '<a>', '</a>'));
+        // The first start mark and the first end mark after it
+        $this->assertSame('1', Utils::getStringBetween('</a><a>1</a><a>2</a>', '<a>', '</a>'));
+        $this->assertSame('', Utils::getStringBetween('<a></a>', '<a>', '</a>'));
+
+        // Marks not found
+        $this->assertSame('', Utils::getStringBetween('value', '<a>', '</a>'));
+        $this->assertSame('', Utils::getStringBetween('value</a>', '<a>', '</a>'));
+        $this->assertSame('', Utils::getStringBetween('', '<a>', '</a>'));
+        // The end mark is missing: nothing is returned (it was the value without its last characters)
+        $this->assertSame('', Utils::getStringBetween('<a>value', '<a>', '</a>'));
+        $this->assertSame('', Utils::getStringBetween('</a><a>value', '<a>', '</a>'));
+    }
+
+    /**
      * Tests the formatPrivateKey method of the Utils
      *
      * @covers OneLogin\Saml2\Utils::formatPrivateKey

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+Unreleased
+
+* Fix [#589](https://github.com/SAML-Toolkits/php-saml/issues/589) `Utils::formatCert` accepts again the certs that it accepted before the support of comments ([#570](https://github.com/SAML-Toolkits/php-saml/pull/570)) and that failed since then with "supplied parameter cannot be coerced into an X509 certificate" / "Unable to extract public key":
+  * A cert with the header or the footer repeated (headers added to a cert that already had them)
+  * A cert with the header and no footer, or with a damaged footer (truncated, with a missing dash, with another text...). The last characters of such a cert were removed
+  The text before the header and after the footer (comments) is still ignored. What is left of a damaged footer is now removed from the cert returned, and if there are several certs the first one is returned
+* `Utils::getStringBetween` returns an empty string, as documented, if the end mark is not found. It returned the string without its last characters
+
 v4.6.0
 
 * Fix [#674](https://github.com/SAML-Toolkits/php-saml/issues/674) Escape the values written in the XML of the `AuthnRequest`, `LogoutRequest`, `LogoutResponse` and the SP metadata. A value with a `&`, like an IdP URL with several query parameters, produced an XML that was not well formed:
