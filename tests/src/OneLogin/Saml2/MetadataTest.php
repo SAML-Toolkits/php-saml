@@ -330,4 +330,87 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(2, substr_count($metadata2, '<md:KeyDescriptor use="encryption"'));
     }
+
+    /**
+     * Tests that the values written in the metadata are escaped, so the
+     * XML is well formed and has the values of the settings (#674)
+     *
+     * @covers OneLogin\Saml2\Metadata::builder
+     */
+    public function testBuilderValuesAreEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $url = 'https://sp.example.com/endpoint?client=foo&id=bar';
+        $text = 'A & B <"quoted"> \'text\'';
+
+        $settingsInfo['sp']['entityId'] = $url . '&e=1';
+        $settingsInfo['sp']['assertionConsumerService']['url'] = $url . '&acs=1';
+        $settingsInfo['sp']['singleLogoutService']['url'] = $url . '&sls=1';
+        $settingsInfo['sp']['NameIDFormat'] = 'urn:example:nameid?a=1&b=2';
+        $settingsInfo['sp']['attributeConsumingService'] = array(
+            'serviceName' => $text . ' service',
+            'serviceDescription' => $text . ' description',
+            'requestedAttributes' => array(
+                array(
+                    'name' => $url . '&attr=1',
+                    'nameFormat' => 'urn:example:format?a=1&b=2',
+                    'friendlyName' => $text . ' friendly',
+                    'isRequired' => true,
+                    'attributeValue' => array($text . ' value', $url . '&value=1'),
+                ),
+            ),
+        );
+        $settingsInfo['organization'] = array(
+            'en-US' => array(
+                'name' => $text . ' name',
+                'displayname' => $text . ' displayname',
+                'url' => $url . '&org=1',
+            ),
+        );
+        $settingsInfo['contactPerson'] = array(
+            'technical' => array(
+                'givenName' => $text . ' technical',
+                'emailAddress' => 'a&b@example.com',
+            ),
+            'support' => array(
+                'givenName' => 'support_name',
+                'emailAddress' => 'support@example.com',
+            ),
+        );
+
+        $settings = new Settings($settingsInfo);
+        $metadata = Metadata::builder($settings->getSPData(), false, false, null, null, $settings->getContacts(), $settings->getOrganization());
+
+        $dom = new \DOMDocument();
+        $this->assertTrue($dom->loadXML($metadata));
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('md', 'urn:oasis:names:tc:SAML:2.0:metadata');
+        $xpath->registerNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+        $value = function ($query) use ($xpath) {
+            return $xpath->evaluate('string(' . $query . ')');
+        };
+
+        $this->assertEquals($url . '&e=1', $value('/md:EntityDescriptor/@entityID'));
+        $this->assertEquals($url . '&acs=1', $value('//md:AssertionConsumerService/@Location'));
+        $this->assertEquals($url . '&sls=1', $value('//md:SingleLogoutService/@Location'));
+        $this->assertEquals('urn:example:nameid?a=1&b=2', $value('//md:NameIDFormat'));
+
+        $this->assertEquals($text . ' service', $value('//md:ServiceName'));
+        $this->assertEquals($text . ' description', $value('//md:ServiceDescription'));
+        $this->assertEquals($url . '&attr=1', $value('//md:RequestedAttribute/@Name'));
+        $this->assertEquals('urn:example:format?a=1&b=2', $value('//md:RequestedAttribute/@NameFormat'));
+        $this->assertEquals($text . ' friendly', $value('//md:RequestedAttribute/@FriendlyName'));
+        $this->assertEquals($text . ' value', $value('//md:RequestedAttribute/saml:AttributeValue[1]'));
+        $this->assertEquals($url . '&value=1', $value('//md:RequestedAttribute/saml:AttributeValue[2]'));
+
+        $this->assertEquals($text . ' name', $value('//md:OrganizationName'));
+        $this->assertEquals($text . ' displayname', $value('//md:OrganizationDisplayName'));
+        $this->assertEquals($url . '&org=1', $value('//md:OrganizationURL'));
+
+        $this->assertEquals($text . ' technical', $value('//md:ContactPerson[@contactType="technical"]/md:GivenName'));
+        $this->assertEquals('a&b@example.com', $value('//md:ContactPerson[@contactType="technical"]/md:EmailAddress'));
+        $this->assertEquals('support_name', $value('//md:ContactPerson[@contactType="support"]/md:GivenName'));
+    }
 }
