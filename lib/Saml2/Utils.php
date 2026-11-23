@@ -267,7 +267,7 @@ class OneLogin_Saml2_Utils
 
     public static function formatPrivateKey($key, $heads = true)
     {
-        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        $key = str_replace(array("\x0D", "\r", "\n", "\t"), "", $key);
         if (!empty($key)) {
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
                 $key = OneLogin_Saml2_Utils::getStringBetween($key, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
