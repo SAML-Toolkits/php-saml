@@ -60,10 +60,12 @@ class AuthnRequest
 
         $subjectStr = "";
         if (isset($nameIdValueReq)) {
+            $subjectNameIdFormat = htmlspecialchars($spData['NameIDFormat'], ENT_QUOTES);
+            $subjectNameIdValue = htmlspecialchars($nameIdValueReq, ENT_QUOTES);
             $subjectStr = <<<SUBJECT
 
      <saml:Subject>
-        <saml:NameID Format="{$spData['NameIDFormat']}">{$nameIdValueReq}</saml:NameID>
+        <saml:NameID Format="{$subjectNameIdFormat}">{$subjectNameIdValue}</saml:NameID>
         <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"></saml:SubjectConfirmation>
     </saml:Subject>
 SUBJECT;
@@ -75,6 +77,7 @@ SUBJECT;
             if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
                 $nameIDPolicyFormat = Constants::NAMEID_ENCRYPTED;
             }
+            $nameIDPolicyFormat = htmlspecialchars($nameIDPolicyFormat, ENT_QUOTES);
 
             $nameIdPolicyStr = <<<NAMEIDPOLICY
 
@@ -95,8 +98,9 @@ NAMEIDPOLICY;
                 $lang = $langs[0];
             }
             if (isset($organizationData[$lang]['displayname']) && !empty($organizationData[$lang]['displayname'])) {
+                $providerName = htmlspecialchars($organizationData[$lang]['displayname'], ENT_QUOTES);
                 $providerNameStr = <<<PROVIDERNAME
-    ProviderName="{$organizationData[$lang]['displayname']}"
+    ProviderName="{$providerName}"
 PROVIDERNAME;
             }
         }
@@ -126,7 +130,7 @@ ISPASSIVE;
 
             $authnComparisonAttr = '';
             if (!empty($authnComparison)) {
-                $authnComparisonAttr = sprintf('Comparison="%s"', $authnComparison);
+                $authnComparisonAttr = sprintf('Comparison="%s"', htmlspecialchars($authnComparison, ENT_QUOTES));
             }
 
             if ($security['requestedAuthnContext'] === true) {
@@ -139,7 +143,7 @@ REQUESTEDAUTHN;
             } else {
                 $requestedAuthnStr .= "    <samlp:RequestedAuthnContext $authnComparisonAttr>\n";
                 foreach ($security['requestedAuthnContext'] as $contextValue) {
-                    $requestedAuthnStr .= "        <saml:AuthnContextClassRef>".$contextValue."</saml:AuthnContextClassRef>\n";
+                    $requestedAuthnStr .= "        <saml:AuthnContextClassRef>".htmlspecialchars($contextValue, ENT_QUOTES)."</saml:AuthnContextClassRef>\n";
                 }
                 $requestedAuthnStr .= '    </samlp:RequestedAuthnContext>';
             }
@@ -147,7 +151,9 @@ REQUESTEDAUTHN;
 
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
         $acsUrl = htmlspecialchars($spData['assertionConsumerService']['url'], ENT_QUOTES);
-        $destination = $this->_settings->getIdPSSOUrl();
+        $acsBinding = htmlspecialchars($spData['assertionConsumerService']['binding'], ENT_QUOTES);
+        // Only the value written in the XML is escaped, the URL of the redirection is not
+        $destination = htmlspecialchars($this->_settings->getIdPSSOUrl(), ENT_QUOTES);
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -157,7 +163,7 @@ REQUESTEDAUTHN;
 {$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="{$issueInstant}"
     Destination="{$destination}"
-    ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
+    ProtocolBinding="{$acsBinding}"
     AssertionConsumerServiceURL="{$acsUrl}">
     <saml:Issuer>{$spEntityId}</saml:Issuer>{$subjectStr}{$nameIdPolicyStr}{$requestedAuthnStr}
 </samlp:AuthnRequest>

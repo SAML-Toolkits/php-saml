@@ -803,6 +803,114 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests the isValid method of the LogoutRequest
+     * Case missing Destination, with and without requireDestination
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     */
+    public function testIsInvalidMissingDestination()
+    {
+        $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+        $request = str_replace('Destination="http://stuff.com/endpoints/endpoints/sls.php"', '', $request, $count);
+        $this->assertSame(1, $count);
+        $encodedRequest = base64_encode(gzdeflate($request));
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        // By default a LogoutRequest with no Destination is accepted
+        $logoutRequest = new LogoutRequest(new Settings($settingsInfo), $encodedRequest);
+        $this->assertTrue($logoutRequest->isValid());
+
+        $settingsInfo['security']['requireDestination'] = true;
+        $logoutRequest2 = new LogoutRequest(new Settings($settingsInfo), $encodedRequest);
+        $this->assertFalse($logoutRequest2->isValid());
+        $this->assertEquals('The LogoutRequest has no Destination value', $logoutRequest2->getError());
+        $this->assertEquals(ValidationError::MISSING_DESTINATION, $logoutRequest2->getErrorException()->getCode());
+
+        // requireDestination is only checked in strict mode
+        $settingsInfo['strict'] = false;
+        $logoutRequest3 = new LogoutRequest(new Settings($settingsInfo), $encodedRequest);
+        $this->assertTrue($logoutRequest3->isValid());
+    }
+
+    /**
+     * Tests the isValid method of the LogoutRequest
+     * Case empty Destination, with and without relaxDestinationValidation
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     */
+    public function testIsInvalidEmptyDestination()
+    {
+        $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['requireDestination'] = true;
+
+        // A Destination with only whitespaces is an empty Destination too
+        foreach (array('', '   ') as $emptyValue) {
+            $emptyRequest = str_replace('http://stuff.com/endpoints/endpoints/sls.php', $emptyValue, $request);
+            $encodedRequest = base64_encode(gzdeflate($emptyRequest));
+
+            $settingsInfo['security']['relaxDestinationValidation'] = false;
+            $logoutRequest = new LogoutRequest(new Settings($settingsInfo), $encodedRequest);
+            $this->assertFalse($logoutRequest->isValid());
+            $this->assertEquals('The LogoutRequest has an empty Destination value', $logoutRequest->getError());
+            $this->assertEquals(ValidationError::EMPTY_DESTINATION, $logoutRequest->getErrorException()->getCode());
+
+            $settingsInfo['security']['relaxDestinationValidation'] = true;
+            $logoutRequest2 = new LogoutRequest(new Settings($settingsInfo), $encodedRequest);
+            $this->assertTrue($logoutRequest2->isValid());
+        }
+    }
+
+    /**
+     * Tests the isValid method of the LogoutRequest
+     * Case Destination and destinationStrictlyMatches
+     *
+     * @covers OneLogin\Saml2\LogoutRequest::isValid
+     * @covers OneLogin\Saml2\Utils::checkDestination
+     */
+    public function testIsValidDestinationStrictlyMatches()
+    {
+        $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+        $currentURL = Utils::getSelfURLNoQuery();
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        $exactRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $request)));
+        // Surrounding whitespaces are ignored
+        $paddedRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', ' ' . $currentURL . ' ', $request)));
+        $longerRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL . '/extra', $request)));
+
+        $settings = new Settings($settingsInfo);
+        foreach (array($exactRequest, $paddedRequest, $longerRequest) as $encodedRequest) {
+            $logoutRequest = new LogoutRequest($settings, $encodedRequest);
+            $this->assertTrue($logoutRequest->isValid());
+        }
+
+        $settingsInfo['security']['destinationStrictlyMatches'] = true;
+        $settings = new Settings($settingsInfo);
+        foreach (array($exactRequest, $paddedRequest) as $encodedRequest) {
+            $logoutRequest = new LogoutRequest($settings, $encodedRequest);
+            $this->assertTrue($logoutRequest->isValid());
+        }
+
+        $logoutRequest = new LogoutRequest($settings, $longerRequest);
+        $this->assertFalse($logoutRequest->isValid());
+        $routedURL = Utils::getSelfRoutedURLNoQuery();
+        $this->assertEquals("The LogoutRequest was received at $routedURL instead of $currentURL/extra", $logoutRequest->getError());
+        $this->assertEquals(ValidationError::WRONG_DESTINATION, $logoutRequest->getErrorException()->getCode());
+    }
+
+    /**
+     * Tests the isValid method of the LogoutRequest
      * Case Invalid NotOnOrAfter
      *
      * @covers OneLogin\Saml2\LogoutRequest::isValid
@@ -1120,5 +1228,38 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         $logoutRequest = new LogoutRequest($settings);
         $xml = $logoutRequest->getXML();
         $id1 = LogoutRequest::getID($xml.'<garbage>');
+    }
+
+    /**
+     * Tests that the values written in the LogoutRequest are escaped, so the
+     * XML is well formed and has the values received (#674)
+     *
+     * @covers OneLogin\Saml2\LogoutRequest
+     */
+    public function testValuesAreEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $sloUrl = 'https://idp.example.com/slo?client=foo&id=bar';
+        $entityId = 'https://sp.example.com/metadata?client=foo&id=bar';
+        $nameId = 'user&<"name">@example.com';
+        // A SessionIndex is a value sent by the IdP: it must not be able to add elements
+        $sessionIndex = 'a&b</samlp:SessionIndex><samlp:SessionIndex>injected';
+
+        $settingsInfo['idp']['singleLogoutService']['url'] = $sloUrl;
+        $settingsInfo['sp']['entityId'] = $entityId;
+        $settings = new Settings($settingsInfo);
+
+        $logoutRequest = new LogoutRequest($settings, null, $nameId, $sessionIndex);
+        $xml = $logoutRequest->getXML();
+        $this->assertStringContainsString('Destination="https://idp.example.com/slo?client=foo&amp;id=bar"', $xml);
+
+        $dom = new \DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $this->assertEquals($sloUrl, $dom->documentElement->getAttribute('Destination'));
+        $this->assertEquals($entityId, LogoutRequest::getIssuer($dom));
+        $this->assertEquals($nameId, LogoutRequest::getNameId($dom));
+        $this->assertSame(array($sessionIndex), LogoutRequest::getSessionIndexes($dom));
     }
 }
