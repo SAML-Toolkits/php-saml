@@ -362,35 +362,7 @@ class OneLogin_Saml2_Response
                 }
 
                 // Check destination
-                if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
-                    if (empty($destination)) {
-                        if (!$security['relaxDestinationValidation']) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The response has an empty Destination value",
-                                OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
-                            );
-                        }
-                    } else {
-                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
-                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
-                            $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
-                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
-
-                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
-                                throw new OneLogin_Saml2_ValidationError(
-                                    "The response was received at $currentURL instead of $destination",
-                                    OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                                );
-                            }
-                        }
-                    }
-                } elseif ($security['requireDestination']) {
-                    throw new OneLogin_Saml2_ValidationError(
-                        "The response has no Destination value",
-                        OneLogin_Saml2_ValidationError::MISSING_DESTINATION
-                    );
-                }
+                OneLogin_Saml2_Utils::checkDestination($this->document, $security, $currentURL, 'response');
 
                 // Check audience
                 $validAudiences = $this->getAudiences();

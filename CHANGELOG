@@ -2,6 +2,9 @@ CHANGELOG
 =========
 
 v.2.24.0
+* Fix [#657](https://github.com/SAML-Toolkits/php-saml/issues/657) The Destination check of `OneLogin_Saml2_Response`, `OneLogin_Saml2_LogoutRequest` and `OneLogin_Saml2_LogoutResponse` is done by the new `OneLogin_Saml2_Utils::checkDestination`, so the 3 messages are validated in the same way:
+  * `security.requireDestination` now also applies to `OneLogin_Saml2_LogoutRequest` and `OneLogin_Saml2_LogoutResponse`: when true, a logout message with no Destination attribute is rejected with `OneLogin_Saml2_ValidationError::MISSING_DESTINATION`
+  * The Destination of a `OneLogin_Saml2_LogoutRequest` and a `OneLogin_Saml2_LogoutResponse` is trimmed before it is compared, as the one of the `OneLogin_Saml2_Response` already was. A Destination that only has whitespaces is now reported as `OneLogin_Saml2_ValidationError::EMPTY_DESTINATION` instead of `WRONG_DESTINATION`, and `security.relaxDestinationValidation` accepts it
 * Update certificate and private_key string replacement to include tabs.
 * Add `OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl`, which returns the XML that the last call to `OneLogin_Saml2_IdPMetadataParser::parseRemoteXML` retrieved from the URL (null if the request failed)
 * Several decryption error handling improvements:

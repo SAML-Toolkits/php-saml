@@ -199,6 +199,129 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Returns the logout response of the tests, deflated and encoded, with
+     * the Destination attribute replaced.
+     *
+     * @param string|null $destination The new value, null to remove the attribute
+     *
+     * @return string
+     */
+    private function buildLogoutResponseWithDestination($destination)
+    {
+        $message = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response_deflated.xml.base64');
+        $xml = gzinflate(base64_decode($message));
+        $attribute = isset($destination) ? 'Destination="' . $destination . '"' : '';
+        $xml = str_replace('Destination="http://stuff.com/endpoints/endpoints/sls.php"', $attribute, $xml, $count);
+        $this->assertSame(1, $count);
+
+        // A Signature left by another test would make the message fail on its signature
+        $_GET = array();
+
+        return base64_encode(gzdeflate($xml));
+    }
+
+    /**
+     * Tests the isValid method of the LogoutResponse
+     * Case missing Destination, with and without requireDestination
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin_Saml2_Utils::checkDestination
+     */
+    public function testIsInValidMissingDestination()
+    {
+        $message = $this->buildLogoutResponseWithDestination(null);
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        // By default a LogoutResponse with no Destination is accepted
+        $response = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo), $message);
+        $this->assertTrue($response->isValid());
+
+        $settingsInfo['security']['requireDestination'] = true;
+        $response2 = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo), $message);
+        $this->assertFalse($response2->isValid());
+        $this->assertEquals('The LogoutResponse has no Destination value', $response2->getError());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::MISSING_DESTINATION, $response2->getErrorException()->getCode());
+
+        // requireDestination is only checked in strict mode
+        $settingsInfo['strict'] = false;
+        $response3 = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo), $message);
+        $this->assertTrue($response3->isValid());
+    }
+
+    /**
+     * Tests the isValid method of the LogoutResponse
+     * Case empty Destination, with and without relaxDestinationValidation
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin_Saml2_Utils::checkDestination
+     */
+    public function testIsInValidEmptyDestination()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+        $settingsInfo['security']['requireDestination'] = true;
+
+        // A Destination with only whitespaces is an empty Destination too
+        foreach (array('', '   ') as $emptyValue) {
+            $message = $this->buildLogoutResponseWithDestination($emptyValue);
+
+            $settingsInfo['security']['relaxDestinationValidation'] = false;
+            $response = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo), $message);
+            $this->assertFalse($response->isValid());
+            $this->assertEquals('The LogoutResponse has an empty Destination value', $response->getError());
+            $this->assertEquals(OneLogin_Saml2_ValidationError::EMPTY_DESTINATION, $response->getErrorException()->getCode());
+
+            $settingsInfo['security']['relaxDestinationValidation'] = true;
+            $response2 = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo), $message);
+            $this->assertTrue($response2->isValid());
+        }
+    }
+
+    /**
+     * Tests the isValid method of the LogoutResponse
+     * Case Destination and destinationStrictlyMatches
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::isValid
+     * @covers OneLogin_Saml2_Utils::checkDestination
+     */
+    public function testIsValidDestinationStrictlyMatches()
+    {
+        $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+        $settingsInfo['strict'] = true;
+
+        $exactMessage = $this->buildLogoutResponseWithDestination($currentURL);
+        // Surrounding whitespaces are ignored
+        $paddedMessage = $this->buildLogoutResponseWithDestination(' ' . $currentURL . ' ');
+        $longerMessage = $this->buildLogoutResponseWithDestination($currentURL . '/extra');
+
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        foreach (array($exactMessage, $paddedMessage, $longerMessage) as $message) {
+            $response = new OneLogin_Saml2_LogoutResponse($settings, $message);
+            $this->assertTrue($response->isValid());
+        }
+
+        $settingsInfo['security']['destinationStrictlyMatches'] = true;
+        $settings = new OneLogin_Saml2_Settings($settingsInfo);
+        foreach (array($exactMessage, $paddedMessage) as $message) {
+            $response = new OneLogin_Saml2_LogoutResponse($settings, $message);
+            $this->assertTrue($response->isValid());
+        }
+
+        $response = new OneLogin_Saml2_LogoutResponse($settings, $longerMessage);
+        $this->assertFalse($response->isValid());
+        $routedURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+        $this->assertEquals("The LogoutResponse was received at $routedURL instead of $currentURL/extra", $response->getError());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::WRONG_DESTINATION, $response->getErrorException()->getCode());
+    }
+
+    /**
     * Tests the isValid method of the OneLogin_Saml2_LogoutResponse
     * Case invalid xml
     *
