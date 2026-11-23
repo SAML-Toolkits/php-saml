@@ -2082,13 +2082,69 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $rsa15Response = new OneLogin_Saml2_Response($this->_settings, $rsa15Xml);
         $this->assertEquals($expectedNameId, $rsa15Response->getNameId());
 
+        // Reported by isValid, as the EncryptedID is decrypted there
+        $blockedResponse = new OneLogin_Saml2_Response($settingsWithoutRSA15, $rsa15Xml);
+        $this->assertFalse($blockedResponse->isValid());
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $blockedResponse->getErrorException());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $blockedResponse->getErrorException()->getCode());
+        $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $blockedResponse->getError());
+
         try {
-            $blockedResponse = new OneLogin_Saml2_Response($settingsWithoutRSA15, $rsa15Xml);
             $blockedResponse->getNameId();
             $this->fail('Exception was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage());
-            $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $e->getCode());
+            $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $e->getMessage());
+            $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
         }
+    }
+
+    /**
+     * Errors while decrypting the EncryptedAssertion are not thrown by the constructor, isValid reports them
+     *
+     * @covers OneLogin_Saml2_Response::__construct
+     * @covers OneLogin_Saml2_Auth::processResponse
+     */
+    public function testDecryptionErrorsAreReportedByIsValid()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+
+        // An encryption algorithm not allowed by the settings (rsa-1_5)
+        $noRSA15SettingsInfo = $settingsInfo;
+        $noRSA15SettingsInfo['security']['allowRSA15KeyTransport'] = false;
+        $response = new OneLogin_Saml2_Response(new OneLogin_Saml2_Settings($noRSA15SettingsInfo), $xml);
+        $this->assertFalse($response->encrypted);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $response->getErrorException()->getCode());
+
+        // No private key to decrypt the assertion (the tests always find sp.key on the custom path)
+        $noKeySettings = $this->getMockBuilder('OneLogin_Saml2_Settings')
+            ->setConstructorArgs(array($settingsInfo))
+            ->setMethods(array('getSPkey'))
+            ->getMock();
+        $noKeySettings->expects($this->any())->method('getSPkey')->will($this->returnValue(null));
+        $response = new OneLogin_Saml2_Response($noKeySettings, $xml);
+        $this->assertFalse($response->encrypted);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals(OneLogin_Saml2_Error::PRIVATE_KEY_NOT_FOUND, $response->getErrorException()->getCode());
+
+        // Wrong private key
+        $wrongKeySettingsInfo = $settingsInfo;
+        openssl_pkey_export(openssl_pkey_new(array('private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA)), $wrongKey);
+        $wrongKeySettingsInfo['sp']['privateKey'] = $wrongKey;
+        $response = new OneLogin_Saml2_Response(new OneLogin_Saml2_Settings($wrongKeySettingsInfo), $xml);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::DECRYPTION_FAILED, $response->getErrorException()->getCode());
+
+        // Auth reports it as an error
+        $auth = new OneLogin_Saml2_Auth($wrongKeySettingsInfo);
+        $_POST['SAMLResponse'] = $xml;
+        $auth->processResponse();
+        unset($_POST['SAMLResponse']);
+        $this->assertFalse($auth->isAuthenticated());
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertEquals(OneLogin_Saml2_ValidationError::DECRYPTION_FAILED, $auth->getLastErrorException()->getCode());
     }
 }

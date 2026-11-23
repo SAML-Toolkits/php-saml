@@ -447,7 +447,7 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
             OneLogin_Saml2_LogoutRequest::getNameId($rsa15Request, $key, false);
             $this->fail('OneLogin_Saml2_ValidationError was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage());
+            $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $e->getMessage());
         }
 
         // In strict mode, isValid() decrypts the EncryptedID applying the setting
@@ -466,9 +466,9 @@ class OneLogin_Saml2_LogoutRequestTest extends PHPUnit_Framework_TestCase
                 $this->assertTrue($logoutRequest->isValid(), (string) $logoutRequest->getError());
             } else {
                 $this->assertFalse($logoutRequest->isValid());
-                $this->assertEquals('Unsupported or not allowed key transport algorithm', $logoutRequest->getError());
+                $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $logoutRequest->getError());
                 $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $logoutRequest->getErrorException());
-                $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $logoutRequest->getErrorException()->getCode());
+                $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $logoutRequest->getErrorException()->getCode());
             }
         }
     }

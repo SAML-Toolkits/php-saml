@@ -14,6 +14,11 @@ class OneLogin_Saml2_Utils
     const DECRYPTION_FAILED_MESSAGE = 'Failure decrypting Data';
 
     /**
+     * Message of the OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED error (same prefix as php-saml 3.x and 4.x)
+     */
+    const RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE = 'RSA-1.5 key transport is disabled. Enable the allowRSA15KeyTransport security setting to accept it';
+
+    /**
      * @var array Transforms accepted on a received Signature Reference. SAML only
      *            needs enveloped-signature plus canonicalization (XPath/XSLT are rejected).
      */
@@ -1478,6 +1483,12 @@ class OneLogin_Saml2_Utils
             }
             $keyMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedKey)->item(0);
             if ($keyMethod === null || !in_array($keyMethod->getAttribute('Algorithm'), $keyAlgorithms, true)) {
+                if ($keyMethod !== null && $keyMethod->getAttribute('Algorithm') === XMLSecurityKey::RSA_1_5) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        self::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE,
+                        OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                    );
+                }
                 throw new OneLogin_Saml2_ValidationError(
                     'Unsupported or not allowed key transport algorithm',
                     OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR

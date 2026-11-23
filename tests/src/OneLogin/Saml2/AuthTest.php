@@ -219,6 +219,35 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * An encryption algorithm not allowed by the settings is reported as an error, not thrown
+     *
+     * @covers OneLogin_Saml2_Auth::processResponse
+     */
+    public function testProcessResponseEncryptionAlgorithmNotAllowed()
+    {
+        $files = array(
+            // rsa-1_5 EncryptedAssertion
+            'valid_encrypted_assertion.xml.base64',
+            // rsa-1_5 EncryptedID
+            'response_encrypted_nameid.xml.base64',
+        );
+        foreach ($files as $file) {
+            $settingsInfo = $this->_settingsInfo;
+            $settingsInfo['security']['allowRSA15KeyTransport'] = false;
+            $auth = new OneLogin_Saml2_Auth($settingsInfo);
+
+            $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/' . $file);
+            $auth->processResponse();
+
+            $this->assertFalse($auth->isAuthenticated(), $file);
+            $this->assertEquals(array('invalid_response'), $auth->getErrors(), $file);
+            $this->assertSame(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $auth->getLastErrorException()->getCode(), $file);
+            $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $auth->getLastErrorReason(), $file);
+        }
+        unset($_POST['SAMLResponse']);
+    }
+
+    /**
     * Tests the processResponse method of the OneLogin_Saml2_Auth class
     * Case Invalid Response, Invalid requestID
     *

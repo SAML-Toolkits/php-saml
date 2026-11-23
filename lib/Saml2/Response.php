@@ -59,11 +59,12 @@ class OneLogin_Saml2_Response
     private $_errorException;
 
     /**
-     * If the message was rejected before decrypting it, this var has the cause (reported by isValid)
+     * If the message was rejected before or while decrypting it (invalid message signature,
+     * encryption algorithm not allowed by the settings, decryption error...), this var has the cause (reported by isValid)
      *
      * @var Exception|null
      */
-    private $_messageSignatureError;
+    private $_preDecryptionError;
 
     /**
      * If the signature of the Response was verified (successfully) before decrypting it
@@ -115,19 +116,32 @@ class OneLogin_Saml2_Response
                 $this->_validateMessageSignatureBeforeDecryption();
             } catch (Exception $e) {
                 // The EncryptedAssertion is not decrypted. isValid() reports the cause
-                $this->_messageSignatureError = $e;
+                $this->_preDecryptionError = $e;
                 return;
             } catch (Throwable $e) {
                 // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
-                $this->_messageSignatureError = new OneLogin_Saml2_ValidationError(
+                $this->_preDecryptionError = new OneLogin_Saml2_ValidationError(
                     "Signature validation failed. SAML Response rejected",
                     OneLogin_Saml2_ValidationError::INVALID_SIGNATURE
                 );
                 return;
             }
-            $this->decryptedDocument = clone $this->document;
+            try {
+                $this->decryptedDocument = $this->_decryptAssertion(clone $this->document);
+            } catch (Exception $e) {
+                // If the decryption fails (no private key, algorithm not allowed, decryption error...)
+                // isValid() reports the cause. The assertion is not available.
+                $this->_preDecryptionError = $e;
+                return;
+            } catch (Throwable $e) {
+                // PHP 7 Errors (never matched on PHP 5, where Throwable does not exist)
+                $this->_preDecryptionError = new OneLogin_Saml2_ValidationError(
+                    OneLogin_Saml2_Utils::DECRYPTION_FAILED_MESSAGE,
+                    OneLogin_Saml2_ValidationError::DECRYPTION_FAILED
+                );
+                return;
+            }
             $this->encrypted = true;
-            $this->decryptedDocument = $this->_decryptAssertion($this->decryptedDocument);
         }
     }
 
@@ -198,9 +212,9 @@ class OneLogin_Saml2_Response
         $this->_error = null;
         $this->_errorException = null;
         try {
-            // The message was rejected before decrypting it
-            if ($this->_messageSignatureError !== null) {
-                throw $this->_messageSignatureError;
+            // The message was rejected before or while decrypting it
+            if ($this->_preDecryptionError !== null) {
+                throw $this->_preDecryptionError;
             }
 
             // Check SAML version
@@ -511,6 +525,13 @@ class OneLogin_Saml2_Response
                     );
                 }
             }
+
+            // Once the validation is done, if there is an EncryptedID we can decrypt it here so if it is
+            // using a not allowed method, the decryption errors will be reported here
+            if ($this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->length > 0) {
+                $this->getNameIdData();
+            }
+
             return true;
         } catch (Exception $e) {
             $this->_error = $e->getMessage();
