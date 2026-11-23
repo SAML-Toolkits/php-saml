@@ -878,35 +878,43 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
     public function testIsValidDestinationStrictlyMatches()
     {
         $request = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
-        $currentURL = Utils::getSelfURLNoQuery();
 
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
-        $settingsInfo['strict'] = true;
+        Utils::setSelfHost('example.test');
 
-        $exactRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $request)));
-        // Surrounding whitespaces are ignored
-        $paddedRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', ' ' . $currentURL . ' ', $request)));
-        $longerRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL . '/extra', $request)));
+        try {
+            $currentURL = Utils::getSelfURLNoQuery();
 
-        $settings = new Settings($settingsInfo);
-        foreach (array($exactRequest, $paddedRequest, $longerRequest) as $encodedRequest) {
-            $logoutRequest = new LogoutRequest($settings, $encodedRequest);
-            $this->assertTrue($logoutRequest->isValid());
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+            $settingsInfo['strict'] = true;
+
+            $exactRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL, $request)));
+            // Surrounding whitespaces are ignored
+            $paddedRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', ' ' . $currentURL . ' ', $request)));
+            $longerRequest = base64_encode(gzdeflate(str_replace('http://stuff.com/endpoints/endpoints/sls.php', $currentURL . '/extra', $request)));
+
+            $settings = new Settings($settingsInfo);
+            foreach (array($exactRequest, $paddedRequest, $longerRequest) as $encodedRequest) {
+                $logoutRequest = new LogoutRequest($settings, $encodedRequest);
+                $this->assertTrue($logoutRequest->isValid());
+            }
+
+            $settingsInfo['security']['destinationStrictlyMatches'] = true;
+            $settings = new Settings($settingsInfo);
+            foreach (array($exactRequest, $paddedRequest) as $encodedRequest) {
+                $logoutRequest = new LogoutRequest($settings, $encodedRequest);
+                $this->assertTrue($logoutRequest->isValid());
+            }
+
+            $logoutRequest = new LogoutRequest($settings, $longerRequest);
+            $this->assertFalse($logoutRequest->isValid());
+            $routedURL = Utils::getSelfRoutedURLNoQuery();
+            $this->assertStringStartsWith('http://example.test', $routedURL);
+            $this->assertEquals("The LogoutRequest was received at $routedURL instead of $currentURL/extra", $logoutRequest->getError());
+            $this->assertEquals(ValidationError::WRONG_DESTINATION, $logoutRequest->getErrorException()->getCode());
+        } finally {
+            Utils::setSelfHost(null);
         }
-
-        $settingsInfo['security']['destinationStrictlyMatches'] = true;
-        $settings = new Settings($settingsInfo);
-        foreach (array($exactRequest, $paddedRequest) as $encodedRequest) {
-            $logoutRequest = new LogoutRequest($settings, $encodedRequest);
-            $this->assertTrue($logoutRequest->isValid());
-        }
-
-        $logoutRequest = new LogoutRequest($settings, $longerRequest);
-        $this->assertFalse($logoutRequest->isValid());
-        $routedURL = Utils::getSelfRoutedURLNoQuery();
-        $this->assertEquals("The LogoutRequest was received at $routedURL instead of $currentURL/extra", $logoutRequest->getError());
-        $this->assertEquals(ValidationError::WRONG_DESTINATION, $logoutRequest->getErrorException()->getCode());
     }
 
     /**

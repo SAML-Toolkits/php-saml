@@ -8,7 +8,6 @@ use OneLogin\Saml2\Settings;
 use OneLogin\Saml2\Constants;
 use OneLogin\Saml2\LogoutResponse;
 use OneLogin\Saml2\ValidationError;
-
 use DomDocument;
 
 /**
@@ -21,7 +20,7 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * Initializes the Test Suite
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $settingsDir = TEST_ROOT .'/settings/';
         include $settingsDir.'settings1.php';
@@ -364,35 +363,42 @@ class LogoutResponseTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsValidDestinationStrictlyMatches()
     {
-        $currentURL = Utils::getSelfURLNoQuery();
+        Utils::setSelfHost('example.test');
 
-        $settingsDir = TEST_ROOT .'/settings/';
-        include $settingsDir.'settings1.php';
-        $settingsInfo['strict'] = true;
+        try {
+            $currentURL = Utils::getSelfURLNoQuery();
 
-        $exactMessage = $this->buildLogoutResponseWithDestination($currentURL);
-        // Surrounding whitespaces are ignored
-        $paddedMessage = $this->buildLogoutResponseWithDestination(' ' . $currentURL . ' ');
-        $longerMessage = $this->buildLogoutResponseWithDestination($currentURL . '/extra');
+            $settingsDir = TEST_ROOT .'/settings/';
+            include $settingsDir.'settings1.php';
+            $settingsInfo['strict'] = true;
 
-        $settings = new Settings($settingsInfo);
-        foreach (array($exactMessage, $paddedMessage, $longerMessage) as $message) {
-            $response = new LogoutResponse($settings, $message);
-            $this->assertTrue($response->isValid());
+            $exactMessage = $this->buildLogoutResponseWithDestination($currentURL);
+            // Surrounding whitespaces are ignored
+            $paddedMessage = $this->buildLogoutResponseWithDestination(' ' . $currentURL . ' ');
+            $longerMessage = $this->buildLogoutResponseWithDestination($currentURL . '/extra');
+
+            $settings = new Settings($settingsInfo);
+            foreach (array($exactMessage, $paddedMessage, $longerMessage) as $message) {
+                $response = new LogoutResponse($settings, $message);
+                $this->assertTrue($response->isValid());
+            }
+
+            $settingsInfo['security']['destinationStrictlyMatches'] = true;
+            $settings = new Settings($settingsInfo);
+            foreach (array($exactMessage, $paddedMessage) as $message) {
+                $response = new LogoutResponse($settings, $message);
+                $this->assertTrue($response->isValid());
+            }
+
+            $response = new LogoutResponse($settings, $longerMessage);
+            $this->assertFalse($response->isValid());
+            $routedURL = Utils::getSelfRoutedURLNoQuery();
+            $this->assertStringStartsWith('http://example.test', $routedURL);
+            $this->assertEquals("The LogoutResponse was received at $routedURL instead of $currentURL/extra", $response->getError());
+            $this->assertEquals(ValidationError::WRONG_DESTINATION, $response->getErrorException()->getCode());
+        } finally {
+            Utils::setSelfHost(null);
         }
-
-        $settingsInfo['security']['destinationStrictlyMatches'] = true;
-        $settings = new Settings($settingsInfo);
-        foreach (array($exactMessage, $paddedMessage) as $message) {
-            $response = new LogoutResponse($settings, $message);
-            $this->assertTrue($response->isValid());
-        }
-
-        $response = new LogoutResponse($settings, $longerMessage);
-        $this->assertFalse($response->isValid());
-        $routedURL = Utils::getSelfRoutedURLNoQuery();
-        $this->assertEquals("The LogoutResponse was received at $routedURL instead of $currentURL/extra", $response->getError());
-        $this->assertEquals(ValidationError::WRONG_DESTINATION, $response->getErrorException()->getCode());
     }
 
     /**
