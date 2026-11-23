@@ -110,10 +110,10 @@ class OneLogin_Saml2_LogoutRequest
                 $nameIdNameQualifier
             );
 
-            $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
+            $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>".htmlspecialchars($sessionIndex, ENT_QUOTES)."</samlp:SessionIndex>" : "";
 
             $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
-            $destination = $this->_settings->getIdPSLOUrl();
+            $destination = htmlspecialchars($this->_settings->getIdPSLOUrl(), ENT_QUOTES);
             $logoutRequest = <<<LOGOUTREQUEST
 <samlp:LogoutRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"

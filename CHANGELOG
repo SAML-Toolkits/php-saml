@@ -2,6 +2,12 @@ CHANGELOG
 =========
 
 v.2.24.0
+* Fix [#674](https://github.com/SAML-Toolkits/php-saml/issues/674) Escape the values written in the XML of the `AuthnRequest`, `LogoutRequest`, `LogoutResponse` and the SP metadata. A value with a `&`, like an IdP URL with several query parameters, produced an XML that was not well formed:
+  * `AuthnRequest`: Destination (`idp.singleSignOnService.url`), ProviderName (displayname of the organization), `sp.NameIDFormat`, the `security.requestedAuthnContext` values, `security.requestedAuthnContextComparison` and the NameID of the Subject (`nameIdValueReq`)
+  * `LogoutRequest`: Destination (`idp.singleLogoutService.url`) and SessionIndex
+  * `LogoutResponse`: Destination (`idp.singleLogoutService.responseUrl`) and InResponseTo
+  * Metadata: the organization and contact person data, `sp.NameIDFormat`, the bindings, and the name, description, requested attributes and attribute values of `sp.attributeConsumingService`
+  The URL the user is redirected to is not changed. If any of those settings was defined already escaped (`&amp;`) to get a valid XML, the escaping must be removed from the settings, otherwise the value will be escaped twice
 * Fix [#657](https://github.com/SAML-Toolkits/php-saml/issues/657) The Destination check of `OneLogin_Saml2_Response`, `OneLogin_Saml2_LogoutRequest` and `OneLogin_Saml2_LogoutResponse` is done by the new `OneLogin_Saml2_Utils::checkDestination`, so the 3 messages are validated in the same way:
   * `security.requireDestination` now also applies to `OneLogin_Saml2_LogoutRequest` and `OneLogin_Saml2_LogoutResponse`: when true, a logout message with no Destination attribute is rejected with `OneLogin_Saml2_ValidationError::MISSING_DESTINATION`
   * The Destination of a `OneLogin_Saml2_LogoutRequest` and a `OneLogin_Saml2_LogoutResponse` is trimmed before it is compared, as the one of the `OneLogin_Saml2_Response` already was. A Destination that only has whitespaces is now reported as `OneLogin_Saml2_ValidationError::EMPTY_DESTINATION` instead of `WRONG_DESTINATION`, and `security.relaxDestinationValidation` accepts it

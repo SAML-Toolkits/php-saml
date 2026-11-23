@@ -668,4 +668,46 @@ class OneLogin_Saml2_LogoutResponseTest extends PHPUnit_Framework_TestCase
         $settings = new OneLogin_Saml2_Settings($settingsInfo);
         $logoutResponse = new OneLogin_Saml2_LogoutResponse($settings, '<garbage>');
     }
+
+    /**
+     * Tests that the values written in the LogoutResponse are escaped, so the
+     * XML is well formed and has the values received (#674)
+     *
+     * @covers OneLogin_Saml2_LogoutResponse::build
+     */
+    public function testBuildValuesAreEscaped()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $sloUrl = 'https://idp.example.com/slo?client=foo&id=bar';
+        $sloResponseUrl = 'https://idp.example.com/slo_response?client=foo&id=bar';
+        $entityId = 'https://sp.example.com/metadata?client=foo&id=bar';
+        // The ID of the LogoutRequest is a value sent by the IdP: it must not be able to add attributes
+        $inResponseTo = 'id&1" Destination="https://attacker.example.com/';
+
+        $settingsInfo['idp']['singleLogoutService']['url'] = $sloUrl;
+        $settingsInfo['idp']['singleLogoutService']['responseUrl'] = $sloResponseUrl;
+        $settingsInfo['sp']['entityId'] = $entityId;
+
+        $response = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo));
+        $response->build($inResponseTo);
+        $xml = $response->getXML();
+        $this->assertContains('Destination="https://idp.example.com/slo_response?client=foo&amp;id=bar"', $xml);
+
+        $dom = new \DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $this->assertEquals($sloResponseUrl, $dom->documentElement->getAttribute('Destination'));
+        $this->assertEquals($inResponseTo, $dom->documentElement->getAttribute('InResponseTo'));
+        $this->assertEquals($entityId, OneLogin_Saml2_Utils::query($dom, '/samlp:LogoutResponse/saml:Issuer')->item(0)->textContent);
+
+        // Without a responseUrl the URL of the SLO service is the Destination
+        unset($settingsInfo['idp']['singleLogoutService']['responseUrl']);
+        $response2 = new OneLogin_Saml2_LogoutResponse(new OneLogin_Saml2_Settings($settingsInfo));
+        $response2->build('ONELOGIN_1');
+        $dom2 = new \DOMDocument();
+        $this->assertTrue($dom2->loadXML($response2->getXML()));
+        $this->assertEquals($sloUrl, $dom2->documentElement->getAttribute('Destination'));
+        $this->assertEquals('ONELOGIN_1', $dom2->documentElement->getAttribute('InResponseTo'));
+    }
 }
