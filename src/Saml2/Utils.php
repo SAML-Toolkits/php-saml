@@ -249,7 +249,7 @@ class Utils
             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
 
-        $x509cert = str_replace(["\x0d", "\r", "\n", " "], '', $x509cert);
+        $x509cert = str_replace(["\x0d", "\r", "\n", "\t", " "], '', $x509cert);
 
         if ($heads && $x509cert !== '') {
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
@@ -272,7 +272,7 @@ class Utils
             return;
         }
 
-        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        $key = str_replace(array("\x0D", "\r", "\n", "\t"), "", $key);
         if (!empty($key)) {
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
                 $key = Utils::getStringBetween($key, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
