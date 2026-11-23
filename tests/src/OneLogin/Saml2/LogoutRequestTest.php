@@ -451,15 +451,17 @@ class LogoutRequestTest extends \PHPUnit\Framework\TestCase
         try {
             LogoutRequest::getNameId($cbcXml, $key, false, false);
             $this->fail('Exception was not raised');
-        } catch (Exception $e) {
+        } catch (ValidationError $e) {
+            $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
             $this->assertStringContainsString('Unsupported or not allowed data encryption algorithm', $e->getMessage());
         }
 
         $settingsInfo['security']['allowCBCEncryption'] = false;
         $blockedLogoutRequest = new LogoutRequest(new Settings($settingsInfo), $prepareRequest($cbcXml));
         $this->assertFalse($blockedLogoutRequest->isValid());
+        $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $blockedLogoutRequest->getErrorException()->getCode());
         $this->assertStringContainsString(
-            'Unsupported or not allowed data encryption algorithm',
+            'Unsupported or not allowed data encryption algorithm. Enable the allowCBCEncryption security setting to accept it',
             $blockedLogoutRequest->getErrorException()->getMessage()
         );
 

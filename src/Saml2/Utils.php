@@ -1452,7 +1452,9 @@ class Utils
      * @param bool       $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
      * @param bool       $allowCBCEncryption     Accept data encrypted with CBC (unauthenticated).
      *
-     * @throws ValidationError
+     * @throws ValidationError ENCRYPTION_ALGORITHM_NOT_ALLOWED if the algorithm is rejected by
+     *                         $allowRSA15KeyTransport or $allowCBCEncryption, KEY_ALGORITHM_ERROR
+     *                         if it is not supported
      */
     public static function validateEncryptedDataStructure(DOMElement $encryptedData, $allowRSA15KeyTransport = true, $allowCBCEncryption = true)
     {
@@ -1465,8 +1467,9 @@ class Utils
         }
 
         $dataAlgorithms = array(XMLSecurityKey::AES128_GCM, XMLSecurityKey::AES192_GCM, XMLSecurityKey::AES256_GCM);
+        $cbcAlgorithms = array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC);
         if ($allowCBCEncryption) {
-            $dataAlgorithms = array_merge($dataAlgorithms, array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC));
+            $dataAlgorithms = array_merge($dataAlgorithms, $cbcAlgorithms);
         }
         $keyAlgorithms = array(XMLSecurityKey::RSA_OAEP_MGF1P, XMLSecurityKey::RSA_OAEP);
         if ($allowRSA15KeyTransport) {
@@ -1479,7 +1482,15 @@ class Utils
 
         // xmlseclibs uses the first EncryptionMethod descendant, so that is the one checked
         $encMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedData)->item(0);
-        if ($encMethod === null || !in_array($encMethod->getAttribute('Algorithm'), $dataAlgorithms, true)) {
+        $dataAlgorithm = $encMethod === null ? null : $encMethod->getAttribute('Algorithm');
+        if (!in_array($dataAlgorithm, $dataAlgorithms, true)) {
+            if (in_array($dataAlgorithm, $cbcAlgorithms, true)) {
+                // Supported algorithm, rejected by the settings
+                throw new ValidationError(
+                    'Unsupported or not allowed data encryption algorithm. Enable the allowCBCEncryption security setting to accept it',
+                    ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                );
+            }
             throw new ValidationError(
                 'Unsupported or not allowed data encryption algorithm',
                 ValidationError::KEY_ALGORITHM_ERROR
@@ -1496,7 +1507,15 @@ class Utils
                 );
             }
             $keyMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedKey)->item(0);
-            if ($keyMethod === null || !in_array($keyMethod->getAttribute('Algorithm'), $keyAlgorithms, true)) {
+            $keyAlgorithm = $keyMethod === null ? null : $keyMethod->getAttribute('Algorithm');
+            if (!in_array($keyAlgorithm, $keyAlgorithms, true)) {
+                if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
+                    // Supported algorithm, rejected by the settings
+                    throw new ValidationError(
+                        'Unsupported or not allowed key transport algorithm. Enable the allowRSA15KeyTransport security setting to accept it',
+                        ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                    );
+                }
                 throw new ValidationError(
                     'Unsupported or not allowed key transport algorithm',
                     ValidationError::KEY_ALGORITHM_ERROR

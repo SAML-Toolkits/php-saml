@@ -2064,15 +2064,37 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $rsa15Xml = file_get_contents(TEST_ROOT . '/data/responses/response_encrypted_nameid.xml.base64');
         $legacyResponse = new Response($this->_legacySettings, $rsa15Xml);
+        $this->assertTrue($legacyResponse->isValid());
         $this->assertEquals($expectedNameId, $legacyResponse->getNameId());
 
+        // Reported by isValid, as the EncryptedID is decrypted there
+        $blockedResponse = new Response($this->createSettingsWithoutRSA15(), $rsa15Xml);
+        $this->assertRejectedEncryptionAlgorithm($blockedResponse, 'Unsupported or not allowed key transport algorithm', 'allowRSA15KeyTransport');
+
         try {
-            $blockedResponse = new Response($this->createSettingsWithoutRSA15(), $rsa15Xml);
             $blockedResponse->getNameId();
             $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertStringContainsString('Unsupported or not allowed key transport algorithm', $e->getMessage());
+        } catch (ValidationError $e) {
+            $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
         }
+    }
+
+    /**
+     * Asserts that the Response is not valid because of an encryption algorithm not allowed by the settings
+     *
+     * @param Response $response
+     * @param string   $expectedMessage
+     * @param string   $setting         The setting that allows the algorithm
+     */
+    private function assertRejectedEncryptionAlgorithm(Response $response, $expectedMessage, $setting)
+    {
+        $this->assertFalse($response->isValid());
+        $this->assertFalse($response->encrypted);
+        $error = $response->getErrorException();
+        $this->assertInstanceOf(ValidationError::class, $error);
+        $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $error->getCode());
+        $this->assertStringContainsString($expectedMessage, $error->getMessage());
+        $this->assertStringContainsString("Enable the $setting security setting", $error->getMessage());
     }
 
     /**
@@ -2094,25 +2116,16 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_settings, $cbcXml);
         $this->assertEquals('2de11defd199f8d5bb63f9b7deb265ba5c675c10', $response->getNameId());
 
-        try {
-            $blockedResponse = new Response($gcmOnlySettings, $cbcXml);
-            $blockedResponse->getNameId();
-            $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertStringContainsString('Unsupported or not allowed data encryption algorithm', $e->getMessage());
-        }
+        $blockedResponse = new Response($gcmOnlySettings, $cbcXml);
+        $this->assertRejectedEncryptionAlgorithm($blockedResponse, 'Unsupported or not allowed data encryption algorithm', 'allowCBCEncryption');
 
-        // aes128-cbc in an EncryptedAssertion, rejected while constructing the Response
+        // aes128-cbc in an EncryptedAssertion, rejected while constructing the Response and reported by isValid
         $cbcAssertionXml = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
         $response = new Response($this->_legacySettings, $cbcAssertionXml);
         $this->assertNotEmpty($response->getNameId());
 
-        try {
-            new Response($gcmOnlyLegacySettings, $cbcAssertionXml);
-            $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertStringContainsString('Unsupported or not allowed data encryption algorithm', $e->getMessage());
-        }
+        $blockedResponse = new Response($gcmOnlyLegacySettings, $cbcAssertionXml);
+        $this->assertRejectedEncryptionAlgorithm($blockedResponse, 'Unsupported or not allowed data encryption algorithm', 'allowCBCEncryption');
 
         // AES-GCM is still accepted
         $gcmXml = $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId());
@@ -2164,15 +2177,13 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($tamperedResponse->isValid());
         $this->assertSame('Reference validation failed', $tamperedResponse->getError());
 
-        // Without strict, the tampered ciphertext reaches the decryption
+        // Without strict, the tampered ciphertext reaches the decryption, reported by isValid
         $settingsInfo['strict'] = false;
         $settingsInfo['security']['wantMessagesSigned'] = false;
-        try {
-            new Response($this->createLegacyEncryptionSettings($settingsInfo), $tamperedXml);
-            $this->fail('ValidationError was not raised');
-        } catch (ValidationError $e) {
-            $this->assertSame(ValidationError::DECRYPTION_FAILED, $e->getCode());
-        }
+        $tamperedResponse = new Response($this->createLegacyEncryptionSettings($settingsInfo), $tamperedXml);
+        $this->assertFalse($tamperedResponse->encrypted);
+        $this->assertFalse($tamperedResponse->isValid());
+        $this->assertSame(ValidationError::DECRYPTION_FAILED, $tamperedResponse->getErrorException()->getCode());
 
         // The signature is only required in strict mode
         $settingsInfo['strict'] = false;
@@ -2213,20 +2224,10 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
             $this->assertSame('subject-nameid', $response->getNameId(), $dataAlgorithm . ' ' . $keyAlgorithm);
 
             if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
-                try {
-                    new Response($this->createSettingsWithoutRSA15(), $xml);
-                    $this->fail('Exception was not raised');
-                } catch (Exception $e) {
-                    $this->assertStringContainsString('Unsupported or not allowed key transport algorithm', $e->getMessage());
-                }
+                $this->assertRejectedEncryptionAlgorithm(new Response($this->createSettingsWithoutRSA15(), $xml), 'Unsupported or not allowed key transport algorithm', 'allowRSA15KeyTransport');
             }
             if ($dataAlgorithm === XMLSecurityKey::AES128_CBC) {
-                try {
-                    new Response($withoutCBC, $xml);
-                    $this->fail('Exception was not raised');
-                } catch (Exception $e) {
-                    $this->assertStringContainsString('Unsupported or not allowed data encryption algorithm', $e->getMessage());
-                }
+                $this->assertRejectedEncryptionAlgorithm(new Response($withoutCBC, $xml), 'Unsupported or not allowed data encryption algorithm', 'allowCBCEncryption');
             }
         }
     }
@@ -2308,19 +2309,54 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->_legacySettings, $rsa15Xml);
         $this->assertEquals('ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69', $response->getNameId());
 
-        try {
-            new Response($this->createSettingsWithoutRSA15(), $rsa15Xml);
-            $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertStringContainsString('Unsupported or not allowed key transport algorithm', $e->getMessage());
-        }
+        $this->assertRejectedEncryptionAlgorithm(new Response($this->createSettingsWithoutRSA15(), $rsa15Xml), 'Unsupported or not allowed key transport algorithm', 'allowRSA15KeyTransport');
 
-        // Decrypted while constructing the Response, before any signature validation
-        try {
-            new Response($this->_settings, $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, random_bytes(32))));
-            $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertEquals('Failure decrypting Data', $e->getMessage());
-        }
+        // Decrypted while constructing the Response, before any signature validation; reported by isValid
+        $response = new Response($this->_settings, $this->buildResponseWithEncryptedAssertion($this->buildEncryptedNameId(XMLSecurityKey::RSA_OAEP_MGF1P, random_bytes(32))));
+        $this->assertFalse($response->encrypted);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('Failure decrypting Data', $response->getError());
+    }
+
+    /**
+     * Errors while decrypting the EncryptedAssertion are not thrown by the constructor, isValid reports them
+     *
+     * @covers OneLogin\Saml2\Response::__construct
+     * @covers OneLogin\Saml2\Auth::processResponse
+     */
+    public function testDecryptionErrorsAreReportedByIsValid()
+    {
+        $settingsDir = TEST_ROOT .'/settings/';
+        include $settingsDir.'settings1.php';
+
+        $xml = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+
+        // No private key to decrypt the assertion (the tests always find sp.key on the custom path)
+        $noKeySettings = $this->getMockBuilder(Settings::class)
+            ->setConstructorArgs(array($this->createLegacyEncryptionSettingsInfo($settingsInfo)))
+            ->onlyMethods(array('getSPkey'))
+            ->getMock();
+        $noKeySettings->method('getSPkey')->willReturn(null);
+        $response = new Response($noKeySettings, $xml);
+        $this->assertFalse($response->encrypted);
+        $this->assertFalse($response->isValid());
+        $this->assertSame(\OneLogin\Saml2\Error::PRIVATE_KEY_NOT_FOUND, $response->getErrorException()->getCode());
+
+        // Wrong private key
+        $wrongKeySettingsInfo = $this->createLegacyEncryptionSettingsInfo($settingsInfo);
+        openssl_pkey_export(openssl_pkey_new(array('private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA)), $wrongKey);
+        $wrongKeySettingsInfo['sp']['privateKey'] = $wrongKey;
+        $response = new Response(new Settings($wrongKeySettingsInfo), $xml);
+        $this->assertFalse($response->isValid());
+        $this->assertSame(ValidationError::DECRYPTION_FAILED, $response->getErrorException()->getCode());
+
+        // Auth reports it as an error
+        $auth = new \OneLogin\Saml2\Auth($wrongKeySettingsInfo);
+        $_POST['SAMLResponse'] = $xml;
+        $auth->processResponse();
+        unset($_POST['SAMLResponse']);
+        $this->assertFalse($auth->isAuthenticated());
+        $this->assertEquals(array('invalid_response'), $auth->getErrors());
+        $this->assertSame(ValidationError::DECRYPTION_FAILED, $auth->getLastErrorException()->getCode());
     }
 }

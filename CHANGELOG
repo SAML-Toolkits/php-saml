@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+v3.11.0
+* Several decryption error handling improvements:
+  * An encryption algorithm rejected by the `security.allowCBCEncryption` or `security.allowRSA15KeyTransport` settings is reported with the new `ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED` code, and the name of the setting that allows the algorithm is appended to the message. Before, it was reported with `ValidationError::KEY_ALGORITHM_ERROR`, which is still the code of an algorithm that is not supported
+  * An EncryptedAssertion that can not be decrypted no longer makes the `Response` constructor throw: `isValid()` returns false and `getErrorException()` has the cause. Before, the `ValidationError` was thrown by the constructor, and `Auth::processResponse` did not catch it.
+  This covers a rejected algorithm and every other decryption error of the EncryptedAssertion and of the EncryptedID inside it (`Error::PRIVATE_KEY_NOT_FOUND`, `ValidationError::DECRYPTION_FAILED`, `KEY_ALGORITHM_ERROR`, `MISSING_ENCRYPTED_ELEMENT`, `UNSUPPORTED_RETRIEVAL_METHOD`...). The assertion of such a Response is not available (`encrypted` is false), as when the signature of the message is rejected before decrypting it.
+  * `Utils::decryptElement`, `Utils::validateEncryptedDataStructure`, `Response::getNameIdData`/`getNameId` and `LogoutRequest::getNameIdData`/`getNameId` throw the `ValidationError` with the new code for a rejected algorithm. Other errors are thrown as before
+  * `LogoutRequest::isValid()` (and so `Auth::processSLO`, with the `invalid_logout_request` error) already reported a rejected algorithm in the EncryptedID; its error now has the new code
+* `Response::isValid()` decrypts the EncryptedID of a not encrypted Assertion once the signatures are validated, as `LogoutRequest::isValid()` does, so a NameID that can not be decrypted makes `isValid()` return false. Before, `isValid()` returned true and `getNameId()` (called by `Auth::processResponse`) threw the exception
+
 v3.10.0
 * Refactor Signature validation on Signed Responses with Encrypted Assertion.
 * [#667](https://github.com/SAML-Toolkits/php-saml/pull/667) HTTP-Redirect signature validation with `retrieveParametersFromServer`: SAMLRequest, SAMLResponse, RelayState, SigAlg and Signature are matched against the complete field names of the query string, instead of searched as substrings of it. A signed Logout Request/Response with one of those names inside a value or inside the name of another parameter (for example `RelayState=Signature`) is now validated; it was rejected with "Duplicate parameter in query string" or "Both SAMLRequest and SAMLResponse provided". A message signed with an empty RelayState (`RelayState=&SigAlg=...`) is now validated; its signature validation failed
