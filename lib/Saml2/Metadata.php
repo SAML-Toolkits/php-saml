@@ -41,8 +41,9 @@ class OneLogin_Saml2_Metadata
 
         if (isset($sp['singleLogoutService'])) {
             $slsUrl = htmlspecialchars($sp['singleLogoutService']['url'], ENT_QUOTES);
+            $slsBinding = htmlspecialchars($sp['singleLogoutService']['binding'], ENT_QUOTES);
             $sls = <<<SLS_TEMPLATE
-        <md:SingleLogoutService Binding="{$sp['singleLogoutService']['binding']}"
+        <md:SingleLogoutService Binding="{$slsBinding}"
                                 Location="{$slsUrl}" />
 
 SLS_TEMPLATE;
@@ -67,14 +68,18 @@ SLS_TEMPLATE;
             $organizationInfoDisplaynames = array();
             $organizationInfoUrls = array();
             foreach ($organization as $lang => $info) {
+                $lang = htmlspecialchars($lang, ENT_QUOTES);
+                $orgName = htmlspecialchars($info['name'], ENT_QUOTES);
+                $orgDisplayname = htmlspecialchars($info['displayname'], ENT_QUOTES);
+                $orgUrl = htmlspecialchars($info['url'], ENT_QUOTES);
                 $organizationInfoNames[] = <<<ORGANIZATION_NAME
-       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
+       <md:OrganizationName xml:lang="{$lang}">{$orgName}</md:OrganizationName>
 ORGANIZATION_NAME;
                 $organizationInfoDisplaynames[] = <<<ORGANIZATION_DISPLAY
-       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
+       <md:OrganizationDisplayName xml:lang="{$lang}">{$orgDisplayname}</md:OrganizationDisplayName>
 ORGANIZATION_DISPLAY;
                 $organizationInfoUrls[] = <<<ORGANIZATION_URL
-       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+       <md:OrganizationURL xml:lang="{$lang}">{$orgUrl}</md:OrganizationURL>
 ORGANIZATION_URL;
             }
             $orgData = implode("\n", $organizationInfoNames)."\n".implode("\n", $organizationInfoDisplaynames)."\n".implode("\n", $organizationInfoUrls);
@@ -90,10 +95,13 @@ ORGANIZATIONSTR;
         if (!empty($contacts)) {
             $contactsInfo = array();
             foreach ($contacts as $type => $info) {
+                $type = htmlspecialchars($type, ENT_QUOTES);
+                $givenName = htmlspecialchars($info['givenName'], ENT_QUOTES);
+                $emailAddress = htmlspecialchars($info['emailAddress'], ENT_QUOTES);
                 $contactsInfo[] = <<<CONTACT
     <md:ContactPerson contactType="{$type}">
-        <md:GivenName>{$info['givenName']}</md:GivenName>
-        <md:EmailAddress>{$info['emailAddress']}</md:EmailAddress>
+        <md:GivenName>{$givenName}</md:GivenName>
+        <md:EmailAddress>{$emailAddress}</md:EmailAddress>
     </md:ContactPerson>
 CONTACT;
             }
@@ -106,7 +114,7 @@ CONTACT;
             if (isset($sp['attributeConsumingService']['serviceDescription'])) {
                 $attrCsDesc = sprintf(
                     '            <md:ServiceDescription xml:lang="en">%s</md:ServiceDescription>' . PHP_EOL,
-                    $sp['attributeConsumingService']['serviceDescription']
+                    htmlspecialchars($sp['attributeConsumingService']['serviceDescription'], ENT_QUOTES)
                 );
             }
             if (!isset($sp['attributeConsumingService']['serviceName'])) {
@@ -114,12 +122,12 @@ CONTACT;
             }
             $requestedAttributeData = array();
             foreach ($sp['attributeConsumingService']['requestedAttributes'] as $attribute) {
-                $requestedAttributeStr = sprintf('            <md:RequestedAttribute Name="%s"', $attribute['name']);
+                $requestedAttributeStr = sprintf('            <md:RequestedAttribute Name="%s"', htmlspecialchars($attribute['name'], ENT_QUOTES));
                 if (isset($attribute['nameFormat'])) {
-                    $requestedAttributeStr .= sprintf(' NameFormat="%s"', $attribute['nameFormat']);
+                    $requestedAttributeStr .= sprintf(' NameFormat="%s"', htmlspecialchars($attribute['nameFormat'], ENT_QUOTES));
                 }
                 if (isset($attribute['friendlyName'])) {
-                    $requestedAttributeStr .= sprintf(' FriendlyName="%s"', $attribute['friendlyName']);
+                    $requestedAttributeStr .= sprintf(' FriendlyName="%s"', htmlspecialchars($attribute['friendlyName'], ENT_QUOTES));
                 }
                 if (isset($attribute['isRequired'])) {
                     $requestedAttributeStr .= sprintf(' isRequired="%s"', $attribute['isRequired'] === true ? 'true' : 'false');
@@ -132,6 +140,7 @@ CONTACT;
                         $attribute['attributeValue'] = array($attribute['attributeValue']);
                     }
                     foreach ($attribute['attributeValue'] as $attrValue) {
+                        $attrValue = htmlspecialchars($attrValue, ENT_QUOTES);
                         $reqAttrAuxStr .=<<<ATTRIBUTEVALUE
 
                 <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">{$attrValue}</saml:AttributeValue>
@@ -144,10 +153,11 @@ ATTRIBUTEVALUE;
             }
 
             $requestedAttributeStr = implode(PHP_EOL, $requestedAttributeData);
+            $serviceName = htmlspecialchars($sp['attributeConsumingService']['serviceName'], ENT_QUOTES);
             $strAttributeConsumingService = <<<METADATA_TEMPLATE
 
         <md:AttributeConsumingService index="1">
-            <md:ServiceName xml:lang="en">{$sp['attributeConsumingService']['serviceName']}</md:ServiceName>
+            <md:ServiceName xml:lang="en">{$serviceName}</md:ServiceName>
 {$attrCsDesc}{$requestedAttributeStr}
         </md:AttributeConsumingService>
 METADATA_TEMPLATE;
@@ -166,14 +176,16 @@ TIME_TEMPLATE;
 
         $spEntityId = htmlspecialchars($sp['entityId'], ENT_QUOTES);
         $acsUrl = htmlspecialchars($sp['assertionConsumerService']['url'], ENT_QUOTES);
+        $acsBinding = htmlspecialchars($sp['assertionConsumerService']['binding'], ENT_QUOTES);
+        $nameIdFormat = htmlspecialchars($sp['NameIDFormat'], ENT_QUOTES);
         $metadata = <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      {$timeStr}
                      entityID="{$spEntityId}">
     <md:SPSSODescriptor AuthnRequestsSigned="{$strAuthnsign}" WantAssertionsSigned="{$strWsign}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-{$sls}        <md:NameIDFormat>{$sp['NameIDFormat']}</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="{$sp['assertionConsumerService']['binding']}"
+{$sls}        <md:NameIDFormat>{$nameIdFormat}</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="{$acsBinding}"
                                      Location="{$acsUrl}"
                                      index="1" />{$strAttributeConsumingService}
     </md:SPSSODescriptor>{$strOrganization}{$strContacts}

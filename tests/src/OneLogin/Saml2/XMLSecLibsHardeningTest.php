@@ -263,10 +263,10 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
         $response = new OneLogin_Saml2_Response($this->getSettings(), base64_encode($legacy));
         $this->assertTrue($response->encrypted);
 
-        $this->assertResponseRejected($legacy, $noRSA15, OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
+        $this->assertResponseRejected($legacy, $noRSA15, OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE);
 
         $xml = $this->buildEncryptedResponse(self::ASSERTION, XMLSecurityKey::AES256_CBC, XMLSecurityKey::RSA_1_5);
-        $this->assertResponseRejected($xml, $noRSA15, OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
+        $this->assertResponseRejected($xml, $noRSA15, OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE);
 
         $dataAlgorithms = array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC);
         foreach ($dataAlgorithms as $dataAlgorithm) {
@@ -300,8 +300,8 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
             $response->getNameId();
             $this->fail('OneLogin_Saml2_ValidationError was not raised');
         } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage());
-            $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $e->getCode());
+            $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $e->getMessage());
+            $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
         }
     }
 
@@ -330,7 +330,7 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
             $this->assertSame('subject-nameid', $response->getNameId());
 
             if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
-                $this->assertResponseRejected($xml, $this->getSettings(array('allowRSA15KeyTransport' => false)), OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
+                $this->assertResponseRejected($xml, $this->getSettings(array('allowRSA15KeyTransport' => false)), OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE);
             }
         }
     }
@@ -360,8 +360,8 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
                         $response->getNameId();
                         $this->fail('OneLogin_Saml2_ValidationError was not raised: '.$name);
                     } catch (OneLogin_Saml2_ValidationError $e) {
-                        $this->assertEquals('Unsupported or not allowed key transport algorithm', $e->getMessage(), $name);
-                        $this->assertEquals(OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR, $e->getCode(), $name);
+                        $this->assertEquals(OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE, $e->getMessage(), $name);
+                        $this->assertEquals(OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode(), $name);
                     }
                 }
             }
@@ -558,7 +558,7 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame(array(true, null), $this->validateLogoutRequest($request, array()));
         $this->assertSame(
-            array(false, 'Unsupported or not allowed key transport algorithm'),
+            array(false, OneLogin_Saml2_Utils::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE),
             $this->validateLogoutRequest($request, array('allowRSA15KeyTransport' => false))
         );
 
@@ -682,12 +682,11 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
 
         $plaintext = $doctype.str_replace('forged-nameid', '&xxe;', self::ASSERTION);
         $xml = $this->buildEncryptedResponse($plaintext, XMLSecurityKey::AES128_CBC, XMLSecurityKey::RSA_OAEP_MGF1P);
-        try {
-            new OneLogin_Saml2_Response($this->getSettings(), base64_encode($xml));
-            $assertionError = null;
-        } catch (OneLogin_Saml2_ValidationError $e) {
-            $assertionError = $e;
-        }
+        // Not thrown by the constructor: isValid() reports it
+        $response = new OneLogin_Saml2_Response($this->getSettings(), base64_encode($xml));
+        $this->assertFalse($response->encrypted);
+        $this->assertFalse($response->isValid());
+        $assertionError = $response->getErrorException();
 
         $plaintext = $doctype.'<saml:NameID xmlns:saml="'.OneLogin_Saml2_Constants::NS_SAML.'">&xxe;</saml:NameID>';
         list($cipherValue, $keyCipherValue) = $this->encryptForSP($plaintext, XMLSecurityKey::AES128_CBC, XMLSecurityKey::RSA_OAEP_MGF1P);
@@ -1318,6 +1317,9 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * The EncryptedAssertion is rejected while decrypting it: the constructor does not throw,
+     * the assertion is not available and isValid() reports the OneLogin_Saml2_ValidationError.
+     *
      * @param string                  $xml      SAML Response
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param int                     $code     Expected OneLogin_Saml2_ValidationError code
@@ -1326,13 +1328,13 @@ class OneLogin_Saml2_XMLSecLibsHardeningTest extends PHPUnit_Framework_TestCase
      */
     private function assertResponseRejected($xml, OneLogin_Saml2_Settings $settings, $code, $message, $name = '')
     {
-        try {
-            new OneLogin_Saml2_Response($settings, base64_encode($xml));
-            $this->fail('OneLogin_Saml2_ValidationError was not raised: '.$name);
-        } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertEquals($message, $e->getMessage(), $name);
-            $this->assertEquals($code, $e->getCode(), $name);
-        }
+        $response = new OneLogin_Saml2_Response($settings, base64_encode($xml));
+        $this->assertFalse($response->encrypted, $name);
+        $this->assertFalse($response->isValid(), $name);
+        $error = $response->getErrorException();
+        $this->assertInstanceOf('OneLogin_Saml2_ValidationError', $error, $name);
+        $this->assertEquals($message, $error->getMessage(), $name);
+        $this->assertEquals($code, $error->getCode(), $name);
     }
 
     /**

@@ -167,30 +167,7 @@ class OneLogin_Saml2_LogoutResponse
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check destination
-                if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (empty($destination)) {
-                        if (!$security['relaxDestinationValidation']) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The LogoutResponse has an empty Destination value",
-                                OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
-                            );
-                        }
-                    } else {
-                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
-                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
-                            $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
-                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
-
-                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
-                                throw new OneLogin_Saml2_ValidationError(
-                                    "The LogoutResponse was received at $currentURL instead of $destination",
-                                    OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                                );
-                            }
-                        }
-                    }
-                }
+                OneLogin_Saml2_Utils::checkDestination($this->document, $security, $currentURL, 'LogoutResponse');
 
                 if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
                     throw new OneLogin_Saml2_ValidationError(
@@ -249,7 +226,8 @@ class OneLogin_Saml2_LogoutResponse
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
 
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
-        $destination = $this->_settings->getIdPSLOResponseUrl();
+        $destination = htmlspecialchars($this->_settings->getIdPSLOResponseUrl(), ENT_QUOTES);
+        $inResponseTo = htmlspecialchars((string) $inResponseTo, ENT_QUOTES);
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"

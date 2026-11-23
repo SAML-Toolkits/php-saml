@@ -14,6 +14,11 @@ class OneLogin_Saml2_Utils
     const DECRYPTION_FAILED_MESSAGE = 'Failure decrypting Data';
 
     /**
+     * Message of the OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED error (same prefix as php-saml 3.x and 4.x)
+     */
+    const RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE = 'RSA-1.5 key transport is disabled. Enable the allowRSA15KeyTransport security setting to accept it';
+
+    /**
      * @var array Transforms accepted on a received Signature Reference. SAML only
      *            needs enveloped-signature plus canonicalization (XPath/XSLT are rejected).
      */
@@ -1263,6 +1268,63 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * Checks the Destination attribute of the root element of a SAML message
+     * (Response, LogoutRequest or LogoutResponse) against the URL where the
+     * message was received.
+     *
+     * The check depends on these security settings:
+     *  - requireDestination: a message with no Destination attribute is rejected.
+     *  - relaxDestinationValidation: an empty Destination attribute is accepted.
+     *  - destinationStrictlyMatches: the Destination must be the current URL
+     *    and not only start with it.
+     *
+     * @param DOMDocument $dom        The SAML message as XML
+     * @param array       $security   The security settings
+     * @param string      $currentURL The URL where the message was received (routed URL)
+     * @param string      $type       The name of the message, used in the error messages
+     *
+     * @return void
+     *
+     * @throws OneLogin_Saml2_ValidationError
+     */
+    public static function checkDestination(DOMDocument $dom, array $security, $currentURL, $type = 'response')
+    {
+        if (!$dom->documentElement->hasAttribute('Destination')) {
+            if (!empty($security['requireDestination'])) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The $type has no Destination value",
+                    OneLogin_Saml2_ValidationError::MISSING_DESTINATION
+                );
+            }
+            return;
+        }
+
+        $destination = trim($dom->documentElement->getAttribute('Destination'));
+        if (empty($destination)) {
+            if (empty($security['relaxDestinationValidation'])) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The $type has an empty Destination value",
+                    OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
+                );
+            }
+            return;
+        }
+
+        $strictlyMatches = !empty($security['destinationStrictlyMatches']);
+        $urlComparisonLength = $strictlyMatches ? strlen($destination) : strlen($currentURL);
+        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
+            $currentURLNoRouted = self::getSelfURLNoQuery();
+            $urlComparisonLength = $strictlyMatches ? strlen($destination) : strlen($currentURLNoRouted);
+            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
+                throw new OneLogin_Saml2_ValidationError(
+                    "The $type was received at $currentURL instead of $destination",
+                    OneLogin_Saml2_ValidationError::WRONG_DESTINATION
+                );
+            }
+        }
+    }
+
+    /**
      * Decrypts an encrypted element.
      *
      * @param DOMElement     $encryptedData          The encrypted data.
@@ -1478,6 +1540,12 @@ class OneLogin_Saml2_Utils
             }
             $keyMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedKey)->item(0);
             if ($keyMethod === null || !in_array($keyMethod->getAttribute('Algorithm'), $keyAlgorithms, true)) {
+                if ($keyMethod !== null && $keyMethod->getAttribute('Algorithm') === XMLSecurityKey::RSA_1_5) {
+                    throw new OneLogin_Saml2_ValidationError(
+                        self::RSA15_KEY_TRANSPORT_NOT_ALLOWED_MESSAGE,
+                        OneLogin_Saml2_ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                    );
+                }
                 throw new OneLogin_Saml2_ValidationError(
                     'Unsupported or not allowed key transport algorithm',
                     OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR

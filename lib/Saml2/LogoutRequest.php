@@ -110,10 +110,10 @@ class OneLogin_Saml2_LogoutRequest
                 $nameIdNameQualifier
             );
 
-            $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
+            $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>".htmlspecialchars($sessionIndex, ENT_QUOTES)."</samlp:SessionIndex>" : "";
 
             $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
-            $destination = $this->_settings->getIdPSLOUrl();
+            $destination = htmlspecialchars($this->_settings->getIdPSLOUrl(), ENT_QUOTES);
             $logoutRequest = <<<LOGOUTREQUEST
 <samlp:LogoutRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -395,30 +395,7 @@ LOGOUTREQUEST;
                 }
 
                 // Check destination
-                if ($dom->documentElement->hasAttribute('Destination')) {
-                    $destination = $dom->documentElement->getAttribute('Destination');
-                    if (empty($destination)) {
-                        if (!$security['relaxDestinationValidation']) {
-                            throw new OneLogin_Saml2_ValidationError(
-                                "The LogoutRequest has an empty Destination value",
-                                OneLogin_Saml2_ValidationError::EMPTY_DESTINATION
-                            );
-                        }
-                    } else {
-                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
-                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
-                            $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
-                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
-
-                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
-                                throw new OneLogin_Saml2_ValidationError(
-                                    "The LogoutRequest was received at $currentURL instead of $destination",
-                                    OneLogin_Saml2_ValidationError::WRONG_DESTINATION
-                                );
-                            }
-                        }
-                    }
-                }
+                OneLogin_Saml2_Utils::checkDestination($dom, $security, $currentURL, 'LogoutRequest');
 
                 // Check issuer
                 $issuer = static::getIssuer($dom);
