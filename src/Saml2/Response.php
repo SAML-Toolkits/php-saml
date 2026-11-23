@@ -77,11 +77,12 @@ class Response
     private $_error;
 
     /**
-     * If the message was rejected before decrypting it, this var has the cause (reported by isValid)
+     * If the message was rejected before or while decrypting it (invalid message signature,
+     * or encryption algorithm not allowed by the settings), this var has the cause (reported by isValid)
      *
      * @var Exception|null
      */
-    private $_messageSignatureError;
+    private $_preDecryptionError;
 
     /**
      * If the signature of the message was already validated
@@ -133,15 +134,24 @@ class Response
                 $this->validateMessageSignatureBeforeDecryption();
             } catch (Throwable $e) {
                 // If the validation fails, isValid() reports the cause
-                $this->_messageSignatureError = $e instanceof Exception ? $e : new ValidationError(
+                $this->_preDecryptionError = $e instanceof Exception ? $e : new ValidationError(
                     "Signature validation failed. SAML Response rejected",
                     ValidationError::INVALID_SIGNATURE
                 );
                 return;
             }
-            $this->decryptedDocument = clone $this->document;
+            try {
+                $this->decryptedDocument = $this->decryptAssertion(clone $this->document);
+            } catch (Throwable $e) {
+                // If the decryption fails (no private key, algorithm not allowed, decryption error...)
+                // isValid() reports the cause. The assertion is not available.
+                $this->_preDecryptionError = $e instanceof Exception ? $e : new ValidationError(
+                    XMLSecurityKey::DECRYPTION_FAILURE,
+                    ValidationError::DECRYPTION_FAILED
+                );
+                return;
+            }
             $this->encrypted = true;
-            $this->decryptedDocument = $this->decryptAssertion($this->decryptedDocument);
         }
     }
 
@@ -215,9 +225,9 @@ class Response
     {
         $this->_error = null;
         try {
-            // The message was rejected before decrypting it
-            if ($this->_messageSignatureError !== null) {
-                throw $this->_messageSignatureError;
+            // The message was rejected before or while decrypting it
+            if ($this->_preDecryptionError !== null) {
+                throw $this->_preDecryptionError;
             }
 
             // Check SAML version
@@ -528,6 +538,13 @@ class Response
                     );
                 }
             }
+
+            // Once the validation is done, if there is an EncryptedID we can decrypt it here so if it is
+            // using a not allowed method, the decryption errors will be reported here
+            if ($this->_queryAssertion('/saml:Subject/saml:EncryptedID/xenc:EncryptedData')->length > 0) {
+                $this->getNameIdData();
+            }
+
             return true;
         } catch (Exception $e) {
             $this->_error = $e;
@@ -1265,14 +1282,14 @@ class Response
 
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
-        if (!$objKey = $objenc->locateKey()) {
+        if (!$objKey = Utils::locateDecryptionKey($objenc)) {
             throw new ValidationError(
                 "Unknown algorithm",
                 ValidationError::KEY_ALGORITHM_ERROR
             );
         }
 
-        $objKeyInfo = $objenc->locateKeyInfo($objKey);
+        $objKeyInfo = Utils::locateDecryptionKeyInfo($objenc, $objKey);
 
         // Failures from here depend on the decrypted bytes: report them all the same way
         $useInternalErrors = libxml_use_internal_errors(true);
@@ -1370,7 +1387,7 @@ class Response
         $encData = $encryptedData;
         $objenc->setNode($encData);
         $objenc->type = $encData->getAttribute("Type");
-        if (!$objKey = $objenc->locateKey()) {
+        if (!$objKey = Utils::locateDecryptionKey($objenc)) {
             throw new ValidationError(
                 "Unknown algorithm",
                 ValidationError::KEY_ALGORITHM_ERROR
@@ -1378,7 +1395,7 @@ class Response
         }
 
         $inputKey = null;
-        if ($objKeyInfo = $objenc->locateKeyInfo($objKey)) {
+        if ($objKeyInfo = Utils::locateDecryptionKeyInfo($objenc, $objKey)) {
             if ($objKeyInfo->isEncrypted) {
                 $objKeyInfo->loadKey($pem, false, false);
                 $inputKey = $objKeyInfo;

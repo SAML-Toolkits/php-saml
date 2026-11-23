@@ -208,6 +208,35 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * An encryption algorithm not allowed by the settings is reported as an error, not thrown
+     *
+     * @covers OneLogin\Saml2\Auth::processResponse
+     */
+    public function testProcessResponseEncryptionAlgorithmNotAllowed()
+    {
+        $cases = array(
+            // aes128-cbc EncryptedAssertion
+            array('valid_encrypted_assertion.xml.base64', array('allowRSA15KeyTransport' => true, 'allowCBCEncryption' => false)),
+            // rsa-1_5 EncryptedID
+            array('response_encrypted_nameid.xml.base64', array()),
+        );
+        foreach ($cases as $case) {
+            list($file, $security) = $case;
+            $settingsInfo = $this->_settingsInfo;
+            $settingsInfo['security'] = array_merge(isset($settingsInfo['security']) ? $settingsInfo['security'] : array(), $security);
+            $auth = new Auth($settingsInfo);
+
+            $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/' . $file);
+            $auth->processResponse();
+
+            $this->assertFalse($auth->isAuthenticated(), $file);
+            $this->assertEquals(array('invalid_response'), $auth->getErrors(), $file);
+            $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $auth->getLastErrorException()->getCode(), $file);
+        }
+        unset($_POST['SAMLResponse']);
+    }
+
+    /**
      * Tests the processResponse method of the Auth class
      * Case Response with an EncryptedAssertion that is not signed when signed messages
      * are required: it is reported as an invalid response instead of raising an

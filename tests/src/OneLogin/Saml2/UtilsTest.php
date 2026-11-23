@@ -1757,8 +1757,12 @@ class UtilsTest extends \PHPUnit\Framework\TestCase
         try {
             Utils::decryptElement($encryptedData, $seckey, true, false, false);
             $this->fail('Exception was not raised');
-        } catch (Exception $e) {
-            $this->assertEquals("Data encryption algorithm is not allowed: '" . XMLSecurityKey::AES128_CBC . "'", $e->getMessage());
+        } catch (ValidationError $e) {
+            $this->assertSame(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
+            $this->assertEquals(
+                "Data encryption algorithm is not allowed: '" . XMLSecurityKey::AES128_CBC . "'. Enable the allowCBCEncryption security setting to accept it",
+                $e->getMessage()
+            );
         }
 
         // AES-GCM is still accepted
