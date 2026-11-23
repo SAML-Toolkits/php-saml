@@ -1277,7 +1277,7 @@ class Utils
         $enc->setNode($encryptedData);
         $enc->type = $encryptedData->getAttribute("Type");
 
-        $symmetricKey = $enc->locateKey($encryptedData);
+        $symmetricKey = self::locateDecryptionKey($enc, $encryptedData);
         if (!$symmetricKey) {
             throw new ValidationError(
                 'Could not locate key algorithm in encrypted data.',
@@ -1285,7 +1285,7 @@ class Utils
             );
         }
 
-        $symmetricKeyInfo = $enc->locateKeyInfo($symmetricKey);
+        $symmetricKeyInfo = self::locateDecryptionKeyInfo($enc, $symmetricKey);
         if (!$symmetricKeyInfo) {
             throw new ValidationError(
                 "Could not locate <dsig:KeyInfo> for the encrypted key.",
@@ -1725,6 +1725,71 @@ class Utils
         }
 
         return $enc;
+    }
+
+    /**
+     * Locates the data encryption key (algorithm) of an EncryptedData node,
+     * enforcing the algorithm policy of the decryption context (allowCBCEncryption).
+     *
+     * @param XMLSecEnc    $enc  Decryption context, see createDecryptionContext
+     * @param DomNode|null $node The EncryptedData node, the node of the context if null
+     *
+     * @return XMLSecurityKey|null
+     *
+     * @throws ValidationError ENCRYPTION_ALGORITHM_NOT_ALLOWED if the algorithm is not allowed
+     * @throws Exception
+     */
+    public static function locateDecryptionKey(XMLSecEnc $enc, $node = null)
+    {
+        try {
+            return $enc->locateKey($node);
+        } catch (Exception $e) {
+            throw self::toEncryptionAlgorithmError($e);
+        }
+    }
+
+    /**
+     * Locates the KeyInfo of a data encryption key (resolving its EncryptedKey),
+     * enforcing the algorithm policy of the decryption context (allowRSA15KeyTransport).
+     *
+     * @param XMLSecEnc      $enc Decryption context, see createDecryptionContext
+     * @param XMLSecurityKey $key The data encryption key, see locateDecryptionKey
+     *
+     * @return XMLSecurityKey|null
+     *
+     * @throws ValidationError ENCRYPTION_ALGORITHM_NOT_ALLOWED if the algorithm is not allowed
+     * @throws Exception
+     */
+    public static function locateDecryptionKeyInfo(XMLSecEnc $enc, XMLSecurityKey $key)
+    {
+        try {
+            return $enc->locateKeyInfo($key);
+        } catch (Exception $e) {
+            throw self::toEncryptionAlgorithmError($e);
+        }
+    }
+
+    /**
+     * Converts the exception raised by xmlseclibs when its algorithm policy rejects the
+     * encryption algorithm selected by the message into a ValidationError with the
+     * ENCRYPTION_ALGORITHM_NOT_ALLOWED code. Any other exception is returned unchanged.
+     *
+     * @param Exception $e
+     *
+     * @return Exception
+     */
+    private static function toEncryptionAlgorithmError(Exception $e)
+    {
+        $message = $e->getMessage();
+        if (strpos($message, 'RSA-1.5 key transport is disabled') === 0) {
+            $message .= ". Enable the allowRSA15KeyTransport security setting to accept it";
+        } elseif (strpos($message, 'Data encryption algorithm is not allowed') === 0) {
+            $message .= ". Enable the allowCBCEncryption security setting to accept it";
+        } elseif (strpos($message, 'Key transport algorithm is not allowed') !== 0) {
+            return $e;
+        }
+
+        return new ValidationError($message, ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED);
     }
 
     /**
