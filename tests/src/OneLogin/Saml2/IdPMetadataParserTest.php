@@ -541,6 +541,46 @@ class OneLogin_Saml2_IdPMetadataParserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the getLastFetchedXMLFromUrl method of IdPMetadataParser.
+     *
+     * @covers OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl
+     * @covers OneLogin_Saml2_IdPMetadataParser::parseRemoteXML
+     */
+    public function testGetLastFetchedXMLFromUrl()
+    {
+        $url = $this->metadataFileUrl();
+        $curlOptions = array(CURLOPT_PROTOCOLS => CURLPROTO_FILE);
+
+        // The XML that parseRemoteXML retrieved is available as it was received
+        $idpInfo = $this->parseRemoteXMLWithCurlOptions($url, $curlOptions);
+        $xml = OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl();
+        $this->assertSame(file_get_contents(TEST_ROOT . '/data/metadata/idp/idp_metadata.xml'), $xml);
+        $this->assertEquals($idpInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($xml));
+
+        // parseXML and parseFileXML do not change it
+        OneLogin_Saml2_IdPMetadataParser::parseFileXML(TEST_ROOT . '/data/metadata/idp/FederationMetadata.xml');
+        $this->assertSame($xml, OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl());
+
+        // It is cleared when the request fails (the file protocol is not enabled by default)
+        try {
+            OneLogin_Saml2_IdPMetadataParser::parseRemoteXML($url);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringStartsWith('Error on parseRemoteXML. ', $e->getMessage());
+        }
+        $this->assertNull(OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl());
+
+        // A content that was retrieved but is not XML metadata is available as well
+        $notMetadataUrl = 'file://' . TEST_ROOT . '/data/customPath/certs/sp.crt';
+        try {
+            $this->parseRemoteXMLWithCurlOptions($notMetadataUrl, $curlOptions);
+        } catch (Exception $e) {
+            // The content can not be parsed
+        }
+        $this->assertSame(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt'), OneLogin_Saml2_IdPMetadataParser::getLastFetchedXMLFromUrl());
+    }
+
+    /**
      * Tests the parseRemoteXML method of IdPMetadataParser.
      * Case: CURLOPT_RETURNTRANSFER can not be disabled with the curl options, the
      *       metadata is parsed (and it is not sent to the output)

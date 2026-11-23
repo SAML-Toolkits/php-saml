@@ -8,6 +8,15 @@
 class OneLogin_Saml2_IdPMetadataParser
 {
     /**
+     * XML retrieved by the last call to parseRemoteXML, null if no XML
+     * was retrieved (parseRemoteXML was not executed yet or its last
+     * request failed).
+     *
+     * @var string|null
+     */
+    private static $_lastFetchedXMLFromUrl = null;
+
+    /**
      * Get IdP Metadata Info from URL
      *
      * This class does not validate in any way the URL that is introduced,
@@ -36,6 +45,7 @@ class OneLogin_Saml2_IdPMetadataParser
     public static function parseRemoteXML($url, $entityId = null, $desiredNameIdFormat = null, $desiredSSOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $desiredSLOBinding = OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT, $validatePeer = false, array $curlOptions = array())
     {
         $metadataInfo = array();
+        self::$_lastFetchedXMLFromUrl = null;
 
         try {
             $ch = curl_init($url);
@@ -70,6 +80,7 @@ class OneLogin_Saml2_IdPMetadataParser
 
             $xml = curl_exec($ch);
             if ($xml !== false) {
+                self::$_lastFetchedXMLFromUrl = $xml;
                 $metadataInfo = self::parseXML($xml, $entityId, $desiredNameIdFormat, $desiredSSOBinding, $desiredSLOBinding);
             } else {
                 throw new Exception(curl_error($ch), curl_errno($ch));
@@ -78,6 +89,19 @@ class OneLogin_Saml2_IdPMetadataParser
             throw new Exception('Error on parseRemoteXML. '.$e->getMessage());
         }
         return $metadataInfo;
+    }
+
+    /**
+     * Returns the XML that the last call to parseRemoteXML retrieved from
+     * the URL, as it was received (it is available even if the XML could
+     * not be parsed as IdP metadata).
+     *
+     * @return string|null The XML, or null if parseRemoteXML was not
+     *                     executed yet or its last request failed
+     */
+    public static function getLastFetchedXMLFromUrl()
+    {
+        return self::$_lastFetchedXMLFromUrl;
     }
 
     /**
