@@ -247,7 +247,7 @@ class OneLogin_Saml2_Utils
             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
 
-        $x509cert = str_replace(array("\x0d", "\r", "\n", " "), '', $x509cert);
+        $x509cert = str_replace(array("\x0d", "\r", "\n", "\t", " "), '', $x509cert);
 
         if ($heads && $x509cert !== '') {
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
