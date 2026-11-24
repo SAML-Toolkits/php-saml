@@ -75,6 +75,7 @@ class ValidationError extends Exception
     const MISSING_ENCRYPTED_ELEMENT = 48;
     const MISSING_DESTINATION = 49;
     const DECRYPTION_FAILED = 50;
+    const ENCRYPTION_ALGORITHM_NOT_ALLOWED = 51;
 
 
     /**

@@ -517,12 +517,19 @@ $advancedSettings = array(
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
         'wantXMLValidation' => true,
 
-        // If true, SAMLResponses with an empty value at its Destination
+        // The 3 settings that follow apply to every message received:
+        // SAMLResponse, LogoutRequest and LogoutResponse.
+
+        // If true, messages without a Destination attribute
+        // will be rejected.
+        'requireDestination' => false,
+
+        // If true, messages with an empty value at its Destination
         // attribute will not be rejected for this fact.
         'relaxDestinationValidation' => false,
 
         // If true, Destination URL should strictly match to the address to
-        // which the response has been sent.
+        // which the message has been sent.
         // Notice that if 'relaxDestinationValidation' is true an empty Destination
         // will be accepted.
         'destinationStrictlyMatches' => false,
@@ -1505,6 +1512,7 @@ Auxiliary class that contains several methods
 Auxiliary class that contains several methods to retrieve and process IdP metadata
 
  * `parseRemoteXML` - Get IdP Metadata Info from URL.
+ * `getLastFetchedXMLFromUrl` - Returns the XML retrieved by the last call to `parseRemoteXML`.
  * `parseFileXML` - Get IdP Metadata Info from File.
  * `parseXML` - Get IdP Metadata Info from XML.
  * `injectIntoSettings` - Inject metadata info into php-saml settings array.
@@ -1532,6 +1540,7 @@ $idpInfo = IdPMetadataParser::parseRemoteXML(
 
 An Exception is raised if one of the options is not valid. Take into account that these options can also remove the protections that the method sets (for example the allowed protocols at `CURLOPT_PROTOCOLS`), so never build them from untrusted input.
 
+After calling `parseRemoteXML`, `IdPMetadataParser::getLastFetchedXMLFromUrl()` returns the XML that was retrieved from the URL, for example to show it or to store it. It returns null if the request failed.
 
 For more info, look at the source code; each method is documented and details
 about what it does and how to use it are provided. Make sure to also check the doc folder where

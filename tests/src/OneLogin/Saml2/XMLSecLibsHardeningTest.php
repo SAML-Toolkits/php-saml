@@ -27,6 +27,10 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
 
     const ASSERTION = '<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_forged_assertion" Version="2.0" IssueInstant="2014-03-29T12:01:57Z"><saml:Issuer>http://idp.example.com/</saml:Issuer><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">forged-nameid</saml:NameID></saml:Subject></saml:Assertion>';
 
+    const RSA15_NOT_ALLOWED = 'Unsupported or not allowed key transport algorithm. Enable the allowRSA15KeyTransport security setting to accept it';
+
+    const CBC_NOT_ALLOWED = 'Unsupported or not allowed data encryption algorithm. Enable the allowCBCEncryption security setting to accept it';
+
     private $_settingsInfo;
 
     /**
@@ -282,16 +286,27 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
         $response = new Response($this->getSettings(), base64_encode($legacy));
         $this->assertTrue($response->encrypted);
 
-        $this->assertResponseRejected($legacy, $noRSA15, ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
-        $this->assertResponseRejected($legacy, $noCBC, ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed data encryption algorithm');
+        $this->assertResponseRejected($legacy, $noRSA15, ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::RSA15_NOT_ALLOWED);
+        $this->assertResponseRejected($legacy, $noCBC, ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::CBC_NOT_ALLOWED);
 
         $xml = $this->buildEncryptedResponse(self::ASSERTION, XMLSecurityKey::AES256_GCM, XMLSecurityKey::RSA_1_5);
-        $this->assertResponseRejected($xml, $noRSA15, ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
+        $this->assertResponseRejected($xml, $noRSA15, ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::RSA15_NOT_ALLOWED);
 
         $cbcAlgorithms = array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC);
         foreach ($cbcAlgorithms as $dataAlgorithm) {
             $xml = $this->buildEncryptedResponse(self::ASSERTION, $dataAlgorithm, XMLSecurityKey::RSA_OAEP_MGF1P);
-            $this->assertResponseRejected($xml, $noCBC, ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed data encryption algorithm', $dataAlgorithm);
+            $this->assertResponseRejected($xml, $noCBC, ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::CBC_NOT_ALLOWED, $dataAlgorithm);
+        }
+
+        // An algorithm that is not supported is not reported as rejected by the settings
+        $unsupported = array(
+            'Unsupported or not allowed data encryption algorithm' => str_replace(XMLSecurityKey::AES128_CBC, 'http://www.w3.org/2001/04/xmlenc#kw-aes128', $legacy),
+            'Unsupported or not allowed key transport algorithm' => str_replace(XMLSecurityKey::RSA_1_5, 'http://www.w3.org/2001/04/xmlenc#rsa-unknown', $legacy),
+        );
+        foreach ($unsupported as $message => $xml) {
+            $this->assertNotSame($legacy, $xml);
+            $this->assertResponseRejected($xml, $this->getSettings(), ValidationError::KEY_ALGORITHM_ERROR, $message);
+            $this->assertResponseRejected($xml, $noRSA15, ValidationError::KEY_ALGORITHM_ERROR, $message);
         }
 
         $gcmAlgorithms = array(XMLSecurityKey::AES128_GCM, XMLSecurityKey::AES192_GCM, XMLSecurityKey::AES256_GCM);
@@ -318,8 +333,8 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($response->getNameId());
 
         $cases = array(
-            'Unsupported or not allowed key transport algorithm' => array('allowRSA15KeyTransport' => false),
-            'Unsupported or not allowed data encryption algorithm' => array('allowCBCEncryption' => false),
+            self::RSA15_NOT_ALLOWED => array('allowRSA15KeyTransport' => false),
+            self::CBC_NOT_ALLOWED => array('allowCBCEncryption' => false),
         );
         foreach ($cases as $message => $security) {
             $response = new Response($this->getSettings($security), base64_encode($xml));
@@ -328,7 +343,7 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
                 $this->fail('ValidationError was not raised');
             } catch (ValidationError $e) {
                 $this->assertEquals($message, $e->getMessage());
-                $this->assertEquals(ValidationError::KEY_ALGORITHM_ERROR, $e->getCode());
+                $this->assertEquals(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode());
             }
         }
     }
@@ -364,10 +379,10 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
             $this->assertSame('subject-nameid', $response->getNameId(), $dataAlgorithm.' '.$keyAlgorithm);
 
             if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
-                $this->assertResponseRejected($xml, $this->getSettings(array('allowRSA15KeyTransport' => false)), ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed key transport algorithm');
+                $this->assertResponseRejected($xml, $this->getSettings(array('allowRSA15KeyTransport' => false)), ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::RSA15_NOT_ALLOWED);
             }
             if ($dataAlgorithm === XMLSecurityKey::AES128_CBC) {
-                $this->assertResponseRejected($xml, $this->getSettings(array('allowCBCEncryption' => false)), ValidationError::KEY_ALGORITHM_ERROR, 'Unsupported or not allowed data encryption algorithm');
+                $this->assertResponseRejected($xml, $this->getSettings(array('allowCBCEncryption' => false)), ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, self::CBC_NOT_ALLOWED);
             }
         }
     }
@@ -397,10 +412,10 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
 
                 $rejections = array();
                 if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
-                    $rejections[] = array('allowRSA15KeyTransport', 'Unsupported or not allowed key transport algorithm');
+                    $rejections[] = array('allowRSA15KeyTransport', self::RSA15_NOT_ALLOWED);
                 }
                 if ($dataAlgorithm === XMLSecurityKey::AES128_CBC) {
-                    $rejections[] = array('allowCBCEncryption', 'Unsupported or not allowed data encryption algorithm');
+                    $rejections[] = array('allowCBCEncryption', self::CBC_NOT_ALLOWED);
                 }
                 foreach ($rejections as $rejection) {
                     list($setting, $message) = $rejection;
@@ -411,7 +426,7 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
                         $this->fail('ValidationError was not raised: '.$name.' '.$setting);
                     } catch (ValidationError $e) {
                         $this->assertEquals($message, $e->getMessage(), $name.' '.$setting);
-                        $this->assertEquals(ValidationError::KEY_ALGORITHM_ERROR, $e->getCode(), $name.' '.$setting);
+                        $this->assertEquals(ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED, $e->getCode(), $name.' '.$setting);
                     }
                 }
             }
@@ -625,8 +640,8 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(array(true, null), $this->validateLogoutRequest($request, array()));
 
         $notAllowed = array(
-            'Unsupported or not allowed key transport algorithm' => array('allowRSA15KeyTransport' => false),
-            'Unsupported or not allowed data encryption algorithm' => array('allowCBCEncryption' => false),
+            self::RSA15_NOT_ALLOWED => array('allowRSA15KeyTransport' => false),
+            self::CBC_NOT_ALLOWED => array('allowCBCEncryption' => false),
         );
         foreach ($notAllowed as $message => $security) {
             $this->assertSame(array(false, $message), $this->validateLogoutRequest($request, $security));
@@ -1266,6 +1281,9 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * The EncryptedAssertion can not be decrypted: the constructor of the Response
+     * does not throw, the assertion is not available and isValid() reports the cause.
+     *
      * @param string             $xml      SAML Response
      * @param Settings           $settings Settings
      * @param int                $code     Expected ValidationError code
@@ -1274,13 +1292,7 @@ class XMLSecLibsHardeningTest extends \PHPUnit\Framework\TestCase
      */
     private function assertResponseRejected($xml, Settings $settings, $code, $message, $name = '')
     {
-        try {
-            new Response($settings, base64_encode($xml));
-            $this->fail('ValidationError was not raised: '.$name);
-        } catch (ValidationError $e) {
-            $this->assertEquals($message, $e->getMessage(), $name);
-            $this->assertEquals($code, $e->getCode(), $name);
-        }
+        $this->assertResponseNotDecrypted($xml, $settings, $message, $code, $name);
     }
 
     /**

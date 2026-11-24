@@ -530,6 +530,46 @@ class IdPMetadataParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests the getLastFetchedXMLFromUrl method of IdPMetadataParser.
+     *
+     * @covers OneLogin\Saml2\IdPMetadataParser::getLastFetchedXMLFromUrl
+     * @covers OneLogin\Saml2\IdPMetadataParser::parseRemoteXML
+     */
+    public function testGetLastFetchedXMLFromUrl()
+    {
+        $url = $this->metadataFileUrl();
+        $curlOptions = array(CURLOPT_PROTOCOLS => CURLPROTO_FILE);
+
+        // The XML that parseRemoteXML retrieved is available as it was received
+        $idpInfo = $this->parseRemoteXMLWithCurlOptions($url, $curlOptions);
+        $xml = IdPMetadataParser::getLastFetchedXMLFromUrl();
+        $this->assertSame(file_get_contents(TEST_ROOT . '/data/metadata/idp/idp_metadata.xml'), $xml);
+        $this->assertEquals($idpInfo, IdPMetadataParser::parseXML($xml));
+
+        // parseXML and parseFileXML do not change it
+        IdPMetadataParser::parseFileXML(TEST_ROOT . '/data/metadata/idp/FederationMetadata.xml');
+        $this->assertSame($xml, IdPMetadataParser::getLastFetchedXMLFromUrl());
+
+        // It is cleared when the request fails (the file protocol is not enabled by default)
+        try {
+            IdPMetadataParser::parseRemoteXML($url);
+            $this->fail('Exception was not raised');
+        } catch (Exception $e) {
+            $this->assertStringContainsString('Error on parseRemoteXML. ', $e->getMessage());
+        }
+        $this->assertNull(IdPMetadataParser::getLastFetchedXMLFromUrl());
+
+        // A content that was retrieved but is not XML metadata is available as well
+        $notMetadataUrl = 'file://' . TEST_ROOT . '/data/customPath/certs/sp.crt';
+        try {
+            $idpInfo = $this->parseRemoteXMLWithCurlOptions($notMetadataUrl, $curlOptions);
+        } catch (Exception $e) {
+            $idpInfo = null;
+        }
+        $this->assertSame(file_get_contents(TEST_ROOT . '/data/customPath/certs/sp.crt'), IdPMetadataParser::getLastFetchedXMLFromUrl());
+    }
+
+    /**
      * Tests the parseRemoteXML method of IdPMetadataParser.
      * Case: CURLOPT_RETURNTRANSFER can not be disabled with the curl options, the
      *       metadata is parsed (and it is not sent to the output)

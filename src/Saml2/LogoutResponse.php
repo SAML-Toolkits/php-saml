@@ -182,29 +182,8 @@ class LogoutResponse
 
                 $currentURL = Utils::getSelfRoutedURLNoQuery();
 
-                if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = $this->document->documentElement->getAttribute('Destination');
-                    if (empty($destination)) {
-                        if (!$security['relaxDestinationValidation']) {
-                            throw new ValidationError(
-                                "The LogoutResponse has an empty Destination value",
-                                ValidationError::EMPTY_DESTINATION
-                            );
-                        }
-                    } else {
-                        $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURL);
-                        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
-                            $currentURLNoRouted = Utils::getSelfURLNoQuery();
-                            $urlComparisonLength = $security['destinationStrictlyMatches'] ? strlen($destination) : strlen($currentURLNoRouted);
-                            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
-                                throw new ValidationError(
-                                    "The LogoutResponse was received at $currentURL instead of $destination",
-                                    ValidationError::WRONG_DESTINATION
-                                );
-                            }
-                        }
-                    }
-                }
+                // Check destination
+                Utils::checkDestination($this->document, $security, $currentURL, 'LogoutResponse');
 
                 if ($security['wantMessagesSigned'] && !isset($_GET['Signature'])) {
                     throw new ValidationError(
@@ -260,7 +239,8 @@ class LogoutResponse
         $this->id = Utils::generateUniqueID();
         $issueInstant = Utils::parseTime2SAML(time());
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
-        $destination = $this->_settings->getIdPSLOResponseUrl();
+        $destination = htmlspecialchars($this->_settings->getIdPSLOResponseUrl(), ENT_QUOTES);
+        $inResponseTo = htmlspecialchars((string) $inResponseTo, ENT_QUOTES);
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"

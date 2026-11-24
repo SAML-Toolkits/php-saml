@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+v3.11.0
+* Fix [#674](https://github.com/SAML-Toolkits/php-saml/issues/674) Escape the values written in the XML of the `AuthnRequest`, `LogoutRequest`, `LogoutResponse` and the SP metadata. A value with a `&`, like an IdP URL with several query parameters, produced an XML that was not well formed:
+  * `AuthnRequest`: Destination (`idp.singleSignOnService.url`), ProviderName (displayname of the organization), `sp.NameIDFormat`, the `security.requestedAuthnContext` values, `security.requestedAuthnContextComparison` and the NameID of the Subject (`nameIdValueReq`)
+  * `LogoutRequest`: Destination (`idp.singleLogoutService.url`) and SessionIndex
+  * `LogoutResponse`: Destination (`idp.singleLogoutService.responseUrl`) and InResponseTo
+  * Metadata: the organization and contact person data, `sp.NameIDFormat`, the bindings, and the name, description, requested attributes and attribute values of `sp.attributeConsumingService`
+  The URL the user is redirected to is not changed. If any of those settings was defined already escaped (`&amp;`) to get a valid XML, the escaping must be removed from the settings, otherwise the value will be escaped twice
+* Fix [#657](https://github.com/SAML-Toolkits/php-saml/issues/657) The Destination check of `Response`, `LogoutRequest` and `LogoutResponse` is done by the new `Utils::checkDestination`, so the 3 messages are validated in the same way:
+  * `security.requireDestination` now also applies to `LogoutRequest` and `LogoutResponse`: when true, a logout message with no Destination attribute is rejected with `ValidationError::MISSING_DESTINATION`
+  * The Destination of a `LogoutRequest` and a `LogoutResponse` is trimmed before it is compared, as the one of the `Response` already was. A Destination that only has whitespaces is now reported as `ValidationError::EMPTY_DESTINATION` instead of `WRONG_DESTINATION`, and `security.relaxDestinationValidation` accepts it
+* Update certificate and private_key string replacement to include tabs.
+* Add `IdPMetadataParser::getLastFetchedXMLFromUrl`, which returns the XML that the last call to `IdPMetadataParser::parseRemoteXML` retrieved from the URL (null if the request failed)
+* Several decryption error handling improvements:
+  * An encryption algorithm rejected by the `security.allowCBCEncryption` or `security.allowRSA15KeyTransport` settings is reported with the new `ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED` code, and the name of the setting that allows the algorithm is appended to the message. Before, it was reported with `ValidationError::KEY_ALGORITHM_ERROR`, which is still the code of an algorithm that is not supported
+  * An EncryptedAssertion that can not be decrypted no longer makes the `Response` constructor throw: `isValid()` returns false and `getErrorException()` has the cause. Before, the `ValidationError` was thrown by the constructor, and `Auth::processResponse` did not catch it.
+  This covers a rejected algorithm and every other decryption error of the EncryptedAssertion and of the EncryptedID inside it (`Error::PRIVATE_KEY_NOT_FOUND`, `ValidationError::DECRYPTION_FAILED`, `KEY_ALGORITHM_ERROR`, `MISSING_ENCRYPTED_ELEMENT`, `UNSUPPORTED_RETRIEVAL_METHOD`...). The assertion of such a Response is not available (`encrypted` is false), as when the signature of the message is rejected before decrypting it.
+  * `Utils::decryptElement`, `Utils::validateEncryptedDataStructure`, `Response::getNameIdData`/`getNameId` and `LogoutRequest::getNameIdData`/`getNameId` throw the `ValidationError` with the new code for a rejected algorithm. Other errors are thrown as before
+  * `LogoutRequest::isValid()` (and so `Auth::processSLO`, with the `invalid_logout_request` error) already reported a rejected algorithm in the EncryptedID; its error now has the new code
+* `Response::isValid()` decrypts the EncryptedID of a not encrypted Assertion once the signatures are validated, as `LogoutRequest::isValid()` does, so a NameID that can not be decrypted makes `isValid()` return false. Before, `isValid()` returned true and `getNameId()` (called by `Auth::processResponse`) threw the exception
+
 v3.10.0
 * Refactor Signature validation on Signed Responses with Encrypted Assertion.
 * [#667](https://github.com/SAML-Toolkits/php-saml/pull/667) HTTP-Redirect signature validation with `retrieveParametersFromServer`: SAMLRequest, SAMLResponse, RelayState, SigAlg and Signature are matched against the complete field names of the query string, instead of searched as substrings of it. A signed Logout Request/Response with one of those names inside a value or inside the name of another parameter (for example `RelayState=Signature`) is now validated; it was rejected with "Duplicate parameter in query string" or "Both SAMLRequest and SAMLResponse provided". A message signed with an empty RelayState (`RelayState=&SigAlg=...`) is now validated; its signature validation failed

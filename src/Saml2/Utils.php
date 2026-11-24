@@ -249,7 +249,7 @@ class Utils
             $x509cert = static::getStringBetween($x509cert, '-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----');
         }
 
-        $x509cert = str_replace(["\x0d", "\r", "\n", " "], '', $x509cert);
+        $x509cert = str_replace(["\x0d", "\r", "\n", "\t", " "], '', $x509cert);
 
         if ($heads && $x509cert !== '') {
             $x509cert = "-----BEGIN CERTIFICATE-----\n".chunk_split($x509cert, 64, "\n")."-----END CERTIFICATE-----\n";
@@ -272,7 +272,7 @@ class Utils
             return;
         }
 
-        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        $key = str_replace(array("\x0D", "\r", "\n", "\t"), "", $key);
         if (!empty($key)) {
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
                 $key = Utils::getStringBetween($key, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
@@ -1280,6 +1280,63 @@ class Utils
     }
 
     /**
+     * Checks the Destination attribute of the root element of a SAML message
+     * (Response, LogoutRequest or LogoutResponse) against the URL where the
+     * message was received.
+     *
+     * The check depends on these security settings:
+     *  - requireDestination: a message with no Destination attribute is rejected.
+     *  - relaxDestinationValidation: an empty Destination attribute is accepted.
+     *  - destinationStrictlyMatches: the Destination must be the current URL
+     *    and not only start with it.
+     *
+     * @param DOMDocument $dom        The SAML message as XML
+     * @param array       $security   The security settings
+     * @param string      $currentURL The URL where the message was received (routed URL)
+     * @param string      $type       The name of the message, used in the error messages
+     *
+     * @return void
+     *
+     * @throws ValidationError
+     */
+    public static function checkDestination(DOMDocument $dom, array $security, $currentURL, $type = 'response')
+    {
+        if (!$dom->documentElement->hasAttribute('Destination')) {
+            if (!empty($security['requireDestination'])) {
+                throw new ValidationError(
+                    "The $type has no Destination value",
+                    ValidationError::MISSING_DESTINATION
+                );
+            }
+            return;
+        }
+
+        $destination = trim($dom->documentElement->getAttribute('Destination'));
+        if (empty($destination)) {
+            if (empty($security['relaxDestinationValidation'])) {
+                throw new ValidationError(
+                    "The $type has an empty Destination value",
+                    ValidationError::EMPTY_DESTINATION
+                );
+            }
+            return;
+        }
+
+        $strictlyMatches = !empty($security['destinationStrictlyMatches']);
+        $urlComparisonLength = $strictlyMatches ? strlen($destination) : strlen($currentURL);
+        if (strncmp($destination, $currentURL, $urlComparisonLength) !== 0) {
+            $currentURLNoRouted = self::getSelfURLNoQuery();
+            $urlComparisonLength = $strictlyMatches ? strlen($destination) : strlen($currentURLNoRouted);
+            if (strncmp($destination, $currentURLNoRouted, $urlComparisonLength) !== 0) {
+                throw new ValidationError(
+                    "The $type was received at $currentURL instead of $destination",
+                    ValidationError::WRONG_DESTINATION
+                );
+            }
+        }
+    }
+
+    /**
      * Decrypts an encrypted element.
      *
      * @param DOMElement     $encryptedData          The encrypted data.
@@ -1452,7 +1509,9 @@ class Utils
      * @param bool       $allowRSA15KeyTransport Accept keys wrapped with rsa-1_5.
      * @param bool       $allowCBCEncryption     Accept data encrypted with CBC (unauthenticated).
      *
-     * @throws ValidationError
+     * @throws ValidationError ENCRYPTION_ALGORITHM_NOT_ALLOWED if the algorithm is rejected by
+     *                         $allowRSA15KeyTransport or $allowCBCEncryption, KEY_ALGORITHM_ERROR
+     *                         if it is not supported
      */
     public static function validateEncryptedDataStructure(DOMElement $encryptedData, $allowRSA15KeyTransport = true, $allowCBCEncryption = true)
     {
@@ -1465,8 +1524,9 @@ class Utils
         }
 
         $dataAlgorithms = array(XMLSecurityKey::AES128_GCM, XMLSecurityKey::AES192_GCM, XMLSecurityKey::AES256_GCM);
+        $cbcAlgorithms = array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC);
         if ($allowCBCEncryption) {
-            $dataAlgorithms = array_merge($dataAlgorithms, array(XMLSecurityKey::AES128_CBC, XMLSecurityKey::AES192_CBC, XMLSecurityKey::AES256_CBC, XMLSecurityKey::TRIPLEDES_CBC));
+            $dataAlgorithms = array_merge($dataAlgorithms, $cbcAlgorithms);
         }
         $keyAlgorithms = array(XMLSecurityKey::RSA_OAEP_MGF1P, XMLSecurityKey::RSA_OAEP);
         if ($allowRSA15KeyTransport) {
@@ -1479,7 +1539,15 @@ class Utils
 
         // xmlseclibs uses the first EncryptionMethod descendant, so that is the one checked
         $encMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedData)->item(0);
-        if ($encMethod === null || !in_array($encMethod->getAttribute('Algorithm'), $dataAlgorithms, true)) {
+        $dataAlgorithm = $encMethod === null ? null : $encMethod->getAttribute('Algorithm');
+        if (!in_array($dataAlgorithm, $dataAlgorithms, true)) {
+            if (in_array($dataAlgorithm, $cbcAlgorithms, true)) {
+                // Supported algorithm, rejected by the settings
+                throw new ValidationError(
+                    'Unsupported or not allowed data encryption algorithm. Enable the allowCBCEncryption security setting to accept it',
+                    ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                );
+            }
             throw new ValidationError(
                 'Unsupported or not allowed data encryption algorithm',
                 ValidationError::KEY_ALGORITHM_ERROR
@@ -1496,7 +1564,15 @@ class Utils
                 );
             }
             $keyMethod = $xpath->query('.//xenc:EncryptionMethod', $encryptedKey)->item(0);
-            if ($keyMethod === null || !in_array($keyMethod->getAttribute('Algorithm'), $keyAlgorithms, true)) {
+            $keyAlgorithm = $keyMethod === null ? null : $keyMethod->getAttribute('Algorithm');
+            if (!in_array($keyAlgorithm, $keyAlgorithms, true)) {
+                if ($keyAlgorithm === XMLSecurityKey::RSA_1_5) {
+                    // Supported algorithm, rejected by the settings
+                    throw new ValidationError(
+                        'Unsupported or not allowed key transport algorithm. Enable the allowRSA15KeyTransport security setting to accept it',
+                        ValidationError::ENCRYPTION_ALGORITHM_NOT_ALLOWED
+                    );
+                }
                 throw new ValidationError(
                     'Unsupported or not allowed key transport algorithm',
                     ValidationError::KEY_ALGORITHM_ERROR
