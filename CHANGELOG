@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-v3.11.0
+v3.11.1
 * Fix [#674](https://github.com/SAML-Toolkits/php-saml/issues/674) Escape the values written in the XML of the `AuthnRequest`, `LogoutRequest`, `LogoutResponse` and the SP metadata. A value with a `&`, like an IdP URL with several query parameters, produced an XML that was not well formed:
   * `AuthnRequest`: Destination (`idp.singleSignOnService.url`), ProviderName (displayname of the organization), `sp.NameIDFormat`, the `security.requestedAuthnContext` values, `security.requestedAuthnContextComparison` and the NameID of the Subject (`nameIdValueReq`)
   * `LogoutRequest`: Destination (`idp.singleLogoutService.url`) and SessionIndex
