@@ -273,10 +273,11 @@ METADATA_TEMPLATE;
         }
 
         $signing = $xml->getElementsByTagName('KeyDescriptor')->item(0);
-        $signing->setAttribute('use', 'signing');
         $signing->appendChild($keyInfo);
 
         if ($wantsEncrypted === true) {
+            $signing->setAttribute('use', 'signing');
+
             $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
             $encryption->setAttribute('use', 'encryption');
 
